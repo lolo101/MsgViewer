@@ -1,0 +1,104 @@
+<html>
+    <body>
+        <font face="Verdana">
+        <center>
+            <h1>Einführung in das Multilanguage System</h1>
+        </center>
+        
+Dieser Dialog kann für jeden von <code>BaseDialog</code>, oder <code>BaseDialogDialog</code> abgeleiteten Dialog mit Hilfe
+der <b>F12</b> Taste geöffnet werden.
+<p>
+Auf der Linken Seite werden nun die im Dialog enthaltenen Elemente angezeigt, die automatisch gefunden wurden.
+Auf der rechten Seite können nun die Übersetzungen eingepflegt werden.
+<p>
+Die Übersetztungen werden nun in einer Datei (<b><i>APPHOME</i>/translations/at.redeye.FrameWork.base.translation.TranslationDialog_de.properties</b>)
+gespeichert. Der Dateiname ist der Name der Klasse, sowie das entsprechende Sprachkürzel.
+<p>
+Um die Übersetzung in die Jar Datei zu übernehmen, muß die Übersetzungsdatei in das selbe Verzeichnis
+kopiert werden, in dem sich auch die Klasse befindet. Alternativ kann die Datei
+auch im Verzeichnis <b>translations</b>, oder <b>resources/translations</b> abgelegt werden.
+<p>
+<center>
+    <img src="/at/redeye/FrameWork/base/translation/resources/Help/naming.png">
+</center>
+<p>
+Die Datei muß allerdings umbenannt werden und zwar genau so, wie die Klasse heißt + die entsprechende Sprachendung.
+</p>
+
+<h2>Verwendung im Programm</h2>
+
+Die Implemtierungssprache muß nicht im gesammten Programm konsitent sein. Die
+Implementierungssprache muß nur für den aktuellen Dialog konsistent sein.
+<p>
+Die Implementierungssprache wird im Konstruktor mit Hilfe der Funktion
+<pre>
+    setBaseLanguage(String language);
+</pre>
+festgelegt. Wird die implementierungssprache im Konstruktor nicht gesetzt, so wird 
+der Wert der <b>Root</b> klasse übernommen. (Siehe auch: <code>Root.getBaseLanguage()</code>)
+<p>
+Wurde die globale Implementierungssprache in der Root Klasse nicht festgelegt, so wird automatisch
+englisch (<b>en</b>) verwendet.
+<p>
+Für die Element, die automatisch vom Übersetzungsdialog gefunden werden, muß der
+Programmierer gar nichts weiter tun.
+</p>
+<p><i>
+        Funktionieren tut, das folgendermaßem: die Funktion doLayout() ist im BaseDialog Überladen
+        und bevor doLayout() von der Parentklasse aufgerufen wird, wird in dem Dialog nach
+        allen Label, Buttons, etc... gesucht und der Text, wenn eine Übersetztung zur
+        verfügung steht ausgetauscht.<br>
+        Somit können nur Element automatisch gefunden und übersetzt werden, die
+        im Konstruktor erzeugt wurden und an die Maske angebunden sind.
+    </i>
+<p>
+Werden allerdings Texte dynamisch erzeugt, oder geändert, so muß die Funktion <code>MlM()</code>
+verwendet werden. zb:
+</p>
+<pre>
+    jLabelFoo.setText( <b>MlM</b>( "Speichern" ));
+</pre>
+
+
+<h2>Ohne Basisdialog</h2>
+
+Soll eine Klasse übersetzt werden, die nicht vom BaseDialog abgeleitet worden ist,
+so muß vorher in der Klasse bei allen Texten <code>Root.MlM()</code> verwendet werden.
+Um die Übersetzungstexte für die Klasse zu finden, kann mit
+<pre>
+    Root.loadMlM4Class( Object obj, String impl_locale )
+</pre>
+eine Überstzungsdatei geladen werden.<br>
+<b>impl_locale</b> ist dabei die Implementierungssprache.
+
+<h2>Globale übersetzungsdatei</h2>
+Findet <code>BaseDialog.MlM()</code> keine Überestzung, so wird <b>Root.MlM()</b>
+aufgerufen. Und Root sucht seinen Informationen in der globalen Überstzungsdatei,
+die entweder <b><i>APPHOME</i>/translations/trans_en.properties</b> 
+heißt, oder an einem Resourcepfad zu finden ist, der mit
+<pre>
+    Root.setLanguageTranslationResourcePath(String path)
+</pre>
+festgelegt wurde. Für diesen Pfad gibt es keinen standard Wert.
+Über diese globale Übersetzungsdatei ließe sich nur eine einige
+Übersetzungsdatei pflegen.
+
+<h2>Bonecollector</h2>
+Alle Nachrichten, die nicht übersetzt werden konnten, werden automatisch
+beim Beenden der Applikation in die Datei
+<b><i>APPHOME</i>/translations/trans_en_US.missing.properties</b> geschrieben.
+Je nach ausgewählter Sprache natürlich. Dies sollte das suchen und finden
+fehlender Texte erleichtern.
+
+<h2>Hilfetexte</h2>
+
+Auch Hilfetexte können lokalisiert werden.
+Dazu muß nur die HTML Datei nach dem üblichen Schema angepasst werden.
+
+<br/>
+<br/>
+<br/>
+<br/>
+        </font>
+    </body>
+</html>

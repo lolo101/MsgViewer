@@ -1,0 +1,201 @@
+/*
+ * This is a RTF Parser according to the specification of Microsoft http://support.microsoft.com/kb/269575
+ *
+ * The goal of this parser is ignoring all RTF Text and let come the hidden HTML Code come out again
+ */
+
+options {
+    STATIC=false;
+}
+
+
+PARSER_BEGIN(RTFParser)
+package at.redeye.MSGViewer.rtfparser;
+import java.util.ArrayList;
+import java.util.List;
+
+
+public class RTFParser {
+
+    RTFGroup current_group = null;
+    List<RTFGroup> groups = new ArrayList();
+    String characterSet = "";
+
+    public List<RTFGroup> getGroups()
+    {
+        return groups;
+    }
+
+    public String getHTML()
+    {
+        StringBuilder sb = new StringBuilder();
+
+        for( RTFGroup group : groups )
+        {
+            if( !group.isEmptyText() )
+            {
+                String content = group.getTextContent();
+                sb.append(content);
+
+                if( content.contains("<head>") )
+                {
+/*
+                    if( !characterSet.isEmpty() )
+                    {
+                        sb.append("\n<meta http-equiv=\"Content-Type\" content=\"text/html charset=");
+                        sb.append(codePage2Iso(characterSet));
+                        sb.append("\">");
+                    }
+*/
+                }
+            }
+        }
+
+        return sb.toString();
+    }
+
+    String codePage2Iso( String codepage )
+    {
+        if( codepage.equals( "1252" ) )
+            return "iso-8859-1";
+
+        return codepage;
+    }
+
+}
+PARSER_END(RTFParser)
+
+SKIP : { " " | "\n" | "\r" | "\r\n" }
+
+
+<DEFAULT> TOKEN :
+{
+   < C_ESC : "\\" >
+ | < C_BRACE_OPEN : "\\" "{" >
+ | < C_BRACE_CLOSE : "\\" "}" >
+ | < C_NONBREAKING_SPACE : "\\~" >
+ | < C_OPTIONAL_HYPHEN : "\\-" >
+ | < C_NONBREAKING_HYPHEN : "\\_" >
+ | < C_GROUP_START : "{" >
+ | < C_GROUP_END : "}" >
+ | < C_BACKSLASH : "\\\\" >
+ | < C_ESC_CHAR : "\\" "'" ( ["A"-"Z","a"-"z","0"-"9"] ){2} >
+ | < C_CODEPAGE : "\\ansicpg" ( [ "0"-"9"] ) {4} >
+ | < C_COMMAND : "\\" ( ["A"-"Z","a"-"z","0"-"9"] )+ >
+ | < C_SKIP_NEXT : "\\" "*" >
+ | < STRING: (~["\\","\n","}","{"])+> 
+}
+
+/*
+<VALUE> TOKEN:
+{
+    < STRING: (~["\\","\n","}","{"])*>:DEFAULT
+}
+*/
+
+void parse() : {}
+{
+    group() ( group() )* <EOF>
+}
+
+void group() : {}
+{
+    group_start()
+    (  
+        set_codepage()
+      | command()
+      | string_sequence()
+      | <C_SKIP_NEXT>
+      | brace_open()
+      | brace_close()
+      | esc_special_char()
+      | ( <C_BACKSLASH> ) { current_group.addTextContent("\\"); }
+      | ( <C_NONBREAKING_HYPHEN> ) { current_group.addTextContent("_"); }
+      | ( <C_OPTIONAL_HYPHEN> ) { current_group.addTextContent("-"); }
+      | ( <C_NONBREAKING_SPACE> ) { current_group.addTextContent("&nbsp;"); }
+      | group()
+    )*
+    group_end()
+}
+
+void esc_special_char() :
+{
+    Token esc_char = null;
+}
+{
+    esc_char = <C_ESC_CHAR>
+    {
+        // System.out.println("found xxxxxxxxxxxxxxxxxxxxxxxxxx");
+        current_group.addTextContent( ConvertCharset.convertCharacter(characterSet, esc_char.image.substring(2)) );
+    }
+}
+
+void set_codepage() :
+{
+    Token codepage = null;
+}
+{
+    codepage = <C_CODEPAGE>
+    {
+        // System.out.println("found xxxxxxxxxxxxxxxxxxxxxxxxxx");
+        characterSet = codepage.image.substring(8);
+    }
+}
+
+void brace_open() :
+{
+    Token brace = null;
+}
+{
+    brace = <C_BRACE_OPEN>
+    {
+        current_group.addTextContent( "{" );
+    }
+}
+
+void brace_close() :
+{
+    Token brace = null;
+}
+{
+    brace = <C_BRACE_CLOSE>
+    {
+        current_group.addTextContent( "}" );
+    }
+}
+
+void string_sequence() :
+{
+    Token string = null;
+}
+{
+    string = <STRING>
+    {
+       current_group.addTextContent(string.image);
+    }
+}
+
+void command() :
+{
+    Token command = null;
+}
+{
+    command = <C_COMMAND>
+    {
+        current_group.addCommand(command.image);
+    }
+}
+
+void group_start() : {}
+{
+    <C_GROUP_START>
+    {        
+        current_group = new RTFGroup();
+        groups.add( current_group );
+    }
+}
+
+void group_end() : {}
+{
+    <C_GROUP_END>
+}

@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+
+PROJECT="MSGViewer"
+VERSION="1.9"
+
+cd $DIR
+rm -rf output/$PROJECT
+mkdir -p output/$PROJECT
+cp -a ../../dist/*.jar output/$PROJECT
+cp -a ../../dist/lib output/$PROJECT
+cp -a $PROJECT output/$PROJECT
+cp -a msg2mbox output/$PROJECT
+cp -a msg2eml output/$PROJECT
+cp -a ${PROJECT}.desktop output/$PROJECT
+cp -a ../icon.ico output/$PROJECT
+cp -a ../icon.png output/$PROJECT
+cd output
+tar cfz $PROJECT.tar.gz $PROJECT
+
+cd $DIR
+rm -rf output/${PROJECT}-${VERSION}
+mkdir -p output/${PROJECT}-${VERSION}
+cp -a ../../dist/*.jar output/${PROJECT}-${VERSION}
+cp -a ../../dist/lib output/${PROJECT}-${VERSION}
+cd output
+7z a $PROJECT-${VERSION}.zip $PROJECT-${VERSION}
+

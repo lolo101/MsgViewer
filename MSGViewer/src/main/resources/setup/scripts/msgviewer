@@ -1,0 +1,37 @@
+#!/bin/bash
+#
+# This script starts the java webstart application MSGViewer
+#
+# Put this file into a bin directory so you can easyly start msgviewer from the command line
+# For associating .msg files with this command add the mime type
+#
+#     	application/vnd.ms-outlook
+#
+# to your mime types and for idetification use *.msg
+# 
+
+echo "args:" $*
+
+IFS="
+"
+
+for i in "$@" ; do
+	echo "'$i'"  
+	if test -f "$i" ; then
+		echo HERE 
+		if test -f "`pwd`/$i" ; then
+			FILES="$FILES '`pwd`/$i'"
+		else
+			FILES="$FILES \"$i\""
+		fi
+	else
+			FILES="$FILES \"$i\""
+	fi
+done
+
+echo $FILES 
+
+cmd="java -jar '$HOME/.MSGViewer/jar/MSGViewer.jar' '$HOME/.MSGViewer/launch.jnlp'  $FILES"
+echo $cmd 
+eval $cmd
+

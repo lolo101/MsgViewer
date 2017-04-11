@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.0+" codebase="http://redeye.hoffer.cx/sftpupload/" href="launch.jnlp">
+    <information>
+        <title>SFtpUpload</title>
+        <vendor>Redeye Labs</vendor>
+        <homepage href="http://redeye.hoffer.cx"/>
+        <description>Simple SFTP Uploader</description>
+	<description kind="short">Simple SFTP Uploader</description>
+        <icon href="icon.gif" kind="default"/>
+        <icon href="redeye.png" kind="splash"/>
+        <offline-allowed/>
+    </information>
+    <security>
+        <all-permissions/>
+    </security>
+    <resources>
+        <j2se version="1.6+" max-heap-size="512M"/>
+        <jar href="SFtpUpload.jar" main="true" eager="true"/>
+	<jar href="lib/FrameWork.jar" download="eager"/>
+	<jar href="lib/log4j-1.2.12.jar" download="eager"/>
+	<jar href="lib/jsch-0.1.44.jar" download="eager"/>
+	<jar href="lib/jzlib.jar" download="eager"/> 
+	<nativelib href="lib/jshortcut-0_4_repacked.jar" download="eager"/> 
+    </resources>
+    <application-desc main-class="at.redeye.SFtpUpload.Main">
+    </application-desc>
+</jnlp>

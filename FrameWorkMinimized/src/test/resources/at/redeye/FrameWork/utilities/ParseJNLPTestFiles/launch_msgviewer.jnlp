@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.0+" codebase="http://redeye.hoffer.cx/MSGViewer/" href="launch.jnlp">
+    <information>
+        <title>MSGViewer</title>
+        <vendor>Redeye Labs</vendor>
+        <homepage href="http://redeye.hoffer.cx"/>
+        <description>Viewer for Outlook msg files</description>
+	<description kind="short">Viewer for Outlook msg files</description>
+        <icon href="icon.gif" kind="default"/>
+        <icon href="redeye.png" kind="splash"/>
+        <offline-allowed/>
+    </information>
+    <security>
+        <all-permissions/>
+    </security>
+    <resources>
+        <j2se version="1.6+" max-heap-size="512M"/>
+	<jar eager="true" href="MSGViewer.jar" main="true"/>
+	<jar href="msgparser.jar"/>
+	<jar href="poi-3.2-FINAL-20081019.jar"/>
+    	<jar href="tnef-1.3.1.jar"/>
+	<jar href="MSGViewer.jar" eager="true" main="true"/>
+        <jar href="FrameWork.jar" download="eager"/>
+        <jar href="log4j-1.2.12.jar" download="eager"/>
+        <jar href="proxy-vole.jar" download="eager"/>
+        <jar href="js.jar" download="eager"/>
+        <jar href="jshortcut-0_4_repacked.jar" download="eager"/>
+        <jar href="ShellExec.jar" download="eager"/>
+    </resources>
+    <application-desc main-class="at.redeye.MSGViewer.Main">
+    </application-desc>
+</jnlp>

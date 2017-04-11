@@ -1,0 +1,229 @@
+<!--
+Document   : ChangeLog.html
+    Author     : martin
+-->
+<html>
+    <body>
+        <font face="Verdana">
+            <center>
+                <h1>Changelog</h1>                
+            </center>
+
+            <br/>
+            
+	    <p>
+            <h3>Version 1.9 (2015-04-23)</h3>
+            <ul>
+                <li>
+                    Applied patch by Peter Schmidt. This Patch adds -t (Converts the message to the users temporary directory.)
+                    and -o (Opens the converted message with the associated standard application.) option.                    
+                </li>            
+            </ul>
+            </p>
+            
+	    <p>
+            <h3>Version 1.8 (2015-03-28)</h3>
+            <ul>
+                <li>
+                    Removed proxy plugins, since online update was deactived in version 1.6.1
+                </li>                                               
+                <li>
+                    Applied patch by Peter Schmidt. This Patch adds -msg2eml option.
+                </li>                                               
+                <li>
+                    Bugfixes in msg2mbox and msgviewer start script.
+                </li>                
+                <li>
+                    Added msg2eml script.
+                </li>
+                <li>
+                    Added -h -v command line options, to see a help screen. Dokumented available options.
+                </li>                
+            </ul>
+            </p>                
+            
+	    <p>
+            <h3>Version 1.7 (2014-03-16 - 2015-01-06)</h3>
+            <ul>
+                <li>
+                    Moved to sourceforge. Switched from german as sourcede language to english.
+                </li>                               
+                <li>
+                    Did some internal refactoring. Now MSGViewer provides a panel, that may can be
+                    use by other java applications.
+                </li>
+                <li>
+                    Fixed some nullpointer exception.
+                </li>                
+            </ul>
+            </p>              
+
+	    <p>
+            <h3>Version 1.6.1 (2012-12-23)</h3>
+            <ul>
+                <li>
+                    Perform an autoupdate only once per week, since this causes to much
+                    traffic on our server, if the autoupdate is done every program startup.
+                    <br/>
+                    By using the <b>-noautoupdate</b> command line switch this can be disabled
+                    at all.
+                </li>                               
+            </ul>
+            </p>             
+            
+	    <p>
+            <h3>Version 1.6 (2012-11-30)</h3>
+            <ul>
+                <li>
+                    Added eml support (thats the same format as mbox, but the file ending is eml.
+                </li>                               
+            </ul>
+            </p>                
+            
+	    <p>
+            <h3>Version 1.5.2 (2012-01-20)</h3>
+            <ul>
+                <li>
+                    Added command line switch -hidemenubar
+                </li>                               
+            </ul>
+            </p>               
+            
+	    <p>
+            <h3>Version 1.5 (2012-01-20)</h3>
+            <ul>
+                <li>
+                    Added slider for resizing fonts.
+                </li>                
+                <li>
+                    Smother scaling of image icons.
+                </li>              
+                <li>
+                    Default command for opening applications on mac is set to "open"
+                </li>
+            </ul>
+            </p>               
+            
+	    <p>
+            <h3>Version 1.4 (2012-01-18)</h3>
+            <ul>
+                <li>
+                    Handling of attached messages.
+                </li>
+                <li>
+                    Embedded images are displayed correct.
+                </li>                
+            </ul>
+            </p>                
+            
+	    <p>
+            <h3>Version 1.3.1 (2011-07-03)</h3>
+            <ul>
+                <li>
+                    Using Updated Version of the Framework.
+                </li>
+                <li>
+                    A Browser for inspekting msg files is includet now.
+                </li>
+            </ul>
+            </p>                   
+            
+	    <p>
+            <h3>Version 1.3 (2011-07-03)</h3>
+            <ul>
+                <li>Added support for parsing mbox file through java mail API.
+                    Can convert msg files 2 mbox files.
+                </li>
+                <li>
+                    Added msg2mbox converter script. This script will be 
+                    automatically extracted to ~/bin dir on startup.
+                </li>
+            </ul>
+            </p>            
+            
+	    <p>
+            <h3>Version 1.2 (2011-02-16)</h3>
+            <ul>
+                <li>If the name of the image in the HTML encoded message does not match the filename
+                    of any attachment, just use the next image on the stack.
+                    The images on the stack are sorted by the name of the directories they were stored in.
+                    This seems to be the way outlook is storing such messages.
+                </li>
+                <li>
+                    Some bugfixes.
+                </li>
+            </ul>
+            </p>
+
+	    <p>
+            <h3>Version 1.1 (2011-02-09)</h3>
+            <ul>
+                <li>Fixed nullpointer access</li>
+            </ul>
+            </p>
+
+	    <p>
+            <h3>Version 1.0 (2010-12-04)</h3>
+            <ul>
+                <li>Added context menus for saving attachments and opening files in the webbrowser</li>
+            </ul>
+            </p>
+
+	    <p>
+            <h3>Version 0.4.1 (2010-12-04)</h3>
+            <ul>
+                <li>Added handler vor opening URLs in Help Files</li>
+                <li>Fixed D&D Bug</li>
+            </ul>
+            </p>
+
+	    <p>
+            <h3>Version 0.4 (2010-12-01)</h3>
+            <ul>
+                <li>Added a detail dialog where you can inspect the mail header code and other stuff.</li>
+                <li>Fixed plaintext character encoding in msgparser libary.</li>
+            </ul>
+            </p>
+
+	    <p>
+            <h3>Version 0.3.1 (2010-12-01)</h3>
+            <ul>
+                <li>Fixed parser Error</li>
+            </ul>
+            </p>
+
+	    <p>
+            <h3>Version 0.3 (2010-11-30)</h3>
+            <ul>
+                <li>Can now handle HTML formated mails.
+                </li>
+                <li>Improved Character Set Convertion for HTML Mails.
+                </li>
+            </ul>
+            </p>
+
+	    <p>
+            <h3>Version 0.2 (2010-11-28)</h3>
+            <ul>
+                <li>Preview attached images
+                </li>
+                <li>Enable switching between RTF view and text mode view
+                </li>
+                <li>Automatically hightlight and open URLs.
+                </li>
+            </ul>
+            </p>
+
+	    <p>
+            <h3>Version 0.1 (2010-11-27)</h3>
+            <ul>
+                <li>First Version
+                </li>                
+            </ul>
+            </p>
+
+	    
+
+        </font>
+    </body>
+</html>

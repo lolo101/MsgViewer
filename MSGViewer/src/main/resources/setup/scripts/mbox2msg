@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+#
+# This script is part of the java webstart application MSGViewer
+
+
+#echo "args:" $*
+
+IFS="
+"
+
+for i in "$@" ; do
+#	echo "'$i'"  
+	if test -f "$i" ; then
+#		echo HERE 
+		if test -f "`pwd`/$i" ; then
+			FILES="$FILES '`pwd`/$i'"
+		else
+			FILES="$FILES \"$i\""
+		fi
+	else
+			FILES="$FILES \"$i\""
+	fi
+done
+
+#echo $FILES 
+
+cmd="java -jar '$HOME/.MSGViewer/jar/MSGViewer.jar' '$HOME/.MSGViewer/launch.jnlp' -msg2mbox $FILES"
+#echo $cmd 
+eval $cmd
+
