@@ -19,6 +19,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.HashMap;
 import net.freeutils.tnef.TNEFUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -28,20 +29,20 @@ public class ShowNode extends BaseDialog {
 
     HashMap <String,String> props;
     int max_descr_lenght = 20;
-    
+
     /** Creates new form ShowNode */
-    public ShowNode(Root root, TreeNodeContainer cont,  HashMap <String,String> props) 
+    public ShowNode(Root root, TreeNodeContainer cont,  HashMap <String,String> props)
     {
         super( root, root.MlM("Navigate:") + " " + cont.getEntry().getName());
-        initComponents();                                
-        
+        initComponents();
+
         this.props = props;
-        
+
         for( String descr : props.values() ) {
             if( descr.length() > max_descr_lenght )
                 max_descr_lenght = descr.length();
         }
-        
+
         if( cont.getEntry().isDocumentEntry() )
         {
             if( cont.getEntry().getName().equals("__properties_version1.0") )
@@ -51,24 +52,24 @@ public class ShowNode extends BaseDialog {
             else if( cont.getEntry().getName().equals("__substg1.0_00030102") )
             {
                 show_entry_stream(cont);
-            } 
+            }
             else if( cont.getEntry().getName().equals("__substg1.0_00040102") )
             {
                 show_string_stream(cont);
             }
             else if( cont.getEntry().getName().equals("__substg1.0_00020102") )
             {
-                show_guid_stream(cont);   
-            }        
+                show_guid_stream(cont);
+            }
             else if( cont.getEntry().getName().matches("__substg1\\.0_[0-9][0-9][0-9][0-9]0102") &&
                    cont.getEntry().getParent().getName().equals("__nameid_version1.0") )
             {
-                show_nameid_stream(cont);                      
-                                                                       
+                show_nameid_stream(cont);
+
             } else  {
-                
-            Object data = null ; 
-            
+
+            Object data = null ;
+
             if( ( data = cont.getData() ) != null ) {
                 if( data instanceof String )
                 {
@@ -78,41 +79,41 @@ public class ShowNode extends BaseDialog {
                 {
                     StringBuilder sb = new StringBuilder();
                     byte bytes[] = (byte[]) data;
-                    
+
                     for( int i = 0; i < bytes.length; i++ ) {
-                        
+
                         if( i > 0 && i % 20 == 0 )
                             sb.append("\n");
-                                                
+
                         if( bytes[i] == 0 )
                             sb.append("__");
                         else
                             sb.append(String.format("%02X", bytes[i]));
-                        
-                        sb.append(" ");                    
-                        
+
+                        sb.append(" ");
+
                         if( bytes[i] > 30 && bytes[i] < 127 ) {
                             sb.append(String.format("%c", (char)bytes[i]));
                         } else {
                             sb.append(" ");
                         }
-                        
-                        sb.append("  ");                        
-                    }                    
-                    
+
+                        sb.append("  ");
+                    }
+
                     sb.append("\n\nASCII only\n");
-                    
+
                     for( int i = 0; i < bytes.length; i++ ) {
-                        
+
                         if( i > 0 && i % 20 == 0 )
                             sb.append("\n");
-                        
+
                         if( bytes[i] > 30 && bytes[i] < 127 ) {
                             sb.append(String.format("%c", (char)bytes[i]));
                         }
-                       
-                    }              
-                    
+
+                    }
+
                     try {
                         byte decBytes[] = TNEFUtils.decompressRTF(bytes);
                         sb.append("\n\ndecompressed TNEF\n\n");
@@ -120,8 +121,8 @@ public class ShowNode extends BaseDialog {
                     } catch( Exception ex ) {
                         logger.error("failed decompressing", ex);
                     }
-                    
-                    sb.append("\n\n"); 
+
+                    sb.append("\n\n");
                     sb.append(TNEFUtils.toHexString(bytes));
 
                     jTHex.setText(sb.toString());
@@ -165,32 +166,32 @@ public class ShowNode extends BaseDialog {
     private javax.swing.JTextArea jTHex;
     // End of variables declaration//GEN-END:variables
 
-    private void show_properties_entry(TreeNodeContainer cont) 
+    private void show_properties_entry(TreeNodeContainer cont)
     {
         boolean is_toplevel = false;
         boolean is_attachment = false;
         boolean is_reciepient = false;
-        
+
         if( cont.getEntry().getParent().getParent() == null )
-            is_toplevel = true;        
+            is_toplevel = true;
         else if( cont.getEntry().getParent().getName().startsWith("__recip_version1.0"))
             is_reciepient = true;
         else if( cont.getEntry().getParent().getName().startsWith("__attach_version1.0"))
             is_attachment = true;
-        
+
         StringBuilder sb = new StringBuilder();
         byte bytes[] = (byte[]) cont.getData();
-        
+
         sb.append("__properties_version1.0\n");
         sb.append("HEADER\n");
         sb.append("\tRESERVED 8 bytes (should by zero)\n\t\t");
-        
+
         int offset = 0;
-        
+
         for( int i = 0; i < 8; i++, offset++) {
             sb.append(formatByte(bytes[offset]));
         }
-        
+
         if (is_toplevel) {
             sb.append("\n\n\tNEXT Recipient ID 4 bytes \n\t\t");
 
@@ -223,174 +224,174 @@ public class ShowNode extends BaseDialog {
                 sb.append(formatByte(bytes[offset]));
             }
         }
-        
+
         sb.append("\n");
-        
+
         for( ; offset < bytes.length; offset += 16) {
             sb.append("\n");
             dumpPropertyEntry( sb, bytes, offset );
         }
-        
-        
-        
-        
+
+
+
+
         jTHex.setText(sb.toString());
     }
-    
+
     private String formatByte( byte b )
     {
         if( b == 0 )
             return "__ ";
-        
+
         return String.format("%02X ", b);
     }
-    
-    private String formatByte0( byte b )
-    {        
-        return String.format("%02X ", b);
-    }    
-    
-    private String formatByte0S( byte b )
-    {        
-        return String.format("%02X", b);
-    }     
 
-    private void dumpPropertyEntry(StringBuilder sb, byte bytes[], int offset) 
+    private String formatByte0( byte b )
+    {
+        return String.format("%02X ", b);
+    }
+
+    private String formatByte0S( byte b )
+    {
+        return String.format("%02X", b);
+    }
+
+    private void dumpPropertyEntry(StringBuilder sb, byte bytes[], int offset)
     {
         sb.append("TAG: ");
-        
-        String tagname = "";     
-        
+
+        String tagname = "";
+
         // property tag
         for( int i = offset + 3; i >= offset; i-- ) {
             sb.append(formatByte0S(bytes[i]));
             tagname += formatByte0S(bytes[i]);
         }
-        
+
         offset += 4;
-        
+
         sb.append(" FLAGS: ");
 /*
         for( int i = offset; i < offset + 4; i++ )
-            sb.append(formatByte0(bytes[i]));        
-  */      
+            sb.append(formatByte0(bytes[i]));
+  */
         if( (bytes[offset] & 0001) > 0 ) {
             sb.append("M");
         } else {
             sb.append("_");
         }
-        
+
         if( (bytes[offset] & 0002) > 0 ) {
             sb.append("R");
         } else {
             sb.append("_");
-        }        
-        
+        }
+
         if( (bytes[offset] & 0004) > 0 ) {
             sb.append("W");
         } else {
             sb.append("_");
-        }        
-        
+        }
+
         offset += 4;
-        
+
         sb.append(" VALUE: ");
-        
+
         int value_start_offset = offset;
-        
+
         for( int i = 0; i < 8; i++, offset++ )
-            sb.append(formatByte0(bytes[offset]));        
-        
+            sb.append(formatByte0(bytes[offset]));
+
         sb.append(" ");
-        
-        String descr = org.apache.commons.lang3.StringUtils.defaultString(props.get(tagname.toLowerCase().substring(0,4)));
-        sb.append(org.apache.commons.lang3.StringUtils.rightPad(descr,max_descr_lenght));
-        
+
+        String descr = StringUtils.defaultString(props.get(tagname.toLowerCase().substring(0,4)));
+        sb.append(StringUtils.rightPad(descr,max_descr_lenght));
+
         String tagtype = tagname.toLowerCase().substring(4);
-        
+
         if( tagtype.equals("001f")) {
-            
-            
+
+
             String res = "";
-            
+
             for( int i = value_start_offset + 3; i >= value_start_offset; i-- ) {
-                res += formatByte0S(bytes[i]);                
+                res += formatByte0S(bytes[i]);
             }
-            
+
             int length = Integer.valueOf(res, 16);
-            
+
             sb.append(" PtypString length: ");
             sb.append(String.valueOf(length - 2));
-            
-        } else if( tagtype.equals("0102") ) {                        
+
+        } else if( tagtype.equals("0102") ) {
             String res = "";
-            
+
             for( int i = value_start_offset + 3; i >= value_start_offset; i-- ) {
-                res += formatByte0S(bytes[i]);                
+                res += formatByte0S(bytes[i]);
             }
-            
-            int length = Integer.valueOf(res, 16);       
-            
+
+            int length = Integer.valueOf(res, 16);
+
             sb.append(" PtypBinary length: ");
             sb.append(String.valueOf(length));
-            
+
         } else if( tagtype.equals("0040")) {
             sb.append(" PtypTime");
-            
+
             /*
             byte buf[] = new byte[8];
-           
+
             for( int i = 0; i < buf.length; i++ )
                 buf[i] = bytes[value_start_offset++];
-             * 
+             *
              */
-            
+
             long val = ByteConvert.convertByteArrayToLong(bytes,value_start_offset);
-            
+
             sb.append(" ");
             sb.append(val);
-            
+
             sb.append(": ");
             sb.append(new Date(MSTimeConvert.PtypeTime2Millis(val)).toString());;
-            
+
         } else if( tagtype.equals("000b")) {
-            sb.append(" boolean");            
-            
+            sb.append(" boolean");
+
         } else if( tagtype.equals("0003")) {
-            
+
             String res = "";
-            
+
             for( int i = value_start_offset + 3; i >= value_start_offset; i-- ) {
-                res += formatByte0S(bytes[i]);                
+                res += formatByte0S(bytes[i]);
             }
-            
-            int length = Integer.valueOf(res, 16);             
-            
+
+            int length = Integer.valueOf(res, 16);
+
             sb.append(" PtypInteger32 value: ");
             sb.append(length);
         }
-        
+
     }
 
-    
+
     private void show_string_stream(TreeNodeContainer cont)
     {
         StringBuilder sb = new StringBuilder();
         byte bytes[] = (byte[]) cont.getData();
-        
+
         sb.append("String Stream ");
         sb.append(cont.getEntry().getName());
         sb.append("\n\n");
-        
-        
+
+
         int offset = 0;
-        
+
         while (offset < bytes.length) {
-            
+
             sb.append("Offset: ");
             sb.append(String.format("%04X", offset));
             sb.append(" ");
-            
+
             // get length 4 bytes
             String s_lenght = "";
 
@@ -411,24 +412,24 @@ public class ShowNode extends BaseDialog {
 
             for (int i = offset, count = 0; i < offset + len; i++, count++) {
                 s_byte[count] = bytes[i];
-                // sb.append(formatByte(bytes[i]));   
+                // sb.append(formatByte(bytes[i]));
             }
-            
+
             offset += len;
-            
+
             try {
                 sb.append(new String(s_byte, "UTF-16LE"));
             } catch (UnsupportedEncodingException ex) {
                 logger.error(ex, ex);
             }
-            
+
             sb.append("\n");
-            
+
             // spool forward to next 4 byte boundary
-            
+
             offset += offset % 4;
         }
-        
+
         jTHex.setText(sb.toString());
     }
 
@@ -441,60 +442,60 @@ public class ShowNode extends BaseDialog {
         sb.append("\n\n");
 
         int count=0;
-        
+
         for (int offset = 0; offset < bytes.length; offset += 16, count++) {
-            
+
             sb.append("INDEX: ");
             sb.append(String.format("% 2d",count+3));
-            
+
             sb.append(" {");
-            
+
             StringBuilder sb_prop_set = new StringBuilder();
-            
+
             int voffset = offset;
             for (int i = voffset + 3; i >= voffset; i--) {
                 sb_prop_set.append(formatByte0S(bytes[i]));
             }
 
             sb_prop_set.append("-");
-            
-            voffset = offset + 4;            
+
+            voffset = offset + 4;
             for (int i = voffset + 1; i >= voffset; i--) {
                 sb_prop_set.append(formatByte0S(bytes[i]));
-            }            
+            }
 
             sb_prop_set.append("-");
-            
-            voffset = offset + 6;            
+
+            voffset = offset + 6;
             for (int i = voffset + 1; i >= voffset; i--) {
                 sb_prop_set.append(formatByte0S(bytes[i]));
-            }                                    
-            
+            }
+
             sb_prop_set.append("-");
-            
-            voffset = offset + 8;            
+
+            voffset = offset + 8;
             for (int i = voffset; i < voffset + 2; i++) {
                 sb_prop_set.append(formatByte0S(bytes[i]));
-            }            
-            
+            }
+
             sb_prop_set.append("-");
 
-            voffset = offset + 10;            
+            voffset = offset + 10;
             for (int i = voffset; i < voffset + 6; i++) {
                 sb_prop_set.append(formatByte0S(bytes[i]));
-            }                                    
-                        
+            }
+
             sb.append(sb_prop_set);
             sb.append("} ");
             sb.append(getPropertySetById(sb_prop_set.toString()));
-            
+
             sb.append("\n");
         }
-                
-        
+
+
         jTHex.setText(sb.toString());
     }
-    
+
     private String getPropertySetById( String id )
     {
         if( id.equals("00020386-0000-0000-C000-000000000046") )
@@ -510,107 +511,107 @@ public class ShowNode extends BaseDialog {
             return "PSETID_Address";
 
         if( id.equals("00062002-0000-0000-C000-000000000046") )
-            return "PSETID_Appointment";        
+            return "PSETID_Appointment";
 
         if( id.equals("6ED8DA90-450B-101B-98DA-00AA003F1305") )
-            return "PSETID_Meeting";  
-        
+            return "PSETID_Meeting";
+
         if( id.equals("0006200A-0000-0000-C000-000000000046") )
-            return "PSETID_Log";  
-        
+            return "PSETID_Log";
+
         if( id.equals("41F28F13-83F4-4114-A584-EEDB5A6B0BFF") )
-            return "PSETID_Messaging";  
-        
+            return "PSETID_Messaging";
+
         if( id.equals("0006200E-0000-0000-C000-000000000046") )
-            return "PSETID_Note";          
+            return "PSETID_Note";
 
         if( id.equals("00062041-0000-0000-C000-000000000046") )
-            return "PSETID_PostRss";     
-        
+            return "PSETID_PostRss";
+
         if( id.equals("00062003-0000-0000-C000-000000000046") )
-            return "PSETID_Task";     
-        
+            return "PSETID_Task";
+
         if( id.equals("4442858E-A9E3-4E80-B900-317A210CC15B") )
-            return "PSETID_UnifiedMessaging";     
-        
+            return "PSETID_UnifiedMessaging";
+
         if( id.equals("00020328-0000-0000-C000-000000000046") )
-            return "PS_MAPI";             
-       
+            return "PS_MAPI";
+
         if( id.equals("71035549-0739-4DCB-9163-00F0580DBBDF") )
-            return "PSETID_AirSync";                     
-        
+            return "PSETID_AirSync";
+
         if( id.equals("00062040-0000-0000-C000-000000000046") )
-            return "PSETID_Sharing";                     
-        
+            return "PSETID_Sharing";
+
         return "";
     }
-    
-    private void show_entry_stream(TreeNodeContainer cont) 
+
+    private void show_entry_stream(TreeNodeContainer cont)
     {
         StringBuilder sb = new StringBuilder();
         byte bytes[] = (byte[]) cont.getData();
-        
+
         sb.append("Entry Stream ");
         sb.append(cont.getEntry().getName());
         sb.append("\n\n");
-        
+
         for (int offset = 0; offset < bytes.length; offset += 8) {
             sb.append("Offset in Stream: ");
-            
+
             int voffset = offset;
 
             // property tag
             for (int i = voffset + 3; i >= voffset; i--) {
                 sb.append(formatByte0S(bytes[i]));
             }
-            
+
             voffset += 4;
-            
-            
+
+
             sb.append(" (in HEX) ");
-            
+
             for (int i = voffset + 3; i >= voffset; i--) {
                 sb.append(formatByte0S(bytes[i]));
-            }              
-            
-            
-            
-            
+            }
+
+
+
+
             String s_guid = "";
-            
-            // 15 Bytes GUID            
+
+            // 15 Bytes GUID
             for (int i = voffset + 1; i >= voffset; i--) {
                 s_guid += formatByte0S(bytes[i]);
-            } 
-            
+            }
+
             voffset += 2;
-            
+
             sb.append(" INDEX: ");
-            
+
             for (int i = voffset + 1; i >= voffset; i--) {
                 sb.append(formatByte0S(bytes[i]));
-            }  
-            
-            sb.append(" GUID: ");                        
-            
+            }
+
+            sb.append(" GUID: ");
+
             long guid = Long.valueOf(s_guid,16);
-            
+
             boolean is_string = (guid & 0x01) > 0;
-                       
-            guid = guid >> 1;           
-            
+
+            guid = guid >> 1;
+
             sb.append(String.format("%04X",guid));
-            
+
             sb.append(" ");
-            
+
             if( is_string )
                 sb.append( "STRING ");
             else
                 sb.append("NUM ");
-            
+
             sb.append("\n");
-        }        
-        
+        }
+
         jTHex.setText(sb.toString());
     }
 
@@ -621,56 +622,56 @@ public class ShowNode extends BaseDialog {
         sb.append("NAMEID Stream ");
         sb.append(cont.getEntry().getName());
         sb.append("\n\n");
-        
+
         for (int offset = 0; offset < bytes.length; offset += 8) {
-            
+
             sb.append( "NAME/CRC-32: ");
-            
+
             int voffset = offset;
             for (int i = voffset + 3; i >= voffset; i--) {
                 sb.append(formatByte0S(bytes[i]));
             }
-            
+
             voffset += 4;
-            
+
             String s_guid = "";
-            
-            // 15 Bytes GUID            
+
+            // 15 Bytes GUID
             for (int i = voffset + 1; i >= voffset; i--) {
                 s_guid += formatByte0S(bytes[i]);
-            } 
-            
+            }
+
             voffset += 2;
-            
+
             sb.append(" INDEX: ");
-            
+
             for (int i = voffset + 1; i >= voffset; i--) {
                 sb.append(formatByte0S(bytes[i]));
-            }  
-            
-            sb.append(" GUID: ");                        
-            
+            }
+
+            sb.append(" GUID: ");
+
             long guid = Long.valueOf(s_guid,16);
-            
+
             boolean is_string = (guid & 0x01) > 0;
-                       
-            guid = guid >> 1;           
-            
+
+            guid = guid >> 1;
+
             sb.append(String.format("%04X",guid));
-            
+
             sb.append(" ");
-            
+
             if( is_string )
                 sb.append( "STRING ");
             else
                 sb.append("NUM ");
-            
-            sb.append("\n");            
-            
+
+            sb.append("\n");
+
         }
-                
-        
+
+
         jTHex.setText(sb.toString());
     }
-    
+
 }
