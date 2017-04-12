@@ -63,12 +63,12 @@ public class StringUtilsTest {
      */
     @Test
     public void testSkip_char() {
-        System.out.println("skip_char");               
+        System.out.println("skip_char");
 
         assertEquals(12, StringUtils.skip_char(new StringBuilder( "das ist     ein Text"), " ", 7));
         assertEquals(2,  StringUtils.skip_char(new StringBuilder( "das ist     ein Text"), " ", 2));
         assertEquals(4,  StringUtils.skip_char(new StringBuilder( "das ist     ein Text"), " ", 4));
-        assertEquals(4,  StringUtils.skip_char(new StringBuilder( "das ist     ein Text"), " ", 3));        
+        assertEquals(4,  StringUtils.skip_char(new StringBuilder( "das ist     ein Text"), " ", 3));
 
         try {
             StringUtils.skip_char(null, null, 0);
@@ -98,7 +98,7 @@ public class StringUtilsTest {
     @Test
     public void testSkip_char_reverse() {
         System.out.println("skip_char_reverse");
-            
+
         assertEquals(15, StringUtils.skip_char_reverse(new StringBuilder("das ist ein    Test"), " ", 15));
         assertEquals(10, StringUtils.skip_char_reverse(new StringBuilder("das ist ein    Test"), " ", 14));
         assertEquals(10, StringUtils.skip_char_reverse(new StringBuilder("das ist ein    Test"), " ", 10));
@@ -170,7 +170,7 @@ public class StringUtilsTest {
         } catch( NullPointerException ex ) {
 
         }
-        
+
     }
 
     /**
@@ -201,8 +201,9 @@ public class StringUtilsTest {
 
         for( String str: testArr )
         {
-            if( joined_string.length() > 0 )
+            if( joined_string.length() > 0 ) {
                 joined_string.append('|');
+            }
 
             joined_string.append(str);
         }
@@ -213,11 +214,12 @@ public class StringUtilsTest {
 
         for( int i = 0; i < testArr.length; i++ )
         {
-            if( !testArr[i].equals(split_str.get(i)) )
+            if( !testArr[i].equals(split_str.get(i)) ) {
                 fail( String.format("Target: '%s' Index %d '%s' != '%s'",
                         joined_string, i, testArr[i],split_str.get(i) ) );
+            }
         }
-        
+
     }
 
     /**
@@ -392,7 +394,7 @@ public class StringUtilsTest {
     @Test
     public void testSet_defaultAutoLineLenght() {
         System.out.println("set_defaultAutoLineLenght");
-        
+
         StringUtils.set_defaultAutoLineLenght(10);
         assertEquals(10, StringUtils.get_defaultAutoLineLenght());
     }
@@ -467,15 +469,16 @@ public class StringUtilsTest {
 
     protected String diff_text( String a, String b )
     {
-        if( a.equals(b) )
+        if( a.equals(b) ) {
             return "";
+        }
 
         String split_a[] = a.split("\n");
         String split_b[] = b.split("\n");
 
         assertEquals(split_b.length, split_a.length);
 
-        StringBuilder res = new StringBuilder();        
+        StringBuilder res = new StringBuilder();
 
         for( int i = 0; i < split_a.length; i++ )
         {
@@ -490,7 +493,7 @@ public class StringUtilsTest {
                 {
                     if( split_a[i].charAt(j) != split_b[i].charAt(j) )
                     {
-                        res.append("^");                       
+                        res.append("^");
                     }
                     else
                     {
@@ -559,7 +562,7 @@ public class StringUtilsTest {
         res = StringUtils.autoLineBreak(testTextB);
         System.out.println("=== RES ===\n" +  res + "\n============\n");
         assertText(testTextB50, res);
-        
+
         StringUtils.set_defaultAutoLineLenght(50);
         res = StringUtils.autoLineBreak(testTextC);
         System.out.println("=== RES ===\n" +  res + "\n============\n");
@@ -694,8 +697,8 @@ public class StringUtilsTest {
     public void testFormatDouble_double_int() {
         System.out.println("formatDouble");
 
-        assertEquals("12,234", StringUtils.formatDouble(12.2340000, 3) );
-        assertEquals("0,03", StringUtils.formatDouble(0.03, 3) );
+        assertEquals(String.format("%.3f", 12.234), StringUtils.formatDouble(12.2340000, 3) );
+        assertEquals(String.format("%.2f", 0.03), StringUtils.formatDouble(0.03, 3) );
         assertEquals("12", StringUtils.formatDouble(12.0000, 3) );
 
     }
@@ -707,10 +710,10 @@ public class StringUtilsTest {
     public void testFormatDouble_double() {
         System.out.println("formatDouble");
 
-        assertEquals("12,234", StringUtils.formatDouble(12.2340000) );
-        assertEquals("0,03", StringUtils.formatDouble(0.03) );
+        assertEquals(String.format("%.3f", 12.234), StringUtils.formatDouble(12.2340000) );
+        assertEquals(String.format("%.2f", 0.03), StringUtils.formatDouble(0.03) );
         assertEquals("12", StringUtils.formatDouble(12.0000) );
-        
+
     }
 
     /**
