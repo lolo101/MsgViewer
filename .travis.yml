@@ -1,4 +1,12 @@
 language: java
 jdk:
-    - oraclejdk7
-    - oraclejdk8
+- oraclejdk7
+- oraclejdk8
+
+deploy:
+  provider: releases
+  api_key:
+    secure: stMst16fAF+9nngZieZrEIs4kn7sVHaLhg8gJMwTDfQjOcklU5qdIW55b3G0szX1h3TbAV9fEm6U9TK05PfXpdW+qTwAqyTfcJ3IQ/AqY3hepbHQKwCFd+OKgkITe147LjeV19GBcM0XXksN5/IfTmvP3vQd68WSVzPSv3mV8wrnI+myEWMHeKGruBYRDTgXNVzrciS40bv8V9g5D1etpyiFdSv7B3QsUa/FSbgQBjELA1VMxbWSnWSti2nk08Yp/yR5Xml358zvShXsWmYgaTMWgDPfkQnaC/qRqnI/HtVbpAtmnFETGEEeCN/3smNMS4t3hK2GWCdi64lC3jI9f+DdFzwJQhXbtsWKq1P4RlTPCjdmpxJcadNgQzs90IiztN0HDPNl52o/9VrLbgNECjYpqYWNp1LcWzESA6axZ/JxbnPPDhuwZTJu30YKb1dkDty5aeRbE4AcJ9TBkuWLYFUrMamCsiEnZazZaJn0mZGvZ80zwakgBBXpe/q0B0isuXP7jvAhPPOLJkQ++UGI1jzix+lN9F6y0hsUwoK2PichCYLhrgRKJd753W5CqkXrgreuzfFthuJ/gpRwviDovMAbYBZCJCvq6nV6sf4EOB8k6KUOO0kexMLBqGjjyCv4hBo2iIdNwhKmS3kLcTaDp16OQY4FA1v31Jlekhij1WU=
+  file: MSGViewer/target/msgviewer.jar
+  on:
+    repo: lolo101/MsgViewer
