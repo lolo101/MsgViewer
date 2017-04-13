@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package net.sourceforge.MSGViewer;
 
 import at.redeye.FrameWork.base.BaseModuleLauncher;
@@ -17,7 +12,7 @@ import org.apache.log4j.Level;
  * @author martin
  */
 public class ModuleLauncher extends BaseModuleLauncher
-{           
+{
     private MainDialog mainwin;
 
     public ModuleLauncher( String[] args )
@@ -25,7 +20,7 @@ public class ModuleLauncher extends BaseModuleLauncher
         super( args );
 
         BaseConfigureLogging(Level.ERROR);
-        
+
         root = new LocalRoot("MSGViewer", "MSGViewer", false, false);
 
         root.setBaseLanguage("en");
@@ -35,19 +30,19 @@ public class ModuleLauncher extends BaseModuleLauncher
     }
 
     public void invoke()
-    {                        
+    {
         if( getStartupFlag(CLIHelpMSGViewer.CLI_HELP))
         {
             CLIHelpMSGViewer help = new CLIHelpMSGViewer(this);
             help.printHelpScreen();
             return;
         }
-        
+
         if( getStartupFlag(CLIHelpMSGViewer.CLI_VERSION))
         {
             CLIHelpMSGViewer help = new CLIHelpMSGViewer(this);
             help.printVersion();
-            
+
             System.out.println( "Copyright (C) 2015  Martin Oberzalek <msgviewer@hoffer.cx>\n" +
                 "\n" +
                 "This program is free software; you can redistribute it and/or modify\n"+
@@ -60,20 +55,11 @@ public class ModuleLauncher extends BaseModuleLauncher
                 "GNU General Public License for more details.\n\n"+
                 "You should have received a copy of the GNU General Public License\n"+
                 "along with this program; if not, write to the Free Software Foundation,\n"+
-                "Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA\n" );            
+                "Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA\n" );
             return;
-        }        
-        
-       CLIFileConverter converter = null;
-       if( getStartupFlag(Msg2MBox.CLI_PARAMETER)) {
-           converter = new Msg2MBox(this);
-       } else if( getStartupFlag(MBox2Msg.CLI_PARAMETER)) {
-           converter = new MBox2Msg(this);
-       } else if( getStartupFlag(Msg2Eml.CLI_PARAMETER)) {
-           converter = new Msg2Eml(this);
-       } else if( getStartupFlag(Eml2Msg.CLI_PARAMETER)) {
-           converter = new Eml2Msg(this);
-       }              
+        }
+
+       CLIFileConverter converter = getConverter();
 
         if (converter != null) {
             converter.setConvertToTemp(getStartupFlag(CLIHelpMSGViewer.CLI_CONVERT_TEMP));
@@ -84,11 +70,25 @@ public class ModuleLauncher extends BaseModuleLauncher
        }
     }
 
+    private CLIFileConverter getConverter() {
+        if( getStartupFlag(Msg2MBox.CLI_PARAMETER)) {
+            return new Msg2MBox(this);
+        } else if( getStartupFlag(MBox2Msg.CLI_PARAMETER)) {
+            return new MBox2Msg(this);
+        } else if( getStartupFlag(Msg2Eml.CLI_PARAMETER)) {
+            return new Msg2Eml(this);
+        } else if( getStartupFlag(Eml2Msg.CLI_PARAMETER)) {
+            return new Eml2Msg(this);
+        } else {
+            return null;
+        }
+    }
+
     @Override
     public String getVersion() {
         return Version.getVersion();
     }
-    
+
     public void invokeGui()
     {
         if (splashEnabled()) {
@@ -118,11 +118,11 @@ public class ModuleLauncher extends BaseModuleLauncher
 
         for( String arg : args )
         {
-            if( arg.toLowerCase().endsWith(".msg") || 
+            if( arg.toLowerCase().endsWith(".msg") ||
                 arg.toLowerCase().endsWith(".mbox") ||
                 arg.toLowerCase().endsWith(".eml") )
             {
-                
+
                 MainDialog win = getStartupFlag("-mainwin")
                         ? new MainWin(root, arg)
                         : new SingleWin(root, arg);
@@ -135,45 +135,46 @@ public class ModuleLauncher extends BaseModuleLauncher
                 {
                     if (getStartupFlag("-hidemenubar")) {
                         win.hideMenuBar();
-                    }                       
-                    win.setVisible(true);          
-                }                                
+                    }
+                    win.setVisible(true);
+                }
             }
         }
-        
+
         if( mainwin == null ) {
             if (getStartupFlag("-mainwin")) {
                 mainwin = new MainWin(root, null);
             } else {
                 mainwin = new SingleWin(root, null);
-            }             
-        } 
+            }
+        }
 
         if( getStartupFlag(CLIHelpMSGViewer.CLI_HIDEMENUBAR) ) {
-            mainwin.hideMenuBar();  
-        }        
-        
-        
-        closeSplash();        
+            mainwin.hideMenuBar();
+        }
+
+
+        closeSplash();
         mainwin.setVisible(true);
-        
+
     }
 
     private boolean getStartupFlag(String string)
     {
        for( String arg  : args )
        {
-           if( arg.equalsIgnoreCase(string) )
+           if( arg.equalsIgnoreCase(string) ) {
                return true;
+           }
        }
-       
+
        return false;
     }
-    
+
     public static void main(String[] args) {
 
         new ModuleLauncher(args).invoke();
 
-    }   
-    
+    }
+
 }
