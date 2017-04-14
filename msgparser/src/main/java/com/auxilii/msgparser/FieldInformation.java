@@ -22,71 +22,71 @@ import org.apache.poi.poifs.filesystem.DocumentEntry;
 /**
  * Convenience class for storing type information
  * about a {@link DocumentEntry}.
- * 
+ *
  * @author roman.kurmanowytsch
  */
 public class FieldInformation {
 
-	/**
-	 * The default value for both the {@link #clazz} and
-	 * the {@link #type} properties.
-	 */
-	public static final String UNKNOWN = "unknown";
-	
-	/**
-	 * The class of the {@link DocumentEntry}.
-	 */
-	protected String clazz = UNKNOWN;
-	/**
-	 * The type of the {@link DocumentEntry}.
-	 */
-	protected String type  = UNKNOWN;
+    /**
+     * The default value for both the {@link #clazz} and
+     * the {@link #type} properties.
+     */
+    public static final String UNKNOWN = "unknown";
 
-	/**
-	 * Empty constructor that uses the default
-	 * values.
-	 */
-	public FieldInformation() {
-	}
+    /**
+     * The class of the {@link DocumentEntry}.
+     */
+    private String clazz = UNKNOWN;
+    /**
+     * The type of the {@link DocumentEntry}.
+     */
+    private String type  = UNKNOWN;
 
-	/**
-	 * Constructor that allows to set the class
-	 * and type properties.
-	 * 
-	 * @param clazz The class of the {@link DocumentEntry}.
-	 * @param type The type of the {@link DocumentEntry}.
-	 */
-	public FieldInformation(String clazz, String type) {
-		this.setClazz(clazz);
-		this.setType(type);
-	}
+    /**
+     * Empty constructor that uses the default
+     * values.
+     */
+    public FieldInformation() {
+    }
 
-	/**
-	 * @return the clazz
-	 */
-	public String getClazz() {
-		return clazz;
-	}
+    /**
+     * Constructor that allows to set the class
+     * and type properties.
+     *
+     * @param clazz The class of the {@link DocumentEntry}.
+     * @param type The type of the {@link DocumentEntry}.
+     */
+    public FieldInformation(String clazz, String type) {
+        this.setClazz(clazz);
+        this.setType(type);
+    }
 
-	/**
-	 * @param clazz the clazz to set
-	 */
-	public void setClazz(String clazz) {
-		this.clazz = clazz;
-	}
+    /**
+     * @return the clazz
+     */
+    public String getClazz() {
+        return clazz;
+    }
 
-	/**
-	 * @return the type
-	 */
-	public String getType() {
-		return type;
-	}
+    /**
+     * @param clazz the clazz to set
+     */
+    public final void setClazz(String clazz) {
+        this.clazz = clazz;
+    }
 
-	/**
-	 * @param type the type to set
-	 */
-	public void setType(String type) {
-		this.type = type;
-	}
-	
+    /**
+     * @return the type
+     */
+    public String getType() {
+        return type;
+    }
+
+    /**
+     * @param type the type to set
+     */
+    public final void setType(String type) {
+        this.type = type;
+    }
+
 }

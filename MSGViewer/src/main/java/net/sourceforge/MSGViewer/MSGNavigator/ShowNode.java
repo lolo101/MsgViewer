@@ -1,25 +1,20 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
- * ShowNode.java
- *
- * Created on 05.07.2011, 16:54:41
- */
 package net.sourceforge.MSGViewer.MSGNavigator;
+
+import java.io.ByteArrayInputStream;
 
 import net.sourceforge.MSGViewer.factory.msg.lib.MSTimeConvert;
 import net.sourceforge.MSGViewer.factory.msg.lib.ByteConvert;
 import at.redeye.FrameWork.base.BaseDialog;
 import at.redeye.FrameWork.base.Root;
 import net.sourceforge.MSGViewer.MSGNavigator.MSGNavigator.TreeNodeContainer;
+
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.HashMap;
-import net.freeutils.tnef.TNEFUtils;
+
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hmef.CompressedRTF;
 
 /**
  *
@@ -27,10 +22,11 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class ShowNode extends BaseDialog {
 
-    HashMap <String,String> props;
-    int max_descr_lenght = 20;
+    private static final long serialVersionUID = 3130592579862038804L;
 
-    /** Creates new form ShowNode */
+    private HashMap <String,String> props;
+    private int max_descr_lenght = 20;
+
     public ShowNode(Root root, TreeNodeContainer cont,  HashMap <String,String> props)
     {
         super( root, root.MlM("Navigate:") + " " + cont.getEntry().getName());
@@ -39,8 +35,9 @@ public class ShowNode extends BaseDialog {
         this.props = props;
 
         for( String descr : props.values() ) {
-            if( descr.length() > max_descr_lenght )
+            if( descr.length() > max_descr_lenght ) {
                 max_descr_lenght = descr.length();
+            }
         }
 
         if( cont.getEntry().isDocumentEntry() )
@@ -68,9 +65,8 @@ public class ShowNode extends BaseDialog {
 
             } else  {
 
-            Object data = null ;
+                Object data = cont.getData();
 
-            if( ( data = cont.getData() ) != null ) {
                 if( data instanceof String )
                 {
                     jTHex.setText((String)data);
@@ -82,13 +78,15 @@ public class ShowNode extends BaseDialog {
 
                     for( int i = 0; i < bytes.length; i++ ) {
 
-                        if( i > 0 && i % 20 == 0 )
+                        if( i > 0 && i % 20 == 0 ) {
                             sb.append("\n");
+                        }
 
-                        if( bytes[i] == 0 )
+                        if( bytes[i] == 0 ) {
                             sb.append("__");
-                        else
+                        } else {
                             sb.append(String.format("%02X", bytes[i]));
+                        }
 
                         sb.append(" ");
 
@@ -105,8 +103,9 @@ public class ShowNode extends BaseDialog {
 
                     for( int i = 0; i < bytes.length; i++ ) {
 
-                        if( i > 0 && i % 20 == 0 )
+                        if( i > 0 && i % 20 == 0 ) {
                             sb.append("\n");
+                        }
 
                         if( bytes[i] > 30 && bytes[i] < 127 ) {
                             sb.append(String.format("%c", (char)bytes[i]));
@@ -115,7 +114,7 @@ public class ShowNode extends BaseDialog {
                     }
 
                     try {
-                        byte decBytes[] = TNEFUtils.decompressRTF(bytes);
+                        byte decBytes[] = new CompressedRTF().decompress(new ByteArrayInputStream(bytes));
                         sb.append("\n\ndecompressed TNEF\n\n");
                         sb.append(new String(decBytes));
                     } catch( Exception ex ) {
@@ -123,11 +122,10 @@ public class ShowNode extends BaseDialog {
                     }
 
                     sb.append("\n\n");
-                    sb.append(TNEFUtils.toHexString(bytes));
+                    sb.append('[').append(Hex.encodeHexString(bytes)).append(']');
 
                     jTHex.setText(sb.toString());
                 }
-            }
             }
         }
     }
@@ -168,16 +166,6 @@ public class ShowNode extends BaseDialog {
 
     private void show_properties_entry(TreeNodeContainer cont)
     {
-        boolean is_toplevel = false;
-        boolean is_attachment = false;
-        boolean is_reciepient = false;
-
-        if( cont.getEntry().getParent().getParent() == null )
-            is_toplevel = true;
-        else if( cont.getEntry().getParent().getName().startsWith("__recip_version1.0"))
-            is_reciepient = true;
-        else if( cont.getEntry().getParent().getName().startsWith("__attach_version1.0"))
-            is_attachment = true;
 
         StringBuilder sb = new StringBuilder();
         byte bytes[] = (byte[]) cont.getData();
@@ -192,6 +180,7 @@ public class ShowNode extends BaseDialog {
             sb.append(formatByte(bytes[offset]));
         }
 
+        boolean is_toplevel = cont.getEntry().getParent().getParent() == null;
         if (is_toplevel) {
             sb.append("\n\n\tNEXT Recipient ID 4 bytes \n\t\t");
 
@@ -204,7 +193,6 @@ public class ShowNode extends BaseDialog {
             for (int i = 0; i < 4; i++, offset++) {
                 sb.append(formatByte(bytes[offset]));
             }
-
 
             sb.append("\n\n\tRecipient Count 4 bytes \n\t\t");
 
@@ -232,18 +220,12 @@ public class ShowNode extends BaseDialog {
             dumpPropertyEntry( sb, bytes, offset );
         }
 
-
-
-
         jTHex.setText(sb.toString());
     }
 
     private String formatByte( byte b )
     {
-        if( b == 0 )
-            return "__ ";
-
-        return String.format("%02X ", b);
+        return b == 0 ? "__ " : String.format("%02X ", b);
     }
 
     private String formatByte0( byte b )
@@ -299,8 +281,9 @@ public class ShowNode extends BaseDialog {
 
         int value_start_offset = offset;
 
-        for( int i = 0; i < 8; i++, offset++ )
+        for( int i = 0; i < 8; i++, offset++ ) {
             sb.append(formatByte0(bytes[offset]));
+        }
 
         sb.append(" ");
 
@@ -309,68 +292,58 @@ public class ShowNode extends BaseDialog {
 
         String tagtype = tagname.toLowerCase().substring(4);
 
-        if( tagtype.equals("001f")) {
+        switch (tagtype) {
+            case "001f":
+                {
+                    String res = "";
+                    for( int i = value_start_offset + 3; i >= value_start_offset; i-- ) {
+                        res += formatByte0S(bytes[i]);
+                    }        int length = Integer.valueOf(res, 16);
+                    sb.append(" PtypString length: ");
+                    sb.append(String.valueOf(length - 2));
+                    break;
+                }
+            case "0102":
+                {
+                    String res = "";
+                    for( int i = value_start_offset + 3; i >= value_start_offset; i-- ) {
+                        res += formatByte0S(bytes[i]);
+                    }        int length = Integer.valueOf(res, 16);
+                    sb.append(" PtypBinary length: ");
+                    sb.append(String.valueOf(length));
+                    break;
+                }
+            case "0040":
+                sb.append(" PtypTime");
+                /*
+                byte buf[] = new byte[8];
 
-
-            String res = "";
-
-            for( int i = value_start_offset + 3; i >= value_start_offset; i-- ) {
-                res += formatByte0S(bytes[i]);
-            }
-
-            int length = Integer.valueOf(res, 16);
-
-            sb.append(" PtypString length: ");
-            sb.append(String.valueOf(length - 2));
-
-        } else if( tagtype.equals("0102") ) {
-            String res = "";
-
-            for( int i = value_start_offset + 3; i >= value_start_offset; i-- ) {
-                res += formatByte0S(bytes[i]);
-            }
-
-            int length = Integer.valueOf(res, 16);
-
-            sb.append(" PtypBinary length: ");
-            sb.append(String.valueOf(length));
-
-        } else if( tagtype.equals("0040")) {
-            sb.append(" PtypTime");
-
-            /*
-            byte buf[] = new byte[8];
-
-            for( int i = 0; i < buf.length; i++ )
+                for( int i = 0; i < buf.length; i++ )
                 buf[i] = bytes[value_start_offset++];
-             *
-             */
+                *
+                */
 
-            long val = ByteConvert.convertByteArrayToLong(bytes,value_start_offset);
-
-            sb.append(" ");
-            sb.append(val);
-
-            sb.append(": ");
-            sb.append(new Date(MSTimeConvert.PtypeTime2Millis(val)).toString());;
-
-        } else if( tagtype.equals("000b")) {
-            sb.append(" boolean");
-
-        } else if( tagtype.equals("0003")) {
-
-            String res = "";
-
-            for( int i = value_start_offset + 3; i >= value_start_offset; i-- ) {
-                res += formatByte0S(bytes[i]);
-            }
-
-            int length = Integer.valueOf(res, 16);
-
-            sb.append(" PtypInteger32 value: ");
-            sb.append(length);
+                long val = ByteConvert.convertByteArrayToLong(bytes,value_start_offset);
+                sb.append(" ");
+                sb.append(val);
+                sb.append(": ");
+                sb.append(new Date(MSTimeConvert.PtypeTime2Millis(val)).toString());
+                ;
+                break;
+            case "000b":
+                sb.append(" boolean");
+                break;
+            case "0003":
+                {
+                    String res = "";
+                    for( int i = value_start_offset + 3; i >= value_start_offset; i-- ) {
+                        res += formatByte0S(bytes[i]);
+                    }        int length = Integer.valueOf(res, 16);
+                    sb.append(" PtypInteger32 value: ");
+                    sb.append(length);
+                    break;
+                }
         }
-
     }
 
 
@@ -382,7 +355,6 @@ public class ShowNode extends BaseDialog {
         sb.append("String Stream ");
         sb.append(cont.getEntry().getName());
         sb.append("\n\n");
-
 
         int offset = 0;
 
@@ -404,7 +376,7 @@ public class ShowNode extends BaseDialog {
             long len = Long.valueOf(s_lenght, 16);
 
             sb.append(s_lenght);
-            sb.append(" (" + len + ")");
+            sb.append(" (").append(len).append(")");
             sb.append(": ");
 
             // +2 nullterminating bytes to be for sure
@@ -498,52 +470,40 @@ public class ShowNode extends BaseDialog {
 
     private String getPropertySetById( String id )
     {
-        if( id.equals("00020386-0000-0000-C000-000000000046") )
-            return "PS_INTERNET_HEADERS";
-
-        if( id.equals("00020329-0000-0000-C000-000000000046") )
-            return "PS_PUBLIC_STRINGS";
-
-        if( id.equals("00062008-0000-0000-C000-000000000046") )
-            return "PSETID_Common";
-
-        if( id.equals("00062004-0000-0000-C000-000000000046") )
-            return "PSETID_Address";
-
-        if( id.equals("00062002-0000-0000-C000-000000000046") )
-            return "PSETID_Appointment";
-
-        if( id.equals("6ED8DA90-450B-101B-98DA-00AA003F1305") )
-            return "PSETID_Meeting";
-
-        if( id.equals("0006200A-0000-0000-C000-000000000046") )
-            return "PSETID_Log";
-
-        if( id.equals("41F28F13-83F4-4114-A584-EEDB5A6B0BFF") )
-            return "PSETID_Messaging";
-
-        if( id.equals("0006200E-0000-0000-C000-000000000046") )
-            return "PSETID_Note";
-
-        if( id.equals("00062041-0000-0000-C000-000000000046") )
-            return "PSETID_PostRss";
-
-        if( id.equals("00062003-0000-0000-C000-000000000046") )
-            return "PSETID_Task";
-
-        if( id.equals("4442858E-A9E3-4E80-B900-317A210CC15B") )
-            return "PSETID_UnifiedMessaging";
-
-        if( id.equals("00020328-0000-0000-C000-000000000046") )
-            return "PS_MAPI";
-
-        if( id.equals("71035549-0739-4DCB-9163-00F0580DBBDF") )
-            return "PSETID_AirSync";
-
-        if( id.equals("00062040-0000-0000-C000-000000000046") )
-            return "PSETID_Sharing";
-
-        return "";
+        switch(id) {
+            case "00020386-0000-0000-C000-000000000046":
+                return "PS_INTERNET_HEADERS";
+            case "00020329-0000-0000-C000-000000000046":
+                return "PS_PUBLIC_STRINGS";
+            case "00062008-0000-0000-C000-000000000046":
+                return "PSETID_Common";
+            case "00062004-0000-0000-C000-000000000046":
+                return "PSETID_Address";
+            case "00062002-0000-0000-C000-000000000046":
+                return "PSETID_Appointment";
+            case "6ED8DA90-450B-101B-98DA-00AA003F1305":
+                return "PSETID_Meeting";
+            case "0006200A-0000-0000-C000-000000000046":
+                return "PSETID_Log";
+            case "41F28F13-83F4-4114-A584-EEDB5A6B0BFF":
+                return "PSETID_Messaging";
+            case "0006200E-0000-0000-C000-000000000046":
+                return "PSETID_Note";
+            case "00062041-0000-0000-C000-000000000046":
+                return "PSETID_PostRss";
+            case "00062003-0000-0000-C000-000000000046":
+                return "PSETID_Task";
+            case "4442858E-A9E3-4E80-B900-317A210CC15B":
+                return "PSETID_UnifiedMessaging";
+            case "00020328-0000-0000-C000-000000000046":
+                return "PS_MAPI";
+            case "71035549-0739-4DCB-9163-00F0580DBBDF":
+                return "PSETID_AirSync";
+            case "00062040-0000-0000-C000-000000000046":
+                return "PSETID_Sharing";
+            default:
+                return "";
+        }
     }
 
     private void show_entry_stream(TreeNodeContainer cont)
@@ -567,55 +527,19 @@ public class ShowNode extends BaseDialog {
 
             voffset += 4;
 
-
             sb.append(" (in HEX) ");
 
             for (int i = voffset + 3; i >= voffset; i--) {
                 sb.append(formatByte0S(bytes[i]));
             }
 
-
-
-
-            String s_guid = "";
-
-            // 15 Bytes GUID
-            for (int i = voffset + 1; i >= voffset; i--) {
-                s_guid += formatByte0S(bytes[i]);
-            }
-
-            voffset += 2;
-
-            sb.append(" INDEX: ");
-
-            for (int i = voffset + 1; i >= voffset; i--) {
-                sb.append(formatByte0S(bytes[i]));
-            }
-
-            sb.append(" GUID: ");
-
-            long guid = Long.valueOf(s_guid,16);
-
-            boolean is_string = (guid & 0x01) > 0;
-
-            guid = guid >> 1;
-
-            sb.append(String.format("%04X",guid));
-
-            sb.append(" ");
-
-            if( is_string )
-                sb.append( "STRING ");
-            else
-                sb.append("NUM ");
-
-            sb.append("\n");
+            appendGuid(voffset, bytes, sb);
         }
 
         jTHex.setText(sb.toString());
     }
 
-        private void show_nameid_stream(TreeNodeContainer cont) {
+    private void show_nameid_stream(TreeNodeContainer cont) {
         StringBuilder sb = new StringBuilder();
         byte bytes[] = (byte[]) cont.getData();
 
@@ -634,44 +558,39 @@ public class ShowNode extends BaseDialog {
 
             voffset += 4;
 
-            String s_guid = "";
-
-            // 15 Bytes GUID
-            for (int i = voffset + 1; i >= voffset; i--) {
-                s_guid += formatByte0S(bytes[i]);
-            }
-
-            voffset += 2;
-
-            sb.append(" INDEX: ");
-
-            for (int i = voffset + 1; i >= voffset; i--) {
-                sb.append(formatByte0S(bytes[i]));
-            }
-
-            sb.append(" GUID: ");
-
-            long guid = Long.valueOf(s_guid,16);
-
-            boolean is_string = (guid & 0x01) > 0;
-
-            guid = guid >> 1;
-
-            sb.append(String.format("%04X",guid));
-
-            sb.append(" ");
-
-            if( is_string )
-                sb.append( "STRING ");
-            else
-                sb.append("NUM ");
-
-            sb.append("\n");
-
+            appendGuid(voffset, bytes, sb);
         }
-
 
         jTHex.setText(sb.toString());
     }
 
+    private void appendGuid(int voffset, byte[] bytes, StringBuilder sb) throws NumberFormatException {
+        String s_guid = "";
+
+        // 15 Bytes GUID
+        for (int i = voffset + 1; i >= voffset; i--) {
+            s_guid += formatByte0S(bytes[i]);
+        }
+
+        voffset += 2;
+
+        sb.append(" INDEX: ");
+
+        for (int i = voffset + 1; i >= voffset; i--) {
+            sb.append(formatByte0S(bytes[i]));
+        }
+
+        sb.append(" GUID: ");
+
+        long guid = Long.valueOf(s_guid,16);
+
+        boolean is_string = (guid & 0x01) > 0;
+
+        guid >>= 1;
+
+        sb.append(String.format("%04X",guid));
+        sb.append(" ");
+        sb.append(is_string ? "STRING " : "NUM ");
+        sb.append("\n");
+    }
 }

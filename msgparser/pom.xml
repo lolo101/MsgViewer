@@ -10,9 +10,12 @@
     <artifactId>msgparser</artifactId>
     <dependencies>
         <dependency>
-            <groupId>net.freeutils.jtnef</groupId>
-            <artifactId>tnef</artifactId>
-            <version>1.5.0</version>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-scratchpad</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
         </dependency>
     </dependencies>
 </project>
