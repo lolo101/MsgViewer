@@ -9,7 +9,7 @@
     <artifactId>MSGViewer</artifactId>
     <repositories>
         <repository>
-            <id>in-project</id>
+            <id>MSGViewer externals</id>
             <url>file://${basedir}/ext_resources</url>
         </repository>
     </repositories>
@@ -35,8 +35,16 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <!--minimizeJar>true</minimizeJar-->
+                            <minimizeJar>true</minimizeJar>
                             <finalName>msgviewer</finalName>
+                            <filters>
+                                <filter>
+                                    <artifact>javax.mail:mail</artifact>
+                                    <includes>
+                                        <include>**</include>
+                                    </includes>
+                                </filter>
+                            </filters>
                         </configuration>
                     </execution>
                 </executions>
