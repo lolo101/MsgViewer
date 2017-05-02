@@ -100,17 +100,7 @@ public class ModuleLauncher extends BaseModuleLauncher
         AppConfigDefinitions.registerDefinitions();
 	FrameWorkConfigDefinitions.registerDefinitions();
 
-        if( Setup.is_win_system() )
-        {
-            root.registerPlugin(new at.redeye.Plugins.ShellExec.Plugin());
-        }
-
-        root.registerPlugin(new net.sourceforge.MSGViewer.Plugins.msgparser.Plugin());
-        root.registerPlugin(new net.sourceforge.MSGViewer.Plugins.tnef.Plugin());
-        root.registerPlugin(new net.sourceforge.MSGViewer.Plugins.poi.Plugin());
-        root.registerPlugin(new net.sourceforge.MSGViewer.Plugins.javamail.Plugin());
-        root.registerPlugin(new at.redeye.Plugins.CommonsLang.Plugin());
-        root.registerPlugin(new at.redeye.Plugins.JerichoHtml.Plugin());
+        registerPlugins();
 
         setLookAndFeel(root);
 
@@ -157,6 +147,20 @@ public class ModuleLauncher extends BaseModuleLauncher
         closeSplash();
         mainwin.setVisible(true);
 
+    }
+
+    private void registerPlugins() {
+        if( Setup.is_win_system() )
+        {
+            root.registerPlugin(new at.redeye.Plugins.ShellExec.Plugin());
+        }
+
+        root.registerPlugin(new net.sourceforge.MSGViewer.Plugins.msgparser.Plugin());
+        root.registerPlugin(new net.sourceforge.MSGViewer.Plugins.tnef.Plugin());
+        root.registerPlugin(new net.sourceforge.MSGViewer.Plugins.poi.Plugin());
+        root.registerPlugin(new net.sourceforge.MSGViewer.Plugins.javamail.Plugin());
+        root.registerPlugin(new at.redeye.Plugins.CommonsLang.Plugin());
+        root.registerPlugin(new at.redeye.Plugins.JerichoHtml.Plugin());
     }
 
     private boolean getStartupFlag(String string)

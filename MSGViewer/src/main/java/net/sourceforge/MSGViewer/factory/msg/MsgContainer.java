@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.sourceforge.MSGViewer.factory.msg;
 
 import net.sourceforge.MSGViewer.factory.msg.PropTypes.PropPtypInteger32;
@@ -15,146 +11,132 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.List;
 import org.apache.poi.poifs.filesystem.DirectoryEntry;
-import org.apache.poi.poifs.filesystem.DocumentEntry;
+import org.apache.poi.poifs.filesystem.Entry;
 
 /**
  *
  * @author martin
  */
-public class MsgContainer 
+public class MsgContainer
 {
     public static final String NAME = "__properties_version1.0";
     public static final String NAMED_NAME = "__nameid_version1.0";
-    
+
     public static final String GUID_STREAM_NAME = "__substg1.0_00020102";
     public static final String ENTRY_STREAM_NAME = "__substg1.0_00030102";
     public static final String STRING_STREAM_NAME = "__substg1.0_00040102";
-    
-    private static final int HEADER_SIZE = 8 + 4 + 4 + 4 + 4 + 8;     
-    private ArrayList<PropType> properties = new ArrayList();
-    private ArrayList<SubstGEntry> substg_streams = new ArrayList();
-        
-    private ArrayList<RecipientEntry> recipients = new ArrayList();
-    
-    public MsgContainer()
-    {
-        
-    }
-    
+
+    private static final int HEADER_SIZE = 8 + 4 + 4 + 4 + 4 + 8;
+    private final List<PropType> properties = new ArrayList<>();
+    private final List<SubstGEntry> substg_streams = new ArrayList<>();
+
+    private final List<RecipientEntry> recipients = new ArrayList<>();
+
     public void addProperty( PropType prop )
     {
         properties.add(prop);
     }
-    
+
     public void addVarEntry( SubstGEntry entry )
     {
        addProperty(entry.getPropType());
        substg_streams.add(entry);
     }
-    
+
     public void write( DirectoryEntry root ) throws IOException
     {
         int size = HEADER_SIZE + properties.size() * 16;
         byte bytes[] = new byte[size];
-        
+
         int offset = 8;
-        
-        // next recip id       
+
+        // next recip id
         writeInt(bytes,offset, recipients.size());
         offset +=4;
-        
-        // next attachment id       
+
+        // next attachment id
         writeInt(bytes,offset, 0);
-        offset +=4;        
-        
-        // recip count       
+        offset +=4;
+
+        // recip count
         writeInt(bytes,offset, recipients.size());
-        offset +=4;            
-                
-        // attachment count       
+        offset +=4;
+
+        // attachment count
         writeInt(bytes,offset, 0);
-        offset +=4;               
-        
-        offset = HEADER_SIZE;                
-        
+        offset +=4;
+
+        offset = HEADER_SIZE;
+
         for( PropType prop : properties )
         {
             prop.writePropertiesEntry(bytes, offset);
             offset += 16;
         }
-        
-        for( SubstGEntry entry : substg_streams )
+
+        for( SubstGEntry entry : substg_streams ) {
             entry.createEntry(root);
-        
+        }
+
         int count = 0 ;
-        for( RecipientEntry rec : recipients ) {               
+        for( RecipientEntry rec : recipients ) {
             writeRecipientEntry( root, rec, count++ );
         }
-        
+
         createPropEntry(bytes,root);
         createNamedEntry(root);
     }
-    
+
     private void writeInt( byte[] bytes, int offset, int value ) {
-        
+
        ByteBuffer buffer = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN);
        buffer.putInt(value);
-              
+
        byte[] int_bytes = buffer.array();
-                    
+
        System.arraycopy(int_bytes, 0, bytes, offset, 4);
     }
-    
-    void createPropEntry(byte bytes[], DirectoryEntry root ) throws IOException
+
+    private void createPropEntry(byte bytes[], DirectoryEntry root ) throws IOException
     {
+        deleteEntryIfExists(root, NAME);
+
         ByteArrayInputStream buffer = new ByteArrayInputStream(bytes);
-        
-        DocumentEntry prop_entry = null;
-        
-        try {
-            prop_entry = (DocumentEntry) root.getEntry(NAME);
-        } catch( FileNotFoundException ex ) {
-            
-        }
-        
-        if( prop_entry != null )
-            prop_entry.delete();
-        
-        prop_entry = root.createDocument(NAME, buffer);             
+        root.createDocument(NAME, buffer);
     }
-    
-    void createNamedEntry(DirectoryEntry root ) throws IOException
+
+    private void createNamedEntry(DirectoryEntry root ) throws IOException
     {
-        DirectoryEntry prop_entry = null;
-        
-        try {
-            prop_entry = (DirectoryEntry) root.getEntry(NAMED_NAME);
-        } catch( FileNotFoundException ex ) {
-            
-        }
-        
-        if( prop_entry != null )
-            prop_entry.delete();
-        
-        prop_entry = root.createDirectory(NAMED_NAME);
-        
-        
+        deleteEntryIfExists(root, NAMED_NAME);
+
+        DirectoryEntry prop_entry = root.createDirectory(NAMED_NAME);
+
         prop_entry.createDocument(GUID_STREAM_NAME, new ByteArrayInputStream(new byte[0]));
         prop_entry.createDocument(ENTRY_STREAM_NAME, new ByteArrayInputStream(new byte[0]));
         prop_entry.createDocument(STRING_STREAM_NAME, new ByteArrayInputStream(new byte[0]));
     }
-    
-    void addRecipient( RecipientEntry entry ) {
+
+    private static void deleteEntryIfExists(DirectoryEntry root, String name) {
+        try {
+            Entry prop_entry = root.getEntry(name);
+            if( prop_entry != null ) {
+                prop_entry.delete();
+            }
+        } catch( FileNotFoundException ignore) {}
+    }
+
+    public void addRecipient( RecipientEntry entry ) {
         recipients.add(entry);
     }
 
-    private void writeRecipientEntry(DirectoryEntry root , RecipientEntry rec, int id) throws IOException 
+    private void writeRecipientEntry(DirectoryEntry root , RecipientEntry rec, int id) throws IOException
     {
         DirectoryEntry rec_dir = root.createDirectory(String.format("__recip_version1.0_#%08d", id));
 
-        ArrayList<PropType> p_entries = new ArrayList();
-        ArrayList<SubstGEntry> s_streams = new ArrayList();
+        List<PropType> p_entries = new ArrayList<>();
+        List<SubstGEntry> s_streams = new ArrayList<>();
 
         p_entries.add(new PropPtypInteger32("3000", id));
         p_entries.add(new PropPtypInteger32("0C15", 1));
@@ -172,15 +154,16 @@ public class MsgContainer
         byte bytes[] = new byte[size];
 
         int offset = 8;
-        
+
         for (PropType prop : p_entries) {
             prop.writePropertiesEntry(bytes, offset);
             offset += 16;
         }
-        
-        createPropEntry(bytes,rec_dir);
-        
-        for( SubstGEntry entry : s_streams )
-            entry.createEntry(rec_dir);        
+
+        createPropEntry(bytes, rec_dir);
+
+        for( SubstGEntry entry : s_streams ) {
+            entry.createEntry(rec_dir);
+        }
     }
 }

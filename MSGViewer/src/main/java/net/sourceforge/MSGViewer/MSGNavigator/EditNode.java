@@ -1,13 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
- * EditNode.java
- *
- * Created on 05.07.2011, 20:15:35
- */
 package net.sourceforge.MSGViewer.MSGNavigator;
 
 import at.redeye.FrameWork.base.AutoMBox;
@@ -26,44 +16,42 @@ import org.apache.poi.poifs.filesystem.Entry;
  */
 public class EditNode extends BaseDialog{
 
-    TreeNodeContainer cont;
-    MSGNavigator navwin;
-    
+    private TreeNodeContainer cont;
+    private MSGNavigator navwin;
+
     public EditNode(Root root, MSGNavigator nav, TreeNodeContainer cont) {
-         super( root, root.MlM("Edit:") + " " + cont.getEntry().getName());
-        
-         this.cont = cont;
-         this.navwin = nav;
-         
+        super( root, root.MlM("Edit:") + " " + cont.getEntry().getName());
+
+        this.cont = cont;
+        this.navwin = nav;
+
         initComponents();
-        
+
         if( cont.getEntry().isDocumentEntry() )
         {
-            Object data = null ; 
-            
-            if( ( data = cont.getData() ) != null ) {
-                if( data instanceof String )
-                {
-                    jtHex.setText((String)data);
+            Object data = cont.getData();
+
+            if( data instanceof String )
+            {
+                jtHex.setText((String)data);
+            }
+            else if( data instanceof byte[] )
+            {
+                StringBuilder sb = new StringBuilder();
+                byte[] bytes = (byte[]) data;
+
+                for( int i = 0; i < bytes.length; i++ ) {
+
+                    if( i > 0 && i % 20 == 0 ) {
+                        sb.append("\n");
+                    }
+
+                    sb.append(String.format("%02x", bytes[i] ));
+
+                    sb.append(" ");
                 }
-                else if( data instanceof byte[] )
-                {
-                    StringBuilder sb = new StringBuilder();
-                    byte bytes[] = (byte[]) data;
-                    
-                    for( int i = 0; i < bytes.length; i++ ) {
-                        
-                        if( i > 0 && i % 20 == 0 )
-                            sb.append("\n");
-                                                                              
-                        
-                        sb.append(String.format("%02x", bytes[i] ));
-                        
-                        sb.append(" ");                                                                    
-                    }   
-                    
-                    jtHex.setText(sb.toString());
-                }
+
+                jtHex.setText(sb.toString());
             }
         }
     }
@@ -115,38 +103,38 @@ public class EditNode extends BaseDialog{
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        
-        
+
+
         new AutoMBox(this.getClass().getName()) {
 
             @Override
-            public void do_stuff() throws Exception {       
-                
+            public void do_stuff() throws Exception {
+
                 if( cont.getEntry().getName().matches("__substg1\\.0_[0-9][0-9][0-9][0-9]001[fF]") )
                 {
                     String data = jtHex.getText().trim();
-                    
+
                     Entry entry = cont.getEntry();
 
                     String name = entry.getName();
 
                     DirectoryEntry parent = entry.getParent();
                     entry.delete();
-                    
+
                     ByteArrayInputStream buf = new ByteArrayInputStream(data.getBytes("UTF-16LE"));
 
                     DocumentEntry new_entry = parent.createDocument(name, buf);
-                    
+
                     TopLevelPropertyStream stream = new TopLevelPropertyStream(parent);
                     stream.update(new_entry);
 
-                    
+
                     navwin.edited();
-                    
-                    
+
+
                     close();
-                } 
-                else 
+                }
+                else
                 {
                     String data = jtHex.getText();
 
@@ -169,17 +157,15 @@ public class EditNode extends BaseDialog{
                     DirectoryEntry parent = entry.getParent();
                     entry.delete();
 
-                    ByteArrayInputStream buf = new ByteArrayInputStream(bytes);
-
-                    parent.createDocument(name, buf);
+                    parent.createDocument(name, new ByteArrayInputStream(bytes));
 
                     close();
                 }
-                
+
             }
         };
-        
-        
+
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
 

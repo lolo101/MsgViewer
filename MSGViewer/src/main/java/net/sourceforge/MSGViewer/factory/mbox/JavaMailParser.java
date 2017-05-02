@@ -83,7 +83,7 @@ public class JavaMailParser
 
             if( disp == null && part.getFileName() == null && part.isMimeType("text/html") ) {
                 // this is our html message body
-                byte bytes[] = getContent(part);
+                byte[] bytes = getContent(part);
 
                 StringBuilder sb = new StringBuilder();
 
@@ -92,33 +92,32 @@ public class JavaMailParser
 
                 msg.setBodyRTF(sb.toString());
                 LOGGER.debug(msg.getBodyRTF());
-                return;
-            }
+            } else if (disp == null || disp.equalsIgnoreCase(Part.ATTACHMENT)) {
+                // many mailers don't include a Content-Disposition
 
-        // many mailers don't include a Content-Disposition
-        if (disp == null || disp.equalsIgnoreCase(Part.ATTACHMENT)) {
+                MimeBodyPart mpart = (MimeBodyPart)part;
 
-              MimeBodyPart mpart = (MimeBodyPart)part;
+                FileAttachment att = new FileAttachment();
+                att.setMimeTag(getMime(part.getContentType()));
+                att.setFilename(part.getFileName());
 
-              FileAttachment att = new FileAttachment();
-              att.setMimeTag(getMime(part.getContentType()));
-              att.setFilename(part.getFileName());
+                String cid = mpart.getContentID();
+                if( cid != null ) {
+                    cid = StringUtils.strip(cid, "<>");
+                    att.setCid(cid);
+                }
 
-              String cid = mpart.getContentID();
-              if( cid != null ) {
-                cid = StringUtils.strip(cid, "<>");
-                att.setCid(cid);
-              }
+                att.setSize(mpart.getSize());
 
-              att.setSize(mpart.getSize());
+                if( att.getFilename() == null ) {
+                    att.setFilename("");
+                }
 
-              if( att.getFilename() == null ) {
-                  att.setFilename("");
-              }
+                att.setData(getContent(part));
 
-              att.setData(getContent(part));
-
-              msg.addAttachment(att);
+                msg.addAttachment(att);
+            } else {
+                LOGGER.warn("Unparseable part");
             }
         }
     }

@@ -1,14 +1,12 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.sourceforge.MSGViewer.MSGNavigator;
 
 import net.sourceforge.MSGViewer.factory.msg.lib.MSTimeConvert;
 import net.sourceforge.MSGViewer.factory.msg.lib.ByteConvert;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.poifs.filesystem.DocumentEntry;
 import org.apache.poi.poifs.filesystem.DocumentInputStream;
@@ -19,25 +17,7 @@ import org.apache.poi.poifs.filesystem.DocumentInputStream;
  */
 public class PropertyParser
 {
-    public static class PropertyTag
-    {
-        String descr;
-        String tagname;
-
-        public PropertyTag( String tagname, String descr )
-        {
-            this.tagname = tagname;
-            this.descr = descr;
-        }
-
-        @Override
-        public String toString()
-        {
-            return descr;
-        }
-    }
-
-    private DocumentEntry entry;
+    private final DocumentEntry entry;
 
     private boolean is_toplevel = false;
     private boolean is_attachment = false;
@@ -45,7 +25,7 @@ public class PropertyParser
 
     private int max_descr_lenght = 20;
 
-    private ArrayList<PropertyTag> props = new ArrayList<PropertyTag>();
+    private final List<String> props = new ArrayList<>();
 
     public PropertyParser(DocumentEntry entry) throws IOException
     {
@@ -70,13 +50,14 @@ public class PropertyParser
             is_attachment = true;
         }
 
-        DocumentInputStream in = new DocumentInputStream(entry);
+        InputStream in = new DocumentInputStream(entry);
 
         byte bytes[] = new byte[entry.getSize()];
         int len = in.read(bytes);
 
-        if( len != bytes.length )
+        if( len != bytes.length ) {
             throw new IOException("Not all Data read");
+        }
 
         // RESERVED 8 bytes (should by zero)
         int offset = 8;
@@ -135,55 +116,24 @@ public class PropertyParser
         }
     }
 
-    private String formatByte0( byte b )
-    {
-        return String.format("%02X ", b);
-    }
-
-    private String formatByte0S( byte b )
-    {
-        return String.format("%02X", b);
-    }
-
     private void parsePropertyEntry(byte[] bytes, int offset) {
 
         StringBuilder sb = new StringBuilder();
 
-        // sb.append("TAG: ");
-
-        String tagname = "";
-
         // property tag
         for( int i = offset + 3; i >= offset; i-- ) {
             sb.append(formatByte0S(bytes[i]));
-            tagname += formatByte0S(bytes[i]);
         }
+
+        String tagname = sb.toString();
 
         offset += 4;
 
-        // sb.append(" FLAGS: ");
         sb.append( " " );
-/*
-        for( int i = offset; i < offset + 4; i++ )
-            sb.append(formatByte0(bytes[i]));
-  */
-        if( (bytes[offset] & 0001) > 0 ) {
-            sb.append("M");
-        } else {
-            sb.append("_");
-        }
 
-        if( (bytes[offset] & 0002) > 0 ) {
-            sb.append("R");
-        } else {
-            sb.append("_");
-        }
-
-        if( (bytes[offset] & 0004) > 0 ) {
-            sb.append("W");
-        } else {
-            sb.append("_");
-        }
+        sb.append((bytes[offset] & 0001) > 0 ? "M" : "_");
+        sb.append((bytes[offset] & 0002) > 0 ? "R" : "_");
+        sb.append((bytes[offset] & 0004) > 0 ? "W" : "_");
 
         offset += 4;
 
@@ -191,8 +141,9 @@ public class PropertyParser
 
         int value_start_offset = offset;
 
-        for( int i = 0; i < 8; i++, offset++ )
+        for( int i = 0; i < 8; i++, offset++ ) {
             sb.append(formatByte0(bytes[offset]));
+        }
 
         sb.append(" ");
 
@@ -204,11 +155,7 @@ public class PropertyParser
         if( tagtype.equals("001f")) {
 
 
-            String res = "";
-
-            for( int i = value_start_offset + 3; i >= value_start_offset; i-- ) {
-                res += formatByte0S(bytes[i]);
-            }
+            String res = formatBytes0(value_start_offset, bytes);
 
             int length = Integer.valueOf(res, 16);
 
@@ -216,11 +163,7 @@ public class PropertyParser
             sb.append(String.valueOf(length - 2));
 
         } else if( tagtype.equals("0102") ) {
-            String res = "";
-
-            for( int i = value_start_offset + 3; i >= value_start_offset; i-- ) {
-                res += formatByte0S(bytes[i]);
-            }
+            String res = formatBytes0(value_start_offset, bytes);
 
             int length = Integer.valueOf(res, 16);
 
@@ -242,11 +185,7 @@ public class PropertyParser
 
         } else if( tagtype.equals("0003")) {
 
-            String res = "";
-
-            for( int i = value_start_offset + 3; i >= value_start_offset; i-- ) {
-                res += formatByte0S(bytes[i]);
-            }
+            String res = formatBytes0(value_start_offset, bytes);
 
             int length = Long.valueOf(res, 16).intValue();
 
@@ -254,15 +193,29 @@ public class PropertyParser
             sb.append(length);
         }
 
-        props.add(new PropertyTag(tagname, sb.toString()));
+        props.add(sb.toString());
     }
 
-    public ArrayList<PropertyTag> getPropertyTags()
+    private String formatBytes0(int value_start_offset, byte[] bytes) {
+        String res = "";
+        for( int i = value_start_offset + 3; i >= value_start_offset; i-- ) {
+            res += formatByte0S(bytes[i]);
+        }
+        return res;
+    }
+
+    private String formatByte0( byte b )
+    {
+        return String.format("%02X ", b);
+    }
+
+    private String formatByte0S( byte b )
+    {
+        return String.format("%02X", b);
+    }
+
+    public List<String> getPropertyTags()
     {
         return props;
     }
-
-
-
-
 }

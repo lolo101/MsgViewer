@@ -10,7 +10,7 @@ import net.sourceforge.MSGViewer.MSGNavigator.MSGNavigator.TreeNodeContainer;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
@@ -24,10 +24,10 @@ public class ShowNode extends BaseDialog {
 
     private static final long serialVersionUID = 3130592579862038804L;
 
-    private HashMap <String,String> props;
+    private Map<String,String> props;
     private int max_descr_lenght = 20;
 
-    public ShowNode(Root root, TreeNodeContainer cont,  HashMap <String,String> props)
+    public ShowNode(Root root, TreeNodeContainer cont,  Map<String,String> props)
     {
         super( root, root.MlM("Navigate:") + " " + cont.getEntry().getName());
         initComponents();

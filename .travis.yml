@@ -9,4 +9,5 @@ deploy:
   file: MSGViewer/target/msgviewer.jar
   on:
     repo: lolo101/MsgViewer
+    tags: true
   skip_cleanup: true

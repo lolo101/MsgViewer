@@ -1,12 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package net.sourceforge.MSGViewer.Plugins.tnef;
 
 import at.redeye.FrameWork.base.AutoMBox;
-import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.widgets.helpwindow.HelpFileLoader;
 
 /**
@@ -14,16 +8,16 @@ import at.redeye.FrameWork.widgets.helpwindow.HelpFileLoader;
  * @author martin
  */
 public class Plugin implements at.redeye.FrameWork.Plugin.Plugin
-{    
-    public static String NAME = "TNEF";
-    
-    Root root;
+{
+    public static final String NAME = "TNEF";
 
+    @Override
     public String getName()
     {
         return NAME;
     }
 
+    @Override
     public String getLicenceText()
     {
         final StringBuilder builder = new StringBuilder();
@@ -38,16 +32,18 @@ public class Plugin implements at.redeye.FrameWork.Plugin.Plugin
                 builder.append(licence);
             }
         };
-        
+
 
         return builder.toString();
     }
 
-    public void initPlugin(Object obj) 
+    @Override
+    public void initPlugin(Object obj)
     {
 
     }
 
+    @Override
     public boolean isAvailable() {
         return true;
     }
@@ -58,6 +54,7 @@ public class Plugin implements at.redeye.FrameWork.Plugin.Plugin
         return getName() + " " + getVersion();
     }
 
+    @Override
     public String getChangeLog() {
 
         final StringBuilder builder = new StringBuilder();
@@ -77,6 +74,7 @@ public class Plugin implements at.redeye.FrameWork.Plugin.Plugin
         return builder.toString();
     }
 
+    @Override
     public String getVersion() {
         return Version.getVersion();
     }

@@ -1,12 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package net.sourceforge.MSGViewer.Plugins.javamail;
 
 import at.redeye.FrameWork.base.AutoMBox;
-import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.widgets.helpwindow.HelpFileLoader;
 
 /**
@@ -14,10 +8,8 @@ import at.redeye.FrameWork.widgets.helpwindow.HelpFileLoader;
  * @author martin
  */
 public class Plugin implements at.redeye.FrameWork.Plugin.Plugin
-{    
-    public static String NAME = "javamail";
-    
-    Root root;
+{
+    public static final String NAME = "javamail";
 
     @Override
     public String getName()
@@ -40,13 +32,13 @@ public class Plugin implements at.redeye.FrameWork.Plugin.Plugin
                 builder.append(licence);
             }
         };
-        
+
 
         return builder.toString();
     }
 
     @Override
-    public void initPlugin(Object obj) 
+    public void initPlugin(Object obj)
     {
 
     }

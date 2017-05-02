@@ -1,13 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
- * MSGNavigator.java
- *
- * Created on 04.07.2011, 21:53:25
- */
 package net.sourceforge.MSGViewer.MSGNavigator;
 
 import at.redeye.FrameWork.base.AutoMBox;
@@ -28,6 +18,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import javax.swing.JPopupMenu;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -45,14 +36,14 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
  */
 public class MSGNavigator extends BaseDialog {
 
-    public static final String SETTING_SHOW_SIZE = "MSG_NAVIGATOR_SHOW_SIZE";    
-    public static final String SETTING_AUTOSAVE = "MSG_SETTING_AUTOSAVE";        
-    
-    static final HashMap <String,String> props = new HashMap();
-     POIFSFileSystem fs;
-     File file;
-     
-     boolean setting_show_size = false;
+    public static final String SETTING_SHOW_SIZE = "MSG_NAVIGATOR_SHOW_SIZE";
+    public static final String SETTING_AUTOSAVE = "MSG_SETTING_AUTOSAVE";
+
+    static final Map<String,String> props = new HashMap<>();
+    private POIFSFileSystem fs;
+    private final File file;
+
+    private boolean setting_show_size = false;
 
     static {
         props.put("001a", "Message Class");
@@ -94,7 +85,7 @@ public class MSGNavigator extends BaseDialog {
         props.put("0c1e", "PidTagSenderAddressType"); //  Contains the sending mailbox owner's e-mail address type.
         props.put("0064", "PidTagSentRepresentingAddressType"); //  Contains an e-mail address type.
         props.put("0070", "PidTagConversationTopic"); //   Contains an unchanging copy of the original subject.
-        props.put("300b", "PidTagSearchKey"); //  Contains a unique binary-comparable key that identifies an object for a search. 
+        props.put("300b", "PidTagSearchKey"); //  Contains a unique binary-comparable key that identifies an object for a search.
         props.put("0002", "<b>GUID Stream</b>");
         props.put("0003", "<b>Entry Stream</b>");
         props.put("0004", "<b>String Stream</b>");
@@ -111,7 +102,7 @@ public class MSGNavigator extends BaseDialog {
         props.put("0070", "PidTagConversationTopic");
         props.put("0071", "PidTagConversationIndex");
         props.put("0075", "PidTagReceivedByAddressType");
-        props.put("0c1d", "PidTagSenderSearchKey");      
+        props.put("0c1d", "PidTagSenderSearchKey");
         props.put("0e06", "PidTagMessageDeliveryTime");
         props.put("0e07", "PidTagMessageFlags");
         props.put("0e28", "PidTagPrimarySendAccount");
@@ -133,57 +124,57 @@ public class MSGNavigator extends BaseDialog {
 
      public static class TreeNodeContainer extends DefaultMutableTreeNode
      {
-         Entry entry;
-         Object data;
-         
+         private final Entry entry;
+         private Object data;
+
          public TreeNodeContainer( Entry entry, String name  )
          {
              super( name );
              this.entry = entry;
          }
-         
-         public Entry getEntry() {         
+
+         public Entry getEntry() {
              return entry;
          }
-         
-         public Object getData() {         
+
+         public Object getData() {
              return data;
-         }         
-         
+         }
+
          public void setData( Object data ) {
              this.data = data;
          }
-                 
+
      }
-     
+
      public static class PropertyContainer extends TreeNodeContainer
      {
-         private PropertyParser.PropertyTag tag;
-         
-         public PropertyContainer( Entry entry, String name, PropertyParser.PropertyTag property_tag )
+         private final String tag;
+
+         public PropertyContainer( Entry entry, String name, String property_tag )
          {
-             super( entry, name );      
+             super( entry, name );
              this.tag = property_tag;
          }
-                  
-         public PropertyParser.PropertyTag getPropertyTag()
+
+         public String getPropertyTag()
          {
              return tag;
-         }         
+         }
      }
-    
-       
-     
+
+
+
     /** Creates new form MSGNavigator */
-    public MSGNavigator(Root root, File file) 
+    public MSGNavigator(Root root, File file)
     {
         super( root, root.MlM("Navigate:") + " " + file.getName());
-        
+
         initComponents();
-        
+
         this.file = file;
-        
-       
+
+
         /*
         props.put("8008", "X-MimeOLE");
         props.put("8005", "X-GMX-AntiVirus");
@@ -192,15 +183,15 @@ public class MSGNavigator extends BaseDialog {
         props.put("8009", "X-Provags-ID");
         props.put("8007", "X-Authenticated");
         */
-        
 
-        reload();               
+
+        reload();
     }
-    
-    void reload() {
-        
-        setting_show_size = StringUtils.isYes(root.getSetup().getLocalConfig(SETTING_SHOW_SIZE,"true") );        
-        
+
+    final void reload() {
+
+        setting_show_size = StringUtils.isYes(root.getSetup().getLocalConfig(SETTING_SHOW_SIZE,"true") );
+
          EventQueue.invokeLater(new Runnable() {
 
             @Override
@@ -215,62 +206,62 @@ public class MSGNavigator extends BaseDialog {
 
             }
         });
-    }    
-    
+    }
+
     void parse( File file ) throws FileNotFoundException, IOException
     {
         InputStream in = new FileInputStream(file);
-        
+
         fs = new POIFSFileSystem(in);
         DirectoryNode fs_root = fs.getRoot();
-        
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode(fs_root.getShortDescription());
-       
-        parse( root, fs_root );
-        
-        tree.setModel(new DefaultTreeModel(root));       
+
+        DefaultMutableTreeNode localRoot = new DefaultMutableTreeNode(fs_root.getShortDescription());
+
+        parse( localRoot, fs_root );
+
+        tree.setModel(new DefaultTreeModel(localRoot));
     }
-    
-    private void parse(DefaultMutableTreeNode root_node, DirectoryEntry fs_root) throws IOException 
+
+    private void parse(DefaultMutableTreeNode root_node, DirectoryEntry fs_root) throws IOException
     {
-        for (Iterator<?> iter = fs_root.getEntries(); iter.hasNext(); ) 
+        for (Iterator<?> iter = fs_root.getEntries(); iter.hasNext(); )
         {
-            Entry entry = (Entry) iter.next();            
-            
+            Entry entry = (Entry) iter.next();
+
             if (entry.isDirectoryEntry()) {
-                DirectoryEntry de = (DirectoryEntry) entry;               
-                                
+                DirectoryEntry de = (DirectoryEntry) entry;
+
                 String name = "<html><body><b style=\"color: blue\">" +  entry.getName() + "</b></body></html>";
-                
+
                 DefaultMutableTreeNode node = new TreeNodeContainer(de,name);
-                root_node.add(node);   
-                
+                root_node.add(node);
+
                 parse( node, de );
             } else if( entry.isDocumentEntry() ) {
-                
+
                 DocumentEntry de = (DocumentEntry) entry;
-                
+
                 FieldInformation info = analyzeDocumentEntry(de);
 
                 // the data is accessed by getting an input stream
                 // for the given document entry
-                DocumentInputStream dstream = new DocumentInputStream(de);                               
-                
+                DocumentInputStream dstream = new DocumentInputStream(de);
+
                 if( de.getName().equals("__properties_version1.0") )
                 {
                     info.setType("0102");
                 }
-                
+
                 // create a Java object from the data provided
                 // by the input stream. depending on the field
                 // information, either a String or a byte[] will
                 // be returned. other datatypes are not yet supported
-                Object data = this.getData(dstream, info);       
-                
+                Object data = this.getData(dstream, info);
+
                 StringBuilder sb = new StringBuilder();
-                
+
                 sb.append("<html><body>");
-                
+
                 if( entry.getName().startsWith("__properties") ) {
                     sb.append("<b>");
                     sb.append(entry.getName());
@@ -280,42 +271,45 @@ public class MSGNavigator extends BaseDialog {
                     sb.append(entry.getName());
                     // sb.append("</b>");
                 }
-                
+
                 sb.append("&nbsp;&nbsp;&nbsp;");
-                
+
 
                 String property_name =  props.get(info.getClazz());
-                
-                if( property_name != null )
-                     sb.append(" <code style=\"color: green\">" + property_name + "</code> ");
-                
-                if( setting_show_size )
-                      sb.append(" ").append(de.getSize()).append("b ");
-                
+
+                if( property_name != null ) {
+                    sb.append(" <code style=\"color: green\">").append(property_name).append("</code> ");
+                }
+
+                if( setting_show_size ) {
+                    sb.append(" ").append(de.getSize()).append("b ");
+                }
+
                 if( data instanceof String )
-                {                                               
+                {
                     String s = (String)data;
-                    if( s.length() > 100 )
+                    if( s.length() > 100 ) {
                         s = s.substring(0,100) + "...";
-                    
-                     sb.append("     <i>" + s + "</i>");
+                    }
+
+                     sb.append("     <i>").append(s).append("</i>");
                 } else if( data instanceof byte[] ) {
                     byte bytes[] = (byte[]) data;
-                     sb.append("     <i style=\"color: dd5555\">byte array</i>");
+                    sb.append("     <i style=\"color: dd5555\">byte array</i>");
                 }
 
                 sb.append("</body></html>");
-                    
+
                 TreeNodeContainer node = new TreeNodeContainer(entry,sb.toString());
                 node.setData(data);
-                
+
                 if( de.getName().equals("__properties_version1.0") )
                 {
                     try {
                         PropertyParser pp = new PropertyParser(de);
-                        for (PropertyParser.PropertyTag tag : pp.getPropertyTags()) {
+                        for (String tag : pp.getPropertyTags()) {
                             TreeNodeContainer pnode = new PropertyContainer(entry,
-                                        "<html><body><pre style=\"font-family: monospace; fonz-size:8px\">"  + tag.toString() + "</pre></body></html>",
+                                        "<html><body><pre style=\"font-family: monospace; fonz-size:8px\">"  + tag + "</pre></body></html>",
                                         tag);
                             node.add(pnode);
                         }
@@ -323,22 +317,22 @@ public class MSGNavigator extends BaseDialog {
                         logger.error(ex, ex);
                     }
                 }
-                
-                root_node.add(node);                       
-            }
-        }        
-    }
-    
 
-    
-    
+                root_node.add(node);
+            }
+        }
+    }
+
+
+
+
     /**
      * Reads the information from the InputStream and
      * creates, based on the information in the
      * {@link FieldInformation} object, either a String
-     * or a byte[] (e.g., for attachments) Object 
+     * or a byte[] (e.g., for attachments) Object
      * containing this data.
-     * 
+     *
      * @param dstream The InputStream of the Document Entry.
      * @param info The field information that is needed to
      *  determine the data type of the input stream.
@@ -346,14 +340,14 @@ public class MSGNavigator extends BaseDialog {
      *  the data.
      * @throws IOException Thrown if the .msg file could not
      *  be parsed.
-     * @throws UnsupportedOperationException Thrown if 
+     * @throws UnsupportedOperationException Thrown if
      *  the .msg file contains unknown data.
      */
     protected Object getData(DocumentInputStream dstream, FieldInformation info) throws IOException {
         // if there is no field information available, we simply
         // return null. in that case, we're not interested in the
         // data anyway
-        if ((info == null) || (info.getType() == FieldInformation.UNKNOWN)) {
+        if (info == null || FieldInformation.UNKNOWN.equals(info.getType())) {
             return null;
         }
         // if the type is 001e (we know it is lower case
@@ -365,14 +359,13 @@ public class MSGNavigator extends BaseDialog {
             // we put the complete data into a byte[] object...
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
-            int read = -1;
-            while ((read = dstream.read(buffer)) > 0) {
+            for (int read; (read = dstream.read(buffer)) > 0;) {
                 baos.write(buffer, 0, read);
             }
             // ...and create a String object from it
 /*
             byte bytes[] = baos.toByteArray();
-            
+
             for( int i = 0; i < bytes.length; i++ )
             {
             System.out.print(String.format("%d %c,", (int)bytes[i], (char)bytes[i]));
@@ -386,8 +379,7 @@ public class MSGNavigator extends BaseDialog {
             // Note: this is arcane guesswork, but it works
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
-            int read = -1;
-            while ((read = dstream.read(buffer)) > 0) {
+            for (int read; (read = dstream.read(buffer)) > 0;) {
                 baos.write(buffer, 0, read);
             }
             byte[] bytes = baos.toByteArray();
@@ -398,35 +390,30 @@ public class MSGNavigator extends BaseDialog {
             // the data is read into a byte[] object
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
-            int read = -1;
-            while ((read = dstream.read(buffer)) > 0) {
+            for (int read; (read = dstream.read(buffer)) > 0;) {
                 baos.write(buffer, 0, read);
             }
             return baos.toByteArray();
         } else if (info.getType().equals("0000")) {
             // the data is read into a byte[] object
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
-            int read = -1;
 
             StringBuilder sb = new StringBuilder();
 
-            while ((read = dstream.read(buffer)) > 0) {
+            for (int read; (read = dstream.read(buffer)) > 0;) {
                 for (int i = 0; i < read; i++) {
-                    sb.append((int) buffer[i]);
+                    sb.append(buffer[i]);
                     sb.append(" ");
-                    // baos.write(buffer, 0, read);
                 }
             }
             return sb.toString();
-            // return baos.toByteArray();
         }
 
-        // this should not happen		
+        // this should not happen
         logger.trace("Unknown field type " + info.getType());
         return null;
-    } 
-    
+    }
+
     protected FieldInformation analyzeDocumentEntry(DocumentEntry de) {
         String name = de.getName();
         // we are only interested in document entries
@@ -449,10 +436,10 @@ public class MSGNavigator extends BaseDialog {
                 logger.trace("Could not parse directory entry " + name + " " + re);
             }
             return new FieldInformation(clazz, type);
-        } else {            
+        } else {
             logger.trace("Ignoring entry with name " + name + " size: " + de.getSize());
-        } 
-        
+        }
+
         // we are not interested in the field
     	// and return an empty FieldInformation object
     	return new FieldInformation();
@@ -489,18 +476,19 @@ public class MSGNavigator extends BaseDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void treeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_treeMouseClicked
-        
+
         if( evt.getButton() == MouseEvent.BUTTON3 )
-        {                        
-                        
+        {
+
             TreePath path = tree.getPathForLocation(evt.getX(), evt.getY());
-            
+
             if( path == null ) {
                 // retry it with lower X value
-                for( int x = evt.getX(); x > 0 && path == null; x -= 10 )
+                for( int x = evt.getX(); x > 0 && path == null; x -= 10 ) {
                     path = tree.getPathForLocation(x, evt.getY());
+                }
             }
-            
+
             if (path != null) {
                 tree.setSelectionPath(path);
             }
@@ -508,7 +496,7 @@ public class MSGNavigator extends BaseDialog {
 
             JPopupMenu popup = new NavActionPopup(this);
 
-            popup.show(evt.getComponent(), evt.getX(), evt.getY());                                                
+            popup.show(evt.getComponent(), evt.getX(), evt.getY());
         }
     }//GEN-LAST:event_treeMouseClicked
 
@@ -529,18 +517,18 @@ public class MSGNavigator extends BaseDialog {
                 logger.info("deleting : " + cont.getEntry().getName());
 
                 TopLevelPropertyStream tops = new TopLevelPropertyStream(fs.getRoot());
-                tops.delete(cont.getEntry()); 
-                        
+                tops.delete(cont.getEntry());
+
                 cont.removeFromParent();
                 tree.updateUI();
-                
+
                 if( StringUtils.isYes(root.getSetup().getLocalConfig(SETTING_AUTOSAVE,"false")) )
                 {
                     save();
                     reload();
                 }
             }
-        };    
+        };
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -548,18 +536,17 @@ public class MSGNavigator extends BaseDialog {
     private javax.swing.JTree tree;
     // End of variables declaration//GEN-END:variables
 
-    void save() throws FileNotFoundException, IOException 
+    void save() throws FileNotFoundException, IOException
     {
-       if( fs == null )
+       if( fs == null ) {
            return;
-       
-       OutputStream out = new FileOutputStream(file);
-       
-       fs.writeFilesystem(out);
-       
-       out.close();
+       }
+
+        try (OutputStream out = new FileOutputStream(file)) {
+            fs.writeFilesystem(out);
+        }
     }
-    
+
     @Override
     public void close()
     {
@@ -567,36 +554,38 @@ public class MSGNavigator extends BaseDialog {
         super.close();
     }
 
-    void showSelectedElement() 
+    void showSelectedElement()
     {
         TreePath path = tree.getSelectionPath();
-        
-        if( path == null )
-            return;
-        
-        TreeNodeContainer cont = (TreeNodeContainer) path.getLastPathComponent();                
-        
-        invokeDialog(new ShowNode(root, cont, props));
-    }    
 
-    
+        if( path == null ) {
+            return;
+        }
+
+        TreeNodeContainer cont = (TreeNodeContainer) path.getLastPathComponent();
+
+        invokeDialog(new ShowNode(root, cont, props));
+    }
+
+
     void editSelectedElement() {
         TreePath path = tree.getSelectionPath();
-        
-        if( path == null )
+
+        if( path == null ) {
             return;
-        
+        }
+
         TreeNodeContainer cont = (TreeNodeContainer) path.getLastPathComponent();
-        
+
         invokeDialog(new EditNode(root, this, cont));
     }
 
     void edited() throws FileNotFoundException, IOException {
-                  
+
         if (StringUtils.isYes(root.getSetup().getLocalConfig(SETTING_AUTOSAVE, "false"))) {
             save();
             reload();
         }
-    }    
-    
+    }
+
 }
