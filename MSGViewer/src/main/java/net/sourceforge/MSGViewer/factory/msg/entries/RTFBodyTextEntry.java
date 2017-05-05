@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.sourceforge.MSGViewer.factory.msg.entries;
 
 import net.sourceforge.MSGViewer.factory.msg.PropTypes.PropPtypByteArray;
@@ -17,46 +13,47 @@ import org.apache.poi.poifs.filesystem.DirectoryEntry;
  */
 public class RTFBodyTextEntry extends SubstGEntry
 {
-    public static final String NAME = "1009";      
-    private static final Logger logger = Logger.getLogger(RTFBodyTextEntry.class);
-    
-    byte value[] = null;
-    
+    public static final String NAME = "1009";
+    private static final Logger LOGGER = Logger.getLogger(RTFBodyTextEntry.class);
+
+    private byte[] value = null;
+
     public RTFBodyTextEntry(String text)
     {
-        super( NAME, TYPE_BYTES );      
+        super( NAME, TYPE_BYTES );
         try {
             value = text.getBytes("UTF-16LE");
         } catch( UnsupportedEncodingException ex ) {
-            logger.error(ex,ex);
+            LOGGER.error(ex,ex);
         }
     }
 
     public RTFBodyTextEntry(byte[] bodyCompressesRTF) {
-        super( NAME, TYPE_BYTES );    
+        super( NAME, TYPE_BYTES );
         value = bodyCompressesRTF;
     }
-    
+
     public void setValue( byte value[] ) {
         this.value = value;
     }
-    
+
     public byte[] getValue() {
         return value;
-    }    
+    }
 
     @Override
     public PropType getPropType() {
         PropPtypByteArray prop = new PropPtypByteArray(getTagName());
         prop.setValue(value);
-        return prop;   
+        return prop;
     }
 
     @Override
     public void createEntry(DirectoryEntry dir) throws IOException {
-         if( value == null )
-            value = new byte[0];
-         createEntry(dir,value);        
+         if( value == null ) {
+             value = new byte[0];
+         }
+         createEntry(dir,value);
     }
- 
+
 }

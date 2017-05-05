@@ -1,5 +1,7 @@
 package net.sourceforge.MSGViewer.factory.msg;
 
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+
 import net.sourceforge.MSGViewer.ModuleLauncher;
 import net.sourceforge.MSGViewer.factory.MessageParserFactory;
 import net.sourceforge.MSGViewer.factory.msg.PropTypes.PropPtypInteger32;
@@ -16,6 +18,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import net.sourceforge.MSGViewer.factory.msg.PropTypes.PropPtypBoolean;
+import net.sourceforge.MSGViewer.factory.msg.entries.RTFBodyTextEntry;
 import org.apache.poi.poifs.filesystem.DirectoryNode;
 import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
 
@@ -54,17 +58,19 @@ public class MsgWriter
 
         cont.addVarEntry( new MessageClassEntry() );
 
-        if( msg.getBodyText() != null ) {
+        if( isNotEmpty(msg.getBodyText()) ) {
             cont.addVarEntry( new BodyTextEntry(msg.getBodyText()) );
+        }
+
+        if (isNotEmpty(msg.getBodyRTF())) {
+            cont.addVarEntry( new RTFBodyTextEntry(msg.getBodyRTF() ) );
+             // RTF in Sync
+            cont.addProperty(new PropPtypBoolean("0e1f",true));
         }
 
         if( msg.getHeaders() != null  && !msg.getHeaders().isEmpty() ) {
             cont.addVarEntry( new HeadersEntry(msg.getHeaders() ) );
         }
-
- //        cont.addVarEntry( new RTFBodyTextEntry(msg.getBodyCompressesRTF() ) );
-         // RTF in Sync
- //        cont.addProperty(new PropPtypBoolean("0e1f",true));
 
         // PidTagStoreSupportMask data is encoded in unicode
         cont.addProperty(new PropPtypInteger32("340d",0x00040000));
@@ -119,13 +125,6 @@ public class MsgWriter
         for (Attachment attachment : msg.getAttachments()) {
             // TODO
         }
-
-         /*
-         new BodyTextEntry().createEntry(root, msg.getBodyText());
-         new MessageClassEntry().createEntry(root); // required
-         new HeadersEntry().createEntry(root, msg.getHeaders());
-          *
-          */
 
         // TopLevelPropertyStream top_props = new TopLevelPropertyStream(root);
 
