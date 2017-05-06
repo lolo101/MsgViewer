@@ -22,17 +22,9 @@ public class PropPtypString extends PropType {
         this.value = value;
     }
 
-    public String getValue()
-    {
-        return value;
-    }
-
     @Override
-    public void writePropertiesEntry(byte[] bytes, int offset)
+    protected void writePropertiesContent(byte[] bytes, int offset)
     {
-       offset = writeTagName(getTagName(), getTypeName(), bytes, offset);
-       offset = writeDefaultFlags(bytes, offset);
-
        if( value == null ) {
            value = "";
        }
@@ -43,8 +35,6 @@ public class PropPtypString extends PropType {
        buffer.putInt(len);
        byte[] int_bytes = buffer.array();
 
-       for( int i = 0; i < int_bytes.length; i++ ) {
-           bytes[offset++] = int_bytes[i];
-       }
+       System.arraycopy(int_bytes, 0, bytes, offset, int_bytes.length);
     }
 }

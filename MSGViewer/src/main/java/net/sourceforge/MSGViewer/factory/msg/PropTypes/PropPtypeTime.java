@@ -12,39 +12,23 @@ public class PropPtypeTime extends PropType
 {
     static final String TYPE_NAME = "0040";
 
-    long value;
+    private final long value;
 
     /**
      *
      * @param tagname name of the tag
-     * @param val in milliseconds since 1.1.1970
+     * @param value in milliseconds since 1.1.1970
      */
-    public PropPtypeTime( String tagname, long val )
+    public PropPtypeTime( String tagname, long value )
     {
         super( tagname, TYPE_NAME , true );
 
-        setValue( val );
-    }
-
-    /**
-     * @param value milliseconds since 1.1.1970
-     */
-    public void setValue( long value )
-    {
         this.value = MSTimeConvert.Millis2PtypeTime(value);
     }
 
-    public long getValue()
-    {
-        return value;
-    }
-
     @Override
-    public void writePropertiesEntry(byte[] bytes, int offset)
+    protected void writePropertiesContent(byte[] bytes, int offset)
     {
-       offset = writeTagName(getTagName(), getTypeName(), bytes, offset);
-       offset = writeDefaultFlags(bytes, offset);
-
        ByteBuffer buffer = ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN);
        buffer.putLong(value);
 

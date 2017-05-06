@@ -29,25 +29,6 @@ import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
  */
 public class MsgWriter
 {
-    /*
-    public void write(Message msg, OutputStream out ) throws IOException
-    {
-         POIFSFileSystem fs = new POIFSFileSystem();
-
-         DirectoryEntry root = fs.getRoot();
-
-         new SubjectEntry().createEntry(root, msg.getSubject());
-         new BodyTextEntry().createEntry(root, msg.getBodyText());
-         new MessageClassEntry().createEntry(root); // required
-         new HeadersEntry().createEntry(root, msg.getHeaders());
-
-         TopLevelPropertyStream top_props = new TopLevelPropertyStream(root);
-
-         top_props.save();
-
-         fs.writeFilesystem(out);
-    }     */
-
     public void write(Message msg, OutputStream out ) throws IOException
     {
         MsgContainer cont = new MsgContainer();
@@ -123,7 +104,7 @@ public class MsgWriter
         }
 
         for (Attachment attachment : msg.getAttachments()) {
-            // TODO
+            cont.addAttachment(attachment);
         }
 
         // TopLevelPropertyStream top_props = new TopLevelPropertyStream(root);

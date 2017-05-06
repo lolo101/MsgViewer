@@ -151,86 +151,96 @@ public class Message {
         if (name == null || value == null) {
             return;
         }
-        name = name.intern();
 
         // we know that the name is lower case
         // because this is done in MsgParser.analyzeDocumentEntry
-        if (name == "001a") {
-            this.setMessageClass((String) value);
-        } else if (name == "1035") {
-            this.setMessageId((String) value);
-        } else if (name == "0037") {
-            this.setSubject((String) value);
-        } else if (name == "0c1f") {
-            this.setFromEmail((String) value);
-        } else if (name == "0042") {
-            this.setFromName((String) value);
-        } else if (name == "0076") {
-            this.setToEmail((String) value);
-        } else if (name == "3001") {
-            this.setToName((String) value);
-        } else if (name == "0e04") {
-            this.setDisplayTo((String) value);
-        } else if (name == "0e03") {
-            this.setDisplayCc((String) value);
-        } else if (name == "0e02") {
-            this.setDisplayBcc((String) value);
-        } else if (name == "1000") {
+        switch (name) {
+            case "001a":
+                this.setMessageClass((String) value);
+                break;
+            case "1035":
+                this.setMessageId((String) value);
+                break;
+            case "0037":
+                this.setSubject((String) value);
+                break;
+            case "0c1f":
+                this.setFromEmail((String) value);
+                break;
+            case "0042":
+                this.setFromName((String) value);
+                break;
+            case "0076":
+                this.setToEmail((String) value);
+                break;
+            case "3001":
+                this.setToName((String) value);
+                break;
+            case "0e04":
+                this.setDisplayTo((String) value);
+                break;
+            case "0e03":
+                this.setDisplayCc((String) value);
+                break;
+            case "0e02":
+                this.setDisplayBcc((String) value);
+                break;
+            case "1000":
                 if (value instanceof String) {
                     this.setBodyText((String) value);
                 } else if (value instanceof byte[]) {
-                        this.setBodyText(new String((byte[]) value));
+                    this.setBodyText(new String((byte[]) value));
                 } else {
-                        LOGGER.info( "Unexpected body class: "+value.getClass().getName());
+                    LOGGER.info( "Unexpected body class: "+value.getClass().getName());
                     this.setBodyText(value.toString());
                 }
-        } else if (name == "1009") {
-            // we simply try to decompress the RTF data
-            // if it's not compressed, the utils class
-            // is able to detect this anyway
-            if (value instanceof byte[]) {
-                byte[] compressedRTF = (byte[]) value;
-                try {
-                    byte[] decompressedRTF = new CompressedRTF().decompress(new ByteArrayInputStream(compressedRTF));
-                    // is RTF always in ANSI encoding?
-                    this.setBodyRTF(new String(decompressedRTF));
-                } catch(Exception e) {
-                    LOGGER.info( "Could not decompress RTF data "  +  e);
+                break;
+            case "1009":
+                // we simply try to decompress the RTF data
+                // if it's not compressed, the utils class
+                // is able to detect this anyway
+                if (value instanceof byte[]) {
+                    byte[] compressedRTF = (byte[]) value;
+                    try {
+                        byte[] decompressedRTF = new CompressedRTF().decompress(new ByteArrayInputStream(compressedRTF));
+                        // is RTF always in ANSI encoding?
+                        this.setBodyRTF(new String(decompressedRTF));
+                    } catch(Exception e) {
+                        LOGGER.info( "Could not decompress RTF data "  +  e);
+                    }
+                } else {
+                    LOGGER.info( "Unexpected data type "+value.getClass());
                 }
-            } else {
-                LOGGER.info( "Unexpected data type "+value.getClass());
-            }
-        } else if (name == "007d") {
-            // email headers
-            String headers = (String) value;
-            this.setHeaders(headers);
-            // try to parse the date from the headers
-            Date date = Message.getDateFromHeaders(headers);
-            if (date != null) {
-                this.setDate(date);
-            }
-        } else {
+                break;
+            case "007d":
+                // email headers
+                String headers = (String) value;
+                this.setHeaders(headers);
+                // try to parse the date from the headers
+                Date date = Message.getDateFromHeaders(headers);
+                if (date != null) {
+                    this.setDate(date);
+                }
+                break;
+            default:
+                if (LOGGER.isTraceEnabled())
+                {
                     String res = null;
-                    int len = 0;
+                    if (value instanceof byte[]) {
+                        byte[] compressedRTF = (byte[]) value;
 
-                    if (LOGGER.isTraceEnabled())
-                    {
-                        if (value instanceof byte[]) {
-                            byte[] compressedRTF = (byte[]) value;
+                        int len = compressedRTF.length;
 
-                            len = compressedRTF.length;
+                        try {
+                            byte[] decompressedRTF = new CompressedRTF().decompress(new ByteArrayInputStream(compressedRTF));
+                            // is RTF always in ANSI encoding?
+                            res = new String(decompressedRTF);
+                        } catch (Exception e) {
+                            LOGGER.info("Could not decompress RTF data " + e);
+                        }
 
-                            try {
-                                byte[] decompressedRTF = new CompressedRTF().decompress(new ByteArrayInputStream(compressedRTF));
-                                // is RTF always in ANSI encoding?
-                                res = new String(decompressedRTF);
-                            } catch (Exception e) {
-                                LOGGER.info("Could not decompress RTF data " + e);
-                            }
-
-                            if (res == null) {
-                                res = new String(compressedRTF);
-                            }
+                        if (res == null) {
+                            res = new String(compressedRTF);
                         }
 
                         if (len > 100) {
@@ -238,6 +248,8 @@ public class Message {
                         }
                     }
                     LOGGER.trace("unknown name: " + name + " res: " + ( res != null ? res : ""));
+                }
+                break;
         }
 
         // save all properties (incl. those identified above)
@@ -563,8 +575,7 @@ public class Message {
                 String dateValue = headerLine.substring("Date:".length()).trim();
                 SimpleDateFormat formatter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss z", Locale.ENGLISH);
                 try {
-                    Date date = formatter.parse(dateValue);
-                    return date;
+                    return formatter.parse(dateValue);
                 } catch(Exception e) {
                     LOGGER.info( "Could not parse date "+dateValue, e);
                 }

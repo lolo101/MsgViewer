@@ -11,24 +11,11 @@ import org.apache.poi.poifs.filesystem.DirectoryEntry;
  */
 public class StringUTF16SubstgEntry extends SubstGEntry
 {
-    private String value;
-
-    public StringUTF16SubstgEntry( String name ) {
-        super( name, TYPE_UTF16 );
-    }
-
+    private final String value;
 
     public StringUTF16SubstgEntry( String name , String value ) {
         super( name, TYPE_UTF16 );
         this.value = value;
-    }
-
-    public void setValue( String value ) {
-        this.value = value;
-    }
-
-    public String getValue() {
-        return value;
     }
 
     @Override
@@ -40,10 +27,7 @@ public class StringUTF16SubstgEntry extends SubstGEntry
 
     @Override
     public void createEntry(DirectoryEntry dir) throws IOException {
-        if( value == null ) {
-            value = "";
-        }
-         createEntry(dir,value);
+        createEntry(dir,value == null ? "" : value);
     }
 
 }

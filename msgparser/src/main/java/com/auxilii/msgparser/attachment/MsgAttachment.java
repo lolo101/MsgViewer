@@ -25,16 +25,16 @@ import com.auxilii.msgparser.Message;
  * of storing a byte[] of the attachment, this
  * implementation provides an embedded
  * {@link Message} object.
- * 
+ *
  * @author roman.kurmanowytsch
  */
 public class MsgAttachment implements Attachment {
-	
+
 	/**
 	 * The encapsulated (attached) message.
 	 */
-	Message message = null;
-	
+	private Message message = null;
+
 	/**
 	 * @return the message
 	 */
@@ -48,11 +48,11 @@ public class MsgAttachment implements Attachment {
 	public void setMessage(Message message) {
 		this.message = message;
 	}
-	
+
 	/**
 	 * Returns the String returned by
 	 * {@link Message#toString()}.
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
@@ -60,6 +60,6 @@ public class MsgAttachment implements Attachment {
 		if (this.message == null) {
 			return null;
 		}
-		return "Mail Attachment: "+this.message.toString();
+		return "Mail Attachment: " + this.message;
 	}
 }
