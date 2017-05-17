@@ -19,7 +19,7 @@ public class PropPtypInteger32 extends PropType {
 
     public PropPtypInteger32(String tagname, int value)
     {
-        super( tagname, TYPE_NAME, true );
+        super( tagname, TYPE_NAME );
         this.value = value;
     }
 

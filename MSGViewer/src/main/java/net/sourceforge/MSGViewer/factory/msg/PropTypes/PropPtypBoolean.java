@@ -16,7 +16,7 @@ public class PropPtypBoolean extends PropType {
 
     public PropPtypBoolean( String tagname, boolean value )
     {
-        super( tagname, TYPE_NAME, true );
+        super( tagname, TYPE_NAME );
         this.value = value;
     }
 

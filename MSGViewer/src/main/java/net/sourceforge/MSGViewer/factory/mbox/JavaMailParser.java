@@ -36,10 +36,9 @@ public class JavaMailParser
     private static final ToEmailHeader TO_PARSER =  new ToEmailHeader();
     private static final DateHeader DATE_PARSER = new DateHeader();
 
-    public Message parse( File file ) throws IOException, Exception
+    public Message parse( File file ) throws Exception
     {
-        Session session = Session.getInstance(System.getProperties());
-        javax.mail.Message jmsg = new MimeMessage(session, new FileInputStream(file));
+        javax.mail.Message jmsg = parseJMessage(file);
 
         Message msg = new Message();
 
@@ -58,6 +57,13 @@ public class JavaMailParser
         parse( msg, jmsg );
 
         return msg;
+    }
+
+    private javax.mail.Message parseJMessage(File file) throws MessagingException, IOException {
+        try (InputStream stream = new FileInputStream(file)) {
+            Session session = Session.getInstance(System.getProperties());
+            return new MimeMessage(session, stream);
+        }
     }
 
     private void parse( Message msg, Part part ) throws MessagingException, IOException

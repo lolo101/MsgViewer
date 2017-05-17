@@ -21,7 +21,7 @@ public class PropPtypeTime extends PropType
      */
     public PropPtypeTime( String tagname, long value )
     {
-        super( tagname, TYPE_NAME , true );
+        super( tagname, TYPE_NAME );
 
         this.value = MSTimeConvert.Millis2PtypeTime(value);
     }

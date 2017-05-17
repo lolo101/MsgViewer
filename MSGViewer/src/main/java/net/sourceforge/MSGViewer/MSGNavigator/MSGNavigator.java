@@ -16,9 +16,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import javax.swing.JPopupMenu;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -39,86 +37,102 @@ public class MSGNavigator extends BaseDialog {
     public static final String SETTING_SHOW_SIZE = "MSG_NAVIGATOR_SHOW_SIZE";
     public static final String SETTING_AUTOSAVE = "MSG_SETTING_AUTOSAVE";
 
-    static final Map<String,String> props = new HashMap<>();
     private POIFSFileSystem fs;
     private final File file;
 
     private boolean setting_show_size = false;
 
-    static {
-        props.put("001a", "Message Class");
-        props.put("1035", "MessageId");
-        props.put("0037", "Subject");
-        props.put("0c1f", "FromEmail");
-        props.put("0042", "FromName");
-        props.put("0076", "ToEmail");
-        props.put("3001", "ToName");
-        props.put("0e04", "PidTagDisplayTo");
-        props.put("0e03", "DisplayCc");
-        props.put("0e02", "DisplayBcc");
-        props.put("1000", "BodyText");
-        props.put("1009", "RTFBodyText");
-        props.put("007d", "Headers");
-        props.put("0044", "recv name");
-        props.put("004d", "author");
-        props.put("0050", "reply");
-        props.put("005a", "sender");
-        props.put("0065", "sent email");
-        props.put("0076", "received email");
-        props.put("0078", "repr. email");
-        props.put("0c1a", "sender name");
-        props.put("0e1d", "subject normalized");
-        props.put("1046", "sender email");
-        props.put("3003", "email address");
-        props.put("1008", "rtf sync");
-
-        // attachment stuff
-        props.put("3701", "attachment data");
-        props.put("3704", "file name");
-        props.put("3707", "long Filen name");
-        props.put("370e", "mime tag");
-        props.put("3703", "extension");
+    enum Properties {
+        GUIDStream("0002"),
+        EntryStream("0003"),
+        PidTagAutoForwardComment("0004"),
+        PidTagMessageClass("001a"),
+        PidTagSubject("0037"),
+        PidTagClientSubmitTime("0039"),
+        PidTagSentRepresentingSearchKey("003b"),
+        PidTagSubjectPrefix("003d"),
+        PidTagReceivedByEntryId("003f"),
+        PidTagSentRepresentingEntryId("0041"), //  Identifies an address book EntryID.
+        PidTagSentRepresentingName("0042"),
+        PidTagReceivedRepresentingName("0044"),
+        PidTagOriginalAuthorName("004d"),
+        PidTagReplyRecipientNames("0050"),
+        PidTagReceivedBySearchKey("0051"),
+        PidTagOriginalSenderName("005a"),
+        PidTagSentRepresentingAddressType("0064"), //  Contains an e-mail address type.
+        PidTagSentRepresentingEmailAddress("0065"),
+        PidTagConversationTopic("0070"), //   Contains an unchanging copy of the original subject.
+        PidTagConversationIndex("0071"),
+        PidTagReceivedByAddressType("0075"),
+        PidTagReceivedByEmailAddress("0076"),
+        PidTagTransportMessageHeaders("007d"),
+        PidTagReceivedRepresentingEmailAddress("0078"),
 
         // added by mobby
-        props.put("0041", "PidTagSentRepresentingEntryId"); //  Identifies an address book EntryID.
-        props.put("0c19", "PidTagSenderEntryId"); // Identifies an address book EntryID that contains the sending mailbox owner's address book EntryID.
-        props.put("0c1e", "PidTagSenderAddressType"); //  Contains the sending mailbox owner's e-mail address type.
-        props.put("0064", "PidTagSentRepresentingAddressType"); //  Contains an e-mail address type.
-        props.put("0070", "PidTagConversationTopic"); //   Contains an unchanging copy of the original subject.
-        props.put("300b", "PidTagSearchKey"); //  Contains a unique binary-comparable key that identifies an object for a search.
-        props.put("0002", "<b>GUID Stream</b>");
-        props.put("0003", "<b>Entry Stream</b>");
-        props.put("0004", "<b>String Stream</b>");
-        props.put("3007", "PidTagCreationTime");
-        props.put("3008", "PidTagLastModificationTime");
-        props.put("0ff7", "PidTagAccessLevel");
-        props.put("0ff4", "PidTagAccess");
-        props.put("340d", "PidTagStoreSupportMask");
-        props.put("0039", "PidTagClientSubmitTime");
-        props.put("0e1f", "PidTagRtfInSync");
-        props.put("003b", "PidTagSentRepresentingSearchKey");
-        props.put("003f", "PidTagReceivedByEntryId");
-        props.put("0051", "PidTagReceivedBySearchKey");
-        props.put("0070", "PidTagConversationTopic");
-        props.put("0071", "PidTagConversationIndex");
-        props.put("0075", "PidTagReceivedByAddressType");
-        props.put("0c1d", "PidTagSenderSearchKey");
-        props.put("0e06", "PidTagMessageDeliveryTime");
-        props.put("0e07", "PidTagMessageFlags");
-        props.put("0e28", "PidTagPrimarySendAccount");
-        props.put("0e29", "PidTagNextSendAcct");
-        props.put("3fde", "PidTagInternetCodepage");
-        props.put("003d", "PidTagSubjectPrefix");
-        props.put("0c15", "PidTagRecipientType");
-        props.put("0fff", "PidTagEntryId");
-        props.put("3002", "PidTagAddressType");
-        props.put("0ff6", "PidTagInstanceKey");
-        props.put("3000", "PidTagRowid");
-        props.put("3712", "PidTagAttachContentId");
-        props.put("8007", "PidLidContactItemData");
-        props.put("", "");
-        props.put("", "");
-        props.put("", "");
+        PidTagSenderEntryId("0c19"), // Identifies an address book EntryID that contains the sending mailbox owner's address book EntryID.
+        PidTagSenderName("0c1a"),
+        PidTagSenderAddressType("0c1e"), //  Contains the sending mailbox owner's e-mail address type.
+        PidTagRecipientType("0c15"),
+        PidTagSenderSearchKey("0c1d"),
+        PidTagSenderEmailAddress("0c1f"),
+
+        PidTagDisplayBcc("0e02"),
+        PidTagDisplayCc("0e03"),
+        PidTagDisplayTo("0e04"),
+        PidTagMessageDeliveryTime("0e06"),
+        PidTagMessageFlags("0e07"),
+        PidTagNormalizedSubject("0e1d"),
+        PidTagRtfInSync("0e1f"),
+        PidTagPrimarySendAccount("0e28"),
+        PidTagNextSendAcct("0e29"),
+
+        PidTagAccess("0ff4"),
+        PidTagInstanceKey("0ff6"),
+        PidTagAccessLevel("0ff7"),
+        PidTagEntryId("0fff"),
+
+        PidTagBody("1000"),
+        rtfSync("1008"),
+        RTFBodyText("1009"),
+        MessageId("1035"),
+        senderEmail("1046"),
+
+        PidTagRowid("3000"),
+        ToName("3001"),
+        PidTagAddressType("3002"),
+        emailAddress("3003"),
+        PidTagCreationTime("3007"),
+        PidTagLastModificationTime("3008"),
+        PidTagSearchKey("300b"), //  Contains a unique binary-comparable key that identifies an object for a search.
+
+        PidTagStoreSupportMask("340d"),
+
+        // attachment stuff
+        attachmentData("3701"),
+        extension("3703"),
+        fileName("3704"),
+        longFilenName("3707"),
+        mimeTag("370e"),
+        PidTagAttachContentId("3712"),
+
+        PidTagInternetCodepage("3fde"),
+
+        PidLidContactItemData("8007");
+
+        private final String propId;
+
+        Properties(String propId) {
+            this.propId = propId;
+        }
+
+        public static Properties get(String id) {
+            for (Properties value : values()) {
+                if (value.propId.equals(id)) {
+                    return value;
+                }
+            }
+            throw new IllegalArgumentException(id);
+        }
     }
 
 
@@ -275,7 +289,7 @@ public class MSGNavigator extends BaseDialog {
                 sb.append("&nbsp;&nbsp;&nbsp;");
 
 
-                String property_name =  props.get(info.getClazz());
+                Properties property_name =  Properties.get(info.getClazz());
 
                 if( property_name != null ) {
                     sb.append(" <code style=\"color: green\">").append(property_name).append("</code> ");
@@ -294,7 +308,6 @@ public class MSGNavigator extends BaseDialog {
 
                      sb.append("     <i>").append(s).append("</i>");
                 } else if( data instanceof byte[] ) {
-                    byte bytes[] = (byte[]) data;
                     sb.append("     <i style=\"color: dd5555\">byte array</i>");
                 }
 
@@ -564,7 +577,7 @@ public class MSGNavigator extends BaseDialog {
 
         TreeNodeContainer cont = (TreeNodeContainer) path.getLastPathComponent();
 
-        invokeDialog(new ShowNode(root, cont, props));
+        invokeDialog(new ShowNode(root, cont));
     }
 
 

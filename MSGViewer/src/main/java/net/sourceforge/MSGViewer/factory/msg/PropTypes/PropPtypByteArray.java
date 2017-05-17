@@ -14,7 +14,7 @@ public class PropPtypByteArray extends PropType {
 
     public PropPtypByteArray(String tagname)
     {
-        super( tagname, TYPE_NAME, false );
+        super( tagname, TYPE_NAME );
     }
 
     public void setValue( byte value[] )

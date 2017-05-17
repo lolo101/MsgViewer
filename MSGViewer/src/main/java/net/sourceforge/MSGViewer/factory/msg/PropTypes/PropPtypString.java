@@ -14,7 +14,7 @@ public class PropPtypString extends PropType {
 
     public PropPtypString(String tagname)
     {
-        super( tagname, TYPE_NAME, false );
+        super( tagname, TYPE_NAME );
     }
 
     public void setValue( String value )

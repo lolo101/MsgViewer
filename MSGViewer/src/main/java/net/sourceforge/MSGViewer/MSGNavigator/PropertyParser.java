@@ -31,9 +31,9 @@ public class PropertyParser
     {
         this.entry = entry;
 
-        for (String descr : MSGNavigator.props.values()) {
-            if (descr.length() > max_descr_lenght) {
-                max_descr_lenght = descr.length();
+        for (MSGNavigator.Properties descr : MSGNavigator.Properties.values()) {
+            if (descr.toString().length() > max_descr_lenght) {
+                max_descr_lenght = descr.toString().length();
             }
         }
 
@@ -147,8 +147,8 @@ public class PropertyParser
 
         sb.append(" ");
 
-        String descr = StringUtils.defaultString(MSGNavigator.props.get(tagname.toLowerCase().substring(0,4)));
-        sb.append(StringUtils.rightPad(descr,max_descr_lenght));
+        String descr = MSGNavigator.Properties.get(tagname.toLowerCase().substring(0, 4)).toString();
+        sb.append(StringUtils.rightPad(descr, max_descr_lenght));
 
         String tagtype = tagname.toLowerCase().substring(4);
 

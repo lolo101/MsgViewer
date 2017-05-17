@@ -9,29 +9,17 @@ package net.sourceforge.MSGViewer.factory.msg.PropTypes;
 public abstract class PropType
 {
     private final String typename;
-    private final boolean fixed_length;
-    private String tagname;
+    private final String tagname;
 
-    public PropType( String typename, boolean fixed_length )
-    {
-        this.typename = typename;
-        this.fixed_length = fixed_length;
-    }
-
-    public PropType( String tagname, String typename, boolean fixed_length )
+    public PropType( String tagname, String typename)
     {
         this.tagname = tagname;
         this.typename = typename;
-        this.fixed_length = fixed_length;
     }
 
     public String getTagName()
     {
         return tagname;
-    }
-
-    public boolean isFixeLength() {
-        return fixed_length;
     }
 
     public String getTypeName() {
@@ -46,9 +34,7 @@ public abstract class PropType
        writePropertiesContent(bytes, offset);
     }
 
-    protected abstract void writePropertiesContent(byte[] bytes, int offset);
-
-    private static int writeTagName( String tagname,  String typename, byte bytes[], int offset )
+    private static int writeTagName( String tagname,  String typename, byte[] bytes, int offset )
     {
         String name = tagname + typename;
 
@@ -66,4 +52,6 @@ public abstract class PropType
 
         return offset + 4;
     }
+
+    protected abstract void writePropertiesContent(byte[] bytes, int offset);
 }

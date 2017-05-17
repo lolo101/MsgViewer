@@ -10,7 +10,6 @@ import net.sourceforge.MSGViewer.MSGNavigator.MSGNavigator.TreeNodeContainer;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
-import java.util.Map;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
@@ -24,19 +23,16 @@ public class ShowNode extends BaseDialog {
 
     private static final long serialVersionUID = 3130592579862038804L;
 
-    private Map<String,String> props;
     private int max_descr_lenght = 20;
 
-    public ShowNode(Root root, TreeNodeContainer cont,  Map<String,String> props)
+    public ShowNode(Root root, TreeNodeContainer cont)
     {
         super( root, root.MlM("Navigate:") + " " + cont.getEntry().getName());
         initComponents();
 
-        this.props = props;
-
-        for( String descr : props.values() ) {
-            if( descr.length() > max_descr_lenght ) {
-                max_descr_lenght = descr.length();
+        for( MSGNavigator.Properties descr : MSGNavigator.Properties.values() ) {
+            if( descr.toString().length() > max_descr_lenght ) {
+                max_descr_lenght = descr.toString().length();
             }
         }
 
@@ -287,7 +283,7 @@ public class ShowNode extends BaseDialog {
 
         sb.append(" ");
 
-        String descr = StringUtils.defaultString(props.get(tagname.toLowerCase().substring(0,4)));
+        String descr = MSGNavigator.Properties.get(tagname.toLowerCase().substring(0,4)).toString();
         sb.append(StringUtils.rightPad(descr,max_descr_lenght));
 
         String tagtype = tagname.toLowerCase().substring(4);
@@ -315,14 +311,6 @@ public class ShowNode extends BaseDialog {
                 }
             case "0040":
                 sb.append(" PtypTime");
-                /*
-                byte buf[] = new byte[8];
-
-                for( int i = 0; i < buf.length; i++ )
-                buf[i] = bytes[value_start_offset++];
-                *
-                */
-
                 long val = ByteConvert.convertByteArrayToLong(bytes,value_start_offset);
                 sb.append(" ");
                 sb.append(val);
