@@ -1,4 +1,4 @@
-package net.sourceforge.MSGViewer.factory.msg.PropTypes;
+package net.sourceforge.MSGViewer.factory.msg.properties;
 
 import net.sourceforge.MSGViewer.factory.msg.lib.MSTimeConvert;
 import java.nio.ByteBuffer;

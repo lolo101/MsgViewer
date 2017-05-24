@@ -65,14 +65,13 @@ public class Message {
      * The name part of the From: mail address
      */
     private String fromName = null;
-    /**
-     * The address part of To: mail address.
-     */
-    private String toEmail = null;
-    /**
-     * The name part of the To: mail address
-     */
-    private String toName = null;
+
+    private final List<String> toEmail = new ArrayList<>();
+    private final List<String> toName = new ArrayList<>();
+    private final List<String> ccEmail = new ArrayList<>();
+    private final List<String> ccName = new ArrayList<>();
+    private final List<String> bccEmail = new ArrayList<>();
+    private final List<String> bccName = new ArrayList<>();
     /**
      * The mail's subject.
      */
@@ -171,10 +170,10 @@ public class Message {
                 this.setFromName((String) value);
                 break;
             case "0076":
-                this.setToEmail((String) value);
+                this.addToEmail((String) value);
                 break;
             case "3001":
-                this.setToName((String) value);
+                this.addToName((String) value);
                 break;
             case "0e04":
                 this.setDisplayTo((String) value);
@@ -280,7 +279,24 @@ public class Message {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("From: ").append(this.createMailString(this.fromEmail, this.fromName)).append("\n");
-        sb.append("To: ").append(this.createMailString(this.toEmail, this.toName)).append("\n");
+        if (!toEmail.isEmpty()) {
+            sb.append("To: ");
+            for (int i = 0; i < toEmail.size(); ++i) {
+                sb.append(this.createMailString(toEmail.get(i), toName.get(i))).append("\n");
+            }
+        }
+        if (!ccEmail.isEmpty()) {
+            sb.append("Cc: ");
+            for (int i = 0; i < ccEmail.size(); ++i) {
+                sb.append(this.createMailString(ccEmail.get(i), ccName.get(i))).append("\n");
+            }
+        }
+        if (!bccEmail.isEmpty()) {
+            sb.append("Bcc: ");
+            for (int i = 0; i < bccEmail.size(); ++i) {
+                sb.append(this.createMailString(bccEmail.get(i), bccName.get(i))).append("\n");
+            }
+        }
         if (this.date != null) {
             SimpleDateFormat formatter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss z", Locale.ENGLISH);
             sb.append("Date: ").append(formatter.format(this.date)).append("\n");
@@ -300,7 +316,24 @@ public class Message {
     public String toLongString() {
         StringBuilder sb = new StringBuilder();
         sb.append("From: ").append(this.createMailString(this.fromEmail, this.fromName)).append("\n");
-        sb.append("To: ").append(this.createMailString(this.toEmail, this.toName)).append("\n");
+        if (!toEmail.isEmpty()) {
+            sb.append("To: ");
+            for (int i = 0; i < toEmail.size(); ++i) {
+                sb.append(this.createMailString(toEmail.get(i), toName.get(i))).append("\n");
+            }
+        }
+        if (!ccEmail.isEmpty()) {
+            sb.append("Cc: ");
+            for (int i = 0; i < ccEmail.size(); ++i) {
+                sb.append(this.createMailString(ccEmail.get(i), ccName.get(i))).append("\n");
+            }
+        }
+        if (!bccEmail.isEmpty()) {
+            sb.append("Bcc: ");
+            for (int i = 0; i < bccEmail.size(); ++i) {
+                sb.append(this.createMailString(bccEmail.get(i), bccName.get(i))).append("\n");
+            }
+        }
         if (this.date != null) {
             SimpleDateFormat formatter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss z", Locale.ENGLISH);
             sb.append("Date: ").append(formatter.format(this.date)).append("\n");
@@ -499,23 +532,22 @@ public class Message {
     /**
      * @return the toEmail
      */
-    public String getToEmail() {
+    public List<String> getToEmail() {
         return toEmail;
     }
-
 
     /**
      * @param toEmail the toEmail to set
      */
-    public void setToEmail(String toEmail) {
-        this.toEmail = nullOrTrim(toEmail);
+    public void addToEmail(String toEmail) {
+        this.toEmail.add(nullOrTrim(toEmail));
     }
 
 
     /**
      * @return the toName
      */
-    public String getToName() {
+    public List<String> getToName() {
         return toName;
     }
 
@@ -523,8 +555,40 @@ public class Message {
     /**
      * @param toName the toName to set
      */
-    public void setToName(String toName) {
-        this.toName = nullOrTrim(toName);
+    public void addToName(String toName) {
+        this.toName.add(nullOrTrim(toName));
+    }
+
+    public List<String> getCcEmail() {
+        return ccEmail;
+    }
+
+    public void addCcEmail(String ccEmail) {
+        this.ccEmail.add(nullOrTrim(ccEmail));
+    }
+
+    public List<String> getCcName() {
+        return ccName;
+    }
+
+    public void addCcName(String ccName) {
+        this.ccName.add(nullOrTrim(ccName));
+    }
+
+    public List<String> getBccEmail() {
+        return bccEmail;
+    }
+
+    public void addBccEmail(String bccEmail) {
+        this.bccEmail.add(nullOrTrim(bccEmail));
+    }
+
+    public List<String> getBccName() {
+        return bccName;
+    }
+
+    public void addBccName(String bccName) {
+        this.bccName.add(nullOrTrim(bccName));
     }
 
     /**

@@ -1,7 +1,7 @@
 package net.sourceforge.MSGViewer.factory.msg;
 
-import net.sourceforge.MSGViewer.factory.msg.PropTypes.PropPtypInteger32;
-import net.sourceforge.MSGViewer.factory.msg.PropTypes.PropType;
+import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypInteger32;
+import net.sourceforge.MSGViewer.factory.msg.properties.PropType;
 import net.sourceforge.MSGViewer.factory.msg.entries.StringUTF16SubstgEntry;
 import net.sourceforge.MSGViewer.factory.msg.entries.SubstGEntry;
 import com.auxilii.msgparser.RecipientEntry;

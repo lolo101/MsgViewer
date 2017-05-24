@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * This class represents a recipient's entry of the parsed .msg file. It provides informations like the 
+ * This class represents a recipient's entry of the parsed .msg file. It provides informations like the
  * email address and the display name.
  * @author thomas.misar
  * @author roman.kurmanowytsch
@@ -30,25 +30,25 @@ import java.util.Set;
 public class RecipientEntry {
 
 	/**
-	 * The address part of To: mail address.  
+	 * The address part of To: mail address.
 	 */
-	protected String toEmail = null; 
+	private String toEmail = null;
 	/**
-	 * The address part of To: name.  
+	 * The address part of To: name.
 	 */
-	protected String toName = null; 
+	private String toName = null;
 	/**
 	 * Contains all properties that are not
 	 * covered by the special properties.
 	 */
-	protected Map<String,Object> properties = new HashMap<String,Object>();
+	private final Map<String,Object> properties = new HashMap<>();
 
 	/**
 	 * Sets the name/value pair in the {@link #properties}
 	 * map. Some properties are put into
 	 * special attributes (e.g., {@link #toEmail} when
-	 * the property name is '0076'). 
-	 * 
+	 * the property name is '0076').
+	 *
 	 * @param name The property name (i.e., the class
 	 *  of the document entry).
 	 * @param value The value of the field.
@@ -60,18 +60,17 @@ public class RecipientEntry {
 		if ((name == null) || (value == null)) {
 			return;
 		}
-		name = name.intern();
 
 		// we know that the name is lower case
 		// because this is done in MsgParser.analyzeDocumentEntry
 		if (value instanceof String) {
-			if (name == "39fe") {
+			if ("39fe".equals(name)) {
 				this.setToEmail((String) value);
-			} else if (name == "3003" && this.getToEmail() == null) {
+			} else if ("3003".equals(name) && this.getToEmail() == null) {
 				this.setToEmail((String) value);
-			} else if (name == "3001") {
-				this.setToName((String) value);    		
-			} 
+			} else if ("3001".equals(name)) {
+				this.setToName((String) value);
+			}
 		}
 
 		// save all properties (incl. those identified above)
@@ -110,7 +109,7 @@ public class RecipientEntry {
 	/**
 	 * Provides a short representation of this recipient object <br>
 	 * (e.g. 'Firstname Lastname &lt;firstname.lastname@domain.tld&gt;').
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
@@ -127,7 +126,7 @@ public class RecipientEntry {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return the set of keys that are stored in the properties map.
 	 */
 	public Set<String> getProperties() {
@@ -135,7 +134,7 @@ public class RecipientEntry {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param name the name of the property to be returned.
 	 * @return the property that matches the given name.
 	 */

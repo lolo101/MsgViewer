@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.sourceforge.MSGViewer.factory.mbox.headers;
 
 import at.redeye.FrameWork.utilities.StringUtils;
@@ -17,38 +13,39 @@ import org.apache.log4j.Logger;
  */
 public abstract class EmailHeader extends HeaderParser
 {
-    private static final Logger logger = Logger.getLogger(EmailHeader.class);
-    
+    private static final Logger LOGGER = Logger.getLogger(EmailHeader.class);
+
     public EmailHeader( String header )
     {
         super( header );
     }
 
     @Override
-    public void parse(Message msg, String line) 
+    public void parse(Message msg, String line)
     {
-       logger.debug("line: " + line);
-        
-       List<MailAddress> emails = splitAttendees( line );  
-       
-       if( emails != null && !emails.isEmpty() )
-            assign( msg, emails );
+       LOGGER.debug("line: " + line);
+
+       List<MailAddress> emails = splitAttendees( line );
+
+       if( emails != null && !emails.isEmpty() ) {
+           assign( msg, emails );
+       }
     }
-    
+
     public abstract void assign( Message msg, List<MailAddress> emails );
-    
+
     public static List<MailAddress> splitAttendees(String text)
     {
         String parts[] = text.split(",");
 
-        List<MailAddress> addresses = new ArrayList();
+        List<MailAddress> addresses = new ArrayList<>();
 
         for( String part : parts )
         {
             MailAddress addr = new MailAddress();
 
-            int start = part.indexOf("<");
-            int end = part.indexOf(">");
+            int start = part.indexOf('<');
+            int end = part.indexOf('>');
 
             if( start >= 0 && end >= 0)
             {
@@ -60,14 +57,12 @@ public abstract class EmailHeader extends HeaderParser
                 addr.setEmail(part);
             }
 
-            if( addr.getEmail().contains("@") )
+            if( addr.getEmail().contains("@") ) {
                 addresses.add(addr);
+            }
         }
 
-        if( addresses.isEmpty() )
-            return null;
+        return addresses.isEmpty() ? null : addresses;
+    }
 
-        return addresses;
-    }    
-    
 }

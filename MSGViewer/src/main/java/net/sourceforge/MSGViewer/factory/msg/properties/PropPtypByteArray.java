@@ -1,4 +1,4 @@
-package net.sourceforge.MSGViewer.factory.msg.PropTypes;
+package net.sourceforge.MSGViewer.factory.msg.properties;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -7,17 +7,17 @@ import java.nio.ByteOrder;
  *
  * @author martin
  */
-public class PropPtypString extends PropType {
+public class PropPtypByteArray extends PropType {
 
-    static final String TYPE_NAME = "001f";
-    private String value;
+    static final String TYPE_NAME = "0102";
+    private byte value[];
 
-    public PropPtypString(String tagname)
+    public PropPtypByteArray(String tagname)
     {
         super( tagname, TYPE_NAME );
     }
 
-    public void setValue( String value )
+    public void setValue( byte value[] )
     {
         this.value = value;
     }
@@ -26,10 +26,10 @@ public class PropPtypString extends PropType {
     protected void writePropertiesContent(byte[] bytes, int offset)
     {
        if( value == null ) {
-           value = "";
+           value = new byte[0];
        }
 
-       int len = value.length()*2+2;
+       int len = value.length+4;
 
        ByteBuffer buffer = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN);
        buffer.putInt(len);

@@ -5,6 +5,7 @@ import at.redeye.FrameWork.base.BaseDialog;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.utilities.StringUtils;
 import net.sourceforge.MSGViewer.factory.msg.TopLevelPropertyStream;
+import net.sourceforge.MSGViewer.factory.msg.properties.Properties;
 import com.auxilii.msgparser.FieldInformation;
 import java.awt.EventQueue;
 import java.awt.event.MouseEvent;
@@ -42,98 +43,6 @@ public class MSGNavigator extends BaseDialog {
 
     private boolean setting_show_size = false;
 
-    enum Properties {
-        GUIDStream("0002"),
-        EntryStream("0003"),
-        PidTagAutoForwardComment("0004"),
-        PidTagMessageClass("001a"),
-        PidTagSubject("0037"),
-        PidTagClientSubmitTime("0039"),
-        PidTagSentRepresentingSearchKey("003b"),
-        PidTagSubjectPrefix("003d"),
-        PidTagReceivedByEntryId("003f"),
-        PidTagSentRepresentingEntryId("0041"), //  Identifies an address book EntryID.
-        PidTagSentRepresentingName("0042"),
-        PidTagReceivedRepresentingName("0044"),
-        PidTagOriginalAuthorName("004d"),
-        PidTagReplyRecipientNames("0050"),
-        PidTagReceivedBySearchKey("0051"),
-        PidTagOriginalSenderName("005a"),
-        PidTagSentRepresentingAddressType("0064"), //  Contains an e-mail address type.
-        PidTagSentRepresentingEmailAddress("0065"),
-        PidTagConversationTopic("0070"), //   Contains an unchanging copy of the original subject.
-        PidTagConversationIndex("0071"),
-        PidTagReceivedByAddressType("0075"),
-        PidTagReceivedByEmailAddress("0076"),
-        PidTagTransportMessageHeaders("007d"),
-        PidTagReceivedRepresentingEmailAddress("0078"),
-
-        // added by mobby
-        PidTagSenderEntryId("0c19"), // Identifies an address book EntryID that contains the sending mailbox owner's address book EntryID.
-        PidTagSenderName("0c1a"),
-        PidTagSenderAddressType("0c1e"), //  Contains the sending mailbox owner's e-mail address type.
-        PidTagRecipientType("0c15"),
-        PidTagSenderSearchKey("0c1d"),
-        PidTagSenderEmailAddress("0c1f"),
-
-        PidTagDisplayBcc("0e02"),
-        PidTagDisplayCc("0e03"),
-        PidTagDisplayTo("0e04"),
-        PidTagMessageDeliveryTime("0e06"),
-        PidTagMessageFlags("0e07"),
-        PidTagNormalizedSubject("0e1d"),
-        PidTagRtfInSync("0e1f"),
-        PidTagPrimarySendAccount("0e28"),
-        PidTagNextSendAcct("0e29"),
-
-        PidTagAccess("0ff4"),
-        PidTagInstanceKey("0ff6"),
-        PidTagAccessLevel("0ff7"),
-        PidTagEntryId("0fff"),
-
-        PidTagBody("1000"),
-        rtfSync("1008"),
-        RTFBodyText("1009"),
-        MessageId("1035"),
-        senderEmail("1046"),
-
-        PidTagRowid("3000"),
-        ToName("3001"),
-        PidTagAddressType("3002"),
-        emailAddress("3003"),
-        PidTagCreationTime("3007"),
-        PidTagLastModificationTime("3008"),
-        PidTagSearchKey("300b"), //  Contains a unique binary-comparable key that identifies an object for a search.
-
-        PidTagStoreSupportMask("340d"),
-
-        // attachment stuff
-        attachmentData("3701"),
-        extension("3703"),
-        fileName("3704"),
-        longFilenName("3707"),
-        mimeTag("370e"),
-        PidTagAttachContentId("3712"),
-
-        PidTagInternetCodepage("3fde"),
-
-        PidLidContactItemData("8007");
-
-        private final String propId;
-
-        Properties(String propId) {
-            this.propId = propId;
-        }
-
-        public static Properties get(String id) {
-            for (Properties value : values()) {
-                if (value.propId.equals(id)) {
-                    return value;
-                }
-            }
-            throw new IllegalArgumentException(id);
-        }
-    }
 
 
      public static class TreeNodeContainer extends DefaultMutableTreeNode
@@ -187,17 +96,6 @@ public class MSGNavigator extends BaseDialog {
         initComponents();
 
         this.file = file;
-
-
-        /*
-        props.put("8008", "X-MimeOLE");
-        props.put("8005", "X-GMX-AntiVirus");
-        props.put("8004", "X-GMX-AntiSpam");
-        props.put("8006", "X-Mailer");
-        props.put("8009", "X-Provags-ID");
-        props.put("8007", "X-Authenticated");
-        */
-
 
         reload();
     }
@@ -368,58 +266,67 @@ public class MSGNavigator extends BaseDialog {
         // lower case), we create a String object from the data.
         // the encoding of the binary data is most probably
         // ISO-8859-1 (not pure ASCII).
-        if (info.getType().equals("001e")) {
-            // we put the complete data into a byte[] object...
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            byte[] buffer = new byte[1024];
-            for (int read; (read = dstream.read(buffer)) > 0;) {
-                baos.write(buffer, 0, read);
-            }
-            // ...and create a String object from it
-/*
-            byte bytes[] = baos.toByteArray();
-
-            for( int i = 0; i < bytes.length; i++ )
+        switch (info.getType()) {
+            case "001e":
             {
-            System.out.print(String.format("%d %c,", (int)bytes[i], (char)bytes[i]));
-            }
-            System.out.println();
-             */
-            String text = new String(baos.toByteArray(), "ISO-8859-1");
-            return text;
-        } else if (info.getType().equals("001f")) {
-            // Unicode encoding with lowbyte followed by hibyte
-            // Note: this is arcane guesswork, but it works
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            byte[] buffer = new byte[1024];
-            for (int read; (read = dstream.read(buffer)) > 0;) {
-                baos.write(buffer, 0, read);
-            }
-            byte[] bytes = baos.toByteArray();
-
-            String text = new String(bytes, "UTF-16LE");
-            return text;
-        } else if (info.getType().equals("0102")) {
-            // the data is read into a byte[] object
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            byte[] buffer = new byte[1024];
-            for (int read; (read = dstream.read(buffer)) > 0;) {
-                baos.write(buffer, 0, read);
-            }
-            return baos.toByteArray();
-        } else if (info.getType().equals("0000")) {
-            // the data is read into a byte[] object
-            byte[] buffer = new byte[1024];
-
-            StringBuilder sb = new StringBuilder();
-
-            for (int read; (read = dstream.read(buffer)) > 0;) {
-                for (int i = 0; i < read; i++) {
-                    sb.append(buffer[i]);
-                    sb.append(" ");
+                // we put the complete data into a byte[] object...
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                byte[] buffer = new byte[1024];
+                for (int read; (read = dstream.read(buffer)) > 0;) {
+                    baos.write(buffer, 0, read);
                 }
+                // ...and create a String object from it
+                /*
+                byte bytes[] = baos.toByteArray();
+
+                for( int i = 0; i < bytes.length; i++ )
+                {
+                System.out.print(String.format("%d %c,", (int)bytes[i], (char)bytes[i]));
+                }
+                System.out.println();
+                */
+                String text = new String(baos.toByteArray(), "ISO-8859-1");
+                return text;
             }
-            return sb.toString();
+            case "001f":
+            {
+                // Unicode encoding with lowbyte followed by hibyte
+                // Note: this is arcane guesswork, but it works
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                byte[] buffer = new byte[1024];
+                for (int read; (read = dstream.read(buffer)) > 0;) {
+                    baos.write(buffer, 0, read);
+                }
+                byte[] bytes = baos.toByteArray();
+
+                String text = new String(bytes, "UTF-16LE");
+                return text;
+            }
+            case "0102":
+            {
+                // the data is read into a byte[] object
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                byte[] buffer = new byte[1024];
+                for (int read; (read = dstream.read(buffer)) > 0;) {
+                    baos.write(buffer, 0, read);
+                }
+                return baos.toByteArray();
+            }
+            case "0000":
+            {
+                // the data is read into a byte[] object
+                byte[] buffer = new byte[1024];
+
+                StringBuilder sb = new StringBuilder();
+
+                for (int read; (read = dstream.read(buffer)) > 0;) {
+                    for (int i = 0; i < read; i++) {
+                        sb.append(buffer[i]);
+                        sb.append(" ");
+                    }
+                }
+                return sb.toString();
+            }
         }
 
         // this should not happen

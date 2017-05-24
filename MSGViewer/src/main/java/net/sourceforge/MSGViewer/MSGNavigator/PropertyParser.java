@@ -2,6 +2,7 @@ package net.sourceforge.MSGViewer.MSGNavigator;
 
 import net.sourceforge.MSGViewer.factory.msg.lib.MSTimeConvert;
 import net.sourceforge.MSGViewer.factory.msg.lib.ByteConvert;
+import net.sourceforge.MSGViewer.factory.msg.properties.Properties;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public class PropertyParser
     {
         this.entry = entry;
 
-        for (MSGNavigator.Properties descr : MSGNavigator.Properties.values()) {
+        for (Properties descr : Properties.values()) {
             if (descr.toString().length() > max_descr_lenght) {
                 max_descr_lenght = descr.toString().length();
             }
@@ -147,7 +148,7 @@ public class PropertyParser
 
         sb.append(" ");
 
-        String descr = MSGNavigator.Properties.get(tagname.toLowerCase().substring(0, 4)).toString();
+        String descr = Properties.get(tagname.toLowerCase().substring(0, 4)).toString();
         sb.append(StringUtils.rightPad(descr, max_descr_lenght));
 
         String tagtype = tagname.toLowerCase().substring(4);

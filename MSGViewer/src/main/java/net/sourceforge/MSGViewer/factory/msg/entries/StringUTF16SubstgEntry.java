@@ -1,7 +1,7 @@
 package net.sourceforge.MSGViewer.factory.msg.entries;
 
-import net.sourceforge.MSGViewer.factory.msg.PropTypes.PropPtypString;
-import net.sourceforge.MSGViewer.factory.msg.PropTypes.PropType;
+import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypString;
+import net.sourceforge.MSGViewer.factory.msg.properties.PropType;
 import java.io.IOException;
 import org.apache.poi.poifs.filesystem.DirectoryEntry;
 

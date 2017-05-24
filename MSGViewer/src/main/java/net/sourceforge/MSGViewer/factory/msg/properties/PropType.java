@@ -1,4 +1,4 @@
-package net.sourceforge.MSGViewer.factory.msg.PropTypes;
+package net.sourceforge.MSGViewer.factory.msg.properties;
 
 /**
  *
@@ -29,12 +29,12 @@ public abstract class PropType
     /* writes the 16 byte entry of the property stream into the given bytes
      */
     public final void writePropertiesEntry( byte[] bytes, int offset ) {
-       offset = writeTagName(getTagName(), getTypeName(), bytes, offset);
+       offset = writeTagName(bytes, offset);
        offset = writeDefaultFlags(bytes, offset);
        writePropertiesContent(bytes, offset);
     }
 
-    private static int writeTagName( String tagname,  String typename, byte[] bytes, int offset )
+    private int writeTagName(byte[] bytes, int offset )
     {
         String name = tagname + typename;
 

@@ -1,9 +1,6 @@
 package net.sourceforge.MSGViewer.factory.mbox;
 
 import at.redeye.FrameWork.utilities.StringUtils;
-import net.sourceforge.MSGViewer.factory.mbox.headers.DateHeader;
-import net.sourceforge.MSGViewer.factory.mbox.headers.FromEmailHeader;
-import net.sourceforge.MSGViewer.factory.mbox.headers.ToEmailHeader;
 import com.auxilii.msgparser.Message;
 import com.auxilii.msgparser.attachment.FileAttachment;
 import java.io.ByteArrayOutputStream;
@@ -16,12 +13,19 @@ import java.util.Enumeration;
 import javax.mail.Address;
 import javax.mail.BodyPart;
 import javax.mail.Header;
+import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
 import javax.mail.Session;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import net.sourceforge.MSGViewer.factory.mbox.headers.BccEmailHeader;
+import net.sourceforge.MSGViewer.factory.mbox.headers.CcEmailHeader;
+import net.sourceforge.MSGViewer.factory.mbox.headers.DateHeader;
+import net.sourceforge.MSGViewer.factory.mbox.headers.EmailHeader;
+import net.sourceforge.MSGViewer.factory.mbox.headers.FromEmailHeader;
+import net.sourceforge.MSGViewer.factory.mbox.headers.ToEmailHeader;
 import org.apache.log4j.Logger;
 
 /**
@@ -32,8 +36,10 @@ public class JavaMailParser
 {
     private static final Logger LOGGER = Logger.getLogger(JavaMailParser.class.getName());
 
-    private static final FromEmailHeader FROM_PARSER = new FromEmailHeader();
-    private static final ToEmailHeader TO_PARSER =  new ToEmailHeader();
+    private static final EmailHeader FROM_PARSER = new FromEmailHeader();
+    private static final EmailHeader TO_PARSER =  new ToEmailHeader();
+    private static final EmailHeader CC_PARSER =  new CcEmailHeader();
+    private static final EmailHeader BCC_PARSER =  new BccEmailHeader();
     private static final DateHeader DATE_PARSER = new DateHeader();
 
     public Message parse( File file ) throws Exception
@@ -43,7 +49,9 @@ public class JavaMailParser
         Message msg = new Message();
 
         FROM_PARSER.parse(msg, getAddresses(jmsg.getFrom()) );
-        TO_PARSER.parse(msg, getAddresses(jmsg.getFrom()) );
+        TO_PARSER.parse(msg, getAddresses(jmsg.getRecipients(RecipientType.TO)) );
+        CC_PARSER.parse(msg, getAddresses(jmsg.getRecipients(RecipientType.CC)) );
+        BCC_PARSER.parse(msg, getAddresses(jmsg.getRecipients(RecipientType.BCC)) );
         msg.setSubject(jmsg.getSubject());
 
 

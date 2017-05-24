@@ -1,6 +1,6 @@
 package net.sourceforge.MSGViewer.factory.msg.entries;
 
-import net.sourceforge.MSGViewer.factory.msg.PropTypes.PropType;
+import net.sourceforge.MSGViewer.factory.msg.properties.PropType;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;

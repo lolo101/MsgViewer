@@ -1,8 +1,8 @@
 package net.sourceforge.MSGViewer.factory.msg.entries;
 
 import java.io.IOException;
-import net.sourceforge.MSGViewer.factory.msg.PropTypes.PropPtypByteArray;
-import net.sourceforge.MSGViewer.factory.msg.PropTypes.PropType;
+import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypByteArray;
+import net.sourceforge.MSGViewer.factory.msg.properties.PropType;
 import org.apache.poi.poifs.filesystem.DirectoryEntry;
 
 public class BinaryEntry extends SubstGEntry {

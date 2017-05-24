@@ -4,11 +4,13 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 import net.sourceforge.MSGViewer.ModuleLauncher;
 import net.sourceforge.MSGViewer.factory.MessageParserFactory;
-import net.sourceforge.MSGViewer.factory.msg.PropTypes.PropPtypInteger32;
-import net.sourceforge.MSGViewer.factory.msg.PropTypes.PropPtypeTime;
+import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypBoolean;
+import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypInteger32;
+import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypeTime;
 import net.sourceforge.MSGViewer.factory.msg.entries.BodyTextEntry;
 import net.sourceforge.MSGViewer.factory.msg.entries.HeadersEntry;
 import net.sourceforge.MSGViewer.factory.msg.entries.MessageClassEntry;
+import net.sourceforge.MSGViewer.factory.msg.entries.RTFBodyTextEntry;
 import net.sourceforge.MSGViewer.factory.msg.entries.StringUTF16SubstgEntry;
 import net.sourceforge.MSGViewer.factory.msg.entries.SubjectEntry;
 import com.auxilii.msgparser.Message;
@@ -18,8 +20,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import net.sourceforge.MSGViewer.factory.msg.PropTypes.PropPtypBoolean;
-import net.sourceforge.MSGViewer.factory.msg.entries.RTFBodyTextEntry;
 import org.apache.poi.poifs.filesystem.DirectoryNode;
 import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
 
@@ -75,12 +75,9 @@ public class MsgWriter
             cont.addVarEntry( new StringUTF16SubstgEntry("0c1f", msg.getFromEmail() ) );
         }
 
-        if( msg.getToEmail() != null && !msg.getToEmail().isEmpty() ) {
-            cont.addVarEntry( new StringUTF16SubstgEntry("0076", msg.getToEmail() ) );
-        }
-
-        if( msg.getToName() != null && !msg.getToName().isEmpty() ) {
-            cont.addVarEntry( new StringUTF16SubstgEntry("3001", msg.getToName() ) );
+        for (int i = 0; i < msg.getToEmail().size(); ++i) {
+            cont.addVarEntry( new StringUTF16SubstgEntry("0076", msg.getToEmail().get(i) ) );
+            cont.addVarEntry( new StringUTF16SubstgEntry("3001", msg.getToName().get(i) ) );
         }
 
         if( msg.getMessageId() != null && !msg.getMessageId().isEmpty() ) {
