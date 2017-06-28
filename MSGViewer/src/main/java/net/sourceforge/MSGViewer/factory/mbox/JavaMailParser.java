@@ -114,6 +114,7 @@ public class JavaMailParser
                 FileAttachment att = new FileAttachment();
                 att.setMimeTag(getMime(part.getContentType()));
                 att.setFilename(part.getFileName());
+                att.setExtension(part.getFileName().substring(part.getFileName().lastIndexOf('.') + 1));
 
                 String cid = mpart.getContentID();
                 if( cid != null ) {
