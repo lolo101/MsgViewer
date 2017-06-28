@@ -1,10 +1,8 @@
 package net.sourceforge.MSGViewer.factory.msg.entries;
 
 import net.sourceforge.MSGViewer.factory.msg.properties.PropType;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import org.apache.poi.poifs.filesystem.DirectoryEntry;
 
 /**
@@ -13,42 +11,18 @@ import org.apache.poi.poifs.filesystem.DirectoryEntry;
  */
 public abstract class SubstGEntry
 {
+    public static final String TYPE_INT32 = "0003";
     public static final String TYPE_ASCII = "001e";
     public static final String TYPE_UTF16 = "001f";
     public static final String TYPE_BYTES = "0102";
 
-    private final String type;
-    private final String name;
+    protected final String type;
+    protected final String name;
 
     public SubstGEntry(String name,  String type )
     {
         this.name = name;
         this.type = type;
-    }
-
-    public void createEntry( DirectoryEntry dir, String value ) throws IOException
-    {
-        InputStream in = decode(value);
-
-        dir.createDocument("__substg1.0_" + name + type.toUpperCase(), in);
-    }
-
-    private InputStream decode(String value) throws UnsupportedEncodingException {
-        switch(type) {
-            case TYPE_ASCII:
-                return new ByteArrayInputStream(value.getBytes("ISO-8859-1"));
-            case TYPE_UTF16:
-                return new ByteArrayInputStream(value.getBytes("UTF-16LE"));
-            default:
-                throw new IllegalArgumentException(type);
-        }
-    }
-
-    public void createEntry( DirectoryEntry dir, byte value[] ) throws IOException
-    {
-        InputStream in = new ByteArrayInputStream(value);
-
-        dir.createDocument("__substg1.0_" + name + type.toUpperCase(), in);
     }
 
     public String getTypeName() {
@@ -66,5 +40,10 @@ public abstract class SubstGEntry
 
     public abstract PropType getPropType();
 
-    public abstract void createEntry(  DirectoryEntry dir ) throws IOException;
+    public void createEntry(  DirectoryEntry dir ) throws IOException {
+        InputStream stream = createEntryContent();
+        dir.createDocument("__substg1.0_" + name + type.toUpperCase(), stream);
+    }
+
+    protected abstract InputStream createEntryContent() throws IOException;
 }

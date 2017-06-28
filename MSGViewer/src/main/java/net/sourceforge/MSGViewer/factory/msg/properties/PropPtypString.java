@@ -10,29 +10,19 @@ import java.nio.ByteOrder;
 public class PropPtypString extends PropType {
 
     static final String TYPE_NAME = "001f";
-    private String value;
+    private final int length;
 
-    public PropPtypString(String tagname)
+    public PropPtypString(String tagname, int length)
     {
         super( tagname, TYPE_NAME );
-    }
-
-    public void setValue( String value )
-    {
-        this.value = value;
+        this.length = length * 2 + 2;
     }
 
     @Override
     protected void writePropertiesContent(byte[] bytes, int offset)
     {
-       if( value == null ) {
-           value = "";
-       }
-
-       int len = value.length()*2+2;
-
        ByteBuffer buffer = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN);
-       buffer.putInt(len);
+       buffer.putInt(length);
        byte[] int_bytes = buffer.array();
 
        System.arraycopy(int_bytes, 0, bytes, offset, int_bytes.length);

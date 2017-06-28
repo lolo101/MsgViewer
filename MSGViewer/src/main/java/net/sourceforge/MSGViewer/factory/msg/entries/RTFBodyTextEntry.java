@@ -14,8 +14,4 @@ public class RTFBodyTextEntry extends BinaryEntry
     {
         super(NAME, text.getBytes("UTF-16LE"));
     }
-
-    public RTFBodyTextEntry(byte[] bodyCompressesRTF) {
-        super( NAME, bodyCompressesRTF);
-    }
 }

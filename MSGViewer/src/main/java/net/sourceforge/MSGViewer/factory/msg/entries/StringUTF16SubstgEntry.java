@@ -1,9 +1,13 @@
 package net.sourceforge.MSGViewer.factory.msg.entries;
 
+import static net.sourceforge.MSGViewer.factory.msg.entries.SubstGEntry.TYPE_ASCII;
+import static net.sourceforge.MSGViewer.factory.msg.entries.SubstGEntry.TYPE_UTF16;
+
+import java.io.ByteArrayInputStream;
 import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypString;
 import net.sourceforge.MSGViewer.factory.msg.properties.PropType;
-import java.io.IOException;
-import org.apache.poi.poifs.filesystem.DirectoryEntry;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
 /**
  *
@@ -15,19 +19,24 @@ public class StringUTF16SubstgEntry extends SubstGEntry
 
     public StringUTF16SubstgEntry( String name , String value ) {
         super( name, TYPE_UTF16 );
-        this.value = value;
+        this.value = value == null ? "" : value;
     }
 
     @Override
     public PropType getPropType() {
-        PropPtypString prop = new PropPtypString(getTagName());
-        prop.setValue(value);
-        return prop;
+        return new PropPtypString(getTagName(), value.length());
     }
 
     @Override
-    public void createEntry(DirectoryEntry dir) throws IOException {
-        createEntry(dir,value == null ? "" : value);
+    protected InputStream createEntryContent() throws UnsupportedEncodingException {
+        switch(type) {
+            case TYPE_ASCII:
+                return new ByteArrayInputStream(value.getBytes("ISO-8859-1"));
+            case TYPE_UTF16:
+                return new ByteArrayInputStream(value.getBytes("UTF-16LE"));
+            default:
+                throw new IllegalArgumentException(type);
+        }
     }
 
 }

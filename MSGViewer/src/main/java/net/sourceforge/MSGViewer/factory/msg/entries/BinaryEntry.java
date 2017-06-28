@@ -1,9 +1,9 @@
 package net.sourceforge.MSGViewer.factory.msg.entries;
 
-import java.io.IOException;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypByteArray;
 import net.sourceforge.MSGViewer.factory.msg.properties.PropType;
-import org.apache.poi.poifs.filesystem.DirectoryEntry;
 
 public class BinaryEntry extends SubstGEntry {
 
@@ -16,14 +16,12 @@ public class BinaryEntry extends SubstGEntry {
 
     @Override
     public PropType getPropType() {
-        PropPtypByteArray prop = new PropPtypByteArray(getTagName());
-        prop.setValue(value);
-        return prop;
+        return new PropPtypByteArray(getTagName(), value.length);
     }
 
     @Override
-    public void createEntry(DirectoryEntry dir) throws IOException {
-        createEntry(dir, value);
+    protected InputStream createEntryContent() {
+        return new ByteArrayInputStream(value);
     }
 
 }
