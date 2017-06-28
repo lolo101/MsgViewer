@@ -21,9 +21,9 @@ public class ToEmailHeader extends EmailHeader
     {
         for (MailAddress email : emails) {
             RecipientEntry recipientEntry = new RecipientEntry();
-            recipientEntry.setToEmail(email.getEmail());
-            recipientEntry.setToName(email.getDisplayName());
-            recipientEntry.setProperty("type", "To");
+            recipientEntry.setEmail(email.getEmail());
+            recipientEntry.setName(email.getDisplayName());
+            recipientEntry.setType(RecipientEntry.RecipientType.TO);
             msg.addRecipient(recipientEntry);
         }
     }

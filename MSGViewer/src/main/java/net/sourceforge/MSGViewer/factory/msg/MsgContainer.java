@@ -97,7 +97,7 @@ public class MsgContainer
         createNamedEntry(root);
     }
 
-    private void writeInt( byte[] bytes, int offset, int value ) {
+    private static void writeInt( byte[] bytes, int offset, int value ) {
 
        ByteBuffer buffer = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN);
        buffer.putInt(value);
@@ -107,7 +107,7 @@ public class MsgContainer
        System.arraycopy(int_bytes, 0, bytes, offset, 4);
     }
 
-    private void createPropEntry(byte[] bytes, DirectoryEntry root ) throws IOException
+    private static void createPropEntry(byte[] bytes, DirectoryEntry root ) throws IOException
     {
         deleteEntryIfExists(root, NAME);
 
@@ -115,7 +115,7 @@ public class MsgContainer
         root.createDocument(NAME, buffer);
     }
 
-    private void createNamedEntry(DirectoryEntry root ) throws IOException
+    private static void createNamedEntry(DirectoryEntry root ) throws IOException
     {
         deleteEntryIfExists(root, NAMED_NAME);
 
@@ -143,13 +143,14 @@ public class MsgContainer
         attachments.add(attachment);
     }
 
-    private void writeRecipientEntry(DirectoryEntry root , RecipientEntry rec, int id) throws IOException
+    private static void writeRecipientEntry(DirectoryEntry root , RecipientEntry rec, int id) throws IOException
     {
         DirectoryEntry rec_dir = root.createDirectory(String.format("__recip_version1.0_#%08d", id));
 
         List<? extends SubstGEntry> entries = Arrays.asList(
-                new StringUTF16SubstgEntry("3001", rec.getToName()),
-                new StringUTF16SubstgEntry("3003", rec.getToEmail())
+                new StringUTF16SubstgEntry("3001", rec.getName()),
+                new StringUTF16SubstgEntry("3002", "SMTP"),
+                new StringUTF16SubstgEntry("3003", rec.getEmail())
         );
 
         for (SubstGEntry entry : entries) {
@@ -158,7 +159,7 @@ public class MsgContainer
 
         List<PropType> props = new ArrayList<>();
         props.add(new PropPtypInteger32("3000", id));
-        props.add(new PropPtypInteger32("0C15", 1));
+        props.add(new PropPtypInteger32("0C15", rec.getType().getValue()));
         for (SubstGEntry entry : entries) {
             props.add(entry.getPropType());
         }
@@ -168,14 +169,14 @@ public class MsgContainer
         createPropEntry(bytes, rec_dir);
     }
 
-    private void writeAttachment(DirectoryEntry root, Attachment attachment, int id) throws IOException {
+    private static void writeAttachment(DirectoryEntry root, Attachment attachment, int id) throws IOException {
         DirectoryEntry att_dir = root.createDirectory(String.format("__attach_version1.0_#%08d", id));
         if (attachment instanceof FileAttachment) {
             writeFileAttachment((FileAttachment) attachment, id, att_dir);
         }
     }
 
-    private void writeFileAttachment(FileAttachment attachment, int id, DirectoryEntry att_dir) throws IOException {
+    private static void writeFileAttachment(FileAttachment attachment, int id, DirectoryEntry att_dir) throws IOException {
         List<? extends SubstGEntry> entries = Arrays.asList(
                 new BinaryEntry("3701", attachment.getData()),
                 new StringUTF16SubstgEntry("3703", attachment.getExtension()),
@@ -202,7 +203,7 @@ public class MsgContainer
     private static byte[] createPropertiesEntryContent(Collection<PropType> p_entries) {
         int offset = 8;
         int size = offset + p_entries.size() * 16;
-        byte bytes[] = new byte[size];
+        byte[] bytes = new byte[size];
 
         for (PropType prop : p_entries) {
             prop.writePropertiesEntry(bytes, offset);

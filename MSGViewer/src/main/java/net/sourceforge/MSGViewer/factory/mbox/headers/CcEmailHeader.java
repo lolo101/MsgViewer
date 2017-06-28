@@ -2,6 +2,7 @@ package net.sourceforge.MSGViewer.factory.mbox.headers;
 
 import net.sourceforge.MSGViewer.factory.mbox.MailAddress;
 import com.auxilii.msgparser.Message;
+import com.auxilii.msgparser.RecipientEntry;
 import java.util.List;
 
 /**
@@ -19,8 +20,11 @@ public class CcEmailHeader extends EmailHeader
     public void assign(Message msg, List<MailAddress> emails)
     {
         for (MailAddress email : emails) {
-            msg.addCcEmail(email.getEmail());
-            msg.addCcName(email.getDisplayName());
+            RecipientEntry recipientEntry = new RecipientEntry();
+            recipientEntry.setEmail(email.getEmail());
+            recipientEntry.setName(email.getDisplayName());
+            recipientEntry.setType(RecipientEntry.RecipientType.CC);
+            msg.addRecipient(recipientEntry);
         }
     }
 }

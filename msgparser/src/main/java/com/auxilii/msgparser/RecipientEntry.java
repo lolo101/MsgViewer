@@ -17,10 +17,6 @@
  */
 package com.auxilii.msgparser;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * This class represents a recipient's entry of the parsed .msg file. It provides informations like the
  * email address and the display name.
@@ -29,116 +25,100 @@ import java.util.Set;
  */
 public class RecipientEntry {
 
-	/**
-	 * The address part of To: mail address.
-	 */
-	private String toEmail = null;
-	/**
-	 * The address part of To: name.
-	 */
-	private String toName = null;
-	/**
-	 * Contains all properties that are not
-	 * covered by the special properties.
-	 */
-	private final Map<String,Object> properties = new HashMap<>();
+    public enum RecipientType {
+        FROM(0),
+        TO(1),
+        CC(2),
+        BCC(3);
 
-	/**
-	 * Sets the name/value pair in the {@link #properties}
-	 * map. Some properties are put into
-	 * special attributes (e.g., {@link #toEmail} when
-	 * the property name is '0076').
-	 *
-	 * @param name The property name (i.e., the class
-	 *  of the document entry).
-	 * @param value The value of the field.
-	 * @throws ClassCastException Thrown if the detected data
-	 *  type does not match the expected data type.
-	 */
-	public void setProperty(String name, Object value) throws ClassCastException {
+        private final int type;
 
-		if ((name == null) || (value == null)) {
-			return;
-		}
+        private RecipientType(int type) {
+            this.type = type;
+        }
 
-		// we know that the name is lower case
-		// because this is done in MsgParser.analyzeDocumentEntry
-		if (value instanceof String) {
-			if ("39fe".equals(name)) {
-				this.setToEmail((String) value);
-			} else if ("3003".equals(name) && this.getToEmail() == null) {
-				this.setToEmail((String) value);
-			} else if ("3001".equals(name)) {
-				this.setToName((String) value);
-			}
-		}
+        public int getValue() {
+            int flag = 0x10000000;
+            return flag | type;
+        }
+    }
 
-		// save all properties (incl. those identified above)
-		this.properties.put(name, value);
-	}
+    private String email = null;
+    private String name = null;
+    private RecipientType type;
+
+    /**
+     * Sets the name/value pair in the {@link #properties}
+     * map. Some properties are put into
+     * special attributes (e.g., {@link #email} when
+     * the property name is '0076').
+     *
+     * @param name The property name (i.e., the class
+     *  of the document entry).
+     * @param value The value of the field.
+     * @throws ClassCastException Thrown if the detected data
+     *  type does not match the expected data type.
+     */
+    public void setProperty(String name, Object value) throws ClassCastException {
+
+        if ((name == null) || (value == null)) {
+            return;
+        }
+
+        // we know that the name is lower case
+        // because this is done in MsgParser.analyzeDocumentEntry
+        if (value instanceof String) {
+            if ("39fe".equals(name)) {
+                this.setEmail((String) value);
+            } else if ("3003".equals(name) && this.getEmail() == null) {
+                this.setEmail((String) value);
+            } else if ("3001".equals(name)) {
+                this.setName((String) value);
+            }
+        }
+    }
 
 
-	/**
-	 * @return the to: email
-	 */
-	public String getToEmail() {
-		return toEmail;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	/**
-	 * @param toEmail the to email to be set
-	 */
-	public void setToEmail(String toEmail) {
-		this.toEmail = toEmail;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	/**
-	 * @return the to name
-	 */
-	public String getToName() {
-		return toName;
-	}
+    public String getName() {
+        return name;
+    }
 
-	/**
-	 * @param toName the to name to be set
-	 */
-	public void setToName(String toName) {
-		this.toName = toName;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	/**
-	 * Provides a short representation of this recipient object <br>
-	 * (e.g. 'Firstname Lastname &lt;firstname.lastname@domain.tld&gt;').
-	 *
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append(this.toName);
-		if (sb.length() > 0) {
-			sb.append(" ");
-		}
-		if ((this.toEmail != null) && (this.toEmail.length() > 0)) {
-			sb.append("<" + this.toEmail + ">");
-		}
-		return sb.toString();
-	}
+    public RecipientType getType() {
+        return type;
+    }
 
-	/**
-	 *
-	 * @return the set of keys that are stored in the properties map.
-	 */
-	public Set<String> getProperties() {
-		return this.properties.keySet();
-	}
+    public void setType(RecipientType type) {
+        this.type = type;
+    }
 
-	/**
-	 *
-	 * @param name the name of the property to be returned.
-	 * @return the property that matches the given name.
-	 */
-	public Object getProperty(String name) {
-		return this.properties.get(name);
-	}
+    /**
+     * Provides a short representation of this recipient object <br>
+     * (e.g. 'Firstname Lastname &lt;firstname.lastname@domain.tld&gt;').
+     *
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.name);
+        if (sb.length() > 0) {
+            sb.append(" ");
+        }
+        if ((this.email != null) && (this.email.length() > 0)) {
+            sb.append("<").append(this.email).append(">");
+        }
+        return sb.toString();
+    }
 }
