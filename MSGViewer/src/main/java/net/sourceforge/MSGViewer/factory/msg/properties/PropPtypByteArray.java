@@ -1,8 +1,5 @@
 package net.sourceforge.MSGViewer.factory.msg.properties;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
 /**
  *
  * @author martin
@@ -19,12 +16,8 @@ public class PropPtypByteArray extends PropType {
     }
 
     @Override
-    protected void writePropertiesContent(byte[] bytes, int offset)
+    protected long getPropertiesContent()
     {
-       ByteBuffer buffer = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN);
-       buffer.putInt(length);
-       byte[] int_bytes = buffer.array();
-
-       System.arraycopy(int_bytes, 0, bytes, offset, int_bytes.length);
+       return length;
     }
 }

@@ -10,6 +10,7 @@ import com.auxilii.msgparser.attachment.FileAttachment;
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -53,32 +54,27 @@ public class MsgContainer
     public void write( DirectoryEntry root ) throws IOException
     {
         int size = HEADER_SIZE + properties.size() * 16;
-        byte bytes[] = new byte[size];
+        ByteBuffer bytes = ByteBuffer.allocate(size).order(ByteOrder.LITTLE_ENDIAN);
 
-        int offset = 8;
+        bytes.position(8);
 
         // next recip id
-        writeInt(bytes,offset, recipients.size());
-        offset +=4;
+        bytes.putInt(recipients.size());
 
         // next attachment id
-        writeInt(bytes,offset, attachments.size());
-        offset +=4;
+        bytes.putInt(attachments.size());
 
         // recip count
-        writeInt(bytes,offset, recipients.size());
-        offset +=4;
+        bytes.putInt(recipients.size());
 
         // attachment count
-        writeInt(bytes,offset, attachments.size());
-        offset +=4;
+        bytes.putInt(attachments.size());
 
-        offset = HEADER_SIZE;
+        bytes.position(HEADER_SIZE);
 
         for( PropType prop : properties )
         {
-            prop.writePropertiesEntry(bytes, offset);
-            offset += 16;
+            prop.writePropertiesEntry(bytes);
         }
 
         for( SubstGEntry entry : substg_streams ) {
@@ -93,25 +89,15 @@ public class MsgContainer
             writeAttachment(root, attachments.get(count), count);
         }
 
-        createPropEntry(bytes,root);
+        createPropEntry(bytes, root);
         createNamedEntry(root);
     }
 
-    private static void writeInt( byte[] bytes, int offset, int value ) {
-
-       ByteBuffer buffer = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN);
-       buffer.putInt(value);
-
-       byte[] int_bytes = buffer.array();
-
-       System.arraycopy(int_bytes, 0, bytes, offset, 4);
-    }
-
-    private static void createPropEntry(byte[] bytes, DirectoryEntry root ) throws IOException
+    private static void createPropEntry(ByteBuffer bytes, DirectoryEntry root ) throws IOException
     {
         deleteEntryIfExists(root, NAME);
 
-        ByteArrayInputStream buffer = new ByteArrayInputStream(bytes);
+        InputStream buffer = new ByteArrayInputStream(bytes.array());
         root.createDocument(NAME, buffer);
     }
 
@@ -164,7 +150,7 @@ public class MsgContainer
             props.add(entry.getPropType());
         }
 
-        byte[] bytes = createPropertiesEntryContent(props);
+        ByteBuffer bytes = createPropertiesEntryContent(props);
 
         createPropEntry(bytes, rec_dir);
     }
@@ -195,19 +181,18 @@ public class MsgContainer
             props.add(entry.getPropType());
         }
 
-        byte[] bytes = createPropertiesEntryContent(props);
+        ByteBuffer bytes = createPropertiesEntryContent(props);
 
         createPropEntry(bytes, att_dir);
     }
 
-    private static byte[] createPropertiesEntryContent(Collection<PropType> p_entries) {
-        int offset = 8;
-        int size = offset + p_entries.size() * 16;
-        byte[] bytes = new byte[size];
+    private static ByteBuffer createPropertiesEntryContent(Collection<PropType> p_entries) {
+        int size = 8 + p_entries.size() * 16;
+        ByteBuffer bytes = ByteBuffer.allocate(size);
+        bytes.position(8);
 
         for (PropType prop : p_entries) {
-            prop.writePropertiesEntry(bytes, offset);
-            offset += 16;
+            prop.writePropertiesEntry(bytes);
         }
 
         return bytes;

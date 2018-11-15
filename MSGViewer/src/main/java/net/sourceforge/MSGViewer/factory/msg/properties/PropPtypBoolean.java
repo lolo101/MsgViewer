@@ -21,8 +21,8 @@ public class PropPtypBoolean extends PropType {
     }
 
     @Override
-    protected void writePropertiesContent(byte[] bytes, int offset)
+    protected long getPropertiesContent()
     {
-       bytes[offset] = (byte) (value ? 0x1 : 0x0);
+       return value ? 0x1 : 0x0;
     }
 }

@@ -1,8 +1,6 @@
 package net.sourceforge.MSGViewer.factory.msg.properties;
 
 import net.sourceforge.MSGViewer.factory.msg.lib.MSTimeConvert;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 /**
  *
@@ -27,13 +25,8 @@ public class PropPtypeTime extends PropType
     }
 
     @Override
-    protected void writePropertiesContent(byte[] bytes, int offset)
+    protected long getPropertiesContent()
     {
-       ByteBuffer buffer = ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN);
-       buffer.putLong(value);
-
-       byte[] long_bytes = buffer.array();
-
-       System.arraycopy(long_bytes, 0, bytes, offset, 8);
+       return value;
     }
 }
