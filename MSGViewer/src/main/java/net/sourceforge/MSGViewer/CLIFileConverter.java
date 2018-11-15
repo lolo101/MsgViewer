@@ -3,7 +3,6 @@ package net.sourceforge.MSGViewer;
 import java.awt.Desktop;
 import java.io.File;
 import java.nio.file.Paths;
-import java.text.MessageFormat;
 import java.util.Arrays;
 
 import javax.swing.JOptionPane;
@@ -14,7 +13,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import at.redeye.FrameWork.base.BaseModuleLauncher;
-import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.base.Setup;
 
 import com.auxilii.msgparser.Message;
@@ -24,7 +22,6 @@ public abstract class CLIFileConverter {
 	private static final Logger LOGGER = BaseModuleLauncher.logger;
 
 	private final ModuleLauncher module_launcher;
-	private final Root root;
 	private final String sourceType;
 	private final String targetType;
 	private boolean convertToTemp = false;
@@ -42,7 +39,6 @@ public abstract class CLIFileConverter {
 	public CLIFileConverter(ModuleLauncher module_launcher, String sourceType,
 			String targetType) {
 		this.module_launcher = module_launcher;
-		this.root = module_launcher.root;
 		BaseModuleLauncher.BaseConfigureLogging(Level.INFO);
 
 		this.sourceType = sourceType;
@@ -74,52 +70,40 @@ public abstract class CLIFileConverter {
 	public abstract String getCLIParameter();
 
 	public void usage() {
-		System.out.println(this.root.MlM(MessageFormat.format(
-				"usage: {0} FILE FILE ....", this.getCLIParameter())));
+		System.out.println(module_launcher.root.MlM(String.format(
+				"usage: %s FILE FILE ....", getCLIParameter())));
 	}
 
 	public void work() {
 		boolean converted = false;
 		MessageParserFactory factory = new MessageParserFactory();
 
-		for (String sourceFilePath : this.module_launcher.args) {
-			if (sourceFilePath.toLowerCase().endsWith(
-					MessageFormat.format(".{0}", this.sourceType))) {
+		for (String sourceFilePath : module_launcher.args) {
+			if (sourceFilePath.toLowerCase().endsWith(String.format(".%s", sourceType))) {
 				converted = true;
-				this.processFile(factory, sourceFilePath);
+				processFile(factory, sourceFilePath);
 			}
 		}
 
 		if (!converted) {
-			this.usage();
+			usage();
 		}
 	}
 
 	private void processFile(MessageParserFactory factory, String sourceFilePath) {
-		File sourceFile = new File(sourceFilePath);
+		File sourceFile = new File(sourceFilePath).getAbsoluteFile();
 		String baseFileName = sourceFile.getName();
 		int idx = baseFileName.lastIndexOf('.');
 		baseFileName = baseFileName.substring(0, idx);
-		LOGGER.info(MessageFormat.format("conversion source file: {0}",
-				sourceFile));
 		try {
+			File targetFile = convertToTemp
+					? File.createTempFile(baseFileName, String.format(".%s", targetType))
+					: Paths.get(sourceFile.getParent(), String.format("%s.%s", baseFileName, targetType)).toFile();
 
-			File targetFile;
-			if (convertToTemp) {
-				targetFile = File.createTempFile(baseFileName,
-						MessageFormat.format(".{0}", targetType));
-			} else {
-				File targetDirectory = sourceFile.getParentFile();
-				targetFile = Paths.get(
-						targetDirectory.getAbsolutePath(),
-						MessageFormat.format("{0}.{1}", baseFileName,
-								targetType)).toFile();
-			}
-
-			LOGGER.info(MessageFormat.format("conversion target file: {0}",
-					targetFile));
+			LOGGER.info("conversion source file: " + sourceFile);
 			Message msg = factory.parseMessage(sourceFile);
 
+			LOGGER.info("conversion target file: " + targetFile);
 			factory.saveMessage(msg, targetFile);
 
 			if (openAfterConvert) {
@@ -137,7 +121,7 @@ public abstract class CLIFileConverter {
 		} catch (Exception e) {
 			LOGGER.warn("failed to open default application with Desktop.open(), trying system dependent command.");
 			String[] cmdarray = null;
-                                                			
+
 			if (Setup.is_linux_system()) {
 				cmdarray = new String[2];
 				cmdarray[0] = "xdg-open";
@@ -145,7 +129,7 @@ public abstract class CLIFileConverter {
                         } else if (Setup.is_mac_system()) {
 				cmdarray = new String[2];
 				cmdarray[0] = "open";
-				cmdarray[1] = targetFile.getAbsolutePath();                                
+				cmdarray[1] = targetFile.getAbsolutePath();
 			} else if (Setup.is_win_system()) {
 				cmdarray = new String[3];
 				cmdarray[0] = "cmd";
@@ -156,11 +140,9 @@ public abstract class CLIFileConverter {
 				try {
 					Runtime.getRuntime().exec(cmdarray);
 				} catch (Exception e1) {
-					String message = MessageFormat
-							.format("Unable to open converted file.\nCould not execute command {0} \nwith parameters {1}",
-									cmdarray[0], Arrays.asList(cmdarray)
-											.subList(1, cmdarray.length));
-					LOGGER.error(message.replaceAll("\n", ""));
+					String message = String.format("Unable to open converted file.\nCould not execute command %s",
+							Arrays.toString(cmdarray));
+					LOGGER.error(message.replaceAll("\n", " "));
 					JOptionPane.showMessageDialog(null, message,
 							"Error opening converted file",
 							JOptionPane.ERROR_MESSAGE);
