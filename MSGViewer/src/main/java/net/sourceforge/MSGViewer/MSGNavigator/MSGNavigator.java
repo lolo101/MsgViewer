@@ -189,9 +189,7 @@ public class MSGNavigator extends BaseDialog {
 
                 Properties property_name =  Properties.get(info.getClazz());
 
-                if( property_name != null ) {
-                    sb.append(" <code style=\"color: green\">").append(property_name).append("</code> ");
-                }
+                sb.append(" <code style=\"color: green\">").append(property_name).append("</code> ");
 
                 if( setting_show_size ) {
                     sb.append(" ").append(de.getSize()).append("b ");
