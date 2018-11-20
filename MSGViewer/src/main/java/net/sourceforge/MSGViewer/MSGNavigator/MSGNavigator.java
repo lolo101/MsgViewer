@@ -8,7 +8,9 @@ import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.utilities.StringUtils;
 import net.sourceforge.MSGViewer.factory.msg.TopLevelPropertyStream;
 import net.sourceforge.MSGViewer.factory.msg.properties.Properties;
+
 import com.auxilii.msgparser.FieldInformation;
+
 import java.awt.EventQueue;
 import java.awt.event.MouseEvent;
 import java.io.ByteArrayOutputStream;
@@ -19,11 +21,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Iterator;
+
 import javax.swing.JPopupMenu;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+
 import org.apache.poi.poifs.filesystem.DirectoryEntry;
 import org.apache.poi.poifs.filesystem.DirectoryNode;
 import org.apache.poi.poifs.filesystem.DocumentEntry;
@@ -138,9 +141,7 @@ public class MSGNavigator extends BaseDialog {
 
     private void parse(DefaultMutableTreeNode root_node, DirectoryEntry fs_root) throws IOException
     {
-        for (Iterator<?> iter = fs_root.getEntries(); iter.hasNext(); )
-        {
-            Entry entry = (Entry) iter.next();
+        for (Entry entry : fs_root) {
 
             if (entry.isDirectoryEntry()) {
                 DirectoryEntry de = (DirectoryEntry) entry;
@@ -254,7 +255,7 @@ public class MSGNavigator extends BaseDialog {
      * @throws UnsupportedOperationException Thrown if
      *  the .msg file contains unknown data.
      */
-    protected Object getData(DocumentInputStream dstream, FieldInformation info) throws IOException {
+    private Object getData(DocumentInputStream dstream, FieldInformation info) throws IOException {
         // if there is no field information available, we simply
         // return null. in that case, we're not interested in the
         // data anyway
@@ -267,51 +268,9 @@ public class MSGNavigator extends BaseDialog {
         // the encoding of the binary data is most probably
         // ISO-8859-1 (not pure ASCII).
         switch (info.getType()) {
-            case "001e":
-            {
-                // we put the complete data into a byte[] object...
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                byte[] buffer = new byte[1024];
-                for (int read; (read = dstream.read(buffer)) > 0;) {
-                    baos.write(buffer, 0, read);
-                }
-                // ...and create a String object from it
-                /*
-                byte bytes[] = baos.toByteArray();
-
-                for( int i = 0; i < bytes.length; i++ )
-                {
-                System.out.print(String.format("%d %c,", (int)bytes[i], (char)bytes[i]));
-                }
-                System.out.println();
-                */
-                String text = new String(baos.toByteArray(), "ISO-8859-1");
-                return text;
-            }
-            case "001f":
-            {
-                // Unicode encoding with lowbyte followed by hibyte
-                // Note: this is arcane guesswork, but it works
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                byte[] buffer = new byte[1024];
-                for (int read; (read = dstream.read(buffer)) > 0;) {
-                    baos.write(buffer, 0, read);
-                }
-                byte[] bytes = baos.toByteArray();
-
-                String text = new String(bytes, "UTF-16LE");
-                return text;
-            }
-            case "0102":
-            {
-                // the data is read into a byte[] object
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                byte[] buffer = new byte[1024];
-                for (int read; (read = dstream.read(buffer)) > 0;) {
-                    baos.write(buffer, 0, read);
-                }
-                return baos.toByteArray();
-            }
+            case "001e": return new String(read(dstream), "ISO-8859-1");
+            case "001f": return new String(read(dstream), "UTF-16LE");
+            case "0102": return read(dstream);
             case "0000":
             {
                 // the data is read into a byte[] object
@@ -333,6 +292,15 @@ public class MSGNavigator extends BaseDialog {
         logger.trace("Unknown field type " + info.getType());
         return null;
     }
+
+	private byte[] read(InputStream stream) throws IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		byte[] buffer = new byte[1024];
+		for (int read; (read = stream.read(buffer)) > 0;) {
+			baos.write(buffer, 0, read);
+		}
+		return baos.toByteArray();
+	}
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {

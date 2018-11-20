@@ -16,8 +16,8 @@ import org.apache.poi.poifs.filesystem.Entry;
  */
 public class EditNode extends BaseDialog{
 
-    private TreeNodeContainer cont;
-    private MSGNavigator navwin;
+    private final TreeNodeContainer cont;
+    private final MSGNavigator navwin;
 
     public EditNode(Root root, MSGNavigator nav, TreeNodeContainer cont) {
         super( root, root.MlM("Edit:") + " " + cont.getEntry().getName());
