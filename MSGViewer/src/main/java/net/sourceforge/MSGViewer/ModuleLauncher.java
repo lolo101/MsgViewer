@@ -113,7 +113,7 @@ public class ModuleLauncher extends BaseModuleLauncher
                 arg.toLowerCase().endsWith(".eml") )
             {
 
-                MainDialog win = getStartupFlag("-mainwin")
+                MainDialog win = getStartupFlag(CLIHelpMSGViewer.CLI_MAINWIN)
                         ? new MainWin(root, arg)
                         : new SingleWin(root, arg);
 
@@ -123,7 +123,7 @@ public class ModuleLauncher extends BaseModuleLauncher
                 }
                 else
                 {
-                    if (getStartupFlag("-hidemenubar")) {
+                    if (getStartupFlag(CLIHelpMSGViewer.CLI_HIDEMENUBAR)) {
                         win.hideMenuBar();
                     }
                     win.setVisible(true);
@@ -132,7 +132,7 @@ public class ModuleLauncher extends BaseModuleLauncher
         }
 
         if( mainwin == null ) {
-            if (getStartupFlag("-mainwin")) {
+            if (getStartupFlag(CLIHelpMSGViewer.CLI_MAINWIN)) {
                 mainwin = new MainWin(root, null);
             } else {
                 mainwin = new SingleWin(root, null);

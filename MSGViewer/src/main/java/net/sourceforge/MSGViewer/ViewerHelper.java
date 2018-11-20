@@ -7,6 +7,7 @@
 package net.sourceforge.MSGViewer;
 
 import static at.redeye.FrameWork.base.BaseDialog.logger;
+
 import at.redeye.FrameWork.base.FrameWorkConfigDefinitions;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.base.Setup;
@@ -23,7 +24,6 @@ import net.sourceforge.MSGViewer.rtfparser.ParseException;
 import com.auxilii.msgparser.Message;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -35,24 +35,24 @@ import net.sourceforge.MSGViewer.factory.MessageParserFactory;
  * @author martin
  */
 public class ViewerHelper {
-    
+
     private Root root;
     private File tmp_dir;
     boolean delete_tmp_dir = false;
     private MessageParserFactory parser_factory = new MessageParserFactory();
-    
+
     public ViewerHelper( Root root )
     {
         this.root = root;
-        
+
         try {
            tmp_dir = TempDir.getTempDir(null, null);
            delete_tmp_dir = true;
         } catch (IOException ex) {
            tmp_dir = new File(System.getProperty("java.io.tmpdir") + "/" + root.getAppName());
-        }        
+        }
     }
-    
+
    static boolean is_image_mime_type( String mime )
     {
        switch (mime) {
@@ -66,45 +66,44 @@ public class ViewerHelper {
 
         return false;
     }
-    
+
     static boolean is_mail_message( String file_name )
     {
         if( file_name.toLowerCase().endsWith(".mbox") )
             return true;
-        
+
         return file_name.toLowerCase().endsWith(".msg");
-    }    
-    
+    }
+
     static boolean is_mail_message( String file_name, String mime )
     {
-        
+
         return is_mail_message( file_name );
-    }    
-    
+    }
+
     public String getOpenCommand()
     {
         if( Setup.is_win_system() )
             return "explorer";
 
         return root.getSetup().getLocalConfig(FrameWorkConfigDefinitions.OpenCommand);
-    }    
-    
+    }
+
     static String prepareText( String s )
     {
         if( s == null )
             return "";
-        
+
         StringBuilder sb = new StringBuilder();
 
         s = s.replaceAll("<", "&lt;");
         s = s.replaceAll(">", "&gt;");
 
-        int start = 0;
         int last_start = 0;
 
         while( true )
         {
-            start = s.indexOf("http://", last_start);
+            int start = s.indexOf("http://", last_start);
 
             if( start == -1 )
             {
@@ -143,85 +142,85 @@ public class ViewerHelper {
         }
 
         return sb.toString();
-    }    
-    
+    }
+
     static public String stripMetaTags(String html )
     {
-       html =  html.replaceAll("<[Mm][eE][Tt][aA]\\s.*>", "");       
-       
+       html =  html.replaceAll("<[Mm][eE][Tt][aA]\\s.*>", "");
+
        StringBuilder body_text = new StringBuilder(html);
        Source source = new Source(html);
        source.fullSequentialParse();
-       
+
        for( StartTag tag : source.getAllStartTags("font") )
        {
             // remove size="x"
             Attributes atts = tag.getAttributes();
            if( atts == null )
-               continue;   
-           
+               continue;
+
            net.htmlparser.jericho.Attribute att = atts.get("size");
-           
+
            if( att != null )
            {
                int start = att.getBegin();
                int end = att.getEnd();
-               
+
                for( int i = start; i < end+1; i++ )
                {
                 body_text.setCharAt(i, ' ');
                }
            }
        }
-       
+
        System.out.println(body_text.toString());
-       
+
        return body_text.toString();
-    }    
-    
-    
+    }
+
+
     public void dispose()
     {
          if( delete_tmp_dir && tmp_dir.exists() )
             DeleteDir.deleteDirectory(tmp_dir);
     }
-    
+
     public File getTmpDir()
     {
         return tmp_dir;
     }
-    
+
     public String extractHTMLFromRTF(String bodyText, Message message ) throws ParseException
     {
         if( bodyText.contains("\\purehtml") )
             return bodyText;
-        
+
         HtmlFromRtf rtf2html = new HtmlFromRtf(bodyText);
 
         String html = rtf2html.getHTML();
-        
+
         html = ViewerHelper.stripMetaTags(html);
 
         PrepareImages prep_images = new PrepareImages(getTmpDir().getPath(), message);
 
         return prep_images.prepareImages(new StringBuilder(html)).toString();
-    }    
-    
+    }
+
     public String getMailIconName( File tmp_dir ) throws IOException
     {
         File file = new File(tmp_dir + "/mail.png");
-        
+
         if( file.exists() )
             return file.toString();
-        
+
         byte bytes[] = ReadFile.getBytesResource(this.getClass(), "/net/sourceforge/MSGViewer/resources/icons/rg1024_yellow_mail.png");
-        FileOutputStream writer = new FileOutputStream(file);        
+        FileOutputStream writer = new FileOutputStream(file);
         writer.write(bytes);
         writer.close();
-        
+
         return file.toString();
-    }    
-    
+    }
+
     public File extractUrl(URL url, Message message ) throws IOException
     {
         List<Attachment> attachments = message.getAttachments();
@@ -265,7 +264,7 @@ public class ViewerHelper {
         }
 
         return null;
-    }        
-    
-    
+    }
+
+
 }

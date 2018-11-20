@@ -30,6 +30,7 @@ import java.util.Set;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
 import com.auxilii.msgparser.attachment.MsgAttachment;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.log4j.Logger;
 import org.apache.poi.hmef.CompressedRTF;
@@ -163,10 +164,12 @@ public class Message {
             case "0037":
                 this.setSubject((String) value);
                 break;
-            case "0c1f":
+            case "0c1f": // PidTagSenderEmailAddress
+            case "0065": // PidTagSentRepresentingEmailAddress
                 this.setFromEmail((String) value);
                 break;
-            case "0042":
+            case "0c1a": // PidTagSenderName
+            case "0042": // PidTagSentRepresentingName
                 this.setFromName((String) value);
                 break;
             case "0076":
@@ -206,6 +209,7 @@ public class Message {
                         this.setBodyRTF(new String(decompressedRTF));
                     } catch(Exception e) {
                         LOGGER.info( "Could not decompress RTF data "  +  e);
+                        this.setBodyText(new String(compressedRTF, StandardCharsets.UTF_16LE));
                     }
                 } else {
                     LOGGER.info( "Unexpected data type "+value.getClass());
@@ -260,10 +264,7 @@ public class Message {
         // 0050: reply
         // 005a: sender
         // 0065: sent email
-        // 0076: received email
         // 0078: repr. email
-        // 0c1a: sender name
-        // 0e04: to
         // 0e1d: subject normalized
         // 1046: sender email
         // 3003: email address

@@ -58,32 +58,32 @@ import net.htmlparser.jericho.StartTag;
 public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog, LoadMessageInterface
 {
 
-    private Message message;        
+    private Message message;
     private String file_name;
-    private String dialog_id;    
-    private MessageParserFactory parser_factory = new MessageParserFactory();
+    private String dialog_id;
+    private final MessageParserFactory parser_factory = new MessageParserFactory();
     private String bodyText = null;
-    private ViewerHelper helper = null;
+    private final ViewerHelper helper;
 
-    private static String last_path = null;        
-    
-    int wating_thread_pool_counter = 0;
-    
+    private static String last_path = null;
+
+    private int wating_thread_pool_counter = 0;
+
     /**
      * URL where the mouse cursor is over, for the popup menu
      */
-    URL lastUrl = null;
+    private URL lastUrl = null;
 
     /** Creates new form MainWin */
     public MainWin(Root root, final String file_name ) {
         super(root, file_name != null ? (root.MlM(root.getAppTitle()) + ": " + file_name) : root.getAppTitle() );
 
         this.file_name = file_name;
-        
+
         helper = new ViewerHelper(root);
 
         initComponents();
-        
+
         header.addHyperlinkListener(this);
         body.addHyperlinkListener(this);
 
@@ -102,8 +102,8 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
 
         JCBfix.setSelected(StringUtils.isYes(root.getSetup().getLocalConfig("FixedFont","no" ) ) );
 
-        JCBfix.setEnabled(jRText.isSelected());               
-        
+        JCBfix.setEnabled(jRText.isSelected());
+
         if( file_name == null )
         {
             header.setText(MlM("Drag a msg file into this window") );
@@ -129,7 +129,7 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
                 jMDetailActionPerformed(null);
             }
         });
-        
+
         registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_N,0), new Runnable() {
 
             @Override
@@ -137,12 +137,12 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
                 if( jMNav.isEnabled() )
                     jMNavActionPerformed(null);
             }
-        });        
-    }   
-    
+        });
+    }
+
     @Override
     public String getUniqueDialogIdentifier(Object requester)
-    {                                              
+    {
         /*
          * This way the title of the dialog won't change the id, of the dialog.
          * The id of the dialog is used for saveing with height and position of
@@ -159,8 +159,8 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
     {
         if( message == null )
             return;
-                  
-         message = null;         
+
+         message = null;
     }
 
     @Override
@@ -181,7 +181,7 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
     {
         if( file_name == null )
             return;
-        
+
         this.file_name = file_name;
 
         setWaitCursor();
@@ -197,42 +197,42 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
         setNormalCursor();
     }
 
- 
+
 
     void parse_int(final String file_name) throws IOException, FileNotFoundException, Exception
     {
         cleanUp();
-        
-        final ExecutorService thread_pool = Executors.newCachedThreadPool();        
+
+        final ExecutorService thread_pool = Executors.newCachedThreadPool();
         wating_thread_pool_counter = 0;
 
         File file = new File(file_name);
 
         if( !file.exists() )
             throw new FileNotFoundException( MlM( String.format("File %s not found",file_name)) );
-                
+
         if( file.getName().toLowerCase().endsWith(".msg") )
         {
             jMNav.setEnabled(true);
         } else {
             jMNav.setEnabled(false);
         }
-        
-        message = parser_factory.parseMessage(file);        
-        
+
+        message = parser_factory.parseMessage(file);
+
         last_path = file.getParentFile().getPath();
 
         final StringBuilder sb = new StringBuilder();
 
         setTitle( MlM(root.getAppTitle()) + ": " + message.getSubject() );
-       
+
         sb.append("<html>");
         sb.append("<body style=\"\">");
 
         sb.append("<b>");
         if( message.getSubject() != null )
             sb.append(message.getSubject());
-        sb.append("</b>");        
+        sb.append("</b>");
         sb.append("<br/>");
 
         logger.info("Message From:" + message.getFromName() + "\n To:" + message.getToName() + "\n Email: " + message.getFromEmail());
@@ -252,17 +252,17 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
             sb.append("\">");
             sb.append(message.getFromName());
         }
-        
+
         if( message.getFromEmail() != null && message.getFromEmail().contains("@") )
         {
             sb.append(" [");
             sb.append(message.getFromEmail());
             sb.append("]");
         }
-        
+
         sb.append("</a>");
 
-        sb.append("<br/>");        
+        sb.append("<br/>");
 
         if( message.getDate() != null )
         {
@@ -308,10 +308,10 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
             if( att instanceof FileAttachment)
             {
                 final FileAttachment fatt = (FileAttachment) att;
-                
+
                 sb.append("<a href=\"file://");
                 sb.append(fatt.toString());
-                sb.append("\">");                         
+                sb.append("\">");
 
                 String mime_type = fatt.getMimeTag();
 
@@ -331,59 +331,59 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
                         final File content = new File(message_dir + "/" + fatt.toString());
 
                         if (!content.exists()) {
-                            
+
                             wating_thread_pool_counter++;
-                            
+
                             thread_pool.execute(new Runnable() {
 
                                 @Override
                                 public void run() {
-                                    
+
                                     try {
                                         FileOutputStream fout = new FileOutputStream(content);
                                         fout.write(fatt.getData());
-                                        fout.close();                                        
-                                        
+                                        fout.close();
+
                                     } catch( IOException ex ) {
                                         logger.error(ex,ex);
                                     }
-                                    
+
                                     wating_thread_pool_counter--;
                                 }
                             });
-                            
+
                             wating_thread_pool_counter++;
-                                       
+
                             thread_pool.execute(new Runnable() {
 
                                 @Override
                                 public void run() {
-                                    
+
                                     try {
-                                        
-                                        ImageIcon icon = ImageUtils.loadScaledImageIcon(fatt.getData(), 
+
+                                        ImageIcon icon = ImageUtils.loadScaledImageIcon(fatt.getData(),
                                                                     PrepareImages.getFileName(fatt),
                                                                     max_width, max_height );
-                                        
+
                                         File file_small = new File(content.getAbsolutePath() + "-small.jpg");
-                                        
+
                                         BufferedImage bi = new BufferedImage(icon.getIconWidth(),icon.getIconHeight(),
-                                                                BufferedImage.TYPE_INT_ARGB);                                        
-                                        
+                                                                BufferedImage.TYPE_INT_ARGB);
+
                                         Graphics2D g2 = bi.createGraphics();
                                         g2.drawImage(icon.getImage(), 0, 0, null);
                                         g2.dispose();
-                                        
+
                                         ImageIO.write(bi, "jpg", file_small);
-                                        
+
                                     } catch( IOException ex ) {
                                         logger.error(ex,ex);
                                     }
-                                    
+
                                     wating_thread_pool_counter--;
                                 }
-                            });                            
-                            
+                            });
+
                         }
 /*
                         ImageIcon icon = ImageUtils.loadImageIcon(fatt.getData(), file_name);
@@ -394,28 +394,28 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
                         if( Setup.is_win_system() )
                             extra = "";
 
-                        sb.append("<img border=0 src=\"file:/" + extra + content.getAbsolutePath() + "\" width=\"" 
+                        sb.append("<img border=0 src=\"file:/" + extra + content.getAbsolutePath() + "\" width=\""
                                         + String.valueOf(dim.width) + "\" height=\""
                                         + String.valueOf(dim.height) + "\"  /> ");
-                         * 
+                         *
                          */
 
                         String extra = "/";
 
                         if( Setup.is_win_system() )
                             extra = "";
-                        
+
                         System.out.println(extra + content.getAbsolutePath() + "-small.jpg" );
                         sb.append("<img border=0 src=\"file:/" + extra + content.getAbsolutePath() + "-small.jpg\"/> ");
                     }
                 }
-                
+
                 if( helper.is_mail_message(fatt.getFilename(), fatt.getMimeTag() ) ) {
                     sb.append("<img border=0 align=\"baseline\" src=\"file:");
                     sb.append(helper.getMailIconName(helper.getTmpDir()));
                     sb.append("\"/>");
                 }
-                
+
                 if( !fatt.getFilename().isEmpty() )
                     sb.append(fatt.getFilename());
                 else
@@ -424,10 +424,10 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
                 sb.append("</a> ");
 
             } else if( att instanceof MsgAttachment) {
-                 
+
                 MsgAttachment msgAtt = (MsgAttachment) att;
-                final Message msg = msgAtt.getMessage();                                
-                
+                final Message msg = msgAtt.getMessage();
+
                 File message_dir = helper.getTmpDir();
 
                 if( !message_dir.isDirectory() && !message_dir.mkdirs() )
@@ -435,43 +435,43 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
                         logger.error( "Cannot create tmp dir: " + message_dir.getPath() );
                 }
                 else
-                {                
+                {
                     final String sub_file_name = message_dir + "/" + msg.hashCode() + ".mbox";
-                    
+
                     thread_pool.execute(new Runnable() {
 
                         @Override
                         public void run() {
-                            
+
                             new AutoMBox(file_name) {
 
                                 @Override
                                 public void do_stuff() throws Exception {
-                                    
-                                    MessageParserFactory factory = new MessageParserFactory();                                                                    
+
+                                    MessageParserFactory factory = new MessageParserFactory();
                                     factory.saveMessage(msg, new File(  sub_file_name ));
-                                    
+
                                 }
-                            };                                                        
+                            };
                         }
-                        
+
                     });
-                    
-                                    
+
+
                     sb.append("<a href=\"file://");
                     sb.append(sub_file_name);
-                    sb.append("\">");     
-                
+                    sb.append("\">");
+
                     sb.append("<img border=0 align=\"baseline\" src=\"file:");
                     sb.append(helper.getMailIconName(helper.getTmpDir()));
                     sb.append("\"/>");
-                    
+
                     sb.append(msg.getSubject());
-                
+
                     sb.append("</a> &nbsp; ");
                 }
-                
-                
+
+
             } else {
                 logger.error("unknown Attachment: " + att.toString() + " " + att.getClass().getName() );
             }
@@ -482,33 +482,33 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
 
         if( wating_thread_pool_counter > 0 )
         {
-            updateBody(); // do something different now 
-            
+            updateBody(); // do something different now
+
             new AutoMBox(file_name) {
 
                 @Override
                 public void do_stuff() throws Exception {
                     thread_pool.shutdown();
-                    
+
                     if( wating_thread_pool_counter > 0 ) {
                         thread_pool.awaitTermination(1, TimeUnit.DAYS);
                     }
                 }
             };
-                    
+
             header.setText(sb.toString());
             header.setCaretPosition(0);
 
         } else {
-                                
+
             header.setText(sb.toString());
             header.setCaretPosition(0);
-        
+
             updateBody();
         }
     }
-    
-    
+
+
 
     private void updateBody()
     {
@@ -516,10 +516,10 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
             return;
 
         if( jRRTF.isSelected() &&  message.getBodyRTF() != null &&  !message.getBodyRTF().isEmpty() )
-        {            
+        {
             if( message.getBodyRTF() == null )
                 return;
-            
+
             if( message.getBodyRTF().contains("\\fromhtml") )
             {
                 AutoMBox am = new AutoMBox(MainWin.class.getName()) {
@@ -535,7 +535,7 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
                         }
 
                         bodyText = helper.extractHTMLFromRTF(message.getBodyRTF(),message);
-                        
+
                         logger.trace(bodyText);
                         // System.out.println("\n\n");
                         body.setText(bodyText);
@@ -553,12 +553,12 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
             else if( message.getBodyRTF().contains("\\purehtml") )
             {
                 body.setContentType("text/html");
-                
+
                 PrepareImages prep_images = new PrepareImages(helper.getTmpDir().getPath(), message);
 
-                String html = prep_images.prepareImages(new StringBuilder(ViewerHelper.stripMetaTags(message.getBodyRTF()))).toString();                
+                String html = prep_images.prepareImages(new StringBuilder(ViewerHelper.stripMetaTags(message.getBodyRTF()))).toString();
                 bodyText = html;
-                body.setText(html);  
+                body.setText(html);
             }
             else
             {
@@ -617,7 +617,7 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
 
         body.setCaretPosition(0);
     }
-    
+
 
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -923,33 +923,33 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
     }//GEN-LAST:event_bodyMouseClicked
 
     private void jMNavActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMNavActionPerformed
-        
+
         invokeDialogUnique(new MSGNavigator(root, new File(file_name)));
-        
+
     }//GEN-LAST:event_jMNavActionPerformed
 
     private void jSFontSizeStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSFontSizeStateChanged
-        
+
         EditorKit editor = body.getEditorKit();
-   
-        if (editor instanceof HTMLEditorKit) {                                   
-            
+
+        if (editor instanceof HTMLEditorKit) {
+
             Source source = new Source(body.getText());
             source.fullSequentialParse();
 
             ArrayList<String> tags = new ArrayList();
 
-            for (StartTag tag : source.getAllStartTags()) {                
+            for (StartTag tag : source.getAllStartTags()) {
                 tags.add(tag.getName());
             }
-            
-            
+
+
             HTMLEditorKit html_editor = (HTMLEditorKit) editor;
 
             System.out.println("Value: " + jSFontSize.getValue());
 
-            StyleSheet sheet = html_editor.getStyleSheet();          
-            
+            StyleSheet sheet = html_editor.getStyleSheet();
+
             String rule = "{ font-size: " + (jSFontSize.getValue()) + "pt; }";
 
             StringBuilder sb = new StringBuilder();
@@ -963,18 +963,18 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
 
             String text = body.getText();
             body.setDocument(html_editor.createDefaultDocument());
-            body.setText(text);                       
+            body.setText(text);
             body.setCaretPosition(0);
 
-        } else {                                             
-           
+        } else {
+
             bodyText = bodyText.replaceAll("(\\\\fs)([0-9]+)", "$1" + ((jSFontSize.getValue())*2));
             System.out.println(bodyText);
-            body.setText(bodyText);             
+            body.setText(bodyText);
             body.setCaretPosition(0);
-                    
+
         }
-        
+
     }//GEN-LAST:event_jSFontSizeStateChanged
 
     private void jSFontSizePropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jSFontSizePropertyChange
@@ -983,13 +983,13 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
 
     private void jMQuitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMQuitActionPerformed
 
-         close();     
+         close();
 
     }//GEN-LAST:event_jMQuitActionPerformed
 
     private void jMSettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMSettingsActionPerformed
 
-        invokeDialogUnique(new LocalConfig(root));     
+        invokeDialogUnique(new LocalConfig(root));
 
     }//GEN-LAST:event_jMSettingsActionPerformed
 
@@ -1045,7 +1045,7 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
             return;
         }
         final File[] files = fc.getSelectedFiles();
-        
+
         for (File file : files) {
             loadMessage(file.getPath());
         }
@@ -1105,16 +1105,16 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
                 }
 
                 lastUrl = null;
-        
+
                 openUrl(e.getURL());
-            }      
+            }
         };
     }
 
-   
-   
+
+
    public void openUrl(URL url) throws IOException
-    {       
+    {
         logger.info(url);
 
         final String protocoll = url.getProtocol();
@@ -1152,14 +1152,14 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
             content = new File(url.getFile());
         }
 
-        if( helper.is_mail_message(content.toString() ) ) {
+        if( ViewerHelper.is_mail_message(content.toString() ) ) {
             MainWin win = new MainWin(root,content.toString());
-            
+
             if( !menubar.isVisible() )
                 win.hideMenuBar();
-            
+
             invokeDialog(win);
-            
+
         } else {
 
             if (Setup.is_win_system() && root.getPlugin("ShellExec") != null ) {
@@ -1183,7 +1183,7 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
             }
         }
 
-    }    
+    }
 
     @Override
     public void loadMessage(String file_name)
@@ -1200,7 +1200,7 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
             } catch( UnsupportedEncodingException ex ) {
                 logger.error(StringUtils.exceptionToString(ex));
                 file_name = file_name.substring(7);
-            } 
+            }
         }
 
         if( message == null )
@@ -1210,14 +1210,14 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
         else
         {
             MainWin win = new MainWin( root, file_name );
-            
+
             if( !menubar.isVisible() )
                 win.hideMenuBar();
-            
+
             invokeMainDialog( win );
         }
     }
-    
+
     public String getLastOpenPath()
     {
         return last_path;
@@ -1238,20 +1238,20 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
         return helper.getTmpDir();
     }
 
-    private void exportFile(Message message, File file) throws FileNotFoundException, Exception 
+    private void exportFile(Message message, File file) throws FileNotFoundException, Exception
     {
         parser_factory.saveMessage(message, file);
     }
-    
+
     public String getFileName()
     {
        return file_name;
     }
-    
-    public void exportFile( File file ) throws FileNotFoundException, Exception 
+
+    public void exportFile( File file ) throws FileNotFoundException, Exception
     {
         parser_factory.saveMessage(message, file);
-    }       
+    }
 
     @Override
     public void hideMenuBar() {
@@ -1261,10 +1261,10 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
 
     public ViewerHelper getHelper() {
         return helper;
-    }    
+    }
 
     File extractUrl(URL url) throws IOException {
         return helper.extractUrl(url, message);
     }
-    
+
 }

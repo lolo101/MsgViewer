@@ -1,5 +1,7 @@
 package net.sourceforge.MSGViewer.MSGNavigator;
 
+import static com.auxilii.msgparser.MsgParser.analyzeDocumentEntry;
+
 import at.redeye.FrameWork.base.AutoMBox;
 import at.redeye.FrameWork.base.BaseDialog;
 import at.redeye.FrameWork.base.Root;
@@ -330,37 +332,6 @@ public class MSGNavigator extends BaseDialog {
         // this should not happen
         logger.trace("Unknown field type " + info.getType());
         return null;
-    }
-
-    protected FieldInformation analyzeDocumentEntry(DocumentEntry de) {
-        String name = de.getName();
-        // we are only interested in document entries
-        // with names starting with __substg1.
-        logger.trace("Document entry: " + name);
-        String key = "__substg1.";
-        if (name.startsWith(key)) {
-            String clazz = FieldInformation.UNKNOWN;
-            String type = FieldInformation.UNKNOWN;
-            try {
-                String val = name.substring(key.length() + 2).toLowerCase();
-                // the first 4 digits of the remainder
-                // defines the field class (or field name)
-                // and the last 4 digits indicate the
-                // data type.
-                clazz = val.substring(0, 4);
-                type = val.substring(4);
-                logger.trace("  Found document entry: class=" + clazz + ", type=" + type + " size: " + de.getSize());
-            } catch (RuntimeException re) {
-                logger.trace("Could not parse directory entry " + name + " " + re);
-            }
-            return new FieldInformation(clazz, type);
-        } else {
-            logger.trace("Ignoring entry with name " + name + " size: " + de.getSize());
-        }
-
-        // we are not interested in the field
-    	// and return an empty FieldInformation object
-    	return new FieldInformation();
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

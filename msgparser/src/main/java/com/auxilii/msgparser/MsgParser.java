@@ -164,7 +164,7 @@ public class MsgParser {
                 try (DocumentInputStream dstream = new DocumentInputStream(de)) {
                     // analyze the document entry
                     // (i.e., get class and data type)
-                    FieldInformation info = this.analyzeDocumentEntry(de);
+                    FieldInformation info = analyzeDocumentEntry(de);
                     // create a Java object from the data provided
                     // by the input stream. depending on the field
                     // information, either a String or a byte[] will
@@ -212,7 +212,7 @@ public class MsgParser {
                 try (DocumentInputStream dstream = new DocumentInputStream(de)) {
                     // analyze the document entry
                     // (i.e., get class and data type)
-                    FieldInformation info = this.analyzeDocumentEntry(de);
+                    FieldInformation info = analyzeDocumentEntry(de);
                     // create a Java object from the data provided
                     // by the input stream. depending on the field
                     // information, either a String or a byte[] will
@@ -324,7 +324,7 @@ public class MsgParser {
      *  object containing {@link FieldInformation#UNKNOWN} class
      *  and type.
      */
-    protected FieldInformation analyzeDocumentEntry(DocumentEntry de) {
+    public static FieldInformation analyzeDocumentEntry(DocumentEntry de) {
         String name = de.getName();
         // we are only interested in document entries
         // with names starting with __substg1.
