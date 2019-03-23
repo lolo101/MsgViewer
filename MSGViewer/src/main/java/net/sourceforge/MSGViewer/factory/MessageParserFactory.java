@@ -22,7 +22,6 @@ public class MessageParserFactory
     private JavaMailParser jmail_parser;
     private MBoxWriterViaJavaMail mbox_writer;
     private EMLWriterViaJavaMail eml_writer;
-    private MsgWriter msg_writer;
 
     public  Message parseMessage( File file) throws FileNotFoundException, IOException, Exception
     {
@@ -78,11 +77,8 @@ public class MessageParserFactory
     }
 
     private void saveMsgFile(Message msg, File file) throws IOException {
-        if( msg_writer == null ) {
-            msg_writer = new MsgWriter();
-        }
-
         try (OutputStream stream = new FileOutputStream(file)) {
+            MsgWriter msg_writer = new MsgWriter();
             msg_writer.write(msg, stream);
         }
     }

@@ -12,7 +12,6 @@ import org.apache.poi.poifs.filesystem.Entry;
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Iterator;
 
 /**
  *
@@ -25,9 +24,9 @@ public class TopLevelPropertyStream
     
     private DirectoryEntry root;
     private DocumentEntry property_entry;
-    private byte bytes[] = null;
+    private byte[] bytes = null;
     
-    public TopLevelPropertyStream(DirectoryEntry root) throws FileNotFoundException, IOException
+    TopLevelPropertyStream(DirectoryEntry root) throws IOException
     {
         this.root = root;
         
@@ -82,10 +81,8 @@ public class TopLevelPropertyStream
             bytes[offset] = 0;
         
         
-        for( Iterator<Entry> it = root.getEntries(); it.hasNext(); )
+        for( Entry entry : root )
         {
-            Entry entry = it.next();
-            
             DocumentEntry de = null;
             
             if( entry.isDocumentEntry() )
@@ -104,11 +101,8 @@ public class TopLevelPropertyStream
             String tagtype = tagname.substring(4).toLowerCase();
             
             // save tagname
-            bytes[offset++] = Integer.valueOf(tagname.substring(6),16).byteValue();
-            bytes[offset++] = Integer.valueOf(tagname.substring(4,6),16).byteValue();
-            bytes[offset++] = Integer.valueOf(tagname.substring(2,4),16).byteValue();
-            bytes[offset++] = Integer.valueOf(tagname.substring(0,2),16).byteValue();
-            
+            offset = insert(tagname, offset);
+
             // flags set everything to RW
             bytes[offset] = 0x0002 | 0x004;
             offset += 4;
@@ -117,11 +111,8 @@ public class TopLevelPropertyStream
                 // PStringType
                 // length of the String UTF16-LE Coded + 2
                 String lenght_str  = String.format("%08x", de.getSize()+2);
-                
-                bytes[offset++] = Integer.valueOf(lenght_str.substring(6),16).byteValue();
-                bytes[offset++] = Integer.valueOf(lenght_str.substring(4,6),16).byteValue();
-                bytes[offset++] = Integer.valueOf(lenght_str.substring(2,4),16).byteValue();
-                bytes[offset++] = Integer.valueOf(lenght_str.substring(0,2),16).byteValue();                
+
+                offset = insert(lenght_str, offset);
             }
             
             // reserved
@@ -137,14 +128,14 @@ public class TopLevelPropertyStream
         
         property_entry = root.createDocument(NAME, new ByteArrayInputStream(bytes));
     }
-    
+
     /**
      * deletes one entry and removes it's data from the property stream
      * entry.delete() is called by this function
      * @param entry
      * @throws IOException 
      */
-    public void delete( Entry entry ) throws IOException
+    void delete(Entry entry) throws IOException
     {
         if( entry.getName().equals(NAME) )
             throw new RuntimeException("deleting " + NAME + " is not allowed!");
@@ -171,9 +162,9 @@ public class TopLevelPropertyStream
                 if( !entry.delete() )
                 {
                     throw new RuntimeException("cannot delete entry");
-                }                                
-                
-                byte new_bytes[] = new byte[bytes.length-16];
+                }
+
+                byte[] new_bytes = new byte[bytes.length - 16];
                 
                 System.arraycopy(bytes, 0,         new_bytes,  0,      offset);
                 System.arraycopy(bytes, offset+16, new_bytes, offset, new_bytes.length - offset );
@@ -195,13 +186,8 @@ public class TopLevelPropertyStream
         
         property_entry = root.createDocument(NAME, new ByteArrayInputStream(bytes));        
     }
-    
-    private String formatByte0S( byte b )
-    {        
-        return String.format("%02X", b);
-    }      
-    
-    public void update( DocumentEntry entry ) throws IOException
+
+    void update(DocumentEntry entry) throws IOException
     {
         if( entry.getName().equals(NAME) )
             throw new RuntimeException("deleting " + NAME + " is not allowed!");
@@ -233,20 +219,12 @@ public class TopLevelPropertyStream
                     // PStringType
                     // length of the String UTF16-LE Coded + 2
                     String lenght_str  = String.format("%08x", entry.getSize()+2);
-                
-                    bytes[voffset++] = Integer.valueOf(lenght_str.substring(6),16).byteValue();
-                    bytes[voffset++] = Integer.valueOf(lenght_str.substring(4,6),16).byteValue();
-                    bytes[voffset++] = Integer.valueOf(lenght_str.substring(2,4),16).byteValue();
-                    bytes[voffset++] = Integer.valueOf(lenght_str.substring(0,2),16).byteValue();                                    
+                    insert(lenght_str, voffset);
 
                 } else if (tagtype.equals("0102")) {                                        
                     // Binary
                     String lenght_str  = String.format("%08x", entry.getSize()+2);
-                
-                    bytes[voffset++] = Integer.valueOf(lenght_str.substring(6),16).byteValue();
-                    bytes[voffset++] = Integer.valueOf(lenght_str.substring(4,6),16).byteValue();
-                    bytes[voffset++] = Integer.valueOf(lenght_str.substring(2,4),16).byteValue();
-                    bytes[voffset++] = Integer.valueOf(lenght_str.substring(0,2),16).byteValue();                            
+                    insert(lenght_str, voffset);
                 }
                 
                 found = true;
@@ -266,5 +244,17 @@ public class TopLevelPropertyStream
         
         property_entry = root.createDocument(NAME, new ByteArrayInputStream(bytes));                
     }
-    
+
+    private int insert(String value, int offset) {
+        bytes[offset++] = Integer.valueOf(value.substring(6), 16).byteValue();
+        bytes[offset++] = Integer.valueOf(value.substring(4, 6), 16).byteValue();
+        bytes[offset++] = Integer.valueOf(value.substring(2, 4), 16).byteValue();
+        bytes[offset++] = Integer.valueOf(value.substring(0, 2), 16).byteValue();
+        return offset;
+    }
+
+    private String formatByte0S( byte b )
+    {
+        return String.format("%02X", b);
+    }
 }
