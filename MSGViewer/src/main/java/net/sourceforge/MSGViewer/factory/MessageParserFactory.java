@@ -18,12 +18,7 @@ import java.io.OutputStream;
  */
 public class MessageParserFactory
 {
-    private MsgParser msg_parser;
-    private JavaMailParser jmail_parser;
-    private MBoxWriterViaJavaMail mbox_writer;
-    private EMLWriterViaJavaMail eml_writer;
-
-    public  Message parseMessage( File file) throws FileNotFoundException, IOException, Exception
+    public  Message parseMessage( File file) throws Exception
     {
         int idx = file.getName().lastIndexOf('.');
 
@@ -35,31 +30,25 @@ public class MessageParserFactory
 
         switch (suffix) {
             case "msg": return parseMsgFile( file );
-            case "mbox": return paserJavaMailFile( file );
-            case "eml": return paserJavaMailFile( file );
+            case "mbox": return parseJavaMailFile( file );
+            case "eml": return parseJavaMailFile( file );
             default: return null;
         }
     }
 
     private Message parseMsgFile( File file ) throws IOException
     {
-        if( msg_parser == null ) {
-            msg_parser = new MsgParser();
-        }
-
+        MsgParser msg_parser = new MsgParser();
         return msg_parser.parseMsg(file);
     }
 
-    private Message paserJavaMailFile(File file) throws IOException, Exception {
-
-        if( jmail_parser == null ) {
-            jmail_parser = new JavaMailParser();
-        }
-
+    private Message parseJavaMailFile(File file) throws Exception
+    {
+        JavaMailParser jmail_parser = new JavaMailParser();
         return jmail_parser.parse(file);
     }
 
-    public void saveMessage( Message msg, File file ) throws FileNotFoundException, Exception
+    public void saveMessage( Message msg, File file ) throws Exception
     {
         int idx = file.getName().lastIndexOf('.');
 
@@ -85,29 +74,23 @@ public class MessageParserFactory
 
     private void saveMBoxFile(Message msg, File file) throws Exception
     {
-        if( mbox_writer == null ) {
-            mbox_writer = new MBoxWriterViaJavaMail();
-        }
+        MBoxWriterViaJavaMail mbox_writer = new MBoxWriterViaJavaMail();
 
         try (OutputStream stream = new FileOutputStream(file)) {
             mbox_writer.write(msg, stream);
-        } catch( Exception ex ) {
+        } finally {
             mbox_writer.close();
-            throw ex;
         }
     }
 
     private void saveEMLFile(Message msg, File file) throws Exception
     {
-        if( eml_writer == null ) {
-            eml_writer = new EMLWriterViaJavaMail();
-        }
+        EMLWriterViaJavaMail eml_writer = new EMLWriterViaJavaMail();
 
         try (OutputStream stream = new FileOutputStream(file)) {
             eml_writer.write(msg, stream);
-        } catch( Exception ex ) {
+        } finally {
             eml_writer.close();
-            throw ex;
         }
     }
 }

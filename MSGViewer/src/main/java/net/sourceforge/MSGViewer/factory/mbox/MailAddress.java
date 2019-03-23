@@ -11,24 +11,18 @@ package net.sourceforge.MSGViewer.factory.mbox;
  */
 public class MailAddress
 {
-    String display_name;
-    String email;
+    private final String displayName;
+    private final String email;
 
-    public MailAddress( String display_name, String email )
+    public MailAddress( String displayName, String email )
     {
-        this.display_name = display_name;
+        this.displayName = displayName;
         this.email = email;
     }
 
-    public MailAddress()
-    {
-
-    }
-
-
     public String getDisplayName()
     {
-        return display_name;
+        return displayName;
     }
 
     public String getEmail()
@@ -39,22 +33,12 @@ public class MailAddress
     @Override
     public String toString()
     {
-        if( display_name == null )
+        if( displayName == null )
             return email;
 
-        return "\"" + display_name + "\""+ " <" + email + ">";
+        return "\"" + displayName + "\""+ " <" + email + ">";
     }
 
-    public void setDisplayName( String name )
-    {
-        display_name = name;
-    }
-
-    public void setEmail( String email )
-    {
-        this.email = email;
-    }
-    
     @Override
     public boolean equals( Object o )
     {
@@ -66,7 +50,7 @@ public class MailAddress
         
         if( o.getClass() == this.getClass() ) {
             MailAddress addr = (MailAddress)o;
-            return addr.email.equals(email) && addr.display_name.equals(display_name);
+            return addr.email.equals(email) && addr.displayName.equals(displayName);
         }
         
         return false;
@@ -75,7 +59,7 @@ public class MailAddress
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 59 * hash + (this.display_name != null ? this.display_name.hashCode() : 0);
+        hash = 59 * hash + (this.displayName != null ? this.displayName.hashCode() : 0);
         hash = 59 * hash + (this.email != null ? this.email.hashCode() : 0);
         return hash;
     }

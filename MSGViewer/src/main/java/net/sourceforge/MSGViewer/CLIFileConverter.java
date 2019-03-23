@@ -1,21 +1,17 @@
 package net.sourceforge.MSGViewer;
 
-import java.awt.Desktop;
-import java.io.File;
-import java.nio.file.Paths;
-import java.util.Arrays;
-
-import javax.swing.JOptionPane;
-
+import at.redeye.FrameWork.base.BaseModuleLauncher;
+import at.redeye.FrameWork.base.Setup;
+import com.auxilii.msgparser.Message;
 import net.sourceforge.MSGViewer.factory.MessageParserFactory;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import at.redeye.FrameWork.base.BaseModuleLauncher;
-import at.redeye.FrameWork.base.Setup;
-
-import com.auxilii.msgparser.Message;
+import javax.swing.*;
+import java.awt.*;
+import java.io.File;
+import java.nio.file.Paths;
+import java.util.Arrays;
 
 public abstract class CLIFileConverter {
 
@@ -36,8 +32,8 @@ public abstract class CLIFileConverter {
 	 *            the target file type (i.e. ending) without a leading dot. E.g.
 	 *            "mbox"
 	 */
-	public CLIFileConverter(ModuleLauncher module_launcher, String sourceType,
-			String targetType) {
+	CLIFileConverter(ModuleLauncher module_launcher, String sourceType,
+					 String targetType) {
 		this.module_launcher = module_launcher;
 		BaseModuleLauncher.BaseConfigureLogging(Level.INFO);
 
@@ -46,12 +42,17 @@ public abstract class CLIFileConverter {
 	}
 
 	/**
+	 * @return the CLI flag that will trigger this converter. E.g. "-msg2mbox"
+	 */
+	public abstract String getCLIParameter();
+
+	/**
 	 * @param convertToTemp
 	 *            if true, creates the target file in the users tmp directory;
 	 *            if false, creates the target file in the source files
 	 *            directory
 	 */
-	public void setConvertToTemp(boolean convertToTemp) {
+	void setConvertToTemp(boolean convertToTemp) {
 		this.convertToTemp = convertToTemp;
 	}
 
@@ -60,21 +61,11 @@ public abstract class CLIFileConverter {
 	 *            if true, opens the converted file using
 	 *            {@link Desktop#open(File)}
 	 */
-	public void setOpenAfterConvert(boolean openAfterConvert) {
+	void setOpenAfterConvert(boolean openAfterConvert) {
 		this.openAfterConvert = openAfterConvert;
 	}
 
-	/**
-	 * @return the CLI flag that will trigger this converter. E.g. "-msg2mbox"
-	 */
-	public abstract String getCLIParameter();
-
-	public void usage() {
-		System.out.println(module_launcher.root.MlM(String.format(
-				"usage: %s FILE FILE ....", getCLIParameter())));
-	}
-
-	public void work() {
+	void work() {
 		boolean converted = false;
 		MessageParserFactory factory = new MessageParserFactory();
 
@@ -88,6 +79,11 @@ public abstract class CLIFileConverter {
 		if (!converted) {
 			usage();
 		}
+	}
+
+	private void usage() {
+		System.out.println(module_launcher.root.MlM(String.format(
+				"usage: %s FILE FILE ....", getCLIParameter())));
 	}
 
 	private void processFile(MessageParserFactory factory, String sourceFilePath) {
@@ -115,7 +111,7 @@ public abstract class CLIFileConverter {
 		}
 	}
 
-	public void openFile(File targetFile) {
+	private void openFile(File targetFile) {
 		try {
 			Desktop.getDesktop().open(targetFile);
 		} catch (Exception e) {
@@ -126,7 +122,7 @@ public abstract class CLIFileConverter {
 				cmdarray = new String[2];
 				cmdarray[0] = "xdg-open";
 				cmdarray[1] = targetFile.getAbsolutePath();
-                        } else if (Setup.is_mac_system()) {
+			} else if (Setup.is_mac_system()) {
 				cmdarray = new String[2];
 				cmdarray[0] = "open";
 				cmdarray[1] = targetFile.getAbsolutePath();

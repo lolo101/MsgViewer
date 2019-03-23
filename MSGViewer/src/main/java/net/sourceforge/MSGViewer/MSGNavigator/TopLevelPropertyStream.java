@@ -245,7 +245,8 @@ public class TopLevelPropertyStream
         property_entry = root.createDocument(NAME, new ByteArrayInputStream(bytes));                
     }
 
-    private int insert(String value, int offset) {
+    private int insert(String value, int offset)
+    {
         bytes[offset++] = Integer.valueOf(value.substring(6), 16).byteValue();
         bytes[offset++] = Integer.valueOf(value.substring(4, 6), 16).byteValue();
         bytes[offset++] = Integer.valueOf(value.substring(2, 4), 16).byteValue();

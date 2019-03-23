@@ -1,12 +1,14 @@
 package net.sourceforge.MSGViewer.factory.msg;
 
-import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypInteger32;
-import net.sourceforge.MSGViewer.factory.msg.properties.PropType;
-import net.sourceforge.MSGViewer.factory.msg.entries.StringUTF16SubstgEntry;
-import net.sourceforge.MSGViewer.factory.msg.entries.SubstGEntry;
 import com.auxilii.msgparser.RecipientEntry;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
+import net.sourceforge.MSGViewer.factory.msg.entries.*;
+import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypInteger32;
+import net.sourceforge.MSGViewer.factory.msg.properties.PropType;
+import org.apache.poi.poifs.filesystem.DirectoryEntry;
+import org.apache.poi.poifs.filesystem.Entry;
+
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -17,12 +19,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import net.sourceforge.MSGViewer.factory.msg.entries.BinaryEntry;
-import net.sourceforge.MSGViewer.factory.msg.entries.EntryStreamEntry;
-import net.sourceforge.MSGViewer.factory.msg.entries.GuidStreamEntry;
-import net.sourceforge.MSGViewer.factory.msg.entries.StringStreamEntry;
-import org.apache.poi.poifs.filesystem.DirectoryEntry;
-import org.apache.poi.poifs.filesystem.Entry;
 
 /**
  *
@@ -39,17 +35,6 @@ public class MsgContainer
 
     private final List<RecipientEntry> recipients = new ArrayList<>();
     private final List<Attachment> attachments = new ArrayList<>();
-
-    public void addProperty( PropType prop )
-    {
-        properties.add(prop);
-    }
-
-    public void addVarEntry( SubstGEntry entry )
-    {
-       addProperty(entry.getPropType());
-       substg_streams.add(entry);
-    }
 
     public void write( DirectoryEntry root ) throws IOException
     {
@@ -93,6 +78,25 @@ public class MsgContainer
         createNamedEntry(root);
     }
 
+    void addProperty(PropType prop)
+    {
+        properties.add(prop);
+    }
+
+    void addVarEntry(SubstGEntry entry)
+    {
+       addProperty(entry.getPropType());
+       substg_streams.add(entry);
+    }
+
+    void addRecipient(RecipientEntry entry) {
+        recipients.add(entry);
+    }
+
+    void addAttachment(Attachment attachment) {
+        attachments.add(attachment);
+    }
+
     private static void createPropEntry(ByteBuffer bytes, DirectoryEntry root ) throws IOException
     {
         deleteEntryIfExists(root, NAME);
@@ -119,14 +123,6 @@ public class MsgContainer
                 prop_entry.delete();
             }
         } catch( FileNotFoundException ignore) {}
-    }
-
-    public void addRecipient( RecipientEntry entry ) {
-        recipients.add(entry);
-    }
-
-    public void addAttachment(Attachment attachment) {
-        attachments.add(attachment);
     }
 
     private static void writeRecipientEntry(DirectoryEntry root , RecipientEntry rec, int id) throws IOException

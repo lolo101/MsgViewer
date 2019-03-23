@@ -11,18 +11,18 @@ import com.auxilii.msgparser.Message;
  * @author martin
  */
 public abstract class HeaderParser 
-{    
-        final String header;
+{
+    private final String header;
         
-        public HeaderParser( String header )
+    HeaderParser(String header)
         {
             this.header = header;
         }
         
-        public String getHeader()
+    public String getHeader()
         {
             return header;
         }
         
-        public abstract void parse(Message message, String line) throws Exception;
+    public abstract void parse(Message message, String line) throws Exception;
 }
