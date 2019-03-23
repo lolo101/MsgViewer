@@ -2,17 +2,17 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package net.sourceforge.MSGViewer.factory.msg;
+package net.sourceforge.MSGViewer.MSGNavigator;
+
+import org.apache.poi.poifs.filesystem.DirectoryEntry;
+import org.apache.poi.poifs.filesystem.DocumentEntry;
+import org.apache.poi.poifs.filesystem.DocumentInputStream;
+import org.apache.poi.poifs.filesystem.Entry;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Iterator;
-import org.apache.log4j.Logger;
-import org.apache.poi.poifs.filesystem.DirectoryEntry;
-import org.apache.poi.poifs.filesystem.DocumentEntry;
-import org.apache.poi.poifs.filesystem.DocumentInputStream;
-import org.apache.poi.poifs.filesystem.Entry;
 
 /**
  *
@@ -20,8 +20,6 @@ import org.apache.poi.poifs.filesystem.Entry;
  */
 public class TopLevelPropertyStream 
 {
-    private static final Logger logger = Logger.getLogger(TopLevelPropertyStream.class.getName());        
-     
     public static final String NAME = "__properties_version1.0";
     private static final int HEADER_SIZE = 8 + 4 + 4 + 4 + 4 + 8; 
     
@@ -170,7 +168,6 @@ public class TopLevelPropertyStream
             
             if( ("__substg1.0_" + tagname).equals(entry.getName() ) )
             {
-                // aus dem Byte array herausschneiden
                 if( !entry.delete() )
                 {
                     throw new RuntimeException("cannot delete entry");
@@ -230,7 +227,6 @@ public class TopLevelPropertyStream
             {
                 String tagtype = tagname.toLowerCase().substring(4);
                  
-                // Tagname und Flags überspringen
                 int voffset = offset + 8;
                 
                 if (tagtype.equals("001f")) {                                        

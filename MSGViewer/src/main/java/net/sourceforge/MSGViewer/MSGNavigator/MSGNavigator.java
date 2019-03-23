@@ -6,7 +6,6 @@ import at.redeye.FrameWork.base.AutoMBox;
 import at.redeye.FrameWork.base.BaseDialog;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.utilities.StringUtils;
-import net.sourceforge.MSGViewer.factory.msg.TopLevelPropertyStream;
 import net.sourceforge.MSGViewer.factory.msg.properties.Properties;
 
 import com.auxilii.msgparser.FieldInformation;
