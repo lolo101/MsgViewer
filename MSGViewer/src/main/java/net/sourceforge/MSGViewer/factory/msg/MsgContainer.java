@@ -20,14 +20,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-/**
- *
- * @author martin
- */
 public class MsgContainer
 {
     public static final String NAME = "__properties_version1.0";
-    public static final String NAMED_NAME = "__nameid_version1.0";
+    public static final String NAMEID_NAME = "__nameid_version1.0";
 
     private static final int HEADER_SIZE = 8 + 4 + 4 + 4 + 4 + 8;
     private final List<PropType> properties = new ArrayList<>();
@@ -75,7 +71,7 @@ public class MsgContainer
         }
 
         createPropEntry(bytes, root);
-        createNamedEntry(root);
+        createNameIdEntry(root);
     }
 
     void addProperty(PropType prop)
@@ -105,11 +101,11 @@ public class MsgContainer
         root.createDocument(NAME, buffer);
     }
 
-    private static void createNamedEntry(DirectoryEntry root ) throws IOException
+    private static void createNameIdEntry(DirectoryEntry root ) throws IOException
     {
-        deleteEntryIfExists(root, NAMED_NAME);
+        deleteEntryIfExists(root, NAMEID_NAME);
 
-        DirectoryEntry prop_entry = root.createDirectory(NAMED_NAME);
+        DirectoryEntry prop_entry = root.createDirectory(NAMEID_NAME);
 
         new GuidStreamEntry(new byte[0]).createEntry(prop_entry);
         new EntryStreamEntry(new byte[0]).createEntry(prop_entry);

@@ -145,6 +145,9 @@ public class MsgParser {
                 } else if (de.getName().startsWith("__recip_version1.0")) {
                     // a recipient entry has been found (which is also a directory entry itself)
                     this.checkRecipientDirectoryEntry(de, msg);
+                } else if (de.getName().startsWith("__nameid_version1.0")) {
+                    // TODO handle stream entries
+                    //this.checkStreamDirectoryEntry(de, msg);
                 } else {
                     // a directory entry has been found. this
                     // node will be recursively checked
@@ -251,51 +254,48 @@ public class MsgParser {
         // if there is no field information available, we simply
         // return null. in that case, we're not interested in the
         // data anyway
-        if ((info == null) || (info.getType() == FieldInformation.UNKNOWN)) {
+        if ((info == null) || FieldInformation.UNKNOWN.equals(info.getType())) {
             return null;
         }
-            // if the type is 001e (we know it is lower case
-            // because analyzeDocumentEntry stores the type in
-            // lower case), we create a String object from the data.
-            // the encoding of the binary data is most probably
-            // ISO-8859-1 (not pure ASCII).
-            switch (info.getType()) {
-                case "001e":
-                {
-                    // we put the complete data into a byte[] object...
-                    byte[] bytes = toBytes(dstream);
-                    // ...and create a String object from it
-                    return new String(bytes, "ISO-8859-1");
-                }
-                case "001f":
-                {
-                    byte[] bytes = toBytes(dstream);
-
-                    // Unicode encoding with lowbyte followed by hibyte
-                    // Note: this is arcane guesswork, but it works
-                    return new String(bytes,"UTF-16LE");
-                }
-                case "0102":
-                    // the data is read into a byte[] object
-                    return toBytes(dstream);
-                case "0000":
-                    // the data is read into a byte[] object
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    byte[] buffer = new byte[1024];
-
-                    StringBuilder sb = new StringBuilder();
-
-                    for (int read;(read = dstream.read(buffer)) > 0;) {
-                        for( int i = 0; i < read; i++ )
-                        {
-                            sb.append(buffer[i]);
-                            sb.append(" ");
-                            // baos.write(buffer, 0, read);
-                        }
-                    }
-                    return sb.toString();
-                    // return baos.toByteArray();
+        // if the type is 001e (we know it is lower case
+        // because analyzeDocumentEntry stores the type in
+        // lower case), we create a String object from the data.
+        // the encoding of the binary data is most probably
+        // ISO-8859-1 (not pure ASCII).
+        switch (info.getType()) {
+            case "001e":
+            {
+                // we put the complete data into a byte[] object...
+                byte[] bytes = toBytes(dstream);
+                // ...and create a String object from it
+                return new String(bytes, "ISO-8859-1");
             }
+            case "001f":
+            {
+                byte[] bytes = toBytes(dstream);
+
+                // Unicode encoding with lowbyte followed by hibyte
+                // Note: this is arcane guesswork, but it works
+                return new String(bytes,"UTF-16LE");
+            }
+            case "0102":
+                // the data is read into a byte[] object
+                return toBytes(dstream);
+            case "0000":
+                // the data is read into a byte[] object
+                byte[] buffer = new byte[1024];
+
+                StringBuilder sb = new StringBuilder();
+
+                for (int read;(read = dstream.read(buffer)) > 0;) {
+                    for( int i = 0; i < read; i++ )
+                    {
+                        sb.append(buffer[i]);
+                        sb.append(" ");
+                    }
+                }
+                return sb.toString();
+        }
 
         // this should not happen
         LOGGER.trace("Unknown field type "+info.getType());
@@ -348,13 +348,6 @@ public class MsgParser {
             return new FieldInformation(clazz, type);
         } else {
             LOGGER.trace("Ignoring entry with name "+name + " size: " + de.getSize());
-
-                /*
-                if( de.getSize() > 500 )
-                {
-                    return new FieldInformation("000","0000");
-                }
-                 */
         }
         // we are not interested in the field
         // and return an empty FieldInformation object
@@ -373,6 +366,7 @@ public class MsgParser {
      *  describing the attachment (name, extension, mime type, ...)
      * @param msg The {@link Message} object that this
      *  attachment should be added to.
+     * @param directoryName
      * @throws IOException Thrown if the attachment could
      *  not be parsed/read.
      */

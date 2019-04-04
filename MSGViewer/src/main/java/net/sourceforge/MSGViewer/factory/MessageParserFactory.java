@@ -12,13 +12,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-/**
- *
- * @author martin
- */
 public class MessageParserFactory
 {
-    public  Message parseMessage( File file) throws Exception
+    public Message parseMessage( File file) throws Exception
     {
         int idx = file.getName().lastIndexOf('.');
 
@@ -29,10 +25,13 @@ public class MessageParserFactory
         String suffix = file.getName().substring(idx+1).toLowerCase();
 
         switch (suffix) {
-            case "msg": return parseMsgFile( file );
-            case "mbox": return parseJavaMailFile( file );
-            case "eml": return parseJavaMailFile( file );
-            default: return null;
+            case "msg":
+                return parseMsgFile( file );
+            case "mbox":
+            case "eml":
+                return parseJavaMailFile( file );
+            default:
+                throw new Exception("Extension '" + suffix + "' not supported");
         }
     }
 
@@ -62,6 +61,8 @@ public class MessageParserFactory
             case "msg": saveMsgFile( msg, file ); break;
             case "mbox": saveMBoxFile( msg, file ); break;
             case "eml": saveEMLFile( msg, file ); break;
+            default:
+                throw new Exception("Extension '" + suffix + "' not supported");
         }
     }
 
@@ -75,22 +76,20 @@ public class MessageParserFactory
     private void saveMBoxFile(Message msg, File file) throws Exception
     {
         MBoxWriterViaJavaMail mbox_writer = new MBoxWriterViaJavaMail();
-
-        try (OutputStream stream = new FileOutputStream(file)) {
-            mbox_writer.write(msg, stream);
-        } finally {
-            mbox_writer.close();
-        }
+        write(mbox_writer, msg, file);
     }
 
     private void saveEMLFile(Message msg, File file) throws Exception
     {
         EMLWriterViaJavaMail eml_writer = new EMLWriterViaJavaMail();
+        write(eml_writer, msg, file);
+    }
 
+    private void write(MBoxWriterViaJavaMail writer, Message msg, File file) throws Exception {
         try (OutputStream stream = new FileOutputStream(file)) {
-            eml_writer.write(msg, stream);
+            writer.write(msg, stream);
         } finally {
-            eml_writer.close();
+            writer.close();
         }
     }
 }
