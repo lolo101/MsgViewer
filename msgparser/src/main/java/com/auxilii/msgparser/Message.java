@@ -30,6 +30,7 @@ import java.util.Set;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
 import com.auxilii.msgparser.attachment.MsgAttachment;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.log4j.Logger;
@@ -204,9 +205,7 @@ public class Message {
                 if (value instanceof byte[]) {
                     byte[] compressedRTF = (byte[]) value;
                     try {
-                        byte[] decompressedRTF = new CompressedRTF().decompress(new ByteArrayInputStream(compressedRTF));
-                        // is RTF always in ANSI encoding?
-                        this.setBodyRTF(new String(decompressedRTF));
+                        this.setBodyRTF(decompressRTF(compressedRTF));
                     } catch(Exception e) {
                         LOGGER.info( "Could not decompress RTF data "  +  e);
                         this.setBodyText(new String(compressedRTF, StandardCharsets.UTF_16LE));
@@ -235,9 +234,7 @@ public class Message {
                         int len = compressedRTF.length;
 
                         try {
-                            byte[] decompressedRTF = new CompressedRTF().decompress(new ByteArrayInputStream(compressedRTF));
-                            // is RTF always in ANSI encoding?
-                            res = new String(decompressedRTF);
+                            res = decompressRTF(compressedRTF);
                         } catch (Exception e) {
                             LOGGER.info("Could not decompress RTF data " + e);
                         }
@@ -674,6 +671,12 @@ public class Message {
 
     public Object getProperty(String name) {
         return this.properties.get(name);
+    }
+
+    private String decompressRTF(byte[] compressedRTF) throws IOException {
+        CompressedRTF decompressor = new CompressedRTF();
+        byte[] decompressedRTF = decompressor.decompress(new ByteArrayInputStream(compressedRTF));
+        return new String(decompressedRTF, 0, decompressor.getDeCompressedSize());
     }
 
     private static String nullOrTrim(String subject1) {
