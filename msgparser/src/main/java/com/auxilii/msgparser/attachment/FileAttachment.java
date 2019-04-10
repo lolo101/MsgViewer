@@ -17,6 +17,8 @@
  */
 package com.auxilii.msgparser.attachment;
 
+import java.util.Objects;
+import java.util.stream.Stream;
 import org.apache.poi.poifs.filesystem.DocumentEntry;
 
 /**
@@ -26,6 +28,8 @@ import org.apache.poi.poifs.filesystem.DocumentEntry;
  * @author roman.kurmanowytsch
  */
 public class FileAttachment implements Attachment {
+
+    private String displayName;
 
     /**
      * The (by Outlook) shortened filename of the attachment.
@@ -61,6 +65,14 @@ public class FileAttachment implements Attachment {
      * AttachContentId
      */
     private String cid = null;
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
 
     /**
      * @return the extension
@@ -171,6 +183,9 @@ public class FileAttachment implements Attachment {
         }
 
         switch (name) {
+            case "3001":
+                this.setDisplayName((String) value);
+                break;
             case "3701":
                 this.setSize(de.getSize());
                 this.setData((byte[]) value);
@@ -200,7 +215,10 @@ public class FileAttachment implements Attachment {
      */
     @Override
     public String toString() {
-        return longFilename == null ? filename : longFilename;
+        return Stream.of(displayName, longFilename, filename)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(null);
     }
 
     public void setCid(String cid) {

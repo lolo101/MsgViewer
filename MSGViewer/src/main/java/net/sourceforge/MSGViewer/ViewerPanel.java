@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package net.sourceforge.MSGViewer;
 
 import at.redeye.FrameWork.base.AutoMBox;
@@ -44,47 +38,38 @@ import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.StartTag;
 import net.sourceforge.MSGViewer.factory.MessageParserFactory;
 
-/**
- *
- * @author martin
- */
 public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener {
 
     private String bodyText = null;
-    private Message message;     
+    private Message message;
     private ViewerHelper helper = null;
     private Root root = null;
     private String file_name;
     private OpenNewMailInterface open_new_mail_handler = null;
     private BaseDialogBase parent = null;
     private MessageParserFactory parser_factory = new MessageParserFactory();
-    
+
     private int wating_thread_pool_counter = 0;
-    
-    /**
-     * URL where the mouse cursor is over, for the popup menu
-     */
-    private URL lastUrl = null;    
-    
+
     /**
      * Creates new form ViewerPanel
      */
     public ViewerPanel() {
         initComponents();
-        
+
         header.addHyperlinkListener(this);
         body.addHyperlinkListener(this);
-                
-       
-        JCBfix.setEnabled(jRText.isSelected());                   
+
+
+        JCBfix.setEnabled(jRText.isSelected());
     }
-    
+
     public void setRoot( Root root, BaseDialogBase parent )
     {
         this.parent = parent;
         this.root = root;
         helper = new ViewerHelper(root);
-        
+
         if( StringUtils.isYes(root.getSetup().getLocalConfig("RTFFormat", "yes") ) )
         {
             jRRTF.setSelected(true);
@@ -97,25 +82,25 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
         }
 
         JCBfix.setSelected(StringUtils.isYes(root.getSetup().getLocalConfig("FixedFont","no" ) ) );
-        
-        JCBfix.setEnabled(jRText.isSelected());                   
-        
-        jSplitPane.setDividerLocation(Integer.parseInt(root.getSetup().getLocalConfig("DividerLocation","150")));        
+
+        JCBfix.setEnabled(jRText.isSelected());
+
+        jSplitPane.setDividerLocation(Integer.parseInt(root.getSetup().getLocalConfig("DividerLocation","150")));
     }
-    
+
     public void loadFile( String file_name )
     {
          this.file_name = file_name;
-         
+
          parse(file_name);
     }
 
-    
+
     public void setopenNewMailInterface( OpenNewMailInterface open_new_mail_handler )
     {
         this.open_new_mail_handler = open_new_mail_handler;
     }
-    
+
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -231,25 +216,25 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
     private void jSFontSizeStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSFontSizeStateChanged
         EditorKit editor = body.getEditorKit();
-   
-        if (editor instanceof HTMLEditorKit) {                                   
-            
+
+        if (editor instanceof HTMLEditorKit) {
+
             Source source = new Source(body.getText());
             source.fullSequentialParse();
 
-            ArrayList<String> tags = new ArrayList();
+            List<String> tags = new ArrayList<>();
 
-            for (StartTag tag : source.getAllStartTags()) {                
+            for (StartTag tag : source.getAllStartTags()) {
                 tags.add(tag.getName());
             }
-            
-            
+
+
             HTMLEditorKit html_editor = (HTMLEditorKit) editor;
 
             System.out.println("Value: " + jSFontSize.getValue());
 
-            StyleSheet sheet = html_editor.getStyleSheet();          
-            
+            StyleSheet sheet = html_editor.getStyleSheet();
+
             String rule = "{ font-size: " + (jSFontSize.getValue()) + "pt; }";
 
             StringBuilder sb = new StringBuilder();
@@ -263,52 +248,51 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
             String text = body.getText();
             body.setDocument(html_editor.createDefaultDocument());
-            body.setText(text);                       
+            body.setText(text);
             body.setCaretPosition(0);
 
-        } else {                                             
-           
-            
+        } else {
+
+
             if( bodyText != null )
             {
                 bodyText = bodyText.replaceAll("(\\\\fs)([0-9]+)", "$1" + ((jSFontSize.getValue())*2));
                 System.out.println(bodyText);
-                body.setText(bodyText);             
+                body.setText(bodyText);
                 body.setCaretPosition(0);
-            }                    
+            }
         }
     }//GEN-LAST:event_jSFontSizeStateChanged
 
     private void jRRTFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRRTFActionPerformed
-                
+
         jRText.setSelected(!jRRTF.isSelected());
         JCBfix.setEnabled(jRText.isSelected());
         updateBody();
     }//GEN-LAST:event_jRRTFActionPerformed
 
     private void jRTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRTextActionPerformed
-        
+
          jRRTF.setSelected(!jRText.isSelected());
          JCBfix.setEnabled(jRText.isSelected());
          updateBody();
     }//GEN-LAST:event_jRTextActionPerformed
 
     private void JCBfixActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JCBfixActionPerformed
-        
+
         updateBody();
     }//GEN-LAST:event_JCBfixActionPerformed
 
-    
    private void updateBody()
     {
         if( message == null )
             return;
 
         if( jRRTF.isSelected() &&  message.getBodyRTF() != null &&  !message.getBodyRTF().isEmpty() )
-        {            
+        {
             if( message.getBodyRTF() == null )
                 return;
-            
+
             if( message.getBodyRTF().contains("\\fromhtml") )
             {
                 AutoMBox am = new AutoMBox(MainWin.class.getName()) {
@@ -324,13 +308,11 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
                         }
 
                         bodyText = helper.extractHTMLFromRTF(message.getBodyRTF(),message);
-                        
+
                         logger.trace(bodyText);
-                        // System.out.println("\n\n");
                         body.setText(bodyText);
                     }
                 };
-
 
                 if( am.isFailed() )
                 {
@@ -342,12 +324,12 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
             else if( message.getBodyRTF().contains("\\purehtml") )
             {
                 body.setContentType("text/html");
-                
+
                 PrepareImages prep_images = new PrepareImages(helper.getTmpDir().getPath(), message);
 
-                String html = prep_images.prepareImages(new StringBuilder(ViewerHelper.stripMetaTags(message.getBodyRTF()))).toString();                
+                String html = prep_images.prepareImages(new StringBuilder(ViewerHelper.stripMetaTags(message.getBodyRTF()))).toString();
                 bodyText = html;
-                body.setText(html);  
+                body.setText(html);
             }
             else
             {
@@ -355,22 +337,9 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
                 bodyText = message.getBodyRTF();
                 body.setText(message.getBodyRTF());
             }
-
-            // System.out.println(message.getBodyRTF());
         }
         else
         {
-            /*
-            body.setContentType("text/plain");
-            body.setText(message.getBodyText());
-
-            if (JCBfix.isSelected()) {
-                body.setFont(new java.awt.Font("Courier New", 0, 12));
-            } else {
-                body.setFont(new java.awt.Font("Dialog", 0, 12));
-            }
-             */
-
             StringBuilder sb = new StringBuilder();
 
             sb.append("<html><body>");
@@ -383,18 +352,9 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
             sb.append("<pre style=\"font-family:" + font + "\">");
 
-            // System.out.println(message.getBodyText());
-
             String text = message.getBodyText();
-/*
-            try {
-                CharacterSetConversion cs = new CharacterSetConversion(message);
-                text = cs.getEncoded(message.getBodyText());
-            } catch( UnsupportedEncodingException ex ) {
-                logger.error(StringUtils.exceptionToString(ex));
-            }
-*/
-            sb.append(helper.prepareText(text));
+
+            sb.append(ViewerHelper.prepareText(text));
 
             sb.append("</pre>");
             sb.append("</body></html>");
@@ -405,8 +365,8 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
         }
 
         body.setCaretPosition(0);
-    }    
-   
+    }
+
     @Override
     public void hyperlinkUpdate( final HyperlinkEvent e )
     {
@@ -420,24 +380,16 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
                 }
 
                 if (!e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
-                    if (e.getEventType().equals(HyperlinkEvent.EventType.ENTERED)) {
-                        lastUrl = e.getURL();
-                    } else if (e.getEventType().equals(HyperlinkEvent.EventType.EXITED)) {
-                        lastUrl = null;
-                    }
-
                     return;
                 }
 
-                lastUrl = null;
-        
                 openUrl(e.getURL());
-            }      
+            }
         };
-    }   
-    
+    }
+
     public void openUrl(URL url) throws IOException
-    {               
+    {
         logger.info(url);
 
         final String protocoll = url.getProtocol();
@@ -475,20 +427,12 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
             content = new File(url.getFile());
         }
 
-        if( helper.is_mail_message(content.toString() ) ) {
-            
+        if( ViewerHelper.is_mail_message(content.toString() ) ) {
+
             if( open_new_mail_handler != null )
             {
                 open_new_mail_handler.openMail( root,content.toString() );
             }
-            /*
-            MainWin win = new MainWin(root,content.toString());
-            
-            if( !menubar.isVisible() )
-                win.hideMenuBar();
-            
-            invokeDialog(win);
-            */
         } else {
 
             if (Setup.is_win_system() && root.getPlugin("ShellExec") != null ) {
@@ -512,14 +456,14 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
             }
         }
 
-    }        
-    
+    }
+
 
     public void parse(final String file_name)
     {
         if( file_name == null )
             return;
-        
+
         this.file_name = file_name;
 
         parent.setWaitCursor();
@@ -533,28 +477,24 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
             };
 
         parent.setNormalCursor();
-    }    
-    
-    void cleanUp() {
-        if (message == null) {
-            return;
-        }
+    }
 
+    void cleanUp() {
         message = null;
     }
 
     void parse_int(final String file_name) throws IOException, FileNotFoundException, Exception
     {
         cleanUp();
-        
-        final ExecutorService thread_pool = Executors.newCachedThreadPool();        
+
+        final ExecutorService thread_pool = Executors.newCachedThreadPool();
         wating_thread_pool_counter = 0;
 
         File file = new File(file_name);
 
         if( !file.exists() )
             throw new FileNotFoundException( parent.MlM( String.format("File %s not found",file_name)) );
-                
+
         /*
         if( file.getName().toLowerCase().endsWith(".msg") )
         {
@@ -562,22 +502,22 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
         } else {
             jMNav.setEnabled(false);
         }*/
-        
-        message = parser_factory.parseMessage(file);        
-        
+
+        message = parser_factory.parseMessage(file);
+
         // last_path = file.getParentFile().getPath();
 
         final StringBuilder sb = new StringBuilder();
 
         // setTitle( MlM(root.getAppTitle()) + ": " + message.getSubject() );
-       
+
         sb.append("<html>");
         sb.append("<body style=\"\">");
 
         sb.append("<b>");
         if( message.getSubject() != null )
             sb.append(message.getSubject());
-        sb.append("</b>");        
+        sb.append("</b>");
         sb.append("<br/>");
 
         logger.info("Message From:" + message.getFromName() + "\n To:" + message.getToName() + "\n Email: " + message.getFromEmail());
@@ -597,17 +537,17 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
             sb.append("\">");
             sb.append(message.getFromName());
         }
-        
+
         if( message.getFromEmail() != null && message.getFromEmail().contains("@") )
         {
             sb.append(" [");
             sb.append(message.getFromEmail());
             sb.append("]");
         }
-        
+
         sb.append("</a>");
 
-        sb.append("<br/>");        
+        sb.append("<br/>");
 
         if( message.getDate() != null )
         {
@@ -649,23 +589,22 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
         for( Attachment att : attachments )
         {
-            //System.out.println(att.getClass().getName());
             if( att instanceof FileAttachment)
             {
                 final FileAttachment fatt = (FileAttachment) att;
-                               
+
                 String encoded_file_name = URLEncoder.encode(fatt.toString(),"utf-8");
-                
+
                 sb.append("<a href=\"file://");
-                sb.append(encoded_file_name); 
-                sb.append("\">");                         
+                sb.append(encoded_file_name);
+                sb.append("\">");
 
                 String mime_type = fatt.getMimeTag();
 
                 logger.info("<a href=\"file://" + encoded_file_name + "\"> " + mime_type);
 
 
-                if( mime_type != null && helper.is_image_mime_type(mime_type) && fatt.getSize() < 1024*1024*2 )
+                if( mime_type != null && ViewerHelper.is_image_mime_type(mime_type) && fatt.getSize() < 1024*1024*2 )
                 {
                     File message_dir = helper.getTmpDir();
 
@@ -678,91 +617,77 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
                         final File content = new File(message_dir + "/" + fatt.toString());
 
                         if (!content.exists()) {
-                            
+
                             wating_thread_pool_counter++;
-                            
+
                             thread_pool.execute(new Runnable() {
 
                                 @Override
                                 public void run() {
-                                    
+
                                     try {
                                         FileOutputStream fout = new FileOutputStream(content);
                                         fout.write(fatt.getData());
-                                        fout.close();                                        
-                                        
+                                        fout.close();
+
                                     } catch( IOException ex ) {
                                         logger.error(ex,ex);
                                     }
-                                    
+
                                     wating_thread_pool_counter--;
                                 }
                             });
-                            
+
                             wating_thread_pool_counter++;
-                                       
+
                             thread_pool.execute(new Runnable() {
 
                                 @Override
                                 public void run() {
-                                    
+
                                     try {
-                                        
-                                        ImageIcon icon = ImageUtils.loadScaledImageIcon(fatt.getData(), 
+
+                                        ImageIcon icon = ImageUtils.loadScaledImageIcon(fatt.getData(),
                                                                     PrepareImages.getFileName(fatt),
                                                                     max_width, max_height );
-                                        
+
                                         File file_small = new File(content.getAbsolutePath() + "-small.jpg");
-                                        
+
                                         BufferedImage bi = new BufferedImage(icon.getIconWidth(),icon.getIconHeight(),
-                                                                BufferedImage.TYPE_INT_ARGB);                                        
-                                        
+                                                                BufferedImage.TYPE_INT_ARGB);
+
                                         Graphics2D g2 = bi.createGraphics();
                                         g2.drawImage(icon.getImage(), 0, 0, null);
                                         g2.dispose();
-                                        
+
                                         ImageIO.write(bi, "jpg", file_small);
-                                        
+
                                     } catch( IOException ex ) {
                                         logger.error(ex,ex);
                                     }
-                                    
+
                                     wating_thread_pool_counter--;
                                 }
-                            });                            
-                            
+                            });
+
                         }
-/*
-                        ImageIcon icon = ImageUtils.loadImageIcon(fatt.getData(), file_name);
-                        Dimension dim = ImageUtils.getScaledSize(icon.getImage(), max_width, max_height, max_height);
 
                         String extra = "/";
 
                         if( Setup.is_win_system() )
                             extra = "";
 
-                        sb.append("<img border=0 src=\"file:/" + extra + content.getAbsolutePath() + "\" width=\"" 
-                                        + String.valueOf(dim.width) + "\" height=\""
-                                        + String.valueOf(dim.height) + "\"  /> ");
-                         * 
-                         */
-
-                        String extra = "/";
-
-                        if( Setup.is_win_system() )
-                            extra = "";
-                        
                         System.out.println(extra + content.getAbsolutePath() + "-small.jpg" );
                         sb.append("<img border=0 src=\"file:/" + extra + content.getAbsolutePath() + "-small.jpg\"/> ");
                     }
                 }
-                
-                if( helper.is_mail_message(fatt.getFilename(), fatt.getMimeTag() ) ) {
+
+                if( ViewerHelper.is_mail_message(fatt.getFilename(), fatt.getMimeTag() ) ) {
                     sb.append("<img border=0 align=\"baseline\" src=\"file:");
                     sb.append(helper.getMailIconName(helper.getTmpDir()));
                     sb.append("\"/>");
                 }
-                
+
                 if( !fatt.getFilename().isEmpty() )
                     sb.append(fatt.getFilename());
                 else
@@ -771,10 +696,10 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
                 sb.append("</a> ");
 
             } else if( att instanceof MsgAttachment) {
-                 
+
                 MsgAttachment msgAtt = (MsgAttachment) att;
-                final Message msg = msgAtt.getMessage();                                
-                
+                final Message msg = msgAtt.getMessage();
+
                 File message_dir = helper.getTmpDir();
 
                 if( !message_dir.isDirectory() && !message_dir.mkdirs() )
@@ -782,45 +707,45 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
                         logger.error( "Cannot create tmp dir: " + message_dir.getPath() );
                 }
                 else
-                {                
+                {
                     final String sub_file_name = message_dir + "/" + msg.hashCode() + ".mbox";
-                    
+
                     thread_pool.execute(new Runnable() {
 
                         @Override
                         public void run() {
-                            
+
                             new AutoMBox(file_name) {
 
                                 @Override
                                 public void do_stuff() throws Exception {
-                                    
-                                    MessageParserFactory factory = new MessageParserFactory();                                                                    
+
+                                    MessageParserFactory factory = new MessageParserFactory();
                                     factory.saveMessage(msg, new File(  sub_file_name ));
-                                    
+
                                 }
-                            };                                                        
+                            };
                         }
-                        
+
                     });
-                    
-                                    
+
+
                     sb.append("<a href=\"file://");
                     sb.append(sub_file_name);
-                    sb.append("\">");     
-                
+                    sb.append("\">");
+
                     sb.append("<img border=0 align=\"baseline\" src=\"file:");
                     sb.append(helper.getMailIconName(helper.getTmpDir()));
                     sb.append("\"/>");
-                    
+
                     sb.append(msg.getSubject());
-                
+
                     sb.append("</a> &nbsp; ");
                 }
-                
-                
+
+
             } else {
-                logger.error("unknown Attachment: " + att.toString() + " " + att.getClass().getName() );
+                logger.error("unknown Attachment: " + att + " " + att.getClass().getName() );
             }
         }
 
@@ -829,41 +754,41 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
         if( wating_thread_pool_counter > 0 )
         {
-            updateBody(); // do something different now 
-            
+            updateBody(); // do something different now
+
             new AutoMBox(file_name) {
 
                 @Override
                 public void do_stuff() throws Exception {
                     thread_pool.shutdown();
-                    
+
                     if( wating_thread_pool_counter > 0 ) {
                         thread_pool.awaitTermination(1, TimeUnit.DAYS);
                     }
                 }
             };
-                    
+
             header.setText(sb.toString());
             header.setCaretPosition(0);
 
         } else {
-                                
+
             header.setText(sb.toString());
             header.setCaretPosition(0);
-        
+
             updateBody();
         }
-    }    
-    
+    }
+
     public void dispose()
     {
         root.getSetup().setLocalConfig("RTFFormat",jRRTF.isSelected() ? "yes" : "no");
         root.getSetup().setLocalConfig("FixedFont", JCBfix.isSelected() ? "yes" : "no");
         root.getSetup().setLocalConfig("DividerLocation", String.valueOf(jSplitPane.getDividerLocation()));
-                
+
         helper.dispose();
     }
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox JCBfix;
     private javax.swing.JEditorPane body;
@@ -886,22 +811,22 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
     public void exportFile(File export_file) throws Exception {
         parser_factory.saveMessage(message, export_file);
     }
-    
-    public void exportFile( File file, Message message ) throws FileNotFoundException, Exception 
+
+    public void exportFile( File file, Message message ) throws FileNotFoundException, Exception
     {
         parser_factory.saveMessage(message, file);
-    }    
-    
+    }
+
     public String getFileName()
     {
-        return file_name;              
+        return file_name;
     }
-    
+
     public JEditorPane getHeaderPane() {
         return header;
     }
-    
+
     public JEditorPane getBodyPane() {
         return body;
-    }    
+    }
 }

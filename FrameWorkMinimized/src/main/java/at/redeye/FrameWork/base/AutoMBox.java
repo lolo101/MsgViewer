@@ -20,41 +20,41 @@ public abstract class AutoMBox
 {
     public interface ShowAdvancedException
     {
-        /**         
+        /**
          * @param ex
          * @return false, if the default exceptiondialog should be shown
-         */        
-        boolean wantShowAdvancedException( Exception ex );        
+         */
+        boolean wantShowAdvancedException( Exception ex );
         void showAdvancedException( Exception ex );
     }
-    
-    protected Logger logger;    
+
+    protected Logger logger;
     protected Exception thrown_ex = null;
     protected boolean failed = true;
     protected boolean do_mbox = true;
-    public boolean logical_failure = false;        
-    
+    public boolean logical_failure = false;
+
     protected static ArrayList<ShowAdvancedException> show_exception_handlers = null;
-    
+
     public AutoMBox( String className, boolean do_mbox )
     {
         logger = Logger.getLogger(className);
         this.do_mbox = do_mbox;
         invoke();
     }
-    
+
     public AutoMBox( String className )
     {
         logger = Logger.getLogger(className);
-        
+
         invoke();
     }
-    
+
     public static void addShowAdvancedExceptionHandle( ShowAdvancedException handler )
     {
         if( show_exception_handlers == null )
             show_exception_handlers = new ArrayList();
-        
+
         show_exception_handlers.add(handler);
     }
 
@@ -62,17 +62,17 @@ public abstract class AutoMBox
     {
         try {
             do_stuff();
-            failed = false;                  
+            failed = false;
         } catch (Exception ex) {
-            logger.error("Exception: " + ex.toString() + "\n" + ex.getLocalizedMessage(), ex );                        
-            thrown_ex = ex;            
+            logger.error("Exception: " + ex.toString() + "\n" + ex.getLocalizedMessage(), ex );
+            thrown_ex = ex;
         }
-        
+
         if (thrown_ex != null) {
             if (do_mbox) {
 
                 boolean show_default_dialog = true;
-                
+
                 if( show_exception_handlers != null )
                 {
                     for( ShowAdvancedException handler : show_exception_handlers )
@@ -83,8 +83,8 @@ public abstract class AutoMBox
                         }
                     }
                 }
-               
-               
+
+
                 if (show_default_dialog) {
                     Root root = Root.getLastRoot();
 
@@ -98,14 +98,11 @@ public abstract class AutoMBox
             }
         }
     }
-    
+
     public abstract void do_stuff() throws Exception;
-    
+
     public boolean isFailed()
     {
-        if( failed || logical_failure )
-            return true;
-
-        return false;
+        return failed || logical_failure;
     }
 }
