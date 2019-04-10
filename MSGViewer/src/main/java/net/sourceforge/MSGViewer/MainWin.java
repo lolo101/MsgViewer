@@ -21,6 +21,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -270,18 +271,19 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
 
         for( Attachment att : attachments )
         {
-            //System.out.println(att.getClass().getName());
             if( att instanceof FileAttachment)
             {
                 final FileAttachment fatt = (FileAttachment) att;
 
+                String encoded_file_name = URLEncoder.encode(fatt.toString(),"utf-8");
+
                 sb.append("<a href=\"file://");
-                sb.append(fatt.toString());
+                sb.append(encoded_file_name);
                 sb.append("\">");
 
                 String mime_type = fatt.getMimeTag();
 
-                logger.info(fatt.toString() + " " + mime_type);
+                logger.info(encoded_file_name + " " + mime_type);
 
 
                 if( mime_type != null && ViewerHelper.is_image_mime_type(mime_type) && fatt.getSize() < 1024*1024*2 )
@@ -1040,9 +1042,9 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
     {
         logger.info(url);
 
-        final String protocoll = url.getProtocol();
+        final String protocol = url.getProtocol();
 
-        if( !protocoll.equals("file") )
+        if( !protocol.equals("file") )
         {
             if (Setup.is_win_system()) {
                 logger.info("opening: " + url);

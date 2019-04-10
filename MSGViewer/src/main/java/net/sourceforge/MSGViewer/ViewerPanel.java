@@ -495,21 +495,9 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
         if( !file.exists() )
             throw new FileNotFoundException( parent.MlM( String.format("File %s not found",file_name)) );
 
-        /*
-        if( file.getName().toLowerCase().endsWith(".msg") )
-        {
-            jMNav.setEnabled(true);
-        } else {
-            jMNav.setEnabled(false);
-        }*/
-
         message = parser_factory.parseMessage(file);
 
-        // last_path = file.getParentFile().getPath();
-
         final StringBuilder sb = new StringBuilder();
-
-        // setTitle( MlM(root.getAppTitle()) + ": " + message.getSubject() );
 
         sb.append("<html>");
         sb.append("<body style=\"\">");
@@ -572,7 +560,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
         if( message.getToEmail() != null && message.getToEmail().contains("@") )
         {
             if( message.getToName() != null )
-                sb.append(" [");
+                sb.append("[");
 
             sb.append(message.getToEmail());
 
