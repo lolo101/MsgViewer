@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package net.sourceforge.MSGViewer;
 
 import static at.redeye.FrameWork.base.BaseDialog.logger;
@@ -28,18 +22,12 @@ import java.io.FileOutputStream;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.List;
-import net.sourceforge.MSGViewer.factory.MessageParserFactory;
 
-/**
- *
- * @author martin
- */
 public class ViewerHelper {
 
     private Root root;
     private File tmp_dir;
     boolean delete_tmp_dir = false;
-    private MessageParserFactory parser_factory = new MessageParserFactory();
 
     public ViewerHelper( Root root )
     {
@@ -55,16 +43,14 @@ public class ViewerHelper {
 
    static boolean is_image_mime_type( String mime )
     {
-       switch (mime) {
-           case "image/jpeg":
-               return true;
-           case "image/gif":
-               return true;
-           case "image/png":
-               return true;
-       }
-
-        return false;
+        switch (mime) {
+            case "image/jpeg":
+            case "image/gif":
+            case "image/png":
+                return true;
+            default:
+                return false;
+        }
     }
 
     static boolean is_mail_message( String file_name )

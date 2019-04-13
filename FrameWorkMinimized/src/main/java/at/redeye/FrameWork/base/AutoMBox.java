@@ -53,7 +53,7 @@ public abstract class AutoMBox
     public static void addShowAdvancedExceptionHandle( ShowAdvancedException handler )
     {
         if( show_exception_handlers == null )
-            show_exception_handlers = new ArrayList();
+            show_exception_handlers = new ArrayList<>();
 
         show_exception_handlers.add(handler);
     }
@@ -64,7 +64,7 @@ public abstract class AutoMBox
             do_stuff();
             failed = false;
         } catch (Exception ex) {
-            logger.error("Exception: " + ex.toString() + "\n" + ex.getLocalizedMessage(), ex );
+            logger.error("Exception: " + ex + "\n" + ex.getLocalizedMessage(), ex );
             thrown_ex = ex;
         }
 

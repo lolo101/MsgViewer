@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.sourceforge.MSGViewer;
 
 import at.redeye.FrameWork.base.Setup;
@@ -18,10 +14,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 
-/**
- *
- * @author martin
- */
 public class PrepareImages {
 
     private static final Logger logger = Logger.getLogger(PrepareImages.class.getName());
@@ -52,7 +44,7 @@ public class PrepareImages {
                 break;
 
             pos = matcher.start();
-            
+
             if (s.length() <= pos + 3) {
                 return -1;
             }
@@ -65,9 +57,9 @@ public class PrepareImages {
         return -1;
     }
 
-    private String replace_src(StringBuilder s, List<FileAttachment> attached_images) {
+    private String replace_src(String s, List<FileAttachment> attached_images) {
 
-        String res[] = s.toString().split("[sS][rR][cC]\\s*=");
+        String res[] = s.split("[sS][rR][cC]\\s*=");
 
         int i = 0;
 
@@ -100,39 +92,37 @@ public class PrepareImages {
                     rest = part.substring(end+1);
             }
 
-            // String src = StringUtils.strip(new StringBuilder(part), " \t\r\n\"");
-
             String imgsrc = src;
 
             if (!src.toLowerCase().startsWith("http:") && !src.isEmpty() ) {
                 logger.info("HERE");
                 imgsrc = "file:/" + extra + base_dir + "/" + src;
                 File file = new File( extra + base_dir + "/" + src );
-                                
+
                 if( !file.exists() && !attached_images.isEmpty() )
                 {
                     if( src.toLowerCase().startsWith("cid:") )
                     {
                         String cid = src.substring(4);
-                        
-                        for( FileAttachment fatt : attached_images ) 
+
+                        for( FileAttachment fatt : attached_images )
                         {
                             if( fatt.getCid() != null ) {
                                 if( fatt.getCid().equals(cid) ) {
-                                    
+
                                     imgsrc = "file:/" + extra + base_dir + "/" + getFileName(fatt);
                                     attached_images.remove(fatt);
                                     break;
                                 }
                             }
                         }
-                        
+
                     } else {
-                        
+
                         imgsrc = "file:/" + extra + base_dir + "/" + getFileName(attached_images.remove(0));
                     }
                 }
-            }            
+            }
 
             logger.info("image: " + src);
 
@@ -146,32 +136,28 @@ public class PrepareImages {
 
         return ret.toString();
     }
-    
-    static String getFileName(FileAttachment fatt)            
+
+    static String getFileName(FileAttachment fatt)
     {
         if( fatt.getFilename() == null || fatt.getFilename().isEmpty() )
             return fatt.getLongFilename();
-        
+
         return fatt.getFilename();
     }
 
     public StringBuilder prepareImages(StringBuilder s) {
-        int start = 0;
 
-        //StringBuilder lower_case = new StringBuilder( s.toString().toLowerCase() );
-        List<FileAttachment> attached_images = new ArrayList();
+        List<FileAttachment> attached_images = new ArrayList<>();
 
         for( Attachment att : attachments )
         {
-            //System.out.println(att.getClass().getName());
             if( att instanceof FileAttachment)
             {
-                FileAttachment fatt = (FileAttachment) att;            
+                FileAttachment fatt = (FileAttachment) att;
 
                 String mime_type = fatt.getMimeTag();
 
-                logger.info(fatt.toString() + " " + mime_type);
-
+                logger.info(fatt + " " + mime_type);
 
                 if( mime_type != null && ViewerHelper.is_image_mime_type(mime_type) ) {
                     attached_images.add(fatt);
@@ -194,8 +180,7 @@ public class PrepareImages {
             }
         });
 
-        while ((start = findImgTag(s, start)) >= 0) {
-            // System.out.println("HERE");
+        for (int start = 0; (start = findImgTag(s, start)) >= 0;) {
 
             int end = s.indexOf(">", start);
 
@@ -203,15 +188,11 @@ public class PrepareImages {
                 break;
             }
 
-            String res = replace_src(new StringBuilder(
-                    s.subSequence(start, end)), attached_images);
+            String res = replace_src(s.substring(start, end), attached_images);
 
             s.replace(start, end, res);
 
-            if( res.length() == 0 )
-                start++;
-            else
-                start += res.length();
+            start += Math.max(1, res.length());
         }
 
         return s;

@@ -1,7 +1,9 @@
 package net.sourceforge.MSGViewer;
 
 import at.redeye.FrameWork.base.AutoMBox;
+
 import static at.redeye.FrameWork.base.BaseDialog.logger;
+
 import at.redeye.FrameWork.base.BaseDialogBase;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.base.Setup;
@@ -21,11 +23,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
@@ -215,53 +217,40 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
     }// </editor-fold>//GEN-END:initComponents
 
     private void jSFontSizeStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSFontSizeStateChanged
+
         EditorKit editor = body.getEditorKit();
 
         if (editor instanceof HTMLEditorKit) {
 
+            System.out.println("Value: " + jSFontSize.getValue());
+
             Source source = new Source(body.getText());
             source.fullSequentialParse();
 
-            List<String> tags = new ArrayList<>();
-
-            for (StartTag tag : source.getAllStartTags()) {
-                tags.add(tag.getName());
-            }
-
+            String rule = "{ font-size: " + jSFontSize.getValue() + "pt; }";
+            String tags = source.getAllStartTags().stream()
+                    .map(StartTag::getName)
+                    .map(t -> t + rule)
+                    .collect(Collectors.joining());
 
             HTMLEditorKit html_editor = (HTMLEditorKit) editor;
-
-            System.out.println("Value: " + jSFontSize.getValue());
-
             StyleSheet sheet = html_editor.getStyleSheet();
-
-            String rule = "{ font-size: " + (jSFontSize.getValue()) + "pt; }";
-
-            StringBuilder sb = new StringBuilder();
-
-            for (String tag : tags) {
-                sb.append(tag);
-                sb.append(rule);
-            }
-
-            sheet.addRule(sb.toString());
+            sheet.addRule(tags);
 
             String text = body.getText();
             body.setDocument(html_editor.createDefaultDocument());
             body.setText(text);
-            body.setCaretPosition(0);
 
         } else {
-
 
             if( bodyText != null )
             {
                 bodyText = bodyText.replaceAll("(\\\\fs)([0-9]+)", "$1" + ((jSFontSize.getValue())*2));
                 System.out.println(bodyText);
                 body.setText(bodyText);
-                body.setCaretPosition(0);
             }
         }
+        body.setCaretPosition(0);
     }//GEN-LAST:event_jSFontSizeStateChanged
 
     private void jRRTFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRRTFActionPerformed
@@ -290,16 +279,12 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
         if( jRRTF.isSelected() &&  message.getBodyRTF() != null &&  !message.getBodyRTF().isEmpty() )
         {
-            if( message.getBodyRTF() == null )
-                return;
-
             if( message.getBodyRTF().contains("\\fromhtml") )
             {
                 AutoMBox am = new AutoMBox(MainWin.class.getName()) {
 
                     @Override
                     public void do_stuff() throws Exception {
-                        body.setContentType("text/html");
                         logger.info("extracting HTML data from RTF Code");
 
                         if( logger.isTraceEnabled() )
@@ -307,10 +292,10 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
                             logger.trace("\n" + StringUtils.addLineNumbers(message.getBodyRTF()));
                         }
 
+                        body.setContentType("text/html");
                         bodyText = helper.extractHTMLFromRTF(message.getBodyRTF(),message);
 
                         logger.trace(bodyText);
-                        body.setText(bodyText);
                     }
                 };
 
@@ -318,53 +303,42 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
                 {
                     body.setContentType("text/rtf");
                     bodyText = message.getBodyRTF();
-                    body.setText(bodyText);
                 }
             }
             else if( message.getBodyRTF().contains("\\purehtml") )
             {
-                body.setContentType("text/html");
-
                 PrepareImages prep_images = new PrepareImages(helper.getTmpDir().getPath(), message);
 
-                String html = prep_images.prepareImages(new StringBuilder(ViewerHelper.stripMetaTags(message.getBodyRTF()))).toString();
-                bodyText = html;
-                body.setText(html);
+                body.setContentType("text/html");
+                bodyText = prep_images.prepareImages(new StringBuilder(ViewerHelper.stripMetaTags(message.getBodyRTF()))).toString();
             }
             else
             {
                 body.setContentType("text/rtf");
                 bodyText = message.getBodyRTF();
-                body.setText(message.getBodyRTF());
             }
         }
         else
         {
-            StringBuilder sb = new StringBuilder();
-
-            sb.append("<html><body>");
-
-            String font = "Dialog,sans-serif;font-size:10px;";
-
-            if (JCBfix.isSelected()) {
-                font = "Courier New;font-size:10px;";
-            }
-
-            sb.append("<pre style=\"font-family:" + font + "\">");
-
-            String text = message.getBodyText();
-
-            sb.append(ViewerHelper.prepareText(text));
-
-            sb.append("</pre>");
-            sb.append("</body></html>");
-
             body.setContentType("text/html");
-            bodyText = sb.toString();
-            body.setText(bodyText);
+            bodyText = asHtml(message.getBodyText());
         }
 
+        body.setText(bodyText);
         body.setCaretPosition(0);
+    }
+
+    private String asHtml(String text) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<html><body>");
+        String font = JCBfix.isSelected()
+                ? "Courier New;font-size:10px;"
+                : "Dialog,sans-serif;font-size:10px;";
+        sb.append("<pre style=\"font-family:").append(font).append("\">");
+        sb.append(ViewerHelper.prepareText(text));
+        sb.append("</pre>");
+        sb.append("</body></html>");
+        return sb.toString();
     }
 
     @Override
@@ -512,7 +486,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
         if (message.getFromEmail() == null && message.getFromName() == null) {
         } else if (message.getFromEmail() == null) {
-            sb.append(parent.MlM("From:") + message.getFromName());
+            sb.append(parent.MlM("From: ") + message.getFromName());
         } else if (message.getFromName() == null) {
             sb.append("<a href=\"mailto:");
             sb.append(message.getFromEmail());
@@ -539,16 +513,14 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
         if( message.getDate() != null )
         {
-            sb.append(parent.MlM("Date"));
-            sb.append(": ");
+            sb.append(parent.MlM("Date: "));
             sb.append(DateFormat.getDateTimeInstance().format(message.getDate()));
             sb.append("<br/>");
         }
 
         if( message.getToEmail() != null || message.getToName() != null )
         {
-            sb.append(parent.MlM("To:"));
-            sb.append(" ");
+            sb.append(parent.MlM("To: "));
         }
 
         if( message.getToName() != null )
@@ -602,7 +574,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
                     }
                     else
                     {
-                        final File content = new File(message_dir + "/" + fatt.toString());
+                        final File content = new File(message_dir + "/" + fatt.getLongFilename());
 
                         if (!content.exists()) {
 
