@@ -10,6 +10,7 @@ public enum Properties {
     PidTagSentRepresentingSearchKey("003b"),
     PidTagSubjectPrefix("003d"),
     PidTagReceivedByEntryId("003f"),
+    PidTagReceivedByName("0040"),
     PidTagSentRepresentingEntryId("0041"),
     PidTagSentRepresentingName("0042"),
     PidTagReceivedRepresentingName("0044"),
@@ -47,6 +48,7 @@ public enum Properties {
     PidTagAccess("0ff4"),
     PidTagInstanceKey("0ff6"),
     PidTagAccessLevel("0ff7"),
+    PidTagRecordKey("0ff9"),
     PidTagEntryId("0fff"),
 
     PidTagBody("1000"),
@@ -73,6 +75,7 @@ public enum Properties {
     PidTagAttachContentId("3712"),
 
     PidTagInternetCodepage("3fde"),
+    PidTagLastModifierName("3ffa"),
 
     PidLidContactItemData("8007"),
 

@@ -3,6 +3,8 @@ package net.sourceforge.MSGViewer;
 import at.redeye.FrameWork.base.AutoMBox;
 
 import static at.redeye.FrameWork.base.BaseDialog.logger;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import at.redeye.FrameWork.base.BaseDialogBase;
 import at.redeye.FrameWork.base.Root;
@@ -11,6 +13,7 @@ import at.redeye.FrameWork.base.imagestorage.ImageUtils;
 import at.redeye.FrameWork.utilities.StringUtils;
 import at.redeye.Plugins.ShellExec.ShellExec;
 import com.auxilii.msgparser.Message;
+import com.auxilii.msgparser.RecipientEntry;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
 import com.auxilii.msgparser.attachment.MsgAttachment;
@@ -49,7 +52,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
     private String file_name;
     private OpenNewMailInterface open_new_mail_handler = null;
     private BaseDialogBase parent = null;
-    private MessageParserFactory parser_factory = new MessageParserFactory();
+    private final MessageParserFactory parser_factory = new MessageParserFactory();
 
     private int wating_thread_pool_counter = 0;
 
@@ -518,26 +521,10 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
             sb.append("<br/>");
         }
 
-        if( message.getToEmail() != null || message.getToName() != null )
+        if( !message.getRecipients().isEmpty() )
         {
             sb.append(parent.MlM("To: "));
-        }
-
-        if( message.getToName() != null )
-        {
-            logger.info("toName: " + message.getToName());
-            sb.append(message.getToName());
-        }
-
-        if( message.getToEmail() != null && message.getToEmail().contains("@") )
-        {
-            if( message.getToName() != null )
-                sb.append("[");
-
-            sb.append(message.getToEmail());
-
-            if( message.getToName() != null )
-                sb.append("]");
+            sb.append(message.getRecipients().stream().map(ViewerPanel::asMailto).collect(toList()));
         }
 
         sb.append("<br>");
@@ -648,11 +635,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
                     sb.append("\"/>");
                 }
 
-                if( !fatt.getFilename().isEmpty() )
-                    sb.append(fatt.getFilename());
-                else
-                    sb.append(fatt.toString());
-
+                sb.append(fatt);
                 sb.append("</a> ");
 
             } else if( att instanceof MsgAttachment) {
@@ -738,6 +721,15 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
             updateBody();
         }
+    }
+
+    private static String asMailto(RecipientEntry recipient) {
+        String name = recipient.getName();
+        String email = recipient.getEmail();
+        if (isNotBlank(email)) {
+            return "<a href='mailto:" + email + "'>" + (isNotBlank(name) ? name + " [" + email + "]" : email) + "</a>";
+        }
+        return name;
     }
 
     public void dispose()

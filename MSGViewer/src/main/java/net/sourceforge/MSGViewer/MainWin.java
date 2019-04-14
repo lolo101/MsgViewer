@@ -1,5 +1,8 @@
 package net.sourceforge.MSGViewer;
 
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import at.redeye.FrameWork.Plugin.AboutPlugins;
 import at.redeye.FrameWork.base.*;
 import at.redeye.FrameWork.base.imagestorage.ImageUtils;
@@ -10,6 +13,7 @@ import net.sourceforge.MSGViewer.factory.MessageParserFactory;
 import net.sourceforge.MSGViewer.rtfparser.ParseException;
 import at.redeye.Plugins.ShellExec.ShellExec;
 import com.auxilii.msgparser.Message;
+import com.auxilii.msgparser.RecipientEntry;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
 import com.auxilii.msgparser.attachment.MsgAttachment;
@@ -233,29 +237,13 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
             sb.append("<br/>");
         }
 
-        if( message.getToEmail() != null || message.getToName() != null )
+        if( !message.getRecipients().isEmpty() )
         {
             sb.append(MlM("To: "));
+            sb.append(message.getRecipients().stream().map(MainWin::asMailto).collect(toList()));
         }
 
-        if( message.getToName() != null )
-        {
-            logger.info("toName: " + message.getToName());
-            sb.append(message.getToName());
-        }
-
-        if( message.getToEmail() != null && message.getToEmail().contains("@") )
-        {
-            if( message.getToName() != null )
-                sb.append(" [");
-
-            sb.append(message.getToEmail());
-
-            if( message.getToName() != null )
-                sb.append("]");
-        }
-
-        sb.append("<br>");
+        sb.append("<br/>");
 
         List<Attachment> attachments = message.getAttachments();
 
@@ -360,7 +348,7 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
                     sb.append("\"/>");
                 }
 
-                sb.append(fatt.toString());
+                sb.append(fatt);
                 sb.append("</a> ");
 
             } else if( att instanceof MsgAttachment) {
@@ -448,7 +436,14 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
         }
     }
 
-
+    private static String asMailto(RecipientEntry recipient) {
+        String name = recipient.getName();
+        String email = recipient.getEmail();
+        if (isNotBlank(email)) {
+            return "<a href='mailto:" + email + "'>" + (isNotBlank(name) ? name + " [" + email + "]" : email) + "</a>";
+        }
+        return name;
+    }
 
     private void updateBody()
     {

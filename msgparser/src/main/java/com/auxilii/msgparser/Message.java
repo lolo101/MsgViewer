@@ -673,7 +673,7 @@ public class Message {
         return this.properties.get(name);
     }
 
-    private String decompressRTF(byte[] compressedRTF) throws IOException {
+    private static String decompressRTF(byte[] compressedRTF) throws IOException {
         CompressedRTF decompressor = new CompressedRTF();
         byte[] decompressedRTF = decompressor.decompress(new ByteArrayInputStream(compressedRTF));
         return new String(decompressedRTF, 0, decompressor.getDeCompressedSize());

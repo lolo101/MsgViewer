@@ -64,7 +64,7 @@ public class FileAttachment implements Attachment {
     /**
      * AttachContentId
      */
-    private String cid = null;
+    private String contentId = null;
 
     public String getDisplayName() {
         return displayName;
@@ -183,27 +183,30 @@ public class FileAttachment implements Attachment {
         }
 
         switch (name) {
+            case "0FF9":
+                //TODO setRecordKey((byte[]) value);
+                break;
             case "3001":
-                this.setDisplayName((String) value);
+                setDisplayName((String) value);
                 break;
             case "3701":
-                this.setSize(de.getSize());
-                this.setData((byte[]) value);
+                setSize(de.getSize());
+                setData((byte[]) value);
                 break;
             case "3704":
-                this.setFilename((String) value);
+                setFilename((String) value);
                 break;
             case "3707":
-                this.setLongFilename((String) value);
+                setLongFilename((String) value);
                 break;
             case "370e":
-                this.setMimeTag((String) value);
+                setMimeTag((String) value);
                 break;
             case "3703":
-                this.setExtension((String) value);
+                setExtension((String) value);
                 break;
             case "3712":
-                this.setCid((String) value);
+                setContentId((String) value);
                 break;
         }
     }
@@ -221,12 +224,12 @@ public class FileAttachment implements Attachment {
                 .orElse(null);
     }
 
-    public void setCid(String cid) {
-        this.cid = cid;
+    public void setContentId(String contentId) {
+        this.contentId = contentId;
     }
 
-    public String getCid() {
-        return cid;
+    public String getContentId() {
+        return contentId;
     }
 
 }

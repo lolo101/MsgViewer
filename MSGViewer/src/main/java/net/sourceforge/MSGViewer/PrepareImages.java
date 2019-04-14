@@ -107,13 +107,11 @@ public class PrepareImages {
 
                         for( FileAttachment fatt : attached_images )
                         {
-                            if( fatt.getCid() != null ) {
-                                if( fatt.getCid().equals(cid) ) {
+                            if( cid.equals(fatt.getContentId()) ) {
 
-                                    imgsrc = "file:/" + extra + base_dir + "/" + getFileName(fatt);
-                                    attached_images.remove(fatt);
-                                    break;
-                                }
+                                imgsrc = "file:/" + extra + base_dir + "/" + getFileName(fatt);
+                                attached_images.remove(fatt);
+                                break;
                             }
                         }
 

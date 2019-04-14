@@ -119,7 +119,7 @@ public class JavaMailParser
                 String cid = mpart.getContentID();
                 if( cid != null ) {
                     cid = StringUtils.strip(cid, "<>");
-                    att.setCid(cid);
+                    att.setContentId(cid);
                 }
 
                 att.setSize(mpart.getSize());
