@@ -383,7 +383,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
                 String open_command = helper.getOpenCommand();
 
-                String command = open_command + " \"" + url.toString() + "\"";
+                String command = open_command + " \"" + url + "\"";
                 logger.info(command);
 
                 String command_array[] = new String[2];
@@ -540,7 +540,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
             {
                 final FileAttachment fatt = (FileAttachment) att;
 
-                String encoded_file_name = URLEncoder.encode(fatt.toString(),"utf-8");
+                String encoded_file_name = URLEncoder.encode(fatt.getFilename(), "utf-8");
 
                 sb.append("<a href=\"file://");
                 sb.append(encoded_file_name);
@@ -572,11 +572,8 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
                                 @Override
                                 public void run() {
 
-                                    try {
-                                        FileOutputStream fout = new FileOutputStream(content);
+                                    try (FileOutputStream fout = new FileOutputStream(content)) {
                                         fout.write(fatt.getData());
-                                        fout.close();
-
                                     } catch( IOException ex ) {
                                         logger.error(ex,ex);
                                     }

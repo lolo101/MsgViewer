@@ -256,7 +256,7 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
             {
                 final FileAttachment fatt = (FileAttachment) att;
 
-                String encoded_file_name = URLEncoder.encode(fatt.toString(),"utf-8");
+                String encoded_file_name = URLEncoder.encode(fatt.getFilename(), "utf-8");
 
                 sb.append("<a href=\"file://");
                 sb.append(encoded_file_name);
@@ -1014,7 +1014,7 @@ public class MainWin extends BaseDialog implements HyperlinkListener, MainDialog
 
                 String open_command = helper.getOpenCommand();
 
-                String command = open_command + " \"" + url.toString() + "\"";
+                String command = open_command + " \"" + url + "\"";
                 logger.info(command);
 
                 String command_array[] = new String[2];

@@ -213,14 +213,11 @@ public class ViewerHelper {
 
         for( Attachment att : attachments )
         {
-            //System.out.println(att.getClass().getName());
             if( att instanceof FileAttachment)
             {
                 FileAttachment fatt = (FileAttachment) att;
 
-                String att_file_name = "file://" + URLEncoder.encode(fatt.toString(),"utf-8");
-
-                // logger.info("file " + fatt);
+                String att_file_name = "file://" + URLEncoder.encode(fatt.getFilename(), "utf-8");
 
                 if( att_file_name.equals(url.toString()) )
                 {
@@ -233,15 +230,13 @@ public class ViewerHelper {
                         throw new RuntimeException( "Cannot create tmp dir: " + message_dir.getPath() );
                     }
 
-                    File content = new File( message_dir + "/" + fatt.toString() );
+                    File content = new File( message_dir + "/" + fatt.getFilename());
 
                     if( !content.exists() )
                     {
-                        FileOutputStream fout = new FileOutputStream(content);
-
-                        fout.write(fatt.getData());
-
-                        fout.close();
+                        try (FileOutputStream fout = new FileOutputStream(content)) {
+                            fout.write(fatt.getData());
+                        }
                     }
 
                     return content;
