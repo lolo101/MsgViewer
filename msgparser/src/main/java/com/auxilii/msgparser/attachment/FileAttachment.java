@@ -220,6 +220,7 @@ public class FileAttachment implements Attachment {
     public String toString() {
         return Stream.of(displayName, longFilename, filename)
                 .filter(Objects::nonNull)
+                .filter(name -> !name.isBlank())
                 .findFirst()
                 .orElse(null);
     }

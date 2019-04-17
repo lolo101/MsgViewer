@@ -85,14 +85,6 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
         jSplitPane.setDividerLocation(Integer.parseInt(root.getSetup().getLocalConfig("DividerLocation","150")));
     }
 
-    public void loadFile( String file_name )
-    {
-         this.file_name = file_name;
-
-         parse(file_name);
-    }
-
-
     public void setopenNewMailInterface( OpenNewMailInterface open_new_mail_handler )
     {
         this.open_new_mail_handler = open_new_mail_handler;

@@ -17,6 +17,8 @@
  */
 package com.auxilii.msgparser;
 
+import static org.apache.poi.util.StringUtil.getFromUnicodeLE;
+
 import java.io.ByteArrayInputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,7 +33,6 @@ import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
 import com.auxilii.msgparser.attachment.MsgAttachment;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 import org.apache.log4j.Logger;
 import org.apache.poi.hmef.CompressedRTF;
@@ -208,7 +209,7 @@ public class Message {
                         this.setBodyRTF(decompressRTF(compressedRTF));
                     } catch(Exception e) {
                         LOGGER.info( "Could not decompress RTF data "  +  e);
-                        this.setBodyText(new String(compressedRTF, StandardCharsets.UTF_16LE));
+                        this.setBodyText(getFromUnicodeLE(compressedRTF));
                     }
                 } else {
                     LOGGER.info( "Unexpected data type "+value.getClass());

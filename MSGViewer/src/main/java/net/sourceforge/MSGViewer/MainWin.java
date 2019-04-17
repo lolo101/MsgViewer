@@ -1,18 +1,13 @@
 package net.sourceforge.MSGViewer;
 
-
 import at.redeye.FrameWork.Plugin.AboutPlugins;
 import at.redeye.FrameWork.base.*;
 import at.redeye.FrameWork.base.prm.impl.gui.LocalConfig;
 import at.redeye.FrameWork.utilities.StringUtils;
 import net.sourceforge.MSGViewer.MSGNavigator.MSGNavigator;
-import net.sourceforge.MSGViewer.factory.MessageParserFactory;
-import net.sourceforge.MSGViewer.rtfparser.ParseException;
-import com.auxilii.msgparser.Message;
 import java.awt.EventQueue;
 import java.awt.event.KeyEvent;
 import java.io.*;
-import java.net.URL;
 import java.net.URLDecoder;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
@@ -20,11 +15,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterface, LoadMessageInterface
 {
-
-    private Message message;
-    private final String file_name;
     private String dialog_id;
-    private final MessageParserFactory parser_factory = new MessageParserFactory();
     private final ViewerHelper helper;
 
     private static String last_path = null;
@@ -32,8 +23,6 @@ public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterf
     /** Creates new form MainWin */
     public MainWin(Root root, final String file_name ) {
         super(root, file_name != null ? (root.MlM(root.getAppTitle()) + ": " + file_name) : root.getAppTitle() );
-
-        this.file_name = file_name;
 
         helper = new ViewerHelper(root);
 
@@ -48,7 +37,10 @@ public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterf
         {
             viewerPanel.getHeaderPane().setText(MlM("Drag a msg file into this window") );
         } else {
-            EventQueue.invokeLater(() -> viewerPanel.parse(file_name));
+            EventQueue.invokeLater(() -> {
+                jMNav.setEnabled(file_name.toLowerCase().endsWith(".msg"));
+                viewerPanel.parse(file_name);
+            });
         }
 
         new EditorDropTarget(this,viewerPanel.getHeaderPane());
@@ -76,16 +68,9 @@ public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterf
         return dialog_id;
     }
 
-
-    void cleanUp()
-    {
-        message = null;
-    }
-
     @Override
     public void close()
     {
-        cleanUp();
         root.getSetup().setLocalConfig("LastPath", last_path);
 
         viewerPanel.dispose();
@@ -233,14 +218,14 @@ public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterf
 
     private void jMDetailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMDetailActionPerformed
 
-        if( message != null)
-            invokeDialogUnique(new Internals(root, message));
+        if( viewerPanel.getMessage() != null)
+            invokeDialogUnique(new Internals(root, viewerPanel.getMessage()));
 
     }//GEN-LAST:event_jMDetailActionPerformed
 
     private void jMNavActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMNavActionPerformed
 
-        invokeDialogUnique(new MSGNavigator(root, new File(file_name)));
+        invokeDialogUnique(new MSGNavigator(root, new File(viewerPanel.getFileName())));
 
     }//GEN-LAST:event_jMNavActionPerformed
 
@@ -288,7 +273,7 @@ public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterf
                         export_file = new File(file.getAbsolutePath() + ".mbox");
                     }
                 }
-                exportFile(message, export_file);
+                viewerPanel.exportFile(export_file);
             }
         };
     }//GEN-LAST:event_jMSaveAsActionPerformed
@@ -361,7 +346,9 @@ public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterf
             }
         }
 
-        if( message == null )
+        jMNav.setEnabled(file_name.toLowerCase().endsWith(".msg"));
+
+        if( viewerPanel.getMessage() == null )
         {
             viewerPanel.parse(file_name);
         }
@@ -386,29 +373,9 @@ public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterf
         last_path = path;
     }
 
-    public String getHTMLCode() throws ParseException
-    {
-        return helper.extractHTMLFromRTF(message.getBodyRTF(), message);
-    }
-
     public File getMailDirectory()
     {
         return helper.getTmpDir();
-    }
-
-    private void exportFile(Message message, File file) throws FileNotFoundException, Exception
-    {
-        parser_factory.saveMessage(message, file);
-    }
-
-    public String getFileName()
-    {
-       return file_name;
-    }
-
-    public void exportFile( File file ) throws FileNotFoundException, Exception
-    {
-        parser_factory.saveMessage(message, file);
     }
 
     @Override
@@ -420,9 +387,4 @@ public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterf
     public ViewerHelper getHelper() {
         return helper;
     }
-
-    File extractUrl(URL url) throws IOException {
-        return helper.extractUrl(url, message);
-    }
-
 }
