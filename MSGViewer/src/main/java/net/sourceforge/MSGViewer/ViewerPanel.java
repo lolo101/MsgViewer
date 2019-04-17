@@ -75,19 +75,11 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
         this.root = root;
         helper = new ViewerHelper(root);
 
-        if( StringUtils.isYes(root.getSetup().getLocalConfig("RTFFormat", "yes") ) )
-        {
-            jRRTF.setSelected(true);
-            jRText.setSelected(false);
-        }
-        else
-        {
-            jRRTF.setSelected(false);
-            jRText.setSelected(true);
-        }
+        boolean rtfFormat = StringUtils.isYes(root.getSetup().getLocalConfig("RTFFormat", "yes") );
+        jRRTF.setSelected(rtfFormat);
+        jRText.setSelected(!rtfFormat);
 
         JCBfix.setSelected(StringUtils.isYes(root.getSetup().getLocalConfig("FixedFont","no" ) ) );
-
         JCBfix.setEnabled(jRText.isSelected());
 
         jSplitPane.setDividerLocation(Integer.parseInt(root.getSetup().getLocalConfig("DividerLocation","150")));
@@ -561,7 +553,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
                     }
                     else
                     {
-                        final File content = new File(message_dir + "/" + fatt.getLongFilename());
+                        final File content = new File(message_dir + "/" + fatt.getFilename());
 
                         if (!content.exists()) {
 
