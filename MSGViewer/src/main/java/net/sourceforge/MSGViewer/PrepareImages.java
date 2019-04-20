@@ -93,11 +93,13 @@ public class PrepareImages {
 
             URI imgsrc = URI.create(src);
 
+            FileAttachment fatt = null;
             if (!imgsrc.isAbsolute()) {
-                FileAttachment fatt = attachmentByLocation.remove(imgsrc.getPath());
-                imgsrc = viewerHelper.getTempFile(fatt).toURI();
+                fatt = attachmentByLocation.remove(imgsrc.getPath());
             } else if (imgsrc.getScheme().equals("cid")) {
-                FileAttachment fatt = attachmentById.remove(imgsrc.getPath());
+                fatt = attachmentById.remove(imgsrc.getSchemeSpecificPart());
+            }
+            if (fatt != null) {
                 imgsrc = viewerHelper.getTempFile(fatt).toURI();
             }
 

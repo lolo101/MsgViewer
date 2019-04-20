@@ -568,7 +568,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
                                                                 max_width, max_height );
 
                                     BufferedImage bi = new BufferedImage(icon.getIconWidth(),icon.getIconHeight(),
-                                                            BufferedImage.TYPE_INT_ARGB);
+                                                            BufferedImage.TYPE_INT_RGB);
 
                                     Graphics2D g2 = bi.createGraphics();
                                     g2.drawImage(icon.getImage(), 0, 0, null);

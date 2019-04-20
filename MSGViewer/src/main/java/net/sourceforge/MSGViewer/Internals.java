@@ -1,14 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
- * Internals.java
- *
- * Created on 02.12.2010, 22:13:17
- */
-
 package net.sourceforge.MSGViewer;
 
 import at.redeye.FrameWork.base.AutoLogger;
@@ -17,17 +6,12 @@ import at.redeye.FrameWork.base.Root;
 import net.sourceforge.MSGViewer.rtfparser.ParseException;
 import com.auxilii.msgparser.Message;
 
-/**
- *
- * @author martin
- */
 public class Internals extends BaseDialog {
 
     private String dialog_id;
-    private Message message;
 
-    private String MESSAGE_NOHTML_CODE;
-    private String MESSAGE_UNPARSABLE_CODE;
+    private static final String MESSAGE_NOHTML_CODE = "This message does not contain HTML formatted code.";
+    private static final String MESSAGE_UNPARSABLE_CODE = "Cannot extract HTML formatted code from RTF coded message.";
 
     /** Creates new form Internals */
     public Internals(Root root, final Message message)
@@ -35,9 +19,6 @@ public class Internals extends BaseDialog {
         super(root, root.MlM("Detail info") + ": " + (message.getSubject() != null ? message.getSubject() : root.getAppTitle()) );
 
         initComponents();
-
-        MESSAGE_NOHTML_CODE = MlM("This message does not contain HTML formatted code.");
-        MESSAGE_UNPARSABLE_CODE = MlM("Cannot extract HTML formatted code from RTF coded message.");
 
         jTHeader.setText(message.getHeaders());
         jTHeader.setCaretPosition(0);
@@ -58,14 +39,14 @@ public class Internals extends BaseDialog {
             };
 
             if (al.isFailed()) {
-                jTHTML.setText(MESSAGE_UNPARSABLE_CODE);
+                jTHTML.setText(MlM(MESSAGE_UNPARSABLE_CODE));
 
 
             }
         } else if ( message.getBodyRTF() != null && message.getBodyRTF().contains("\\purehtml")) {
              jTHTML.setText(message.getBodyRTF());
         } else {
-            jTHTML.setText(MESSAGE_NOHTML_CODE);
+            jTHTML.setText(MlM(MESSAGE_NOHTML_CODE));
         }
 
         jTHTML.setCaretPosition(0);
