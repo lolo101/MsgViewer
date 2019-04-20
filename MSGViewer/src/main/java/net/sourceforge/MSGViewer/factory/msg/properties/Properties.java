@@ -73,6 +73,7 @@ public enum Properties {
     PidTagAttachLongFilename("3707"),
     PidTagAttachMimeTag("370e"),
     PidTagAttachContentId("3712"),
+    PidTagAttachContentLocation("3713"),
 
     PidTagInternetCodepage("3fde"),
     PidTagLastModifierName("3ffa"),

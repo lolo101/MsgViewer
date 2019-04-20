@@ -373,11 +373,6 @@ public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterf
         last_path = path;
     }
 
-    public File getMailDirectory()
-    {
-        return helper.getTmpDir();
-    }
-
     @Override
     public void hideMenuBar() {
        menubar.setVisible(false);

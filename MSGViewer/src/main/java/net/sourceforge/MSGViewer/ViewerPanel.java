@@ -24,7 +24,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -64,7 +63,6 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
         header.addHyperlinkListener(this);
         body.addHyperlinkListener(this);
-
 
         JCBfix.setEnabled(jRText.isSelected());
     }
@@ -294,7 +292,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
             }
             else if( message.getBodyRTF().contains("\\purehtml") )
             {
-                PrepareImages prep_images = new PrepareImages(helper.getTmpDir().getPath(), message);
+                PrepareImages prep_images = new PrepareImages(helper, message);
 
                 body.setContentType("text/html");
                 bodyText = prep_images.prepareImages(new StringBuilder(ViewerHelper.stripMetaTags(message.getBodyRTF()))).toString();
@@ -353,9 +351,9 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
     {
         logger.info(url);
 
-        final String protocoll = url.getProtocol();
+        final String protocol = url.getProtocol();
 
-        if( !protocoll.equals("file") )
+        if( !protocol.equals("file") )
         {
             if (Setup.is_win_system()) {
                 logger.info("opening: " + url);
@@ -524,95 +522,78 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
             {
                 final FileAttachment fatt = (FileAttachment) att;
 
-                String encoded_file_name = URLEncoder.encode(fatt.getFilename(), "utf-8");
+                File content = helper.getTempFile(fatt);
 
-                sb.append("<a href=\"file://");
-                sb.append(encoded_file_name);
+                sb.append("<a href=\"");
+                sb.append(content.toURI());
                 sb.append("\">");
 
                 String mime_type = fatt.getMimeTag();
 
-                logger.info("<a href=\"file://" + encoded_file_name + "\"> " + mime_type);
-
+                logger.info("<a href=\"" + content.toURI() + "\"> " + mime_type);
 
                 if( mime_type != null && ViewerHelper.is_image_mime_type(mime_type) && fatt.getSize() < 1024*1024*2 )
                 {
-                    File message_dir = helper.getTmpDir();
+                    File contentIcon = new File(content.getAbsolutePath() + "-small.jpg");
+                    if (!content.exists()) {
 
-                    if( !message_dir.isDirectory() && !message_dir.mkdirs() )
-                    {
-                        logger.error( "Cannot create tmp dir: " + message_dir.getPath() );
-                    }
-                    else
-                    {
-                        final File content = new File(message_dir + "/" + fatt.getFilename());
+                        wating_thread_pool_counter++;
 
-                        if (!content.exists()) {
+                        thread_pool.execute(new Runnable() {
 
-                            wating_thread_pool_counter++;
+                            @Override
+                            public void run() {
 
-                            thread_pool.execute(new Runnable() {
-
-                                @Override
-                                public void run() {
-
-                                    try (FileOutputStream fout = new FileOutputStream(content)) {
-                                        fout.write(fatt.getData());
-                                    } catch( IOException ex ) {
-                                        logger.error(ex,ex);
-                                    }
-
-                                    wating_thread_pool_counter--;
+                                try (FileOutputStream fout = new FileOutputStream(content)) {
+                                    fout.write(fatt.getData());
+                                } catch( IOException ex ) {
+                                    logger.error(ex,ex);
                                 }
-                            });
 
-                            wating_thread_pool_counter++;
+                                wating_thread_pool_counter--;
+                            }
+                        });
 
-                            thread_pool.execute(new Runnable() {
+                        wating_thread_pool_counter++;
 
-                                @Override
-                                public void run() {
+                        thread_pool.execute(new Runnable() {
 
-                                    try {
+                            @Override
+                            public void run() {
 
-                                        ImageIcon icon = ImageUtils.loadScaledImageIcon(fatt.getData(),
-                                                                    PrepareImages.getFileName(fatt),
-                                                                    max_width, max_height );
+                                try {
 
-                                        File file_small = new File(content.getAbsolutePath() + "-small.jpg");
+                                    ImageIcon icon = ImageUtils.loadScaledImageIcon(fatt.getData(),
+                                                                fatt.toString(),
+                                                                max_width, max_height );
 
-                                        BufferedImage bi = new BufferedImage(icon.getIconWidth(),icon.getIconHeight(),
-                                                                BufferedImage.TYPE_INT_ARGB);
+                                    BufferedImage bi = new BufferedImage(icon.getIconWidth(),icon.getIconHeight(),
+                                                            BufferedImage.TYPE_INT_ARGB);
 
-                                        Graphics2D g2 = bi.createGraphics();
-                                        g2.drawImage(icon.getImage(), 0, 0, null);
-                                        g2.dispose();
+                                    Graphics2D g2 = bi.createGraphics();
+                                    g2.drawImage(icon.getImage(), 0, 0, null);
+                                    g2.dispose();
 
-                                        ImageIO.write(bi, "jpg", file_small);
+                                    ImageIO.write(bi, "jpg", contentIcon);
 
-                                    } catch( IOException ex ) {
-                                        logger.error(ex,ex);
-                                    }
-
-                                    wating_thread_pool_counter--;
+                                } catch( IOException ex ) {
+                                    logger.error(ex,ex);
                                 }
-                            });
 
-                        }
-
-                        String extra = "/";
-
-                        if( Setup.is_win_system() )
-                            extra = "";
-
-                        System.out.println(extra + content.getAbsolutePath() + "-small.jpg" );
-                        sb.append("<img border=0 src=\"file:/" + extra + content.getAbsolutePath() + "-small.jpg\"/> ");
+                                wating_thread_pool_counter--;
+                            }
+                        });
                     }
+
+                    System.out.println(contentIcon);
+                    sb.append("<img border=0 src=\"");
+                    sb.append(contentIcon.toURI());
+                    sb.append("\"/> ");
                 }
 
                 if( ViewerHelper.is_mail_message(fatt.getFilename(), fatt.getMimeTag() ) ) {
                     sb.append("<img border=0 align=\"baseline\" src=\"file:");
-                    sb.append(helper.getMailIconName(helper.getTmpDir()));
+                    sb.append(helper.getMailIconName());
                     sb.append("\"/>");
                 }
 
@@ -624,50 +605,39 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
                 MsgAttachment msgAtt = (MsgAttachment) att;
                 final Message msg = msgAtt.getMessage();
 
-                File message_dir = helper.getTmpDir();
+                File sub_file = helper.getTempFile(msgAtt);
 
-                if( !message_dir.isDirectory() && !message_dir.mkdirs() )
-                {
-                        logger.error( "Cannot create tmp dir: " + message_dir.getPath() );
-                }
-                else
-                {
-                    final String sub_file_name = message_dir + "/" + msg.hashCode() + ".mbox";
+                thread_pool.execute(new Runnable() {
 
-                    thread_pool.execute(new Runnable() {
+                    @Override
+                    public void run() {
 
-                        @Override
-                        public void run() {
+                        new AutoMBox(file_name) {
 
-                            new AutoMBox(file_name) {
+                            @Override
+                            public void do_stuff() throws Exception {
 
-                                @Override
-                                public void do_stuff() throws Exception {
+                                MessageParserFactory factory = new MessageParserFactory();
+                                factory.saveMessage(msg, sub_file);
 
-                                    MessageParserFactory factory = new MessageParserFactory();
-                                    factory.saveMessage(msg, new File(  sub_file_name ));
+                            }
+                        };
+                    }
 
-                                }
-                            };
-                        }
-
-                    });
+                });
 
 
-                    sb.append("<a href=\"file://");
-                    sb.append(sub_file_name);
-                    sb.append("\">");
+                sb.append("<a href=\"");
+                sb.append(sub_file.toURI());
+                sb.append("\">");
 
-                    sb.append("<img border=0 align=\"baseline\" src=\"file:");
-                    sb.append(helper.getMailIconName(helper.getTmpDir()));
-                    sb.append("\"/>");
+                sb.append("<img border=0 align=\"baseline\" src=\"file:");
+                sb.append(helper.getMailIconName());
+                sb.append("\"/>");
 
-                    sb.append(msg.getSubject());
+                sb.append(msg.getSubject());
 
-                    sb.append("</a> &nbsp; ");
-                }
-
-
+                sb.append("</a> &nbsp; ");
             } else {
                 logger.error("unknown Attachment: " + att + " " + att.getClass().getName() );
             }

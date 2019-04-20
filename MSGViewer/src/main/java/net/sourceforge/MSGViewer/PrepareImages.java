@@ -5,11 +5,10 @@ import at.redeye.FrameWork.utilities.StringUtils;
 import com.auxilii.msgparser.Message;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
@@ -18,13 +17,13 @@ public class PrepareImages {
 
     private static final Logger logger = Logger.getLogger(PrepareImages.class.getName());
 
-    String base_dir;
+    private ViewerHelper viewerHelper;
     private final String extra;
     List<Attachment> attachments;
 
-    public PrepareImages( String base_dir, Message message )
+    public PrepareImages( ViewerHelper viewerHelper, Message message )
     {
-        this.base_dir = base_dir;
+        this.viewerHelper = viewerHelper;
 
         if( Setup.is_linux_system() )
             extra = "/";
@@ -57,7 +56,7 @@ public class PrepareImages {
         return -1;
     }
 
-    private String replace_src(String s, List<FileAttachment> attached_images) {
+    private String replace_src(String s, Map<String, FileAttachment> attachmentById, Map<String, FileAttachment> attachmentByLocation) {
 
         String res[] = s.split("[sS][rR][cC]\\s*=");
 
@@ -92,37 +91,17 @@ public class PrepareImages {
                     rest = part.substring(end+1);
             }
 
-            String imgsrc = src;
+            URI imgsrc = URI.create(src);
 
-            if (!src.toLowerCase().startsWith("http:") && !src.isEmpty() ) {
-                logger.info("HERE");
-                imgsrc = "file:/" + extra + base_dir + "/" + src;
-                File file = new File( extra + base_dir + "/" + src );
-
-                if( !file.exists() && !attached_images.isEmpty() )
-                {
-                    if( src.toLowerCase().startsWith("cid:") )
-                    {
-                        String cid = src.substring(4);
-
-                        for( FileAttachment fatt : attached_images )
-                        {
-                            if( cid.equals(fatt.getContentId()) ) {
-
-                                imgsrc = "file:/" + extra + base_dir + "/" + getFileName(fatt);
-                                attached_images.remove(fatt);
-                                break;
-                            }
-                        }
-
-                    } else {
-
-                        imgsrc = "file:/" + extra + base_dir + "/" + getFileName(attached_images.remove(0));
-                    }
-                }
+            if (!imgsrc.isAbsolute()) {
+                FileAttachment fatt = attachmentByLocation.remove(imgsrc.getPath());
+                imgsrc = viewerHelper.getTempFile(fatt).toURI();
+            } else if (imgsrc.getScheme().equals("cid")) {
+                FileAttachment fatt = attachmentById.remove(imgsrc.getPath());
+                imgsrc = viewerHelper.getTempFile(fatt).toURI();
             }
 
-            logger.info("image: " + src);
+            logger.info("image: " + imgsrc);
 
             if (imgsrc != null) {
                 ret.append("\"");
@@ -135,48 +114,24 @@ public class PrepareImages {
         return ret.toString();
     }
 
-    static String getFileName(FileAttachment fatt)
-    {
-        if( fatt.getFilename() == null || fatt.getFilename().isEmpty() )
-            return fatt.getLongFilename();
-
-        return fatt.getFilename();
-    }
-
     public StringBuilder prepareImages(StringBuilder s) {
 
-        List<FileAttachment> attached_images = new ArrayList<>();
+        Map<String, FileAttachment> attachmentById = new HashMap<>();
+        Map<String, FileAttachment> attachmentByLocation = new HashMap<>();
 
         for( Attachment att : attachments )
         {
             if( att instanceof FileAttachment)
             {
                 FileAttachment fatt = (FileAttachment) att;
-
-                String mime_type = fatt.getMimeTag();
-
-                logger.info(fatt + " " + mime_type);
-
-                if( mime_type != null && ViewerHelper.is_image_mime_type(mime_type) ) {
-                    attached_images.add(fatt);
+                if (fatt.getContentId() != null) {
+                    attachmentById.put(fatt.getContentId(), fatt);
+                }
+                if (fatt.getContentLocation()!= null) {
+                    attachmentByLocation.put(fatt.getContentLocation(), fatt);
                 }
             }
         }
-
-        Collections.sort(attached_images,new Comparator<FileAttachment>() {
-
-            @Override
-            public int compare(FileAttachment o1, FileAttachment o2)
-            {
-                if( o1.getSubDir() != null &&
-                    o2.getSubDir() != null )
-                {
-                    return o1.getSubDir().compareTo(o2.getSubDir());
-                }
-
-                return o1.getFilename().compareTo(o2.getFilename());
-            }
-        });
 
         for (int start = 0; (start = findImgTag(s, start)) >= 0;) {
 
@@ -186,11 +141,15 @@ public class PrepareImages {
                 break;
             }
 
-            String res = replace_src(s.substring(start, end), attached_images);
+            try {
+                String res = replace_src(s.substring(start, end), attachmentById, attachmentByLocation);
+                s.replace(start, end, res);
+                start += Math.max(1, res.length());
+            } catch (RuntimeException rex) {
+                logger.error("Failed parsing image tag :", rex);
+                start = end;
+            }
 
-            s.replace(start, end, res);
-
-            start += Math.max(1, res.length());
         }
 
         return s;

@@ -18,6 +18,7 @@ import net.sourceforge.MSGViewer.rtfparser.ParseException;
 import com.auxilii.msgparser.Message;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
+import com.auxilii.msgparser.attachment.MsgAttachment;
 import java.io.FileOutputStream;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -55,10 +56,8 @@ public class ViewerHelper {
 
     static boolean is_mail_message( String file_name )
     {
-        if( file_name.toLowerCase().endsWith(".mbox") )
-            return true;
-
-        return file_name.toLowerCase().endsWith(".msg");
+        return file_name.toLowerCase().endsWith(".mbox")
+                || file_name.toLowerCase().endsWith(".msg");
     }
 
     static boolean is_mail_message( String file_name, String mime )
@@ -171,11 +170,6 @@ public class ViewerHelper {
             DeleteDir.deleteDirectory(tmp_dir);
     }
 
-    public File getTmpDir()
-    {
-        return tmp_dir;
-    }
-
     public String extractHTMLFromRTF(String bodyText, Message message ) throws ParseException
     {
         if( bodyText.contains("\\purehtml") )
@@ -187,22 +181,22 @@ public class ViewerHelper {
 
         html = ViewerHelper.stripMetaTags(html);
 
-        PrepareImages prep_images = new PrepareImages(getTmpDir().getPath(), message);
+        PrepareImages prep_images = new PrepareImages(this, message);
 
         return prep_images.prepareImages(new StringBuilder(html)).toString();
     }
 
-    public String getMailIconName( File tmp_dir ) throws IOException
+    public String getMailIconName() throws IOException
     {
-        File file = new File(tmp_dir + "/mail.png");
+        File file = new File(tmp_dir, "mail.png");
 
         if( file.exists() )
             return file.toString();
 
         byte bytes[] = ReadFile.getBytesResource(this.getClass(), "/net/sourceforge/MSGViewer/resources/icons/rg1024_yellow_mail.png");
-        FileOutputStream writer = new FileOutputStream(file);
-        writer.write(bytes);
-        writer.close();
+        try (FileOutputStream writer = new FileOutputStream(file)) {
+            writer.write(bytes);
+        }
 
         return file.toString();
     }
@@ -223,14 +217,7 @@ public class ViewerHelper {
                 {
                     logger.info("opening " + fatt);
 
-                    File message_dir = getTmpDir();
-
-                    if( !message_dir.isDirectory() && !message_dir.mkdirs() )
-                    {
-                        throw new RuntimeException( "Cannot create tmp dir: " + message_dir.getPath() );
-                    }
-
-                    File content = new File( message_dir + "/" + fatt.getFilename());
+                    File content = getTempFile(fatt);
 
                     if( !content.exists() )
                     {
@@ -247,5 +234,25 @@ public class ViewerHelper {
         return null;
     }
 
+    public File getTempFile(FileAttachment fatt)
+    {
+        if( !tmp_dir.isDirectory() && !tmp_dir.mkdirs() )
+        {
+            throw new RuntimeException( "Cannot create tmp dir: " + tmp_dir );
+        }
+        return new File(tmp_dir,
+                org.apache.commons.lang3.StringUtils.isBlank(fatt.getFilename())
+                        ? fatt.getLongFilename()
+                        : fatt.getFilename());
+    }
+
+    public File getTempFile(MsgAttachment matt)
+    {
+        if( !tmp_dir.isDirectory() && !tmp_dir.mkdirs() )
+        {
+            throw new RuntimeException( "Cannot create tmp dir: " + tmp_dir );
+        }
+        return new File(tmp_dir, matt.getMessage().hashCode() + ".msg");
+    }
 
 }

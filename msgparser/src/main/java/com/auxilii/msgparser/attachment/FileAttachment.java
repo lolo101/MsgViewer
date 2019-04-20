@@ -34,23 +34,23 @@ public class FileAttachment implements Attachment {
     /**
      * The (by Outlook) shortened filename of the attachment.
      */
-    private String filename = null;
+    private String filename;
     /**
      * The full filename of the attachment.
      */
-    private String longFilename = null;
+    private String longFilename;
     /**
      * Mime type of the attachment
      */
-    private String mimeTag = null;
+    private String mimeTag;
     /**
      * The extension of the attachment (may not be set).
      */
-    private String extension = null;
+    private String extension;
     /**
      * The attachment itself as a byte array.
      */
-    private byte[] data = null;
+    private byte[] data;
     /**
      * The size of the attachment.
      */
@@ -59,12 +59,13 @@ public class FileAttachment implements Attachment {
     /**
      * Subdir where the attachment was found
      */
-    private String subdir = null;
+    private String subdir;
 
     /**
      * AttachContentId
      */
-    private String contentId = null;
+    private String contentId;
+    private String contentLocation;
 
     public String getDisplayName() {
         return displayName;
@@ -169,6 +170,22 @@ public class FileAttachment implements Attachment {
         this.subdir = subdir;
     }
 
+    public void setContentId(String contentId) {
+        this.contentId = contentId;
+    }
+
+    public String getContentId() {
+        return contentId;
+    }
+
+    public String getContentLocation() {
+        return contentLocation;
+    }
+
+    public void setContentLocation(String contentLocation) {
+        this.contentLocation = contentLocation;
+    }
+
     /**
      * Sets the property specified by the name parameter. Unknown names are ignored.
      *
@@ -208,6 +225,9 @@ public class FileAttachment implements Attachment {
             case "3712":
                 setContentId((String) value);
                 break;
+            case "3713":
+                setContentLocation((String) value);
+                break;
         }
     }
 
@@ -224,13 +244,4 @@ public class FileAttachment implements Attachment {
                 .findFirst()
                 .orElse(null);
     }
-
-    public void setContentId(String contentId) {
-        this.contentId = contentId;
-    }
-
-    public String getContentId() {
-        return contentId;
-    }
-
 }
