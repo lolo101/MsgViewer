@@ -592,8 +592,8 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
                 }
 
                 if( ViewerHelper.is_mail_message(fatt.getFilename(), fatt.getMimeTag() ) ) {
-                    sb.append("<img border=0 align=\"baseline\" src=\"file:");
-                    sb.append(helper.getMailIconName());
+                    sb.append("<img border=0 align=\"baseline\" src=\"");
+                    sb.append(helper.getMailIconFile().toURI());
                     sb.append("\"/>");
                 }
 
@@ -631,8 +631,8 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
                 sb.append(sub_file.toURI());
                 sb.append("\">");
 
-                sb.append("<img border=0 align=\"baseline\" src=\"file:");
-                sb.append(helper.getMailIconName());
+                sb.append("<img border=0 align=\"baseline\" src=\"");
+                sb.append(helper.getMailIconFile().toURI());
                 sb.append("\"/>");
 
                 sb.append(msg.getSubject());

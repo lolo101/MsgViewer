@@ -6,7 +6,6 @@ import at.redeye.FrameWork.base.FrameWorkConfigDefinitions;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.base.Setup;
 import at.redeye.FrameWork.utilities.DeleteDir;
-import at.redeye.FrameWork.utilities.ReadFile;
 import at.redeye.FrameWork.utilities.StringUtils;
 import at.redeye.FrameWork.utilities.TempDir;
 import java.io.File;
@@ -20,9 +19,11 @@ import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
 import com.auxilii.msgparser.attachment.MsgAttachment;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.List;
+import org.apache.poi.util.IOUtils;
 
 public class ViewerHelper {
 
@@ -186,19 +187,19 @@ public class ViewerHelper {
         return prep_images.prepareImages(new StringBuilder(html)).toString();
     }
 
-    public String getMailIconName() throws IOException
+    public File getMailIconFile() throws IOException
     {
         File file = new File(tmp_dir, "mail.png");
 
         if( file.exists() )
-            return file.toString();
+            return file;
 
-        byte bytes[] = ReadFile.getBytesResource(this.getClass(), "/net/sourceforge/MSGViewer/resources/icons/rg1024_yellow_mail.png");
-        try (FileOutputStream writer = new FileOutputStream(file)) {
-            writer.write(bytes);
+        try (InputStream stream = ViewerHelper.class.getResourceAsStream("/icons/rg1024_yellow_mail.png");
+                FileOutputStream writer = new FileOutputStream(file)) {
+            writer.write(IOUtils.toByteArray(stream));
         }
 
-        return file.toString();
+        return file;
     }
 
     public File extractUrl(URL url, Message message ) throws IOException
