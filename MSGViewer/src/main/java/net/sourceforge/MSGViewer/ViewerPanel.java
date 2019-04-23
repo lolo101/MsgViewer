@@ -53,6 +53,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
     private BaseDialogBase parent = null;
     private final MessageParserFactory parser_factory = new MessageParserFactory();
 
+    private final ExecutorService thread_pool = Executors.newCachedThreadPool();
     private int wating_thread_pool_counter = 0;
 
     /**
@@ -446,7 +447,6 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
     {
         cleanUp();
 
-        final ExecutorService thread_pool = Executors.newCachedThreadPool();
         wating_thread_pool_counter = 0;
 
         File file = new File(file_name);
@@ -537,22 +537,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
                     File contentIcon = new File(content.getAbsolutePath() + "-small.jpg");
                     if (!content.exists()) {
 
-                        wating_thread_pool_counter++;
-
-                        thread_pool.execute(new Runnable() {
-
-                            @Override
-                            public void run() {
-
-                                try (FileOutputStream fout = new FileOutputStream(content)) {
-                                    fout.write(fatt.getData());
-                                } catch( IOException ex ) {
-                                    logger.error(ex,ex);
-                                }
-
-                                wating_thread_pool_counter--;
-                            }
-                        });
+                        write(content, fatt.getData());
 
                         wating_thread_pool_counter++;
 
@@ -592,6 +577,11 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
                 }
 
                 if( ViewerHelper.is_mail_message(fatt.getFilename(), fatt.getMimeTag() ) ) {
+                    if (!content.exists())
+                    {
+                        write(content, fatt.getData());
+                    }
+
                     sb.append("<img border=0 align=\"baseline\" src=\"");
                     sb.append(helper.getMailIconFile().toURI());
                     sb.append("\"/>");
@@ -672,6 +662,25 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
             updateBody();
         }
+    }
+
+    private void write(File content, byte[] data) {
+        wating_thread_pool_counter++;
+
+        thread_pool.execute(new Runnable() {
+
+            @Override
+            public void run() {
+
+                try (FileOutputStream fout = new FileOutputStream(content)) {
+                    fout.write(data);
+                } catch( IOException ex ) {
+                    logger.error(ex,ex);
+                }
+
+                wating_thread_pool_counter--;
+            }
+        });
     }
 
     private static String asMailto(RecipientEntry recipient) {

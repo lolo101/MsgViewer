@@ -68,9 +68,11 @@ public enum Properties {
     PidTagStoreSupportMask("340d"),
 
     PidTagAttachDataBinary("3701"),
+    PidTagAttachEncoding("3702"),
     PidTagAttachExtension("3703"),
     PidTagAttachFilename("3704"),
     PidTagAttachLongFilename("3707"),
+    PidTagAttachRendering("3709"),
     PidTagAttachMimeTag("370e"),
     PidTagAttachContentId("3712"),
     PidTagAttachContentLocation("3713"),
