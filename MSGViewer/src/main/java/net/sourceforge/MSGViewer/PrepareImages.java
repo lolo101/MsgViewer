@@ -1,6 +1,5 @@
 package net.sourceforge.MSGViewer;
 
-import at.redeye.FrameWork.base.Setup;
 import at.redeye.FrameWork.utilities.StringUtils;
 import com.auxilii.msgparser.Message;
 import com.auxilii.msgparser.attachment.Attachment;
@@ -18,17 +17,11 @@ public class PrepareImages {
     private static final Logger logger = Logger.getLogger(PrepareImages.class.getName());
 
     private ViewerHelper viewerHelper;
-    private final String extra;
     List<Attachment> attachments;
 
     public PrepareImages( ViewerHelper viewerHelper, Message message )
     {
         this.viewerHelper = viewerHelper;
-
-        if( Setup.is_linux_system() )
-            extra = "/";
-        else
-            extra = "";
 
         attachments = message.getAttachments();
     }

@@ -52,7 +52,6 @@ public enum Properties {
     PidTagEntryId("0fff"),
 
     PidTagBody("1000"),
-    rtfSync("1008"),
     PidTagRtfCompressed("1009"),
     PidTagInternetMessageId("1035"),
     PidTagOriginalMessageId("1046"),

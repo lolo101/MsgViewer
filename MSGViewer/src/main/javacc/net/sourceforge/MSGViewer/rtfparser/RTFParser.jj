@@ -10,10 +10,9 @@ options {
 
 
 PARSER_BEGIN(RTFParser)
-package at.redeye.MSGViewer.rtfparser;
+package net.sourceforge.MSGViewer.rtfparser;
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class RTFParser {
 
@@ -36,18 +35,6 @@ public class RTFParser {
             {
                 String content = group.getTextContent();
                 sb.append(content);
-
-                if( content.contains("<head>") )
-                {
-/*
-                    if( !characterSet.isEmpty() )
-                    {
-                        sb.append("\n<meta http-equiv=\"Content-Type\" content=\"text/html charset=");
-                        sb.append(codePage2Iso(characterSet));
-                        sb.append("\">");
-                    }
-*/
-                }
             }
         }
 
@@ -80,18 +67,11 @@ SKIP : { " " | "\n" | "\r" | "\r\n" }
  | < C_GROUP_END : "}" >
  | < C_BACKSLASH : "\\\\" >
  | < C_ESC_CHAR : "\\" "'" ( ["A"-"Z","a"-"z","0"-"9"] ){2} >
- | < C_CODEPAGE : "\\ansicpg" ( [ "0"-"9"] ) {4} >
+ | < C_CODEPAGE : "\\ansicpg" ( [ "0"-"9"] ) + >
  | < C_COMMAND : "\\" ( ["A"-"Z","a"-"z","0"-"9"] )+ >
  | < C_SKIP_NEXT : "\\" "*" >
- | < STRING: (~["\\","\n","}","{"])+> 
+ | < STRING: (~["\\","\n","}","{"])+>
 }
-
-/*
-<VALUE> TOKEN:
-{
-    < STRING: (~["\\","\n","}","{"])*>:DEFAULT
-}
-*/
 
 void parse() : {}
 {
@@ -101,7 +81,7 @@ void parse() : {}
 void group() : {}
 {
     group_start()
-    (  
+    (
         set_codepage()
       | command()
       | string_sequence()
@@ -125,7 +105,6 @@ void esc_special_char() :
 {
     esc_char = <C_ESC_CHAR>
     {
-        // System.out.println("found xxxxxxxxxxxxxxxxxxxxxxxxxx");
         current_group.addTextContent( ConvertCharset.convertCharacter(characterSet, esc_char.image.substring(2)) );
     }
 }
@@ -137,7 +116,6 @@ void set_codepage() :
 {
     codepage = <C_CODEPAGE>
     {
-        // System.out.println("found xxxxxxxxxxxxxxxxxxxxxxxxxx");
         characterSet = codepage.image.substring(8);
     }
 }
@@ -189,7 +167,7 @@ void command() :
 void group_start() : {}
 {
     <C_GROUP_START>
-    {        
+    {
         current_group = new RTFGroup();
         groups.add( current_group );
     }
