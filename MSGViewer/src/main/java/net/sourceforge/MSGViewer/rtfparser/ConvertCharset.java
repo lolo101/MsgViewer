@@ -1,18 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package net.sourceforge.MSGViewer.rtfparser;
 
 import at.redeye.FrameWork.utilities.StringUtils;
 import java.io.UnsupportedEncodingException;
 import org.apache.log4j.Logger;
 
-/**
- *
- * @author martin
- */
 public class ConvertCharset
 {
     private static final Logger logger = Logger.getLogger(ConvertCharset.class.getName());
@@ -22,18 +13,21 @@ public class ConvertCharset
         if( characterSet.isEmpty() )
             return text;
 
-        byte[] bytes = new byte[1];
+        String hexa = text.replace("\\'", "");
+
+        byte[] bytes = new byte[hexa.length() / 2];
 
         try {
-            bytes[0] = (byte) Integer.parseInt(text,16);
+            for (int i = 0; i < bytes.length; ++i) {
+                bytes[i] = (byte) Integer.parseInt(hexa.substring(2 * i, 2 * i + 2), 16);
+            }
         } catch( NumberFormatException ex ) {
             logger.error("character set: " + characterSet + " hey string '" + text + "'");
             logger.error(StringUtils.exceptionToString(ex));
         }
 
         try {
-            String res = new String(bytes, "CP" + characterSet);
-            return res;
+            return new String(bytes, "CP" + characterSet);
         } catch (UnsupportedEncodingException ex) {
             logger.error("character set: " + characterSet + " hey string '" + text + "'");
             logger.error(StringUtils.exceptionToString(ex));

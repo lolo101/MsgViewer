@@ -1,24 +1,11 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package net.sourceforge.MSGViewer;
 
 import net.sourceforge.MSGViewer.rtfparser.ParseException;
 import net.sourceforge.MSGViewer.rtfparser.RTFParser;
 import java.io.StringReader;
-import org.apache.log4j.Logger;
 
-/**
- *
- * @author martin
- */
 public class HtmlFromRtf
 {
-    private static final Logger logger = Logger.getLogger(HtmlFromRtf.class.getName());
-    private static final String HTML_START =  "{\\*\\htmltag";
-
     final String htmlText;
 
     public HtmlFromRtf(String bodyText) throws ParseException

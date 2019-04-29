@@ -66,7 +66,7 @@ SKIP : { " " | "\n" | "\r" | "\r\n" }
  | < C_GROUP_START : "{" >
  | < C_GROUP_END : "}" >
  | < C_BACKSLASH : "\\\\" >
- | < C_ESC_CHAR : "\\" "'" ( ["A"-"Z","a"-"z","0"-"9"] ){2} >
+ | < C_ESC_STRING : ("\\" "'" ( ["A"-"Z","a"-"z","0"-"9"] ){2})+ >
  | < C_CODEPAGE : "\\ansicpg" ( [ "0"-"9"] ) + >
  | < C_COMMAND : "\\" ( ["A"-"Z","a"-"z","0"-"9"] )+ >
  | < C_SKIP_NEXT : "\\" "*" >
@@ -100,12 +100,12 @@ void group() : {}
 
 void esc_special_char() :
 {
-    Token esc_char = null;
+    Token esc_str = null;
 }
 {
-    esc_char = <C_ESC_CHAR>
+    esc_str = <C_ESC_STRING>
     {
-        current_group.addTextContent( ConvertCharset.convertCharacter(characterSet, esc_char.image.substring(2)) );
+        current_group.addEscapedChar( characterSet, esc_str.image );
     }
 }
 

@@ -1,31 +1,18 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package net.sourceforge.MSGViewer.rtfparser;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 
-/**
- *
- * @author martin
- */
 public class RTFGroup
-{    
+{
     private StringBuilder text_content;
-    private List<String> commands = new ArrayList();
+    private final List<String> commands = new ArrayList<>();
     private String last_command = "";
-
-    public RTFGroup()
-    {
-        
-    }
 
     void addCommand( String command )
     {
-        
+
         if( command.equals("\\par") )
             addTextContent("\n");
         else if( command.equals("\\tab"))
@@ -35,6 +22,11 @@ public class RTFGroup
             commands.add(command);
             last_command = command;
         }
+    }
+
+    public void addEscapedChar( String characterSet, String hexa )
+    {
+        addTextContent(ConvertCharset.convertCharacter(characterSet, hexa));
     }
 
     public void addTextContent( String text )
@@ -69,10 +61,7 @@ public class RTFGroup
 
     boolean isEmptyText() {
 
-       if( text_content == null )
-           return true;
-
-       return text_content.length() == 0;
+       return StringUtils.isEmpty(text_content);
     }
 
 }
