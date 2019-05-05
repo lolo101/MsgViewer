@@ -2,23 +2,23 @@ package net.sourceforge.MSGViewer.factory.mbox.headers;
 
 import at.redeye.FrameWork.utilities.StringUtils;
 import com.auxilii.msgparser.Message;
+import com.auxilii.msgparser.RecipientEntry;
+import com.auxilii.msgparser.RecipientType;
 import net.sourceforge.MSGViewer.factory.mbox.MailAddress;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author martin
- */
 public abstract class EmailHeader extends HeaderParser
 {
     private static final Logger LOGGER = Logger.getLogger(EmailHeader.class);
+    private final RecipientType type;
 
-    EmailHeader(String header)
+    EmailHeader(RecipientType type)
     {
-        super( header );
+        super( type.toString() );
+        this.type = type;
     }
 
     @Override
@@ -33,7 +33,16 @@ public abstract class EmailHeader extends HeaderParser
        }
     }
 
-    public abstract void assign( Message msg, List<MailAddress> emails );
+    public void assign(Message msg, List<MailAddress> emails)
+    {
+        for (MailAddress email : emails) {
+            RecipientEntry recipientEntry = new RecipientEntry();
+            recipientEntry.setEmail(email.getEmail());
+            recipientEntry.setName(email.getDisplayName());
+            recipientEntry.setType(type);
+            msg.addRecipient(recipientEntry);
+        }
+    }
 
     private static List<MailAddress> splitAttendees(String text)
     {

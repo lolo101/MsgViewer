@@ -25,26 +25,10 @@ package com.auxilii.msgparser;
  */
 public class RecipientEntry {
 
-    public enum RecipientType {
-        FROM(0),
-        TO(1),
-        CC(2),
-        BCC(3);
-
-        private final int type;
-
-        private RecipientType(int type) {
-            this.type = type;
-        }
-
-        public int getValue() {
-            int flag = 0x10000000;
-            return flag | type;
-        }
-    }
-
-    private String email = null;
-    private String name = null;
+    private String email;
+    private String smtp;
+    private String addressType;
+    private String name;
     private RecipientType type;
 
     /**
@@ -67,14 +51,22 @@ public class RecipientEntry {
 
         // we know that the name is lower case
         // because this is done in MsgParser.analyzeDocumentEntry
-        if (value instanceof String) {
-            if ("39fe".equals(name)) {
-                this.setEmail((String) value);
-            } else if ("3003".equals(name) && this.getEmail() == null) {
-                this.setEmail((String) value);
-            } else if ("3001".equals(name)) {
-                this.setName((String) value);
-            }
+        switch(name) {
+            case "0c15":
+                setType(RecipientType.from((Long) value));
+                break;
+            case "3001":
+                setName((String) value);
+                break;
+            case "3002":
+                setAddressType((String) value);
+                break;
+            case "3003":
+                setEmail((String) value);
+                break;
+            case "39fe":
+                setSmtp((String) value);
+                break;
         }
     }
 
@@ -85,6 +77,22 @@ public class RecipientEntry {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getSmtp() {
+        return smtp;
+    }
+
+    public void setSmtp(String smtp) {
+        this.smtp = smtp;
+    }
+
+    public String getAddressType() {
+        return addressType;
+    }
+
+    public void setAddressType(String addressType) {
+        this.addressType = addressType;
     }
 
     public String getName() {
