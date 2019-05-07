@@ -75,9 +75,12 @@ public class MsgWriter
             cont.addVarEntry( new StringUTF16SubstgEntry("0c1f", msg.getFromEmail() ) );
         }
 
-        for (int i = 0; i < msg.getToEmail().size(); ++i) {
-            cont.addVarEntry( new StringUTF16SubstgEntry("0076", msg.getToEmail().get(i) ) );
-            cont.addVarEntry( new StringUTF16SubstgEntry("3001", msg.getToName().get(i) ) );
+        if (msg.getToEmail() != null) {
+            cont.addVarEntry( new StringUTF16SubstgEntry("0076", msg.getToEmail() ) );
+        }
+
+        if (msg.getToName() != null) {
+            cont.addVarEntry( new StringUTF16SubstgEntry("3001", msg.getToName() ) );
         }
 
         if( msg.getMessageId() != null && !msg.getMessageId().isEmpty() ) {
