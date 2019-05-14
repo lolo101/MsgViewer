@@ -210,6 +210,9 @@ public class FileAttachment implements Attachment {
                 setSize(de.getSize());
                 setData((byte[]) value);
                 break;
+            case "3703":
+                setExtension((String) value);
+                break;
             case "3704":
                 setFilename((String) value);
                 break;
@@ -218,9 +221,6 @@ public class FileAttachment implements Attachment {
                 break;
             case "370e":
                 setMimeTag((String) value);
-                break;
-            case "3703":
-                setExtension((String) value);
                 break;
             case "3712":
                 setContentId((String) value);

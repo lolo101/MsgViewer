@@ -383,16 +383,15 @@ public class MsgParser {
                 DocumentEntry de = (DocumentEntry) entry;
 
                 FieldInformation info = analyzeDocumentEntry(de);
-                DocumentInputStream dstream = new DocumentInputStream(de);
+                try (DocumentInputStream dstream = new DocumentInputStream(de)) {
+                    Object data = this.getData(dstream, info);
+                    String clazz = info.getClazz();
 
-                Object data = this.getData(dstream, info);
-                String clazz = info.getClazz();
-
-                // we provide the class and data of the document
-                // entry to the attachment. the attachment implementation
-                // has to know the semantics of the field names
-                attachment.setProperty(clazz, data, de);
-
+                    // we provide the class and data of the document
+                    // entry to the attachment. the attachment implementation
+                    // has to know the semantics of the field names
+                    attachment.setProperty(clazz, data, de);
+                }
                 if( directoryName != null )
                 {
                     int index = directoryName.indexOf('#');

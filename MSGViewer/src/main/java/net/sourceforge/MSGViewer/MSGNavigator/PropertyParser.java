@@ -21,8 +21,6 @@ public class PropertyParser
     private final DocumentEntry entry;
 
     private boolean is_toplevel = false;
-    private boolean is_attachment = false;
-    private boolean is_reciepient = false;
 
     private int max_descr_lenght = 20;
 
@@ -45,19 +43,15 @@ public class PropertyParser
     {
         if (entry.getParent().getParent() == null) {
             is_toplevel = true;
-        } else if (entry.getParent().getName().startsWith("__recip_version1.0")) {
-            is_reciepient = true;
-        } else if (entry.getParent().getName().startsWith("__attach_version1.0")) {
-            is_attachment = true;
         }
 
-        InputStream in = new DocumentInputStream(entry);
-
         byte bytes[] = new byte[entry.getSize()];
-        int len = in.read(bytes);
+        try (InputStream in = new DocumentInputStream(entry)) {
 
-        if( len != bytes.length ) {
-            throw new IOException("Not all Data read");
+            int len = in.read(bytes);
+            if( len != bytes.length ) {
+                throw new IOException("Not all Data read");
+            }
         }
 
         // RESERVED 8 bytes (should by zero)
