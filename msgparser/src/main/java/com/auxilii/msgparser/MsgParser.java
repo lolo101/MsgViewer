@@ -82,7 +82,7 @@ public class MsgParser {
 
     /**
      * Parses a .msg file provided in the specified file.
-         *
+     *
      * @param msgFile The .msg file as a String path.
      * @return A {@link Message} object representing the .msg file.
      * @throws IOException Thrown if the file could not be loaded or parsed.
@@ -108,79 +108,33 @@ public class MsgParser {
         POIFSFileSystem fs = new POIFSFileSystem(msgFileStream);
         DirectoryEntry dir = fs.getRoot();
         Message msg = new Message();
-        this.checkDirectoryEntry(dir, msg);
+        parseMsg(dir, msg);
         return msg;
     }
 
-    /**
-     * Recursively parses the complete .msg file with the
-     * help of the POI library. The parsed information is
-     * put into the {@link Message} object.
-     *
-     * @param dir The current node in the .msg file.
-     * @param msg The resulting {@link Message} object.
-     * @throws IOException Thrown if the .msg file could not
-     *  be parsed.
-     * @throws UnsupportedOperationException Thrown if
-     *  the .msg file contains unknown data.
-     */
-    protected void checkDirectoryEntry(DirectoryEntry dir, Message msg) throws IOException, UnsupportedOperationException {
+    private void parseMsg(DirectoryEntry dir, Message msg) throws IOException {
+        DocumentEntry propertyEntry = (DocumentEntry) dir.getEntry("__properties_version1.0");
+        try ( DocumentInputStream propertyStream = new DocumentInputStream(propertyEntry)) {
+            propertyStream.skip(8);
+            int nextRecipientId = propertyStream.readInt();
+            int nextAttachmentId = propertyStream.readInt();
+            int recipientCount = propertyStream.readInt();
+            int attachmentCount = propertyStream.readInt();
+            boolean topLevel = dir.getParent() == null;
+            if (topLevel) {
+                propertyStream.skip(8);
+            }
 
-        // we iterate through all entries in the current directory
-        for (Entry entry : dir) {
-
-            // check whether the entry is either a directory entry
-            // or a document entry
-
-            if (entry.isDirectoryEntry()) {
-
-                DirectoryEntry de = (DirectoryEntry) entry;
-
-                LOGGER.trace("subdir: " + de.getName());
-
-                // attachments have a special name and
-                // have to be handled separately at this point
-                if (de.getName().startsWith("__attach_version1.0")) {
-                    this.parseAttachment(de, msg, de.getName());
-                } else if (de.getName().startsWith("__recip_version1.0")) {
-                    // a recipient entry has been found (which is also a directory entry itself)
-                    this.checkRecipientDirectoryEntry(de, msg);
-                } else if (de.getName().startsWith("__nameid_version1.0")) {
-                    // TODO handle stream entries
-                    //this.checkStreamDirectoryEntry(de, msg);
-                } else {
-                    // a directory entry has been found. this
-                    // node will be recursively checked
-                    this.checkDirectoryEntry(de, msg);
-                }
-
-            } else if (entry.isDocumentEntry()) {
-
-                // a document entry contains information about
-                // the mail (e.g, from, to, subject, ...)
-                DocumentEntry de = (DocumentEntry) entry;
-
-                LOGGER.trace("entry: "  + de.getName() );
-
-                // the data is accessed by getting an input stream
-                // for the given document entry
-                try (DocumentInputStream dstream = new DocumentInputStream(de)) {
-                    // analyze the document entry
-                    // (i.e., get class and data type)
-                    FieldInformation info = analyzeDocumentEntry(de);
-                    // create a Java object from the data provided
-                    // by the input stream. depending on the field
-                    // information, either a String or a byte[] will
-                    // be returned. other datatypes are not yet supported
-                    Object data = this.getData(dstream, info);
-
-                    LOGGER.trace("  Document data: " + data);
-                    // the data is written into the Message object
-                    msg.setProperty(info.getClazz(), data);
-                }
-            } else {
-                LOGGER.info("what happend here? " + entry.getName());
-                // any other type is not supported
+            for (int index = 0; index < recipientCount; index++) {
+                DirectoryEntry entry = (DirectoryEntry) dir.getEntry(String.format("__recip_version1.0_#%08x", index));
+                parseRecipient(entry, msg);
+            }
+            for (int index = 0; index < attachmentCount; index++) {
+                DirectoryEntry entry = (DirectoryEntry) dir.getEntry(String.format("__attach_version1.0_#%08x", index));
+                parseAttachment(entry, msg);
+            }
+            while (propertyStream.available() > 0) {
+                msg.setProperty(new Property(propertyStream, dir));
             }
         }
     }
@@ -193,10 +147,8 @@ public class MsgParser {
      * @param msg The resulting {@link Message} object.
      * @throws IOException Thrown if the .msg file could not
      *  be parsed.
-     * @throws UnsupportedOperationException Thrown if
-     *  the .msg file contains unknown data.
      */
-    protected void checkRecipientDirectoryEntry(DirectoryEntry dir, Message msg) throws IOException, UnsupportedOperationException {
+    protected void parseRecipient(DirectoryEntry dir, Message msg) throws IOException {
 
         RecipientEntry recipient = new RecipientEntry();
 
@@ -366,11 +318,10 @@ public class MsgParser {
      *  describing the attachment (name, extension, mime type, ...)
      * @param msg The {@link Message} object that this
      *  attachment should be added to.
-     * @param directoryName
      * @throws IOException Thrown if the attachment could
      *  not be parsed/read.
      */
-    protected void parseAttachment(DirectoryEntry dir, Message msg, String directoryName) throws IOException {
+    protected void parseAttachment(DirectoryEntry dir, Message msg) throws IOException {
 
         FileAttachment attachment = new FileAttachment();
 
@@ -392,6 +343,7 @@ public class MsgParser {
                     // has to know the semantics of the field names
                     attachment.setProperty(clazz, data, de);
                 }
+                String directoryName = de.getName();
                 if( directoryName != null )
                 {
                     int index = directoryName.indexOf('#');
@@ -411,7 +363,7 @@ public class MsgParser {
                 msgAttachment.setMessage(attachmentMsg);
                 msg.addAttachment(msgAttachment);
 
-                this.checkDirectoryEntry((DirectoryEntry) entry, attachmentMsg);
+                parseMsg((DirectoryEntry) entry, attachmentMsg);
             }
         }
 

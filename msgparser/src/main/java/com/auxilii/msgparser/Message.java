@@ -136,6 +136,10 @@ public class Message {
     }
 
 
+    void setProperty(Property property) {
+        setProperty(property.getPid(), property.getValue());
+    }
+
     /**
      * Sets the name/value pair in the {@link #properties}
      * map. Some properties are put into
