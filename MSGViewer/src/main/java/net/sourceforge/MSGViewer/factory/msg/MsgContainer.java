@@ -123,7 +123,7 @@ public class MsgContainer
 
     private static void writeRecipientEntry(DirectoryEntry root , RecipientEntry rec, int id) throws IOException
     {
-        DirectoryEntry rec_dir = root.createDirectory(String.format("__recip_version1.0_#%08d", id));
+        DirectoryEntry rec_dir = root.createDirectory(String.format("__recip_version1.0_#%08X", id));
 
         List<? extends SubstGEntry> entries = Arrays.asList(
                 new StringUTF16SubstgEntry("3001", rec.getName()),
@@ -148,7 +148,7 @@ public class MsgContainer
     }
 
     private static void writeAttachment(DirectoryEntry root, Attachment attachment, int id) throws IOException {
-        DirectoryEntry att_dir = root.createDirectory(String.format("__attach_version1.0_#%08d", id));
+        DirectoryEntry att_dir = root.createDirectory(String.format("__attach_version1.0_#%08X", id));
         if (attachment instanceof FileAttachment) {
             writeFileAttachment((FileAttachment) attachment, id, att_dir);
         }
@@ -179,7 +179,7 @@ public class MsgContainer
 
     private static ByteBuffer createPropertiesEntryContent(Collection<PropType> p_entries) {
         int size = 8 + p_entries.size() * 16;
-        ByteBuffer bytes = ByteBuffer.allocate(size);
+        ByteBuffer bytes = ByteBuffer.allocate(size).order(ByteOrder.LITTLE_ENDIAN);
         bytes.position(8);
 
         for (PropType prop : p_entries) {

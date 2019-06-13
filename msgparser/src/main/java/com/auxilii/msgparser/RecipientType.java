@@ -6,6 +6,7 @@ public enum RecipientType {
     CC(2),
     BCC(3);
 
+    private static final int MUST_RESEND = 0x10000000;
     private final int type;
 
     private RecipientType(int type) {
@@ -13,16 +14,16 @@ public enum RecipientType {
     }
 
     public static RecipientType from(int type) {
+        int cleanType = type & 0xFF;
         for (RecipientType value : values()) {
-            if (value.type == type) {
+            if (value.type == cleanType) {
                 return value;
             }
         }
-        throw new IllegalArgumentException("No RecipientType with id " + type);
+        throw new IllegalArgumentException("No RecipientType with id " + cleanType);
     }
 
     public int getValue() {
-        int flag = 0x10000000;
-        return flag | type;
+        return MUST_RESEND | type;
     }
 }
