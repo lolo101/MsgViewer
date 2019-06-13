@@ -122,8 +122,6 @@ public class JavaMailParser
                     att.setContentId(cid);
                 }
 
-                att.setSize(mpart.getSize());
-
                 if( att.getFilename() == null ) {
                     att.setFilename("");
                 }

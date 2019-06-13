@@ -31,6 +31,10 @@ public class RecipientEntry {
     private String name;
     private RecipientType type;
 
+    void setProperty(Property property) {
+        setProperty(property.getPid(), property.getValue());
+    }
+
     /**
      * Sets the name/value pair in the {@link #properties}
      * map. Some properties are put into
@@ -53,7 +57,7 @@ public class RecipientEntry {
         // because this is done in MsgParser.analyzeDocumentEntry
         switch(name) {
             case "0c15":
-                setType(RecipientType.from((Long) value));
+                setType(RecipientType.from((int) value));
                 break;
             case "3001":
                 setName((String) value);

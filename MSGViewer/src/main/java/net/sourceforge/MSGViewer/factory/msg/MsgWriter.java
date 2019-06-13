@@ -107,10 +107,6 @@ public class MsgWriter
             cont.addAttachment(attachment);
         }
 
-        // TopLevelPropertyStream top_props = new TopLevelPropertyStream(root);
-
-        // top_props.save();
-
         NPOIFSFileSystem fs = new NPOIFSFileSystem();
         DirectoryNode root = fs.getRoot();
         cont.write(root);
@@ -125,7 +121,6 @@ public class MsgWriter
          try {
             MessageParserFactory factory = new MessageParserFactory();
             Message msg = factory.parseMessage(new File(
-                    //+ "/home/martin/NetBeansProjects/redeye/MSGViewer/test/data/danke.msg"
                     "/home/martin/programs/java/MSGViewer/test/data/danke.msg"
                     ));
 

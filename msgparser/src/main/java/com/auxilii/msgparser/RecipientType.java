@@ -12,7 +12,7 @@ public enum RecipientType {
         this.type = type;
     }
 
-    public static RecipientType from(long type) {
+    public static RecipientType from(int type) {
         for (RecipientType value : values()) {
             if (value.type == type) {
                 return value;

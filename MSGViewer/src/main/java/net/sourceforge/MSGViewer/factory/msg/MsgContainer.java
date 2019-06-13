@@ -168,7 +168,6 @@ public class MsgContainer
         }
 
         List<PropType> props = new ArrayList<>();
-        props.add(new PropPtypInteger32("3712", id));
         for (SubstGEntry entry : entries) {
             props.add(entry.getPropType());
         }

@@ -1,7 +1,5 @@
 package net.sourceforge.MSGViewer.MSGNavigator;
 
-import static com.auxilii.msgparser.MsgParser.analyzeDocumentEntry;
-
 import at.redeye.FrameWork.base.AutoMBox;
 import at.redeye.FrameWork.base.BaseDialog;
 import at.redeye.FrameWork.base.Root;
@@ -234,8 +232,38 @@ public class MSGNavigator extends BaseDialog {
         }
     }
 
-
-
+    /**
+     * Analyzes the {@link DocumentEntry} and returns
+     * a {@link FieldInformation} object containing the
+     * class (the field name, so to say) and type of
+     * the entry.
+     *
+     * @param de The {@link DocumentEntry} that should be examined.
+     * @return A {@link FieldInformation} object containing class
+     *  and type of the document entry or, if the entry is
+     *  not an interesting field, an empty {@link FieldInformation}
+     *  object containing {@link FieldInformation#UNKNOWN} class
+     *  and type.
+     */
+    public static FieldInformation analyzeDocumentEntry(DocumentEntry de) {
+        String name = de.getName();
+        // we are only interested in document entries
+        // with names starting with __substg1.0_
+        String key = "__substg1.0_";
+        if (name.startsWith(key)) {
+            String val = name.substring(key.length()).toLowerCase();
+            // the first 4 digits of the remainder
+            // defines the field class (or field name)
+            // and the last 4 digits indicate the
+            // data type.
+            String clazz = val.substring(0, 4);
+            String type = val.substring(4);
+            return new FieldInformation(clazz, type);
+        }
+        // we are not interested in the field
+        // and return an empty FieldInformation object
+        return new FieldInformation();
+    }
 
     /**
      * Reads the information from the InputStream and

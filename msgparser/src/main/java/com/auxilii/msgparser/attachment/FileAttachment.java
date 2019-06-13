@@ -51,10 +51,6 @@ public class FileAttachment implements Attachment {
      * The attachment itself as a byte array.
      */
     private byte[] data;
-    /**
-     * The size of the attachment.
-     */
-    private long size = -1;
 
     /**
      * Subdir where the attachment was found
@@ -149,14 +145,7 @@ public class FileAttachment implements Attachment {
      * @return the size
      */
     public long getSize() {
-        return size;
-    }
-
-    /**
-     * @param size the size to set
-     */
-    public void setSize(long size) {
-        this.size = size;
+        return data == null ? -1 : data.length;
     }
 
     /**
@@ -191,9 +180,8 @@ public class FileAttachment implements Attachment {
      *
      * @param name The name of the property (i.e., the class of the {@link DocumentEntry}).
      * @param value The value of the field.
-     * @param de The current {@link DocumentEntry}.
      */
-    public void setProperty(String name, Object value, DocumentEntry de) throws ClassCastException {
+    public void setProperty(String name, Object value) throws ClassCastException {
 
         if (name == null || value == null) {
             return;
@@ -207,7 +195,6 @@ public class FileAttachment implements Attachment {
                 setDisplayName((String) value);
                 break;
             case "3701":
-                setSize(de.getSize());
                 setData((byte[]) value);
                 break;
             case "3703":

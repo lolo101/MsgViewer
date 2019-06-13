@@ -11,7 +11,6 @@ import org.apache.poi.poifs.filesystem.DirectoryEntry;
  */
 public abstract class SubstGEntry
 {
-    public static final String TYPE_INT32 = "0003";
     public static final String TYPE_ASCII = "001e";
     public static final String TYPE_UTF16 = "001f";
     public static final String TYPE_BYTES = "0102";
@@ -40,9 +39,9 @@ public abstract class SubstGEntry
 
     public abstract PropType getPropType();
 
-    public void createEntry(  DirectoryEntry dir ) throws IOException {
+    public final void createEntry(DirectoryEntry dir) throws IOException {
         InputStream stream = createEntryContent();
-        dir.createDocument("__substg1.0_" + name + type.toUpperCase(), stream);
+        dir.createDocument("__substg1.0_" + name.toUpperCase() + type.toUpperCase(), stream);
     }
 
     protected abstract InputStream createEntryContent() throws IOException;
