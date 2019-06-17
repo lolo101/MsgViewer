@@ -1,14 +1,12 @@
 package net.sourceforge.MSGViewer.factory.msg;
 
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+
+import com.auxilii.msgparser.Message;
 import com.auxilii.msgparser.RecipientEntry;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
-import net.sourceforge.MSGViewer.factory.msg.entries.*;
-import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypInteger32;
-import net.sourceforge.MSGViewer.factory.msg.properties.PropType;
-import org.apache.poi.poifs.filesystem.DirectoryEntry;
-import org.apache.poi.poifs.filesystem.Entry;
-
+import com.auxilii.msgparser.attachment.MsgAttachment;
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -19,22 +17,107 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import net.sourceforge.MSGViewer.factory.msg.entries.*;
+import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypBoolean;
+import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypInteger32;
+import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypTime;
+import net.sourceforge.MSGViewer.factory.msg.properties.PropType;
+import org.apache.poi.poifs.filesystem.DirectoryEntry;
+import org.apache.poi.poifs.filesystem.Entry;
+
 
 public class MsgContainer
 {
-    public static final String NAME = "__properties_version1.0";
-    public static final String NAMEID_NAME = "__nameid_version1.0";
+    public static final String PROPERTY_STREAM = "__properties_version1.0";
+    public static final String NAMED_PROPERTY = "__nameid_version1.0";
 
-    private static final int HEADER_SIZE = 8 + 4 + 4 + 4 + 4 + 8;
     private final List<PropType> properties = new ArrayList<>();
     private final List<SubstGEntry> substg_streams = new ArrayList<>();
 
     private final List<RecipientEntry> recipients = new ArrayList<>();
     private final List<Attachment> attachments = new ArrayList<>();
 
+    MsgContainer(Message msg) throws IOException {
+        if( msg.getSubject() != null ) {
+            addVarEntry( new SubjectEntry( msg.getSubject() ) );
+        }
+
+        addVarEntry( new MessageClassEntry() );
+
+        if( isNotEmpty(msg.getBodyText()) ) {
+            addVarEntry( new BodyTextEntry(msg.getBodyText()) );
+        }
+
+        if (isNotEmpty(msg.getBodyRTF())) {
+            addVarEntry( new RTFBodyTextEntry(msg.getBodyRTF() ) );
+            // RTF in Sync
+            addProperty(new PropPtypBoolean("0e1f",true));
+        }
+
+        if( msg.getHeaders() != null  && !msg.getHeaders().isEmpty() ) {
+            addVarEntry( new HeadersEntry(msg.getHeaders() ) );
+        }
+
+        // PidTagStoreSupportMask data is encoded in unicode
+        addProperty(new PropPtypInteger32("340d",0x00040000));
+
+        // PidTagCreationTime
+        addProperty(new PropPtypTime("3007", System.currentTimeMillis()));
+
+        // PidTagLastModificationTime
+        addProperty(new PropPtypTime("3008", System.currentTimeMillis()));
+
+        // PidTagClientSubmitTime
+        if( msg.getDate() != null ) {
+            addProperty(new PropPtypTime("0039", msg.getDate().getTime()));
+        }
+
+        if( msg.getFromName() != null && !msg.getFromName().isEmpty() ) {
+            addVarEntry( new StringUTF16SubstgEntry("0042", msg.getFromName() ) );
+        }
+
+        if( msg.getFromEmail() != null && !msg.getFromEmail().isEmpty() ) {
+            addVarEntry( new StringUTF16SubstgEntry("0c1f", msg.getFromEmail() ) );
+        }
+
+        if (msg.getToEmail() != null) {
+            addVarEntry( new StringUTF16SubstgEntry("0076", msg.getToEmail() ) );
+        }
+
+        if (msg.getToName() != null) {
+            addVarEntry( new StringUTF16SubstgEntry("3001", msg.getToName() ) );
+        }
+
+        if( msg.getMessageId() != null && !msg.getMessageId().isEmpty() ) {
+            addVarEntry( new StringUTF16SubstgEntry("1035", msg.getMessageId() ) );
+        }
+
+        if( msg.getDisplayTo() != null && !msg.getDisplayTo().isEmpty() ) {
+            addVarEntry( new StringUTF16SubstgEntry("0e04",msg.getDisplayTo()));
+        }
+
+        if( msg.getDisplayCc() != null && !msg.getDisplayCc().isEmpty() ) {
+            addVarEntry( new StringUTF16SubstgEntry("0e03",msg.getDisplayCc()));
+        }
+
+        if( msg.getDisplayBcc() != null  && !msg.getDisplayBcc().isEmpty() ) {
+            addVarEntry( new StringUTF16SubstgEntry("0e02",msg.getDisplayBcc()));
+        }
+
+        for( RecipientEntry rec_entry : msg.getRecipients() ) {
+            addRecipient(rec_entry);
+        }
+
+        for (Attachment attachment : msg.getAttachments()) {
+            addAttachment(attachment);
+        }
+    }
+
     public void write( DirectoryEntry root ) throws IOException
     {
-        int size = HEADER_SIZE + properties.size() * 16;
+        int headerSize = root.getParent() == null ? 32 : 24;
+        int size = headerSize + properties.size() * 16;
         ByteBuffer bytes = ByteBuffer.allocate(size).order(ByteOrder.LITTLE_ENDIAN);
 
         bytes.position(8);
@@ -51,7 +134,7 @@ public class MsgContainer
         // attachment count
         bytes.putInt(attachments.size());
 
-        bytes.position(HEADER_SIZE);
+        bytes.position(headerSize);
 
         for( PropType prop : properties )
         {
@@ -70,42 +153,42 @@ public class MsgContainer
             writeAttachment(root, attachments.get(count), count);
         }
 
-        createPropEntry(bytes, root);
-        createNameIdEntry(root);
+        createPropertyStreamEntry(bytes, root);
+        createNamedPropertyEntry(root);
     }
 
-    void addProperty(PropType prop)
+    private void addProperty(PropType prop)
     {
         properties.add(prop);
     }
 
-    void addVarEntry(SubstGEntry entry)
+    private void addVarEntry(SubstGEntry entry)
     {
        addProperty(entry.getPropType());
        substg_streams.add(entry);
     }
 
-    void addRecipient(RecipientEntry entry) {
+    private void addRecipient(RecipientEntry entry) {
         recipients.add(entry);
     }
 
-    void addAttachment(Attachment attachment) {
+    private void addAttachment(Attachment attachment) {
         attachments.add(attachment);
     }
 
-    private static void createPropEntry(ByteBuffer bytes, DirectoryEntry root ) throws IOException
+    private static void createPropertyStreamEntry(ByteBuffer bytes, DirectoryEntry root ) throws IOException
     {
-        deleteEntryIfExists(root, NAME);
+        deleteEntryIfExists(root, PROPERTY_STREAM);
 
         InputStream buffer = new ByteArrayInputStream(bytes.array());
-        root.createDocument(NAME, buffer);
+        root.createDocument(PROPERTY_STREAM, buffer);
     }
 
-    private static void createNameIdEntry(DirectoryEntry root ) throws IOException
+    private static void createNamedPropertyEntry(DirectoryEntry root ) throws IOException
     {
-        deleteEntryIfExists(root, NAMEID_NAME);
+        deleteEntryIfExists(root, NAMED_PROPERTY);
 
-        DirectoryEntry prop_entry = root.createDirectory(NAMEID_NAME);
+        DirectoryEntry prop_entry = root.createDirectory(NAMED_PROPERTY);
 
         new GuidStreamEntry(new byte[0]).createEntry(prop_entry);
         new EntryStreamEntry(new byte[0]).createEntry(prop_entry);
@@ -144,13 +227,16 @@ public class MsgContainer
 
         ByteBuffer bytes = createPropertiesEntryContent(props);
 
-        createPropEntry(bytes, rec_dir);
+        createPropertyStreamEntry(bytes, rec_dir);
     }
 
-    private static void writeAttachment(DirectoryEntry root, Attachment attachment, int id) throws IOException {
+    private void writeAttachment(DirectoryEntry root, Attachment attachment, int id) throws IOException {
         DirectoryEntry att_dir = root.createDirectory(String.format("__attach_version1.0_#%08X", id));
         if (attachment instanceof FileAttachment) {
             writeFileAttachment((FileAttachment) attachment, id, att_dir);
+        }
+        if (attachment instanceof MsgAttachment) {
+            writeMsgAttachment((MsgAttachment) attachment, att_dir);
         }
     }
 
@@ -167,14 +253,38 @@ public class MsgContainer
             entry.createEntry(att_dir);
         }
 
-        List<PropType> props = new ArrayList<>();
-        for (SubstGEntry entry : entries) {
-            props.add(entry.getPropType());
-        }
+        List<PropType> props = entries.stream()
+                .map(SubstGEntry::getPropType)
+                .collect(Collectors.toList());
 
         ByteBuffer bytes = createPropertiesEntryContent(props);
 
-        createPropEntry(bytes, att_dir);
+        createPropertyStreamEntry(bytes, att_dir);
+    }
+
+    private static void writeMsgAttachment(MsgAttachment attachment, DirectoryEntry att_dir) throws IOException {
+        List<? extends SubstGEntry> entries = Arrays.asList();
+
+        for (SubstGEntry entry : entries) {
+            entry.createEntry(att_dir);
+        }
+
+        List<PropType> props = entries.stream()
+                .map(SubstGEntry::getPropType)
+                .collect(Collectors.toList());
+
+        ByteBuffer bytes = createPropertiesEntryContent(props);
+
+        createPropertyStreamEntry(bytes, att_dir);
+
+        DirectoryEntry msg_dir = att_dir.createDirectory("__substg1.0_3701000D");
+        writeMessage(attachment.getMessage(), msg_dir);
+    }
+
+    private static void writeMessage(Message message, DirectoryEntry msg_dir) throws IOException {
+        // TODO
+        MsgContainer container = new MsgContainer(message);
+        container.write(msg_dir);
     }
 
     private static ByteBuffer createPropertiesEntryContent(Collection<PropType> p_entries) {

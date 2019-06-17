@@ -6,7 +6,7 @@ import net.sourceforge.MSGViewer.factory.msg.lib.MSTimeConvert;
  *
  * @author martin
  */
-public class PropPtypeTime extends PropType
+public class PropPtypTime extends PropType
 {
     static final String TYPE_NAME = "0040";
 
@@ -17,7 +17,7 @@ public class PropPtypeTime extends PropType
      * @param tagname name of the tag
      * @param value in milliseconds since 1.1.1970
      */
-    public PropPtypeTime( String tagname, long value )
+    public PropPtypTime( String tagname, long value )
     {
         super( tagname, TYPE_NAME );
 
