@@ -24,8 +24,6 @@ import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypInteger32;
 import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypTime;
 import net.sourceforge.MSGViewer.factory.msg.properties.PropType;
 import org.apache.poi.poifs.filesystem.DirectoryEntry;
-import org.apache.poi.poifs.filesystem.Entry;
-
 
 public class MsgContainer
 {
@@ -197,9 +195,8 @@ public class MsgContainer
 
     private static void deleteEntryIfExists(DirectoryEntry root, String name) {
         try {
-            Entry prop_entry = root.getEntry(name);
-            if( prop_entry != null ) {
-                prop_entry.delete();
+            if( root.hasEntry(name) ) {
+                root.getEntry(name).delete();
             }
         } catch( FileNotFoundException ignore) {}
     }
@@ -282,7 +279,6 @@ public class MsgContainer
     }
 
     private static void writeMessage(Message message, DirectoryEntry msg_dir) throws IOException {
-        // TODO
         MsgContainer container = new MsgContainer(message);
         container.write(msg_dir);
     }

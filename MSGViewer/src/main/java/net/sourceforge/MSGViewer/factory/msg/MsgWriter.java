@@ -29,13 +29,11 @@ public class MsgWriter
 
          try {
             MessageParserFactory factory = new MessageParserFactory();
-            Message msg = factory.parseMessage(new File(
-                    "/home/martin/programs/java/MSGViewer/test/data/danke.msg"
-                    ));
+            Message msg = factory.parseMessage(new File("src/test/resources/danke.msg"));
 
             MsgWriter writer = new MsgWriter();
 
-            writer.write(msg, new FileOutputStream("/home/martin/programs/java/MSGViewer/test/data/test_out.msg"));
+            writer.write(msg, new FileOutputStream("src/test/resources/test_out.msg"));
 
          } catch( Exception ex ) {
              System.out.println(ex);
