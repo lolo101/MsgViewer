@@ -291,22 +291,22 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
                     bodyText = message.getBodyRTF();
                 }
             }
-            else if( message.getBodyRTF().contains("\\purehtml") )
-            {
-                PrepareImages prep_images = new PrepareImages(helper, message);
-
-                body.setContentType("text/html");
-                bodyText = prep_images.prepareImages(new StringBuilder(ViewerHelper.stripMetaTags(message.getBodyRTF()))).toString();
-            }
             else
             {
                 body.setContentType("text/rtf");
                 bodyText = message.getBodyRTF();
             }
         }
+        else if( message.getBodyHtml() != null )
+        {
+            PrepareImages prep_images = new PrepareImages(helper, message);
+
+            body.setContentType("text/html");
+            bodyText = prep_images.prepareImages(new StringBuilder(ViewerHelper.stripMetaTags(message.getBodyHtml())));
+        }
         else
         {
-            body.setContentType("text/html");
+            body.setContentType("text/plain");
             bodyText = asHtml(message.getBodyText());
         }
 

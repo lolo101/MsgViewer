@@ -109,7 +109,7 @@ public class PrepareImages {
         return ret.toString();
     }
 
-    public StringBuilder prepareImages(StringBuilder s) {
+    public String prepareImages(StringBuilder s) {
 
         Map<String, FileAttachment> attachmentById = new HashMap<>();
         Map<String, FileAttachment> attachmentByLocation = new HashMap<>();
@@ -147,6 +147,6 @@ public class PrepareImages {
 
         }
 
-        return s;
+        return s.toString();
     }
 }

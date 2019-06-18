@@ -18,10 +18,10 @@ import java.util.List;
  *
  * @author martin
  */
-public class MBoxParser 
-{        
+public class MBoxParser
+{
     private final List<HeaderParser> header_parsers = new ArrayList<>();
-    
+
     public MBoxParser()
     {
         header_parsers.add(new FromEmailHeader());
@@ -30,20 +30,20 @@ public class MBoxParser
         header_parsers.add(new SubjectHeader());
         header_parsers.add(new MessageIdHeader());
     }
-    
+
     public Message parse( File file ) throws Exception
     {
         byte[] bytes = ReadFile.getBytesFromFile(file);
-        
+
         String content = new String(bytes, StandardCharsets.US_ASCII);
-        
+
         return parse(content);
-    }    
-    
+    }
+
     public Message parse( String content ) throws Exception
     {
         Message msg = new Message();
-        
+
         int idx_unix = content.indexOf("\n\n");
         int idx_win = content.indexOf("\r\n\r\n");
 
@@ -60,19 +60,19 @@ public class MBoxParser
             header_end = idx_win;
 
         String header =  content.substring(start,header_end);
-        
+
         msg.setHeaders(header);
-        
+
         parseHeader(msg, header);
         parseBody( msg, content.substring(header_end+1));
-        
+
         return msg;
     }
 
-    private void parseHeader(Message msg, String header) throws Exception 
+    private void parseHeader(Message msg, String header) throws Exception
     {
         String[] lines = header.split("\n");
-       
+
         for( String line : lines )
         {
             for( HeaderParser parser : header_parsers )
@@ -87,9 +87,8 @@ public class MBoxParser
         }
     }
 
-    private void parseBody(Message msg, String body) 
+    private void parseBody(Message msg, String body)
     {
-       msg.setBodyText(body);        
-       msg.setBodyRTF("");
+       msg.setBodyText(body);
     }
 }

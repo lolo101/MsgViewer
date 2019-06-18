@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import net.sourceforge.MSGViewer.factory.msg.entries.*;
-import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypBoolean;
 import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypInteger32;
 import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypTime;
 import net.sourceforge.MSGViewer.factory.msg.properties.PropType;
@@ -47,10 +46,8 @@ public class MsgContainer
             addVarEntry( new BodyTextEntry(msg.getBodyText()) );
         }
 
-        if (isNotEmpty(msg.getBodyRTF())) {
-            addVarEntry( new RTFBodyTextEntry(msg.getBodyRTF() ) );
-            // RTF in Sync
-            addProperty(new PropPtypBoolean("0e1f",true));
+        if ( msg.getCompressedRTF() != null ) {
+            addVarEntry( new CompressedRTFEntry(msg.getCompressedRTF()) );
         }
 
         if( msg.getHeaders() != null  && !msg.getHeaders().isEmpty() ) {

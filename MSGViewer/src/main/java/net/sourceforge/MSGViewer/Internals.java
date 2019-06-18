@@ -43,8 +43,8 @@ public class Internals extends BaseDialog {
 
 
             }
-        } else if ( message.getBodyRTF() != null && message.getBodyRTF().contains("\\purehtml")) {
-             jTHTML.setText(message.getBodyRTF());
+        } else if ( message.getBodyHtml() != null ) {
+             jTHTML.setText(message.getBodyHtml());
         } else {
             jTHTML.setText(MlM(MESSAGE_NOHTML_CODE));
         }

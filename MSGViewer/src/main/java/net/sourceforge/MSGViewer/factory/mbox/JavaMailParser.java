@@ -60,7 +60,6 @@ public class JavaMailParser
         msg.setMessageId(getFirstHeader(jmsg.getHeader("Message-Id")));
 
         msg.setBodyText("");
-        msg.setBodyRTF("");
 
         parse( msg, jmsg );
 
@@ -95,17 +94,21 @@ public class JavaMailParser
         } else {
             String disp = part.getDisposition();
 
-            if( disp == null && part.getFileName() == null && part.isMimeType("text/html") ) {
-                // this is our html message body
+            if( disp == null && part.getFileName() == null && part.isMimeType("text/*") ) {
                 byte[] bytes = getContent(part);
 
-                StringBuilder sb = new StringBuilder();
+                String body = new String(bytes, getCharset(part.getContentType()));
 
-                sb.append(new String(bytes,getCharset(part.getContentType())));
-                sb.append("<!-- \\purehtml -->");
-
-                msg.setBodyRTF(sb.toString());
-                LOGGER.debug(msg.getBodyRTF());
+                if ( part.isMimeType("text/html") ) {
+                    msg.setBodyHtml(body);
+                    LOGGER.debug(msg.getBodyHtml());
+                } else if ( part.isMimeType("text/rtf") ) {
+                    msg.setBodyRTF(body);
+                    LOGGER.debug(msg.getBodyRTF());
+                } else {
+                    msg.setBodyText(body);
+                    LOGGER.debug(msg.getBodyText());
+                }
             } else if (disp == null || disp.equalsIgnoreCase(Part.ATTACHMENT)) {
                 // many mailers don't include a Content-Disposition
 

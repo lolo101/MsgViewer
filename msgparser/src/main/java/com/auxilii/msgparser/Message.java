@@ -96,10 +96,11 @@ public class Message {
      */
     private String displayBcc = null;
 
-    /**
-     * The body in RTF format (if available)
-     */
-    private String bodyRTF = null;
+    private byte[] compressedRTF;
+
+    private String bodyRTF;
+
+    private String bodyHtml;
 
     /**
      * Email headers (if available)
@@ -194,30 +195,10 @@ public class Message {
                 this.setDisplayBcc((String) value);
                 break;
             case "1000":
-                if (value instanceof String) {
-                    this.setBodyText((String) value);
-                } else if (value instanceof byte[]) {
-                    this.setBodyText(new String((byte[]) value));
-                } else {
-                    LOGGER.info( "Unexpected body class: "+value.getClass().getName());
-                    this.setBodyText(value.toString());
-                }
+                this.setBodyText((String) value);
                 break;
             case "1009":
-                // we simply try to decompress the RTF data
-                // if it's not compressed, the utils class
-                // is able to detect this anyway
-                if (value instanceof byte[]) {
-                    byte[] compressedRTF = (byte[]) value;
-                    try {
-                        this.setBodyRTF(decompressRTF(compressedRTF));
-                    } catch(Exception e) {
-                        LOGGER.info( "Could not decompress RTF data "  +  e);
-                        this.setBodyText(getFromUnicodeLE(compressedRTF));
-                    }
-                } else {
-                    LOGGER.info( "Unexpected data type "+value.getClass());
-                }
+                this.setCompressedRTF((byte[]) value);
                 break;
             case "007d":
                 // email headers
@@ -227,32 +208,6 @@ public class Message {
                 Date date = Message.getDateFromHeaders(headers);
                 if (date != null) {
                     this.setDate(date);
-                }
-                break;
-            default:
-                if (LOGGER.isTraceEnabled())
-                {
-                    String res = null;
-                    if (value instanceof byte[]) {
-                        byte[] compressedRTF = (byte[]) value;
-
-                        int len = compressedRTF.length;
-
-                        try {
-                            res = decompressRTF(compressedRTF);
-                        } catch (Exception e) {
-                            LOGGER.info("Could not decompress RTF data " + e);
-                        }
-
-                        if (res == null) {
-                            res = new String(compressedRTF);
-                        }
-
-                        if (len > 100) {
-                            LOGGER.trace("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx len: " + len);
-                        }
-                    }
-                    LOGGER.trace("unknown name: " + name + " res: " + ( res != null ? res : ""));
                 }
                 break;
         }
@@ -571,21 +526,33 @@ public class Message {
         this.bccName.add(nullOrTrim(bccName));
     }
 
-    /**
-     * @return the bodyRTF
-     */
+    public byte[] getCompressedRTF() {
+        return compressedRTF;
+    }
+
+    public void setCompressedRTF(byte[] compressedRTF) {
+        this.compressedRTF = compressedRTF;
+    }
+
     public String getBodyRTF() {
+        if (bodyRTF == null && compressedRTF != null) {
+            bodyRTF = decompressRTF();
+        }
+
         return bodyRTF;
     }
 
-
-    /**
-     * @param bodyRTF the bodyRTF to set
-     */
     public void setBodyRTF(String bodyRTF) {
-        this.bodyRTF = nullOrTrim(bodyRTF);
+        this.bodyRTF = bodyRTF;
     }
 
+    public String getBodyHtml() {
+        return bodyHtml;
+    }
+
+    public void setBodyHtml(String bodyHtml) {
+        this.bodyHtml = bodyHtml;
+    }
 
     /**
      * @return the headers
@@ -655,10 +622,14 @@ public class Message {
         return this.properties.get(name);
     }
 
-    private static String decompressRTF(byte[] compressedRTF) throws IOException {
-        CompressedRTF decompressor = new CompressedRTF();
-        byte[] decompressedRTF = decompressor.decompress(new ByteArrayInputStream(compressedRTF));
-        return new String(decompressedRTF, 0, decompressor.getDeCompressedSize());
+    private String decompressRTF() {
+        try {
+            CompressedRTF decompressor = new CompressedRTF();
+            byte[] decompressedRTF = decompressor.decompress(new ByteArrayInputStream(compressedRTF));
+            return new String(decompressedRTF, 0, decompressor.getDeCompressedSize());
+        } catch (IOException ex) {
+            return getFromUnicodeLE(compressedRTF);
+        }
     }
 
     private static String nullOrTrim(String subject1) {

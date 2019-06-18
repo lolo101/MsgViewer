@@ -173,9 +173,6 @@ public class ViewerHelper {
 
     public String extractHTMLFromRTF(String bodyText, Message message ) throws ParseException
     {
-        if( bodyText.contains("\\purehtml") )
-            return bodyText;
-
         HtmlFromRtf rtf2html = new HtmlFromRtf(bodyText);
 
         String html = rtf2html.getHTML();
@@ -184,7 +181,7 @@ public class ViewerHelper {
 
         PrepareImages prep_images = new PrepareImages(this, message);
 
-        return prep_images.prepareImages(new StringBuilder(html)).toString();
+        return prep_images.prepareImages(new StringBuilder(html));
     }
 
     public File getMailIconFile() throws IOException
