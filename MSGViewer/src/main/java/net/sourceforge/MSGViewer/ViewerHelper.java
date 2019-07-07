@@ -21,7 +21,6 @@ import com.auxilii.msgparser.attachment.MsgAttachment;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.List;
 import org.apache.poi.util.IOUtils;
 
@@ -29,7 +28,7 @@ public class ViewerHelper {
 
     private Root root;
     private File tmp_dir;
-    boolean delete_tmp_dir = false;
+    private boolean delete_tmp_dir = false;
 
     public ViewerHelper( Root root )
     {
@@ -63,7 +62,6 @@ public class ViewerHelper {
 
     static boolean is_mail_message( String file_name, String mime )
     {
-
         return is_mail_message( file_name );
     }
 
@@ -209,13 +207,11 @@ public class ViewerHelper {
             {
                 FileAttachment fatt = (FileAttachment) att;
 
-                String att_file_name = "file://" + URLEncoder.encode(fatt.getFilename(), "utf-8");
+                File content = getTempFile(fatt);
 
-                if( att_file_name.equals(url.toString()) )
+                if( content.toURI().toURL().equals(url) )
                 {
                     logger.info("opening " + fatt);
-
-                    File content = getTempFile(fatt);
 
                     if( !content.exists() )
                     {
