@@ -307,24 +307,11 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
         else
         {
             body.setContentType("text/plain");
-            bodyText = asHtml(message.getBodyText());
+            bodyText = message.getBodyText();
         }
 
         body.setText(bodyText);
         body.setCaretPosition(0);
-    }
-
-    private String asHtml(String text) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<html><body>");
-        String font = JCBfix.isSelected()
-                ? "Courier New;font-size:10px;"
-                : "Dialog,sans-serif;font-size:10px;";
-        sb.append("<pre style=\"font-family:").append(font).append("\">");
-        sb.append(ViewerHelper.prepareText(text));
-        sb.append("</pre>");
-        sb.append("</body></html>");
-        return sb.toString();
     }
 
     @Override
