@@ -7,6 +7,7 @@ import at.redeye.FrameWork.utilities.StringUtils;
 import net.sourceforge.MSGViewer.MSGNavigator.MSGNavigator;
 import java.awt.EventQueue;
 import java.awt.event.KeyEvent;
+import java.awt.print.PrinterJob;
 import java.io.*;
 import java.net.URLDecoder;
 import javax.swing.*;
@@ -17,6 +18,7 @@ public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterf
 {
     private String dialog_id;
     private final ViewerHelper helper;
+    private final PrinterJob printerJob = PrinterJob.getPrinterJob();
 
     private static String last_path = null;
 
@@ -83,24 +85,26 @@ public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterf
     private void initComponents() {
 
         viewerPanel = new net.sourceforge.MSGViewer.ViewerPanel();
+        printerJob.setPrintable(viewerPanel);
         menubar = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
-        jMOpenFile = new javax.swing.JMenuItem();
-        jMSaveAs = new javax.swing.JMenuItem();
-        jMSettings = new javax.swing.JMenuItem();
-        jMQuit = new javax.swing.JMenuItem();
-        jMenu2 = new javax.swing.JMenu();
-        jMDetail = new javax.swing.JMenuItem();
+        javax.swing.JMenu jMenuProgram = new javax.swing.JMenu();
+        javax.swing.JMenuItem jMOpenFile = new javax.swing.JMenuItem();
+        javax.swing.JMenuItem jMSaveAs = new javax.swing.JMenuItem();
+        javax.swing.JMenuItem jMPrint = new javax.swing.JMenuItem();
+        javax.swing.JMenuItem jMSettings = new javax.swing.JMenuItem();
+        javax.swing.JMenuItem jMQuit = new javax.swing.JMenuItem();
+        javax.swing.JMenu jMenuInfo = new javax.swing.JMenu();
+        javax.swing.JMenuItem jMDetail = new javax.swing.JMenuItem();
         jMNav = new javax.swing.JMenuItem();
-        jSeparator1 = new javax.swing.JPopupMenu.Separator();
-        jMAbout = new javax.swing.JMenuItem();
-        jMChangeLog = new javax.swing.JMenuItem();
-        jMPlugin = new javax.swing.JMenuItem();
+        javax.swing.JPopupMenu.Separator jSeparator1 = new javax.swing.JPopupMenu.Separator();
+        javax.swing.JMenuItem jMAbout = new javax.swing.JMenuItem();
+        javax.swing.JMenuItem jMChangeLog = new javax.swing.JMenuItem();
+        javax.swing.JMenuItem jMPlugin = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(400, 400));
 
-        jMenu1.setText("Program");
+        jMenuProgram.setText("Program");
 
         jMOpenFile.setText("File Open ...");
         jMOpenFile.addActionListener(new java.awt.event.ActionListener() {
@@ -108,7 +112,7 @@ public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterf
                 jMOpenFileActionPerformed(evt);
             }
         });
-        jMenu1.add(jMOpenFile);
+        jMenuProgram.add(jMOpenFile);
 
         jMSaveAs.setText("Save File as ...");
         jMSaveAs.addActionListener(new java.awt.event.ActionListener() {
@@ -116,7 +120,16 @@ public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterf
                 jMSaveAsActionPerformed(evt);
             }
         });
-        jMenu1.add(jMSaveAs);
+        jMenuProgram.add(jMSaveAs);
+
+        jMPrint.setText("Print...");
+        jMPrint.setToolTipText("");
+        jMPrint.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMPrintActionPerformed(evt);
+            }
+        });
+        jMenuProgram.add(jMPrint);
 
         jMSettings.setText("Options");
         jMSettings.addActionListener(new java.awt.event.ActionListener() {
@@ -124,7 +137,7 @@ public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterf
                 jMSettingsActionPerformed(evt);
             }
         });
-        jMenu1.add(jMSettings);
+        jMenuProgram.add(jMSettings);
 
         jMQuit.setText("Quit");
         jMQuit.addActionListener(new java.awt.event.ActionListener() {
@@ -132,11 +145,11 @@ public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterf
                 jMQuitActionPerformed(evt);
             }
         });
-        jMenu1.add(jMQuit);
+        jMenuProgram.add(jMQuit);
 
-        menubar.add(jMenu1);
+        menubar.add(jMenuProgram);
 
-        jMenu2.setText("Info");
+        jMenuInfo.setText("Info");
 
         jMDetail.setText("Details");
         jMDetail.addActionListener(new java.awt.event.ActionListener() {
@@ -144,7 +157,7 @@ public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterf
                 jMDetailActionPerformed(evt);
             }
         });
-        jMenu2.add(jMDetail);
+        jMenuInfo.add(jMDetail);
 
         jMNav.setText("MSG Navigator");
         jMNav.setEnabled(false);
@@ -153,8 +166,8 @@ public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterf
                 jMNavActionPerformed(evt);
             }
         });
-        jMenu2.add(jMNav);
-        jMenu2.add(jSeparator1);
+        jMenuInfo.add(jMNav);
+        jMenuInfo.add(jSeparator1);
 
         jMAbout.setText("About");
         jMAbout.addActionListener(new java.awt.event.ActionListener() {
@@ -162,7 +175,7 @@ public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterf
                 jMAboutActionPerformed(evt);
             }
         });
-        jMenu2.add(jMAbout);
+        jMenuInfo.add(jMAbout);
 
         jMChangeLog.setText("Changelog");
         jMChangeLog.addActionListener(new java.awt.event.ActionListener() {
@@ -170,7 +183,7 @@ public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterf
                 jMChangeLogActionPerformed(evt);
             }
         });
-        jMenu2.add(jMChangeLog);
+        jMenuInfo.add(jMChangeLog);
 
         jMPlugin.setText("Plugins");
         jMPlugin.addActionListener(new java.awt.event.ActionListener() {
@@ -178,9 +191,9 @@ public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterf
                 jMPluginActionPerformed(evt);
             }
         });
-        jMenu2.add(jMPlugin);
+        jMenuInfo.add(jMPlugin);
 
-        menubar.add(jMenu2);
+        menubar.add(jMenuInfo);
 
         setJMenuBar(menubar);
 
@@ -300,23 +313,22 @@ public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterf
 
     }//GEN-LAST:event_jMOpenFileActionPerformed
 
+    private void jMPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMPrintActionPerformed
+        if (printerJob.printDialog()) {
+            new AutoMBox(this.getClass().getName()) {
+                @Override
+                public void do_stuff() throws Exception {
+                    printerJob.print();
+                }
+            };
+        }
+    }//GEN-LAST:event_jMPrintActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JMenuItem jMAbout;
-    private javax.swing.JMenuItem jMChangeLog;
-    private javax.swing.JMenuItem jMDetail;
     private javax.swing.JMenuItem jMNav;
-    private javax.swing.JMenuItem jMOpenFile;
-    private javax.swing.JMenuItem jMPlugin;
-    private javax.swing.JMenuItem jMQuit;
-    private javax.swing.JMenuItem jMSaveAs;
-    private javax.swing.JMenuItem jMSettings;
-    private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
-    private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JMenuBar menubar;
     private net.sourceforge.MSGViewer.ViewerPanel viewerPanel;
     // End of variables declaration//GEN-END:variables
-
 
     @Override
     public void openMail(Root root, String file_name) {

@@ -17,8 +17,12 @@ import com.auxilii.msgparser.RecipientEntry;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
 import com.auxilii.msgparser.attachment.MsgAttachment;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.awt.print.PageFormat;
+import java.awt.print.Printable;
+import java.awt.print.PrinterException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -42,7 +46,7 @@ import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.StartTag;
 import net.sourceforge.MSGViewer.factory.MessageParserFactory;
 
-public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener {
+public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener, Printable {
 
     private String bodyText = null;
     private Message message;
@@ -56,9 +60,6 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
     private final ExecutorService thread_pool = Executors.newCachedThreadPool();
     private int wating_thread_pool_counter = 0;
 
-    /**
-     * Creates new form ViewerPanel
-     */
     public ViewerPanel() {
         initComponents();
 
@@ -89,21 +90,48 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
         this.open_new_mail_handler = open_new_mail_handler;
     }
 
+    @Override
+    public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
+        int pageTop = (int) (pageFormat.getImageableHeight() * pageIndex);
+        if (pageTop >= fullHeight()) {
+            return NO_SUCH_PAGE;
+        }
+        Graphics2D g2d = (Graphics2D)graphics;
+        g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
+
+        int pageHeight = (int) pageFormat.getImageableHeight();
+        int pageWidth = (int) pageFormat.getImageableWidth();
+
+        header.print(g2d.create(0, -pageTop, pageWidth, pageHeight));
+        int headerHeight = header.getHeight();
+        int lineY = headerHeight - pageTop;
+        g2d.drawLine(0, lineY, pageWidth, lineY);
+        body.print(g2d.create(0, headerHeight + 1 - pageTop, pageWidth, pageHeight));
+
+        return PAGE_EXISTS;
+    }
+
+    private int fullHeight() {
+        return header.getHeight() + body.getHeight() + 1;
+    }
+
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jSplitPane = new javax.swing.JSplitPane();
-        jScrollPane1 = new javax.swing.JScrollPane();
+        javax.swing.JScrollPane jScrollPane1 = new javax.swing.JScrollPane();
         header = new javax.swing.JEditorPane();
-        jPanel1 = new javax.swing.JPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
+        header.addPropertyChangeListener("paintingForPrint", new PrintListener());
+        javax.swing.JPanel jPanel1 = new javax.swing.JPanel();
+        javax.swing.JScrollPane jScrollPane2 = new javax.swing.JScrollPane();
         body = new javax.swing.JEditorPane();
-        jPanel2 = new javax.swing.JPanel();
+        header.addPropertyChangeListener("paintingForPrint", new PrintListener());
+        javax.swing.JPanel jPanel2 = new javax.swing.JPanel();
         jRRTF = new javax.swing.JRadioButton();
         jRText = new javax.swing.JRadioButton();
         JCBfix = new javax.swing.JCheckBox();
         jSFontSize = new javax.swing.JSlider();
-        jLabel1 = new javax.swing.JLabel();
+        javax.swing.JLabel jLabel1 = new javax.swing.JLabel();
 
         jSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
@@ -254,11 +282,10 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
     }//GEN-LAST:event_jRTextActionPerformed
 
     private void JCBfixActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JCBfixActionPerformed
-
         updateBody();
     }//GEN-LAST:event_JCBfixActionPerformed
 
-   private void updateBody()
+    private void updateBody()
     {
         if( message == null )
             return;
@@ -405,7 +432,6 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
     }
 
-
     public void parse(final String file_name)
     {
         if( file_name == null )
@@ -458,7 +484,8 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
         if (message.getFromEmail() == null && message.getFromName() == null) {
         } else if (message.getFromEmail() == null) {
-            sb.append(parent.MlM("From: ") + message.getFromName());
+            sb.append(parent.MlM("From: "));
+            sb.append(message.getFromName());
         } else if (message.getFromName() == null) {
             sb.append("<a href=\"mailto:");
             sb.append(message.getFromEmail());
@@ -528,32 +555,27 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
                         wating_thread_pool_counter++;
 
-                        thread_pool.execute(new Runnable() {
+                        thread_pool.execute(() -> {
+                            try {
 
-                            @Override
-                            public void run() {
+                                ImageIcon icon = ImageUtils.loadScaledImageIcon(fatt.getData(),
+                                        fatt.toString(),
+                                        max_width, max_height );
 
-                                try {
+                                BufferedImage bi = new BufferedImage(icon.getIconWidth(),icon.getIconHeight(),
+                                        BufferedImage.TYPE_INT_RGB);
 
-                                    ImageIcon icon = ImageUtils.loadScaledImageIcon(fatt.getData(),
-                                                                fatt.toString(),
-                                                                max_width, max_height );
+                                Graphics2D g2 = bi.createGraphics();
+                                g2.drawImage(icon.getImage(), 0, 0, null);
+                                g2.dispose();
 
-                                    BufferedImage bi = new BufferedImage(icon.getIconWidth(),icon.getIconHeight(),
-                                                            BufferedImage.TYPE_INT_RGB);
+                                ImageIO.write(bi, "jpg", contentIcon);
 
-                                    Graphics2D g2 = bi.createGraphics();
-                                    g2.drawImage(icon.getImage(), 0, 0, null);
-                                    g2.dispose();
-
-                                    ImageIO.write(bi, "jpg", contentIcon);
-
-                                } catch( IOException ex ) {
-                                    logger.error(ex,ex);
-                                }
-
-                                wating_thread_pool_counter--;
+                            } catch( IOException ex ) {
+                                logger.error(ex,ex);
                             }
+
+                            wating_thread_pool_counter--;
                         });
                     }
 
@@ -584,25 +606,18 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
                 File sub_file = helper.getTempFile(msgAtt);
 
-                thread_pool.execute(new Runnable() {
+                thread_pool.execute(() -> {
+                    new AutoMBox(file_name) {
 
-                    @Override
-                    public void run() {
+                        @Override
+                        public void do_stuff() throws Exception {
 
-                        new AutoMBox(file_name) {
+                            MessageParserFactory factory = new MessageParserFactory();
+                            factory.saveMessage(msg, sub_file);
 
-                            @Override
-                            public void do_stuff() throws Exception {
-
-                                MessageParserFactory factory = new MessageParserFactory();
-                                factory.saveMessage(msg, sub_file);
-
-                            }
-                        };
-                    }
-
+                        }
+                    };
                 });
-
 
                 sb.append("<a href=\"");
                 sb.append(sub_file.toURI());
@@ -654,19 +669,14 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
     private void write(File content, byte[] data) {
         wating_thread_pool_counter++;
 
-        thread_pool.execute(new Runnable() {
-
-            @Override
-            public void run() {
-
-                try (FileOutputStream fout = new FileOutputStream(content)) {
-                    fout.write(data);
-                } catch( IOException ex ) {
-                    logger.error(ex,ex);
-                }
-
-                wating_thread_pool_counter--;
+        thread_pool.execute(() -> {
+            try (FileOutputStream fout = new FileOutputStream(content)) {
+                fout.write(data);
+            } catch( IOException ex ) {
+                logger.error(ex,ex);
             }
+
+            wating_thread_pool_counter--;
         });
     }
 
@@ -692,14 +702,9 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
     private javax.swing.JCheckBox JCBfix;
     private javax.swing.JEditorPane body;
     private javax.swing.JEditorPane header;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JRadioButton jRRTF;
     private javax.swing.JRadioButton jRText;
     private javax.swing.JSlider jSFontSize;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSplitPane jSplitPane;
     // End of variables declaration//GEN-END:variables
 
