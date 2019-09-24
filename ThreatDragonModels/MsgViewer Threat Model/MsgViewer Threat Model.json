@@ -1,0 +1,17 @@
+{
+  "summary": {
+    "title": "MsgViewer Threat Model",
+    "owner": "lolo101"
+  },
+  "detail": {
+    "contributors": [],
+    "diagrams": [
+      {
+        "title": "Diagram 1",
+        "thumbnail": "./public/content/images/thumbnail.jpg",
+        "id": 0
+      }
+    ],
+    "reviewer": "lolo101"
+  }
+}
