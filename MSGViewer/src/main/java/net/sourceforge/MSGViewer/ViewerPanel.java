@@ -1,11 +1,6 @@
 package net.sourceforge.MSGViewer;
 
 import at.redeye.FrameWork.base.AutoMBox;
-
-import static at.redeye.FrameWork.base.BaseDialog.logger;
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
 import at.redeye.FrameWork.base.BaseDialogBase;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.base.Setup;
@@ -17,12 +12,21 @@ import com.auxilii.msgparser.RecipientEntry;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
 import com.auxilii.msgparser.attachment.MsgAttachment;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import net.htmlparser.jericho.Source;
+import net.htmlparser.jericho.StartTag;
+import net.sourceforge.MSGViewer.factory.MessageParserFactory;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.text.EditorKit;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.StyleSheet;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
-import java.awt.print.PrinterException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -34,17 +38,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JEditorPane;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-import javax.swing.text.EditorKit;
-import javax.swing.text.html.HTMLEditorKit;
-import javax.swing.text.html.StyleSheet;
-import net.htmlparser.jericho.Source;
-import net.htmlparser.jericho.StartTag;
-import net.sourceforge.MSGViewer.factory.MessageParserFactory;
+
+import static at.redeye.FrameWork.base.BaseDialog.logger;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener, Printable {
 
@@ -91,39 +88,44 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
     }
 
     @Override
-    public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
+    public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) {
         int pageTop = (int) (pageFormat.getImageableHeight() * pageIndex);
         if (pageTop >= fullHeight()) {
             return NO_SUCH_PAGE;
         }
-        Graphics2D g2d = (Graphics2D)graphics;
-        g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
-
-        int pageHeight = (int) pageFormat.getImageableHeight();
-        int pageWidth = (int) pageFormat.getImageableWidth();
-
-        header.print(g2d.create(0, -pageTop, pageWidth, pageHeight));
+        Graphics2D g2d = (Graphics2D)graphics.create(
+                (int)pageFormat.getImageableX(),
+                (int)pageFormat.getImageableY(),
+                (int)pageFormat.getImageableWidth(),
+                (int)pageFormat.getImageableHeight());
         int headerHeight = header.getHeight();
-        int lineY = headerHeight - pageTop;
-        g2d.drawLine(0, lineY, pageWidth, lineY);
-        body.print(g2d.create(0, headerHeight + 1 - pageTop, pageWidth, pageHeight));
+        if (pageTop < headerHeight) {
+            int pageWidth = (int) pageFormat.getImageableWidth();
+            int lineY = headerHeight - pageTop;
+            header.print(g2d.create(0, pageTop, pageWidth, headerHeight));
+            g2d.drawLine(0, lineY, pageWidth, lineY);
+            g2d.translate(0, headerHeight);
+        }
+        g2d.translate(0, -pageTop);
+        body.print(g2d);
+        g2d.dispose();
 
         return PAGE_EXISTS;
     }
 
     private int fullHeight() {
-        return header.getHeight() + body.getHeight() + 1;
+        return header.getHeight() + 1 + body.getHeight();
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jSplitPane = new javax.swing.JSplitPane();
-        javax.swing.JScrollPane jScrollPane1 = new javax.swing.JScrollPane();
+        javax.swing.JScrollPane jScrollPaneHeader = new javax.swing.JScrollPane();
         header = new javax.swing.JEditorPane();
         header.addPropertyChangeListener("paintingForPrint", new PrintListener());
         javax.swing.JPanel jPanel1 = new javax.swing.JPanel();
-        javax.swing.JScrollPane jScrollPane2 = new javax.swing.JScrollPane();
+        javax.swing.JScrollPane jScrollPaneBody = new javax.swing.JScrollPane();
         body = new javax.swing.JEditorPane();
         header.addPropertyChangeListener("paintingForPrint", new PrintListener());
         javax.swing.JPanel jPanel2 = new javax.swing.JPanel();
@@ -136,12 +138,12 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
         jSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
         header.setEditable(false);
-        jScrollPane1.setViewportView(header);
+        jScrollPaneHeader.setViewportView(header);
 
-        jSplitPane.setTopComponent(jScrollPane1);
+        jSplitPane.setTopComponent(jScrollPaneHeader);
 
         body.setEditable(false);
-        jScrollPane2.setViewportView(body);
+        jScrollPaneBody.setViewportView(body);
 
         jRRTF.setText("RTF");
         jRRTF.addActionListener(new java.awt.event.ActionListener() {
@@ -206,12 +208,12 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addComponent(jScrollPaneBody, javax.swing.GroupLayout.Alignment.TRAILING)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
+                .addComponent(jScrollPaneBody, javax.swing.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
