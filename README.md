@@ -28,7 +28,7 @@ You can now run the project with:
 
 ```
 cd MSGViewer/target
-java -jar msgviwer.jar
+java -jar msgviewer.jar
 ```
 
 ## GUI
