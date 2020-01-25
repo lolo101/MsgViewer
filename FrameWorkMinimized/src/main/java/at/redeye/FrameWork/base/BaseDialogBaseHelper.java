@@ -5,43 +5,6 @@
 
 package at.redeye.FrameWork.base;
 
-import java.awt.Cursor;
-import java.awt.Dialog.ModalityType;
-import java.awt.Dimension;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.MouseInfo;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.Vector;
-
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPasswordField;
-import javax.swing.JRootPane;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-
-import org.apache.log4j.Logger;
-
 import at.redeye.FrameWork.base.bindtypes.DBDateTime;
 import at.redeye.FrameWork.base.bindtypes.DBFlagInteger;
 import at.redeye.FrameWork.base.bindtypes.DBValue;
@@ -56,10 +19,23 @@ import at.redeye.SqlDBInterface.SqlDBConnection.impl.SupportedDBMSTypes;
 import at.redeye.SqlDBInterface.SqlDBIO.impl.TableBindingNotRegisteredException;
 import at.redeye.SqlDBInterface.SqlDBIO.impl.UnsupportedDBDataTypeException;
 import at.redeye.SqlDBInterface.SqlDBIO.impl.WrongBindFileFormatException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javax.swing.*;
+import java.awt.*;
+import java.awt.Dialog.ModalityType;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Timer;
+import java.util.*;
 
 /**
- * 
+ *
  * @author martin
  */
 public class BaseDialogBaseHelper implements BindVarInterface {
@@ -78,8 +54,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 	/**
 	 * reference to the logger object
 	 */
-	protected static Logger logger = Logger
-			.getLogger(BaseDialogBaseHelper.class.getName());
+	protected static Logger logger = LogManager.getLogger(BaseDialogBaseHelper.class);
 	private Transaction seq_transaction = null;
 	public Timer autoRefreshTimer = null;
 	public TimerTask autoRefreshTask = null;
@@ -256,7 +231,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 
 	/**
 	 * automatically opens the Help Windows, when F1 is pressed
-	 * 
+	 *
 	 * @param runnable
 	 *            This runnable should open the Help Window
 	 */
@@ -269,7 +244,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 
 	/**
 	 * returns the virtual screensize in a multimonitor system
-	 * 
+	 *
 	 * @return
 	 */
 	public static Dimension getVirtualScreenSize() {
@@ -307,7 +282,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 
 	/**
 	 * Setzt den Sanduhr, oder "normale" Mauscursor
-	 * 
+	 *
 	 * @param state
 	 *            <b>true</b> für die Sanduhr und <b>false</b> für den nurmalen
 	 *            Cursor
@@ -330,7 +305,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 	 * Konfiguriert das jScrollpanel entsprechen dem im Setup hinterlegten
 	 * Geschwindigkeit. Vom User über den Parameter VerticalScrollingSpeed
 	 * einstellbar.
-	 * 
+	 *
 	 * @param scroll_panel
 	 */
 	public void adjustScrollingSpeed(JScrollPane scroll_panel) {
@@ -362,7 +337,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 	/**
 	 * Little helper function that sets the frame visible and push it to front,
 	 * by useing the wait cursor.
-	 * 
+	 *
 	 * @param frame
 	 */
 	public void invokeDialog(JFrame frame) {
@@ -375,8 +350,8 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 	/**
 	 * Little helper function that sets the frame visible and push it to front,
 	 * by useing the wait cursor.
-	 * 
-	 * @param frame
+	 *
+	 * @param dlg
 	 */
 	public void invokeDialog(BaseDialogBase dlg) {
 		setWaitCursor();
@@ -479,13 +454,13 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 	/**
 	 * Checks, if data within the table have been change, asks the user what
 	 * sould be done (save it, don't save it, or cancel current operation
-	 * 
+	 *
 	 * @param tm
 	 *            TableManipulator object
 	 * @return 1 when the data should by saved <br/>
 	 *         0 on saving should be done <br/>
 	 *         -1 cancel current operation <br/>
-	 * 
+	 *
 	 */
 	public int checkSave(TableManipulator tm) {
 		tm.stopEditing();
@@ -535,7 +510,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 
 	/**
 	 * Ermittelt den nächsten Wert für eine gegebene Sequenz
-	 * 
+	 *
 	 * @param seqName
 	 * @return den nächsten Wert der Sequenz
 	 * @throws java.sql.SQLException
@@ -571,7 +546,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 
 	/**
 	 * Ermittelt den nächsten Wert für eine gegebene Sequenz
-	 * 
+	 *
 	 * @param seqName
 	 * @return den nächsten Wert der Sequenz
 	 * @throws java.sql.SQLException
@@ -660,7 +635,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 	 *         Transactino won't be closed on dialog closing event automatically
 	 *         You have to close each allocated Transaction object yourself by
 	 *         calling <b>closeTransaction()</b>
-	 * 
+	 *
 	 *         The Transaction object will by destroyed atomatically on
 	 *         appliaction shutdown
 	 */
@@ -676,7 +651,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 
 	/**
 	 * closes a given Transaction object. Rollback is done automatically.
-	 * 
+	 *
 	 * @param tran
 	 *            a valid Transaction object
 	 * @throws SQLException
@@ -767,7 +742,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 
 	/**
 	 * Registers a listener for a F1, ESC, or somthing global keypressed Event
-	 * 
+	 *
 	 * @param to_listen_Key
 	 *            Keyboard Key
 	 * @param runnable
@@ -795,7 +770,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 	 * wurde. Wurde mehr als ein Eintrag selektiert, bekommt der User eine
 	 * entsprechende Fehlermeldeung aufgeschalten und der Rückgabewert der
 	 * Funktion ist false.
-	 * 
+	 *
 	 * @param table
 	 *            eine jTable
 	 * @return <b>true</b> Wenn nur ein Eintrag selektiert wurde und
@@ -829,12 +804,12 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 
 	/**
 	 * in jTextField an einen StringBuffer anbinden
-	 * 
+	 *
 	 * @param jtext
 	 *            das Textfeld
 	 * @param var
 	 *            der StringBuffer
-	 * 
+	 *
 	 *            Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
 	 *            dann der demenstprechende Inhalt entweder vom GUI zu
 	 *            Variablen, oder umgekehrt übertragen.
@@ -849,12 +824,12 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 
 	/**
 	 * in jTextField an einen StringBuffer anbinden
-	 * 
+	 *
 	 * @param jtext
 	 *            das Textfeld
 	 * @param var
 	 *            der StringBuffer
-	 * 
+	 *
 	 *            Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
 	 *            dann der demenstprechende Inhalt entweder vom GUI zu
 	 *            Variablen, oder umgekehrt übertragen.
@@ -896,16 +871,16 @@ public class BaseDialogBaseHelper implements BindVarInterface {
     public void bindVar(JTextArea jtext, DBValue var) {
         checkBindVars();
         bind_vars.bindVar(jtext, var);
-    }  
-        
+    }
+
 	/**
 	 * Ein jTextField an eine DBValue anbinden
-	 * 
+	 *
 	 * @param jtext
 	 *            das Textfeld
 	 * @param var
 	 *            die Datenbankvariable
-	 * 
+	 *
 	 *            Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
 	 *            dann der demenstprechende Inhalt entweder vom GUI zu
 	 *            Variablen, oder umgekehrt übertragen.
@@ -920,12 +895,12 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 
 	/**
 	 * Eine {@link JComboBox} an eine {@link DBValue} anbinden
-	 * 
-	 * @param jtext
+	 *
+	 * @param jcombo
 	 *            das Textfeld
 	 * @param var
 	 *            die Datenbankvariable
-	 * 
+	 *
 	 *            Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
 	 *            dann der demenstprechende Inhalt entweder vom GUI zu
 	 *            Variablen, oder umgekehrt übertragen.
@@ -941,12 +916,12 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 	/**
 	 * Eine {@link IDateTimeComponent} an eine {@link DBDateTime} Variable
 	 * anbinden
-	 * 
+	 *
 	 * @param comp
 	 *            die DateTime Komponente
 	 * @param dateTime
 	 *            die Datenbankvariable
-	 * 
+	 *
 	 *            Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
 	 *            dann der demenstprechende Inhalt entweder vom GUI zu
 	 *            Variablen, oder umgekehrt übertragen.
@@ -960,12 +935,12 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 
 	/**
 	 * Eine JCheckBox an eine DBFlagInteger Variable anbinden
-	 * 
+	 *
 	 * @param jtext
 	 *            die Textbox
 	 * @param var
 	 *            die Datebanvariable
-	 * 
+	 *
 	 *            Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
 	 *            dann der demenstprechende Inhalt entweder vom GUI zu
 	 *            Variablen, oder umgekehrt übertragen.

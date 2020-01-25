@@ -11,16 +11,12 @@
 
 package at.redeye.FrameWork.base.tablemanipulator.test;
 
-import at.redeye.FrameWork.base.AutoMBox;
-import at.redeye.FrameWork.base.BaseDialog;
-import at.redeye.FrameWork.base.BaseModuleLauncher;
-import at.redeye.FrameWork.base.LocalRoot;
-import at.redeye.FrameWork.base.Root;
+import at.redeye.FrameWork.base.*;
 import at.redeye.FrameWork.base.prm.bindtypes.DBConfig;
 import at.redeye.FrameWork.base.tablemanipulator.TableManipulator;
+
+import javax.swing.*;
 import java.util.Vector;
-import javax.swing.UIManager;
-import org.apache.log4j.BasicConfigurator;
 
 /**
  *
@@ -35,7 +31,7 @@ public class RowHeaderTest extends BaseDialog {
     public RowHeaderTest(Root root) {
         super(root,"Table RowHeader Test");
 
-        initComponents();        
+        initComponents();
 
         DBConfig config = new DBConfig();
 
@@ -47,7 +43,7 @@ public class RowHeaderTest extends BaseDialog {
         tm.hide(config.hist.lo_zeit);
 
         tm.setEditable(config.name);
-        
+
         Vector<DBConfig> data = new Vector<DBConfig>();
 
         for( i = 0 ; i < 19; i++ )
@@ -74,7 +70,7 @@ public class RowHeaderTest extends BaseDialog {
             jr_metal.setSelected(true);
         else if( StyleName.equals("motif") )
             jr_motif.setSelected(true);
-        else 
+        else
             jr_nimbus.setSelected(true);
 
     }
@@ -325,7 +321,6 @@ public class RowHeaderTest extends BaseDialog {
 
     public static void main(String args[]) {
 
-        BasicConfigurator.configure();
         main_root = new LocalRoot("TT");
 
         run();

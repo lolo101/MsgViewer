@@ -5,15 +5,16 @@
 
 package at.redeye.FrameWork.widgets.helpwindow;
 
-import at.redeye.FrameWork.Plugin.Plugin;
 import at.redeye.FrameWork.base.AutoMBox;
 import at.redeye.FrameWork.base.FrameWorkConfigDefinitions;
 import at.redeye.FrameWork.base.Root;
-import java.io.IOException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
 import javax.swing.event.HyperlinkListener;
-import org.apache.log4j.Logger;
+import java.io.IOException;
 
 /**
  *
@@ -21,7 +22,7 @@ import org.apache.log4j.Logger;
  */
 public class HyperlinkExecuter implements HyperlinkListener {
 
-    private static final Logger logger = Logger.getLogger(HyperlinkExecuter.class.getName());
+    private static final Logger logger = LogManager.getLogger(HyperlinkExecuter.class);
     private Root root;
     private static OpenUrlInterface open_url = null;
 
@@ -77,7 +78,7 @@ public class HyperlinkExecuter implements HyperlinkListener {
         if( Setup.is_win_system() )
             return "explorer";
         */
-        
+
         return root.getSetup().getLocalConfig(FrameWorkConfigDefinitions.OpenCommand);
     }
 

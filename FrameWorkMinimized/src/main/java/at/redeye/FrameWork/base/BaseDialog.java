@@ -1,24 +1,5 @@
 package at.redeye.FrameWork.base;
 
-import java.awt.Container;
-import java.awt.Window;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Timer;
-
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JPasswordField;
-import javax.swing.JRootPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-
-import org.apache.log4j.Logger;
-
 import at.redeye.FrameWork.base.bindtypes.DBDateTime;
 import at.redeye.FrameWork.base.bindtypes.DBFlagInteger;
 import at.redeye.FrameWork.base.bindtypes.DBValue;
@@ -28,7 +9,15 @@ import at.redeye.FrameWork.widgets.datetime.IDateTimeComponent;
 import at.redeye.SqlDBInterface.SqlDBIO.impl.TableBindingNotRegisteredException;
 import at.redeye.SqlDBInterface.SqlDBIO.impl.UnsupportedDBDataTypeException;
 import at.redeye.SqlDBInterface.SqlDBIO.impl.WrongBindFileFormatException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javax.swing.*;
+import java.awt.*;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.Timer;
 
 public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
 		BaseDialogBase {
@@ -37,7 +26,7 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
 
 	public BaseDialogBaseHelper helper;
 	JRootPane myrootPane;
-	public static Logger logger = Logger.getLogger(BaseDialog.class.getName());
+	public static Logger logger = LogManager.getLogger(BaseDialog.class);
 	public Root root;
 
 	public BaseDialog(Root root, String title) {
@@ -470,7 +459,7 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
 	 * Little helper function that sets the frame visible and push it to front,
 	 * by useing the wait cursor.
 	 *
-	 * @param frame
+	 * @param dlg
 	 */
 	@Override
 	public void invokeDialog(BaseDialogBase dlg) {
@@ -481,7 +470,7 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
 	 * Little helper function that sets the frame visible and push it to front,
 	 * by useing the wait cursor.
 	 *
-	 * @param frame
+	 * @param dlg
 	 */
 	public void invokeDialog(BaseDialog dlg) {
 		helper.invokeDialog((BaseDialogBase) dlg);

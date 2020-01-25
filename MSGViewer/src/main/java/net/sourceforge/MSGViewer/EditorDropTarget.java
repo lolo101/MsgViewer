@@ -6,26 +6,21 @@
 package net.sourceforge.MSGViewer;
 
 import at.redeye.FrameWork.utilities.StringUtils;
-import java.awt.Color;
-import java.awt.Point;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.dnd.DropTargetEvent;
-import java.awt.dnd.DropTargetListener;
+import java.awt.dnd.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-import javax.swing.JEditorPane;
-import org.apache.log4j.Logger;
 
 /**
  *
@@ -33,7 +28,7 @@ import org.apache.log4j.Logger;
  */
 public class EditorDropTarget implements DropTargetListener
 {
-    private static final Logger logger = Logger.getLogger(EditorDropTarget.class.getName());
+    private static final Logger logger = LogManager.getLogger(EditorDropTarget.class);
     private final JEditorPane pane;
     private final DropTarget dropTarget;
     private boolean acceptableType;
@@ -58,7 +53,7 @@ public class EditorDropTarget implements DropTargetListener
 
     @Override
     public void dragEnter(DropTargetDragEvent dtde) {
-        
+
         logger.debug("dragEnter");
 
         // Get the type of object being transferred and determine
@@ -75,7 +70,7 @@ public class EditorDropTarget implements DropTargetListener
     @Override
     public void dragOver(DropTargetDragEvent dtde) {
 
-        
+
         logger.debug("dragOver");
         // Accept or reject the drag
         boolean acceptedDrag = acceptOrRejectDrag(dtde);
@@ -88,7 +83,7 @@ public class EditorDropTarget implements DropTargetListener
     public void dropActionChanged(DropTargetDragEvent dtde) {
 
         logger.debug("dropActionChanged");
-        
+
         // Accept or reject the drag
         boolean acceptedDrag = acceptOrRejectDrag(dtde);
 
@@ -106,9 +101,9 @@ public class EditorDropTarget implements DropTargetListener
 
     @Override
     public void drop(DropTargetDropEvent dtde) {
-        
+
         logger.debug("drop");
-        
+
           // Check the drop action
     if ((dtde.getDropAction() & DnDConstants.ACTION_COPY_OR_MOVE) != 0) {
       // Accept the drop and get the transfer data
@@ -215,7 +210,7 @@ public class EditorDropTarget implements DropTargetListener
 
   // This method handles a drop for a list of files
   protected boolean dropFile(Transferable transferable) throws IOException,
-      UnsupportedFlavorException, MalformedURLException {
+      UnsupportedFlavorException {
     List fileList = (List) transferable
         .getTransferData(DataFlavor.javaFileListFlavor);
     File transferFile = (File) fileList.get(0);
@@ -292,7 +287,7 @@ public class EditorDropTarget implements DropTargetListener
             + insertData.length());
            */
 
-           String files_to_open[] = insertData.split("\n");
+           String[] files_to_open = insertData.split("\n");
 
            for( String  file_to_open : files_to_open )
                 main_win.loadMessage( file_to_open );
