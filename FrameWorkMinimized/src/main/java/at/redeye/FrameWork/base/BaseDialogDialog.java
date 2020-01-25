@@ -4,24 +4,6 @@
  */
 package at.redeye.FrameWork.base;
 
-import java.awt.Container;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Timer;
-
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JPasswordField;
-import javax.swing.JRootPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-
-import org.apache.log4j.Logger;
-
 import at.redeye.FrameWork.base.bindtypes.DBDateTime;
 import at.redeye.FrameWork.base.bindtypes.DBFlagInteger;
 import at.redeye.FrameWork.base.bindtypes.DBValue;
@@ -31,10 +13,18 @@ import at.redeye.FrameWork.widgets.datetime.IDateTimeComponent;
 import at.redeye.SqlDBInterface.SqlDBIO.impl.TableBindingNotRegisteredException;
 import at.redeye.SqlDBInterface.SqlDBIO.impl.UnsupportedDBDataTypeException;
 import at.redeye.SqlDBInterface.SqlDBIO.impl.WrongBindFileFormatException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javax.swing.*;
+import java.awt.*;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.Timer;
 
 /**
- * 
+ *
  * @author martin
  */
 public class BaseDialogDialog extends javax.swing.JDialog implements
@@ -44,8 +34,7 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 
 	public BaseDialogBaseHelper helper;
 	JRootPane myrootPane;
-	protected static Logger logger = Logger.getLogger(BaseDialogDialog.class
-			.getName());
+	protected static Logger logger = LogManager.getLogger(BaseDialogDialog.class);
 	protected Root root;
 
 	public BaseDialogDialog(Root root, String title) {
@@ -74,7 +63,7 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	/**
 	 * Overload this method, if the window shouldn't open with with the last
 	 * stored with and height.
-	 * 
+	 *
 	 * @return true if the size of the dialog should be stored
 	 */
 	public boolean openWithLastWidthAndHeight() {
@@ -89,7 +78,7 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 
 	/**
 	 * automatically opens the Help Windows, when F1 is pressed
-	 * 
+	 *
 	 * @param runnable
 	 *            This runnable should open the Help Window
 	 */
@@ -106,7 +95,7 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 
 	/**
 	 * Registers a listener for a F1, ESC, or somthing global keypressed Event
-	 * 
+	 *
 	 * @param to_listen_Key
 	 *            Keyboard Key
 	 * @param runnable
@@ -144,7 +133,7 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	 *         Transactino won't be closed on dialog closing event automatically
 	 *         You have to close each allocated Transaction object yourself by
 	 *         calling <b>closeTransaction()</b>
-	 * 
+	 *
 	 *         The Transaction object will by destroyed atomatically on
 	 *         appliaction shutdown
 	 */
@@ -154,7 +143,7 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 
 	/**
 	 * closes a given Transaction object. Rollback is done automatically.
-	 * 
+	 *
 	 * @param tran
 	 *            a valid Transaction object
 	 * @throws SQLException
@@ -183,7 +172,7 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 
 	/**
 	 * Ermittelt den nächsten Wert für eine gegebene Sequenz
-	 * 
+	 *
 	 * @param seqName
 	 * @return den nächsten Wert der Sequenz
 	 * @throws java.sql.SQLException
@@ -204,7 +193,7 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	 * gibt dabei an wieviele Werte benötigt werden. Im Endeffekt darf dann der
 	 * zurückgegeben Wert so oft, wie durch die Varible <b>number</> angeben
 	 * erhöht werden.
-	 * 
+	 *
 	 * @param seqName
 	 * @param number
 	 *            die Anzahl der Werte die geliefert werden soll.
@@ -235,13 +224,13 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	/**
 	 * Checks, if data within the table have been change, asks the user what
 	 * sould be done (save it, don't save it, or cancel current operation
-	 * 
+	 *
 	 * @param tm
 	 *            TableManipulator object
 	 * @return 1 when the data should by saved <br/>
 	 *         0 on saving should be done <br/>
 	 *         -1 cancel current operation <br/>
-	 * 
+	 *
 	 */
 	public int checkSave(TableManipulator tm) {
 		return helper.checkSave(tm);
@@ -252,7 +241,7 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 
 	/**
 	 * to be overrided by subdialogs
-	 * 
+	 *
 	 * @return true if the dialog can be closed
 	 */
 	public boolean canClose() {
@@ -280,7 +269,7 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	 * wurde. Wurde mehr als ein Eintrag selektiert, bekommt der User eine
 	 * entsprechende Fehlermeldeung aufgeschalten und der Rückgabewert der
 	 * Funktion ist false.
-	 * 
+	 *
 	 * @param table
 	 *            eine jTable
 	 * @return <b>true</b> Wenn nur ein Eintrag selektiert wurde und
@@ -294,12 +283,12 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 
 	/**
 	 * in jTextField an einen StringBuffer anbinden
-	 * 
+	 *
 	 * @param jtext
 	 *            das Textfeld
 	 * @param var
 	 *            der StringBuffer
-	 * 
+	 *
 	 *            Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
 	 *            dann der demenstprechende Inhalt entweder vom GUI zu
 	 *            Variablen, oder umgekehrt übertragen.
@@ -310,12 +299,12 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 
 	/**
 	 * in jTextField an einen StringBuffer anbinden
-	 * 
+	 *
 	 * @param jtext
 	 *            das Textfeld
 	 * @param var
 	 *            der StringBuffer
-	 * 
+	 *
 	 *            Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
 	 *            dann der demenstprechende Inhalt entweder vom GUI zu
 	 *            Variablen, oder umgekehrt übertragen.
@@ -326,12 +315,12 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 
 	/**
 	 * Ein jTextField an eine DBValue anbinden
-	 * 
+	 *
 	 * @param jtext
 	 *            das Textfeld
 	 * @param var
 	 *            die Datenbankvariable
-	 * 
+	 *
 	 *            Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
 	 *            dann der demenstprechende Inhalt entweder vom GUI zu
 	 *            Variablen, oder umgekehrt übertragen.
@@ -342,12 +331,12 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 
 	/**
 	 * Eine JCheckBox an eine DBFlagInteger Variable anbinden
-	 * 
+	 *
 	 * @param jtext
 	 *            die Textbox
 	 * @param var
 	 *            die Datebanvariable
-	 * 
+	 *
 	 *            Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
 	 *            dann der demenstprechende Inhalt entweder vom GUI zu
 	 *            Variablen, oder umgekehrt übertragen.
@@ -359,12 +348,12 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 
 	/**
 	 * Eine JComboBox an eine {@link DBValue} Variable anbinden
-	 * 
+	 *
 	 * @param jComboBox
 	 *            die Combo-box
 	 * @param var
 	 *            die Datebanvariable
-	 * 
+	 *
 	 *            Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
 	 *            dann der demenstprechende Inhalt entweder vom GUI zu
 	 *            Variablen, oder umgekehrt übertragen.
@@ -377,12 +366,12 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	/**
 	 * Eine {@link IDateTimeComponent} an eine {@link DBDateTime} Variable
 	 * anbinden
-	 * 
+	 *
 	 * @param comp
 	 *            die DateTime-Komponente
 	 * @param dateTime
 	 *            die Datebanvariable
-	 * 
+	 *
 	 *            Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
 	 *            dann der demenstprechende Inhalt entweder vom GUI zu
 	 *            Variablen, oder umgekehrt übertragen.
@@ -394,12 +383,12 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 
 	/**
 	 * in jTextArea an eine StringBuffer anbinden
-	 * 
+	 *
 	 * @param jtext
 	 *            das Textfeld
 	 * @param var
 	 *            der StringBuffer
-	 * 
+	 *
 	 *            Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
 	 *            dann der demenstprechende Inhalt entweder vom GUI zu
 	 *            Variablen, oder umgekehrt übertragen.
@@ -407,16 +396,16 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
         @Override
 	public void bindVar(JTextArea jtext, StringBuffer var) {
 		helper.bindVar(jtext, var);
-	}   
-        
+	}
+
 	/**
 	 * in jTextArea an eine DBValue anbinden
-	 * 
+	 *
 	 * @param jtext
 	 *            das Textfeld
 	 * @param var
 	 *            der DBValue
-	 * 
+	 *
 	 *            Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
 	 *            dann der demenstprechende Inhalt entweder vom GUI zu
 	 *            Variablen, oder umgekehrt übertragen.
@@ -424,8 +413,8 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
         @Override
 	public void bindVar(JTextArea jtext, DBValue var) {
 		helper.bindVar(jtext, var);
-	}             
-        
+	}
+
 	/**
 	 * Alle Werte der angebunden Variablen in die entsprechenden GUI Komponenten
 	 * übertragen
@@ -445,7 +434,7 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 
 	/**
 	 * gibt die <b>root</b> Klasse zurück
-	 * 
+	 *
 	 * @return
 	 */
 	public Root getRoot() {
@@ -461,7 +450,7 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 
 	/**
 	 * Setzt den Sanduhr, oder "normale" Mauscursor
-	 * 
+	 *
 	 * @param state
 	 *            <b>true</b> für die Sanduhr und <b>false</b> für den nurmalen
 	 *            Cursor
@@ -481,7 +470,7 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	 * Konfiguriert das jScrollpanel entsprechen dem im Setup hinterlegten
 	 * Geschwindigkeit. Vom User über den Parameter VerticalScrollingSpeed
 	 * einstellbar.
-	 * 
+	 *
 	 * @param scroll_panel
 	 */
 	public void adjustScrollingSpeed(JScrollPane scroll_panel) {
@@ -491,7 +480,7 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	/**
 	 * Little helper function that sets the frame visible and push it to front,
 	 * by useing the wait cursor.
-	 * 
+	 *
 	 * @param frame
 	 */
 	public void invokeDialog(JFrame frame) {
@@ -501,8 +490,8 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	/**
 	 * Little helper function that sets the frame visible and push it to front,
 	 * by useing the wait cursor.
-	 * 
-	 * @param frame
+	 *
+	 * @param dlg
 	 */
 	public void invokeDialog(BaseDialogBase dlg) {
 		helper.invokeDialog(dlg);
@@ -560,7 +549,7 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	 * @param requester
 	 *            The calling object (can be used to implement different
 	 *            behavoir for eg saving size of window and table. Can be null
-	 * 
+	 *
 	 * @return a Dialog identifier for saving some data, eg: width an height of
 	 *         the dialog. The default behavior is retuning the dialog title.
 	 *         This function should be overloaded if some instances of dialogs

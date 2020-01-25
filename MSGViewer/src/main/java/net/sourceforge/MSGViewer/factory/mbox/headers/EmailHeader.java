@@ -5,14 +5,15 @@ import com.auxilii.msgparser.Message;
 import com.auxilii.msgparser.RecipientEntry;
 import com.auxilii.msgparser.RecipientType;
 import net.sourceforge.MSGViewer.factory.mbox.MailAddress;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class EmailHeader extends HeaderParser
 {
-    private static final Logger LOGGER = Logger.getLogger(EmailHeader.class);
+    private static final Logger LOGGER = LogManager.getLogger(EmailHeader.class);
     private final RecipientType type;
 
     EmailHeader(RecipientType type)

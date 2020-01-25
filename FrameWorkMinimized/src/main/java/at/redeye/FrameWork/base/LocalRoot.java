@@ -5,30 +5,24 @@
 
 package at.redeye.FrameWork.base;
 
-import java.sql.SQLException;
-import java.util.Vector;
-
-import org.apache.log4j.Logger;
-
-import at.redeye.FrameWork.base.bindtypes.DBStrukt;
+import at.redeye.FrameWork.Plugin.Plugin;
 import at.redeye.FrameWork.base.dll_cache.DLLCache;
 import at.redeye.FrameWork.base.dll_cache.DLLExtractor;
 import at.redeye.FrameWork.base.proxy.AutoProxyHandler;
-import at.redeye.FrameWork.utilities.StringUtils;
-import at.redeye.FrameWork.Plugin.Plugin;
 import at.redeye.FrameWork.base.translation.MLHelper;
+import at.redeye.FrameWork.utilities.StringUtils;
 import at.redeye.FrameWork.utilities.calendar.CalendarFactory;
 import at.redeye.FrameWork.utilities.calendar.Holidays;
-import at.redeye.SqlDBInterface.SqlDBConnection.impl.ConnectionDefinition;
-import at.redeye.SqlDBInterface.SqlDBConnection.impl.MissingConnectionParamException;
-import at.redeye.SqlDBInterface.SqlDBConnection.impl.SupportedDBMSTypes;
-import at.redeye.SqlDBInterface.SqlDBConnection.impl.UnSupportedDatabaseException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 /**
- * 
+ *
  * @author martin
  */
 public class LocalRoot extends Root {
@@ -39,7 +33,7 @@ public class LocalRoot extends Root {
 //	protected DBManager dbmanager = null;
 	protected Vector<BaseDialogBase> dialogs = new Vector<BaseDialogBase>();
 	protected boolean appExitAllowed = true;
-	private static Logger logger = Logger.getLogger(LocalRoot.class);
+	private static Logger logger = LogManager.getLogger(LocalRoot.class);
 	// EncryptedDBPasswd enc;
 	// DelayedLoader loader_encryption;
 	DelayedProxyLoader loader_proxy;
@@ -122,7 +116,7 @@ public class LocalRoot extends Root {
 
 		if (setup.saveProps())
 			return setup.saveGlobalProps();
-                    
+
 		return false;
 	}
 
@@ -297,13 +291,13 @@ public class LocalRoot extends Root {
         }
 
         if( plugin.isAvailable() )
-        {   
+        {
             try {
                 plugin.initPlugin(this);
                 plugins.add(plugin);
             } catch( AccessControlException ex ) {
-                logger.error(ex,ex);                
-            }            
+                logger.error(ex,ex);
+            }
         }
     }
 
@@ -331,7 +325,7 @@ public class LocalRoot extends Root {
     }
 
     @Override
-    public Holidays getHolidays() 
+    public Holidays getHolidays()
     {
         if( holidays == null )
             holidays = CalendarFactory.getDefaultHolidays();
@@ -438,7 +432,7 @@ public class LocalRoot extends Root {
     public AutoProxyHandler getAutProxyHandler()
     {
         waitUntilNetworkIsReady();
-        
+
         return proxy_handler;
     }
 }

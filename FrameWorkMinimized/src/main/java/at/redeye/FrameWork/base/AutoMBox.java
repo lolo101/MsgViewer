@@ -5,12 +5,12 @@
 
 package at.redeye.FrameWork.base;
 
-import org.apache.log4j.Logger;
-
 import at.redeye.FrameWork.utilities.StringUtils;
-import java.util.ArrayList;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import javax.swing.JOptionPane;
+import javax.swing.*;
+import java.util.ArrayList;
 
 /**
  *
@@ -38,14 +38,14 @@ public abstract class AutoMBox
 
     public AutoMBox( String className, boolean do_mbox )
     {
-        logger = Logger.getLogger(className);
+        logger = LogManager.getLogger(className);
         this.do_mbox = do_mbox;
         invoke();
     }
 
     public AutoMBox( String className )
     {
-        logger = Logger.getLogger(className);
+        logger = LogManager.getLogger(className);
 
         invoke();
     }
@@ -93,7 +93,7 @@ public abstract class AutoMBox
                             root.MlM("Es ist ein Fehler aufgetreten:") + " "
                             + thrown_ex.getLocalizedMessage()),
                             root.MlM("Error"),
-                            JOptionPane.OK_OPTION);
+                            JOptionPane.ERROR_MESSAGE);
                 }
             }
         }

@@ -17,25 +17,19 @@
  */
 package com.auxilii.msgparser;
 
-import static org.apache.poi.util.StringUtil.getFromUnicodeLE;
-
-import java.io.ByteArrayInputStream;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
 import com.auxilii.msgparser.attachment.MsgAttachment;
-import java.io.IOException;
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.hmef.CompressedRTF;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import static org.apache.poi.util.StringUtil.getFromUnicodeLE;
 
 /**
  * Class that represents a .msg file. Some
@@ -50,7 +44,7 @@ import org.apache.poi.hmef.CompressedRTF;
  * @author roman.kurmanowytsch
  */
 public class Message {
-    private static final Logger LOGGER = Logger.getLogger(Message.class.getName());
+    private static final Logger LOGGER = LogManager.getLogger(Message.class);
 
     /**
      * The message class as defined in the .msg file.
@@ -236,7 +230,7 @@ public class Message {
     @Override
     public String toString() {
         StringBuilder sb = headerString();
-        sb.append("").append(this.attachments.size()).append(" attachments.");
+        sb.append(this.attachments.size()).append(" attachments.");
         return sb.toString();
     }
 
@@ -253,7 +247,7 @@ public class Message {
         }
         if (this.attachments.size() > 0) {
             sb.append("\n");
-            sb.append("").append(this.attachments.size()).append(" attachments.\n");
+            sb.append(this.attachments.size()).append(" attachments.\n");
             for (Attachment att : this.attachments) {
                 sb.append(att.toString()).append("\n");
             }

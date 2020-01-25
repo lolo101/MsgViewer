@@ -4,15 +4,15 @@
  */
 package at.redeye.FrameWork.utilities;
 
+import org.apache.logging.log4j.Logger;
+
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
 /**
- * 
+ *
  * @author martin
  */
 public class StringUtils {
@@ -309,9 +309,9 @@ public class StringUtils {
 	 * <li>0.03 => 0.03</li>
 	 * <li>12.000 => 12</li>
 	 * </ul>
-	 * 
+	 *
 	 * @param d
-	 * @param rouding
+	 * @param rounding
 	 *            precision
 	 * @return
 	 */
@@ -327,7 +327,7 @@ public class StringUtils {
 	 * <li>0.03 => 0.03</li>
 	 * <li>12.000 => 12</li>
 	 * </ul>
-	 * 
+	 *
 	 * @param d
 	 *            the number
 	 * @return
@@ -343,7 +343,7 @@ public class StringUtils {
 
 	/**
 	 * Finds out, if the given string has the meaning of 'Yes'
-	 * 
+	 *
 	 * @param maybe_a_yes_value
 	 * @return true, false
 	 */
@@ -381,7 +381,7 @@ public class StringUtils {
 
 	/**
 	 * Converts the complete Backtrace of an Exception into a String
-	 * 
+	 *
 	 * @param ex
 	 * @return Backtrace of the Exception
 	 * @deprecated Use {@link Logger#error(Object, Throwable)} instead
@@ -400,7 +400,7 @@ public class StringUtils {
 	/**
 	 * The method cuts off the requested number of lines from source string.<br>
 	 * Processed are the indicaters is <b>\n<\b>
-	 * 
+	 *
 	 * @param sourceString
 	 *            The string that shall be processed.
 	 * @param lines
@@ -433,7 +433,7 @@ public class StringUtils {
 
 	/**
 	 * Converts a byte array into its corresponding ASCII string
-	 * 
+	 *
 	 * @param data
 	 *            Input data
 	 * @return the converted ASCII string
@@ -452,7 +452,7 @@ public class StringUtils {
 
 	/**
 	 * Adds Line numbers as prefix to the text
-	 * 
+	 *
 	 * @param text
 	 * @return Line numbered String
 	 */

@@ -6,14 +6,11 @@ package at.redeye.FrameWork.base.prm.impl;
 
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.base.prm.bindtypes.DBConfig;
-import at.redeye.FrameWork.base.transaction.Transaction;
-import at.redeye.SqlDBInterface.SqlDBIO.impl.UnsupportedDBDataTypeException;
-import at.redeye.SqlDBInterface.SqlDBIO.impl.WrongBindFileFormatException;
-import java.io.IOException;
-import java.sql.SQLException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.Set;
 import java.util.TreeMap;
-import org.apache.log4j.Logger;
 
 /**
  *
@@ -22,7 +19,7 @@ import org.apache.log4j.Logger;
 public class PrmDBInit {
 
     private Root root;
-    private Logger logger = Logger.getLogger(PrmDBInit.class.getSimpleName());
+    private Logger logger = LogManager.getLogger(PrmDBInit.class);
 
     public PrmDBInit(Root root) {
         this.root = root;
@@ -79,5 +76,5 @@ public class PrmDBInit {
 
         root.saveSetup();
     }
-        
+
 }

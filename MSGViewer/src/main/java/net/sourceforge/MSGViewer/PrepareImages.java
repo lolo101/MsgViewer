@@ -4,17 +4,19 @@ import at.redeye.FrameWork.utilities.StringUtils;
 import com.auxilii.msgparser.Message;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.log4j.Logger;
 
 public class PrepareImages {
 
-    private static final Logger logger = Logger.getLogger(PrepareImages.class.getName());
+    private static final Logger logger = LogManager.getLogger(PrepareImages.class);
 
     private ViewerHelper viewerHelper;
     List<Attachment> attachments;
@@ -51,7 +53,7 @@ public class PrepareImages {
 
     private String replace_src(String s, Map<String, FileAttachment> attachmentById, Map<String, FileAttachment> attachmentByLocation) {
 
-        String res[] = s.split("[sS][rR][cC]\\s*=");
+        String[] res = s.split("[sS][rR][cC]\\s*=");
 
         int i = 0;
 
@@ -79,9 +81,7 @@ public class PrepareImages {
             if( start >= 0 && end > 0 )
             {
                 src = part.substring(start+1,end);
-
-                if( end > 0 )
-                    rest = part.substring(end+1);
+                rest = part.substring(end+1);
             }
 
             URI imgsrc = URI.create(src);
@@ -98,12 +98,10 @@ public class PrepareImages {
 
             logger.info("image: " + imgsrc);
 
-            if (imgsrc != null) {
-                ret.append("\"");
-                ret.append(imgsrc);
-                ret.append("\"");
-                ret.append(rest);
-            }
+            ret.append("\"");
+            ret.append(imgsrc);
+            ret.append("\"");
+            ret.append(rest);
         }
 
         return ret.toString();

@@ -6,19 +6,20 @@ package at.redeye.FrameWork.base.prm.impl;
 
 import at.redeye.FrameWork.base.prm.PrmDefaultChecksInterface;
 import at.redeye.SqlDBInterface.SqlDBIO.StmtExecInterface;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import org.apache.log4j.Logger;
 
 /**
- * 
+ *
  * @author mmattl
  */
 public class PrmDefaultCheckSuite implements PrmDefaultChecksInterface {
 
-	private Logger logger = Logger.getLogger(PrmDefaultCheckSuite.class
-			.getName());
-	private long checks2Execute = 0x0;
+	private final Logger logger = LogManager.getLogger(PrmDefaultCheckSuite.class);
+	private final long checks2Execute;
 
 	public PrmDefaultCheckSuite(long checks2Execute) {
 
