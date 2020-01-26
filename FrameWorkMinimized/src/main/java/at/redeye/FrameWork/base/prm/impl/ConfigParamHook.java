@@ -72,7 +72,7 @@ public class ConfigParamHook implements HelpWinHook
         Set<String> keys = config.keySet();
 
         res.append("<table>\n");
-        res.append("<tr bgcolor=\"" + color_title + "\"><td><b>");
+        res.append("<tr bgcolor=\"").append(color_title).append("\"><td><b>");
         res.append(root.MlM("Parameter"));
         res.append("</b></td>\n");
         res.append("<td><b>");
@@ -100,9 +100,9 @@ public class ConfigParamHook implements HelpWinHook
 
             count++;
 
-            DBConfig c = (DBConfig)config.get(key);
+            DBConfig c = config.get(key);
 
-            res.append("<tr bgcolor=\"" + color + "\">\n");
+            res.append("<tr bgcolor=\"").append(color).append("\">\n");
 
             res.append("<td><font face=\"Verdana\">\n");
             res.append( key );
@@ -171,9 +171,7 @@ public class ConfigParamHook implements HelpWinHook
             if( extra != null && extra.isEmpty() == false )
             {
                 res.append("<tr>");
-                res.append("<td colspan=4 bgcolor=\"" + color + "\">" +
-                        "<blockquote>" +
-                        "<font face=\"Verdana\">");
+                res.append("<td colspan=4 bgcolor=\"").append(color).append("\">").append("<blockquote>").append("<font face=\"Verdana\">");
                 res.append(extra);
                 res.append("</blockquote>" +
                         "</font><br/></td> ");

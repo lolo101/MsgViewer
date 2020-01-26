@@ -12,14 +12,14 @@ import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.base.translation.MLUtil;
 
 /**
- * 
+ *
  * @author martin
  */
 public class HelpWin extends BaseDialog {
 
 	private static final long serialVersionUID = 1L;
 
-	String base = new String();
+	String base = "";
 	HelpWinHook hook = null;
 
 	/** Creates new form HelpWin */
@@ -55,9 +55,9 @@ public class HelpWin extends BaseDialog {
 			public void do_stuff() throws Exception {
 
                             String locale = root.getDisplayLanguage();
-                            
+
                             String module_name = null;
-                                    
+
                             if( haveResource( HelpFileLoader.getResourceName(base, ModuleName + "_" + locale) ) )
                             {
                                 module_name = ModuleName + "_" + locale;
@@ -90,23 +90,23 @@ public class HelpWin extends BaseDialog {
 
                             // logger.debug(res.toString());
 
-                            jHelp.setText(res.toString());
+                            jHelp.setText(res);
                             jHelp.setCaretPosition(0);
 			}
 		};
 	}
-        
+
         boolean haveResource( String resource_name )
-        {            
+        {
             boolean result = MLUtil.haveResource( resource_name );
-            
+
             if( logger.isDebugEnabled() ) {
                 if( result )
                     logger.debug( "loaded: "  + resource_name );
                 else
                     logger.debug( "failed loading: "  + resource_name );
             }
-            
+
             return result;
         }
 
@@ -126,11 +126,7 @@ public class HelpWin extends BaseDialog {
 		jBClose.setIcon(new javax.swing.ImageIcon(getClass().getResource(
 				"/at/redeye/FrameWork/base/resources/icons/fileclose.gif"))); // NOI18N
 		jBClose.setText("Schließen");
-		jBClose.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				jBCloseActionPerformed(evt);
-			}
-		});
+		jBClose.addActionListener(this::jBCloseActionPerformed);
 
 		javax.swing.GroupLayout layout = new javax.swing.GroupLayout(
 				getContentPane());
@@ -177,5 +173,5 @@ public class HelpWin extends BaseDialog {
 	//End of variables declaration//GEN-END:variables
 
 
-    
+
 }

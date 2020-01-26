@@ -63,7 +63,7 @@ public class PrmDBInit {
 
         Set<String> keys = LocalConfigDefinitions.entries.keySet();
 
-        TreeMap<String, DBConfig> vals = new TreeMap<String, DBConfig>();
+        TreeMap<String, DBConfig> vals = new TreeMap<>();
 
         for (String key : keys) {
             vals.put(key, LocalConfigDefinitions.get(key));

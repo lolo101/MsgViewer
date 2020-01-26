@@ -18,7 +18,7 @@ import javax.swing.*;
  */
 public class BindVarBase implements BindVarInterface {
 
-    public ArrayList<Pair> pairs = new ArrayList<Pair>();
+    public ArrayList<Pair> pairs = new ArrayList<>();
 
     @Override
     public void bindVar(JTextField jtext, StringBuffer var) {

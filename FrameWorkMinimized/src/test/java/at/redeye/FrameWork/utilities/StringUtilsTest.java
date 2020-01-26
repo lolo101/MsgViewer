@@ -5,12 +5,10 @@
 
 package at.redeye.FrameWork.utilities;
 
+import org.junit.*;
+
 import java.util.List;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+
 import static org.junit.Assert.*;
 
 /**
@@ -23,11 +21,11 @@ public class StringUtilsTest {
     }
 
     @BeforeClass
-    public static void setUpClass() throws Exception {
+    public static void setUpClass() {
     }
 
     @AfterClass
-    public static void tearDownClass() throws Exception {
+    public static void tearDownClass() {
     }
 
     @Before
@@ -45,10 +43,10 @@ public class StringUtilsTest {
     public void testContains() {
         System.out.println("contains");
 
-        assertEquals(StringUtils.contains(' ', ""), false);
-        assertEquals(StringUtils.contains('x', "xxxx"), true);
-        assertEquals(StringUtils.contains('x', "xyz"), true);
-        assertEquals(StringUtils.contains('x', "yyyyyyyyyyyy"), false);
+        assertFalse(StringUtils.contains(' ', ""));
+        assertTrue(StringUtils.contains('x', "xxxx"));
+        assertTrue(StringUtils.contains('x', "xyz"));
+        assertFalse(StringUtils.contains('x', "yyyyyyyyyyyy"));
 
         try {
             StringUtils.contains('x', null);
@@ -180,12 +178,12 @@ public class StringUtilsTest {
     public void testIs_space() {
         System.out.println("is_space");
 
-        assertEquals(true, StringUtils.is_space(' '));
-        assertEquals(true, StringUtils.is_space('\t'));
-        assertEquals(true, StringUtils.is_space('\r'));
-        assertEquals(true, StringUtils.is_space('\n'));
-        assertEquals(false, StringUtils.is_space('\0'));
-        assertEquals(false, StringUtils.is_space('x'));
+        assertTrue(StringUtils.is_space(' '));
+        assertTrue(StringUtils.is_space('\t'));
+        assertTrue(StringUtils.is_space('\r'));
+        assertTrue(StringUtils.is_space('\n'));
+        assertFalse(StringUtils.is_space('\0'));
+        assertFalse(StringUtils.is_space('x'));
     }
 
     /**
@@ -195,7 +193,7 @@ public class StringUtilsTest {
     public void testSplit_str() {
         System.out.println("split_str");
 
-        String testArr[] = { "hallo", "das", "ist", "", "ein", "" , "", "test", "" };
+        String[] testArr = { "hallo", "das", "ist", "", "ein", "" , "", "test", "" };
 
         StringBuilder joined_string = new StringBuilder();
 
@@ -473,8 +471,8 @@ public class StringUtilsTest {
             return "";
         }
 
-        String split_a[] = a.split("\n");
-        String split_b[] = b.split("\n");
+        String[] split_a = a.split("\n");
+        String[] split_b = b.split("\n");
 
         assertEquals(split_b.length, split_a.length);
 
@@ -723,14 +721,14 @@ public class StringUtilsTest {
     public void testIsYes() {
         System.out.println("isYes");
 
-        assertEquals(true, StringUtils.isYes("yes"));
-        assertEquals(false, StringUtils.isYes("no"));
-        assertEquals(true, StringUtils.isYes("X"));
-        assertEquals(false, StringUtils.isYes(" "));
-        assertEquals(false, StringUtils.isYes(null));
-        assertEquals(false, StringUtils.isYes("0"));
-        assertEquals(true, StringUtils.isYes("1"));
-        assertEquals(false, StringUtils.isYes("hugo"));
+        assertTrue(StringUtils.isYes("yes"));
+        assertFalse(StringUtils.isYes("no"));
+        assertTrue(StringUtils.isYes("X"));
+        assertFalse(StringUtils.isYes(" "));
+        assertFalse(StringUtils.isYes(null));
+        assertFalse(StringUtils.isYes("0"));
+        assertTrue(StringUtils.isYes("1"));
+        assertFalse(StringUtils.isYes("hugo"));
     }
 
     /**
@@ -787,7 +785,7 @@ public class StringUtilsTest {
     public void testByteArrayToString() {
         System.out.println("byteArrayToString");
 
-        byte bytes[] = {72,97,108,108,111};
+        byte[] bytes = {72,97,108,108,111};
 
         assertEquals("Hallo",StringUtils.byteArrayToString(bytes));
     }

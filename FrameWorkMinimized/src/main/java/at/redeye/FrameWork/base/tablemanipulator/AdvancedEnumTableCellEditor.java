@@ -6,52 +6,50 @@ package at.redeye.FrameWork.base.tablemanipulator;
 
 import at.redeye.FrameWork.base.bindtypes.DBEnum;
 import at.redeye.FrameWork.base.bindtypes.DBEnumAsInteger;
-
 import at.redeye.FrameWork.base.bindtypes.DBValue;
 import at.redeye.FrameWork.widgets.AutoCompleteCombo;
-import java.awt.Color;
-import java.awt.Component;
-import javax.swing.AbstractCellEditor;
-import javax.swing.JTable;
+
+import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.table.TableCellEditor;
+import java.awt.*;
 
 /**
  *
  * @author martin
  */
 public class AdvancedEnumTableCellEditor extends AbstractCellEditor implements TableCellEditor {
-    
 
-    private static final long serialVersionUID = 1L;        
+
+    private static final long serialVersionUID = 1L;
     AutoCompleteCombo component = new AutoCompleteCombo();
     TableDesign tabledesign;
     int last_row = 0;
     int last_col = 0;
-    Object current_value;    
-    
+    Object current_value;
+
     public AdvancedEnumTableCellEditor(TableDesign tabledesign, DBEnum value ) {
-        this.tabledesign = tabledesign;       
+        this.tabledesign = tabledesign;
 
         for( String s : value.getLocalizedPossibleValues() )
         {
             component.addItem(s);
         }
-        
+
         // component.set_items(value.getPossibleValues());
-        component.setEditable(true);       
+        component.setEditable(true);
     }
 
     public AdvancedEnumTableCellEditor(TableDesign tabledesign, DBEnumAsInteger value) {
-        this.tabledesign = tabledesign;        
+        this.tabledesign = tabledesign;
 
         for( String s : value.getPossibleValues() )
         {
             component.addItem(s);
         }
-                
+
         // component.set_items(value.getPossibleValues());
-        component.setEditable(true);        
+        component.setEditable(true);
     }
 
     @Override
@@ -69,7 +67,7 @@ public class AdvancedEnumTableCellEditor extends AbstractCellEditor implements T
     }
 
     @Override
-    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {        
+    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
 
         last_row = TableDesign.getModelRow(table, row);
         last_col =  TableDesign.getModelCol(table, column);
@@ -86,7 +84,7 @@ public class AdvancedEnumTableCellEditor extends AbstractCellEditor implements T
                     component.requestFocus();
             }
         });
-        
+
         component.setBorder(new LineBorder(Color.BLACK));
 
         if( tabledesign.colls.get(last_col).validator != null )
@@ -117,7 +115,7 @@ public class AdvancedEnumTableCellEditor extends AbstractCellEditor implements T
 
        DBValue val = null;
 
-        if (DBValue.class.isInstance(current_value)) {
+        if (current_value instanceof DBValue) {
            val = (DBValue) current_value;
         } else {
            Object o =  tabledesign.rows.get(last_row).get(last_col);

@@ -11,10 +11,10 @@ import at.redeye.FrameWork.base.tablemanipulator.TableManipulator;
  *
  * @author martin
  */
-public interface CanCloseInterface 
+public interface CanCloseInterface
 {
-    public boolean isEdited();    
-    public int checkSave();
-    public void saveData();
-    public int checkSave(TableManipulator tm);
+    boolean isEdited();
+    int checkSave();
+    void saveData();
+    int checkSave(TableManipulator tm);
 }

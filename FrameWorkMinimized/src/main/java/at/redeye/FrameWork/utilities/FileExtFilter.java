@@ -25,10 +25,10 @@ public class FileExtFilter implements FilenameFilter, FileFilter
      * eg: FileExtFilter("*.txt *.html");
      * @param list all required file extensions here. Space, comma, tab, and semicolon are allowed
      */
-    public FileExtFilter( String extensions )            
+    public FileExtFilter( String extensions )
     {
-        final String ext[] = extensions.split("[ \t;,]");
-        
+        final String[] ext = extensions.split("[ \t;,]");
+
         final StringBuilder regex_string = new StringBuilder("^.*\\.");
         boolean first_regex = true;
 
@@ -44,23 +44,23 @@ public class FileExtFilter implements FilenameFilter, FileFilter
             if( first_regex )
                 first_regex = false;
             else
-                regex_string.append("|");                
-            
+                regex_string.append("|");
+
             regex_string.append("(");
-            
+
             for( int i = 0; i < s_lower.length(); i++ )
             {
-                char c_lower = s_lower.charAt(i);                
+                char c_lower = s_lower.charAt(i);
 
                 if (c_lower == '*') {
                     regex_string.append(".*");
                 } else if(c_lower == '.') {
                     regex_string.append("\\.");
-                } else {                    
-                    regex_string.append(c_lower);                    
+                } else {
+                    regex_string.append(c_lower);
                 }
             }
-            
+
             regex_string.append(")");
         }
 

@@ -13,18 +13,18 @@ import at.redeye.SqlDBInterface.SqlDBIO.impl.DBDataType;
  */
 public class DBInteger extends DBValue {
 
-    Integer value = new Integer(0);
-    
+    Integer value = Integer.valueOf(0);
+
     public DBInteger( String name )
     {
         super( name );
     }
-    
+
     public DBInteger( String name, String title )
     {
         super( name, title );
     }
-    
+
     @Override
     public DBDataType getDBType() {
         return DBDataType.DB_TYPE_INTEGER;
@@ -39,7 +39,7 @@ public class DBInteger extends DBValue {
     public Integer getValue() {
         return value;
     }
-    
+
     @Override
     public String toString()
     {
@@ -53,26 +53,26 @@ public class DBInteger extends DBValue {
 
     @Override
     public boolean acceptString(String s) {
-        
+
         try {
             Integer.parseInt(s);
         } catch ( NumberFormatException ex ) {
             return false;
         }
-        
+
         return true;
     }
 
     @Override
     public DBInteger getCopy() {
         DBInteger i = new DBInteger(name);
-        i.value = new Integer( value );
+        i.value = Integer.valueOf(value);
         return i;
     }
 
     @Override
     public void loadFromCopy(Object obj) {
-        value = new Integer( (Integer) obj );
+        value = Integer.valueOf((Integer) obj);
     }
 
 }

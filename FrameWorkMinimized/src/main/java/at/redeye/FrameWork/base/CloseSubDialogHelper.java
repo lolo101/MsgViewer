@@ -20,11 +20,6 @@ public class CloseSubDialogHelper
 
     public void closeSubDialog( final BaseDialogBase dialog )
     {
-        parent.registerOnCloseListener(new Runnable() {
-
-            public void run() {
-                dialog.close();
-            }
-        });
+        parent.registerOnCloseListener(dialog::close);
     }
 }

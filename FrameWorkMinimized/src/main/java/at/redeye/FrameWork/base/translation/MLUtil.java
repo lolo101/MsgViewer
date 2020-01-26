@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
  */
 public class MLUtil {
 
-    static Pattern number_pattern = Pattern.compile("^[0-9 \t\\n,\\.]+$");
+    static Pattern number_pattern = Pattern.compile("^[0-9 \t\\n,.]+$");
 
     public static Properties convertResourceBundleToProperties(ResourceBundle resource) {
         Properties properties = new Properties();
@@ -57,10 +57,8 @@ public class MLUtil {
     {
         Set<Object> keys = b.keySet();
 
-        Iterator<Object> it = keys.iterator();
-
-        while (it.hasNext()) {
-            String key = (String) it.next();
+        for (Object o : keys) {
+            String key = (String) o;
             String val = (String) b.get(key);
 
             if (!val.isEmpty()) {
@@ -115,7 +113,7 @@ public class MLUtil {
         if( p != null )
             return p;
 
-        String parts[] = locale.split("_");
+        String[] parts = locale.split("_");
 
         if ( parts.length == 1 ) {
             if( !no_default )

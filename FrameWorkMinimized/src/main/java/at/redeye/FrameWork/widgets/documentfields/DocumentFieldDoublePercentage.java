@@ -30,14 +30,14 @@ public class DocumentFieldDoublePercentage extends PlainDocument {
 
         if( str != null )
         {
-            if( str.matches("[0-9,\\.\\-\\+]+"))
+            if( str.matches("[0-9,.\\-+]+"))
             {
                 String all = getText(0, getLength()) + str;
 
                 if( all.length() > 0 )
                 {
                     try {
-                        Double num = Double.parseDouble(all);
+                        double num = Double.parseDouble(all);
 
                         if (num > 0 && num <= 100.0) {
                             super.insertString(offs, str, a);

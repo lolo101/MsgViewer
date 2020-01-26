@@ -23,7 +23,7 @@ public class MsgWriter
         fs.writeFilesystem(out);
     }
 
-     public static void main( String args[] )
+     public static void main(String[] args)
      {
          ModuleLauncher.BaseConfigureLogging();
 

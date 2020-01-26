@@ -57,8 +57,8 @@ public class UnZip
 
             if( !parent.exists() )
                 parent.mkdirs();
-                    
-            byte buffer[] = new byte[BUFFER];
+
+            byte[] buffer = new byte[BUFFER];
             int count;
             FileOutputStream fos = new FileOutputStream( file );
             BufferedOutputStream dest = new BufferedOutputStream( fos, BUFFER );
@@ -68,11 +68,11 @@ public class UnZip
                dest.write(buffer, 0, count);
             }
             dest.flush();
-            dest.close();                                           
+            dest.close();
         }
     }
 
-    public static void main( String argv[] )
+    public static void main(String[] argv)
     {
         try {
             unzip(new File("/home/martin/klo"), new File( "/home/martin/ooo3.zip"));

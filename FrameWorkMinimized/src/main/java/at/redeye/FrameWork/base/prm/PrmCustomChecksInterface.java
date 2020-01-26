@@ -13,6 +13,6 @@ import at.redeye.FrameWork.base.prm.impl.PrmActionEvent;
  */
 public interface PrmCustomChecksInterface   {
 
-    public boolean doCustomChecks (PrmActionEvent event);
+    boolean doCustomChecks(PrmActionEvent event);
 
 }

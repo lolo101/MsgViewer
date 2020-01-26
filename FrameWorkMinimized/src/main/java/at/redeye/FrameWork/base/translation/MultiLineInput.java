@@ -71,27 +71,15 @@ public class MultiLineInput extends javax.swing.JPanel {
 
         JBCopy.setIcon(new javax.swing.ImageIcon(getClass().getResource("/at/redeye/FrameWork/base/resources/icons/2downarrow.png"))); // NOI18N
         JBCopy.setText("Kopieren");
-        JBCopy.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                JBCopyActionPerformed(evt);
-            }
-        });
+        JBCopy.addActionListener(this::JBCopyActionPerformed);
 
         jBSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/at/redeye/FrameWork/base/resources/icons/button_ok.gif"))); // NOI18N
         jBSave.setText("Speichern");
-        jBSave.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBSaveActionPerformed(evt);
-            }
-        });
+        jBSave.addActionListener(this::jBSaveActionPerformed);
 
         jBClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/at/redeye/FrameWork/base/resources/icons/fileclose.gif"))); // NOI18N
         jBClose.setText("Schließen");
-        jBClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBCloseActionPerformed(evt);
-            }
-        });
+        jBClose.addActionListener(this::jBCloseActionPerformed);
 
         JTOrigin.setBackground(new java.awt.Color(240, 240, 240));
         JTOrigin.setColumns(20);

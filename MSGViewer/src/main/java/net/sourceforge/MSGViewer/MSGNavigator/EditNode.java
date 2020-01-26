@@ -4,11 +4,13 @@ import at.redeye.FrameWork.base.AutoMBox;
 import at.redeye.FrameWork.base.BaseDialog;
 import at.redeye.FrameWork.base.Root;
 import net.sourceforge.MSGViewer.MSGNavigator.MSGNavigator.TreeNodeContainer;
-
-import java.io.ByteArrayInputStream;
 import org.apache.poi.poifs.filesystem.DirectoryEntry;
 import org.apache.poi.poifs.filesystem.DocumentEntry;
 import org.apache.poi.poifs.filesystem.Entry;
+
+import java.awt.*;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 
 /**
  *
@@ -60,25 +62,21 @@ public class EditNode extends BaseDialog{
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
+        javax.swing.JScrollPane jScrollPane1 = new javax.swing.JScrollPane();
         jtHex = new javax.swing.JTextArea();
-        jButton1 = new javax.swing.JButton();
+        javax.swing.JButton jSaveButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(500, 300));
 
         jtHex.setColumns(20);
-        jtHex.setFont(new java.awt.Font("Courier New", 0, 12)); // NOI18N
+        jtHex.setFont(new java.awt.Font("Courier New", Font.PLAIN, 12)); // NOI18N
         jtHex.setLineWrap(true);
         jtHex.setRows(5);
         jScrollPane1.setViewportView(jtHex);
 
-        jButton1.setText("Save");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
+        jSaveButton.setText("Save");
+        jSaveButton.addActionListener(this::jSaveButtonActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -86,7 +84,7 @@ public class EditNode extends BaseDialog{
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButton1)
+                .addComponent(jSaveButton)
                 .addContainerGap(430, Short.MAX_VALUE))
             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE)
         );
@@ -95,14 +93,14 @@ public class EditNode extends BaseDialog{
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1)
+                .addComponent(jSaveButton)
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jSaveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jSaveButtonActionPerformed
 
 
         new AutoMBox(this.getClass().getName()) {
@@ -121,7 +119,7 @@ public class EditNode extends BaseDialog{
                     DirectoryEntry parent = entry.getParent();
                     entry.delete();
 
-                    ByteArrayInputStream buf = new ByteArrayInputStream(data.getBytes("UTF-16LE"));
+                    ByteArrayInputStream buf = new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_16LE));
 
                     DocumentEntry new_entry = parent.createDocument(name, buf);
 
@@ -141,11 +139,11 @@ public class EditNode extends BaseDialog{
                     data = data.replaceAll("[ \t\n]", "");
                     logger.info("Data: " + data);
 
-                    byte bytes[] = new byte[data.length() / 2];
+                    byte[] bytes = new byte[data.length() / 2];
                     int bcount = 0;
 
                     for (int i = 0; i < data.length(); i += 2, bcount++) {
-                        char charArray[] = {data.charAt(i), data.charAt(i + 1)};
+                        char[] charArray = {data.charAt(i), data.charAt(i + 1)};
                         bytes[bcount] = (Integer.valueOf(new String(charArray), 16)).byteValue();
                     }
 
@@ -166,12 +164,10 @@ public class EditNode extends BaseDialog{
         };
 
 
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_jSaveButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jtHex;
     // End of variables declaration//GEN-END:variables
 }

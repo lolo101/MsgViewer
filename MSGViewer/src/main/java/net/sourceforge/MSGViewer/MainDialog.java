@@ -12,8 +12,8 @@ package net.sourceforge.MSGViewer;
  */
 public interface MainDialog {
 
-    public void hideMenuBar();
+    void hideMenuBar();
 
-    public void setVisible(boolean b);
-    
+    void setVisible(boolean b);
+
 }

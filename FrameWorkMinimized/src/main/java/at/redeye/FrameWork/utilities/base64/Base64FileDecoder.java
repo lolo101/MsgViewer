@@ -12,23 +12,18 @@ import java.io.OutputStream;
 
 public class Base64FileDecoder {
 
-public static void main (String args[]) throws IOException {
+public static void main (String[] args) throws IOException {
    if (args.length != 2) {
       System.out.println ("Command line parameters: inputFileName outputFileName");
       System.exit (9); }
    decodeFile (args[0], args[1]); }
 
 private static void decodeFile (String inputFileName, String outputFileName) throws IOException {
-   BufferedReader in = null;
-   BufferedOutputStream out = null;
-   try {
-      in = new BufferedReader(new FileReader(inputFileName));
-      out = new BufferedOutputStream(new FileOutputStream(outputFileName));
-      decodeStream (in, out);
-      out.flush(); }
-    finally {
-      if (in != null) in.close();
-      if (out != null) out.close(); }}
+   try (BufferedReader in = new BufferedReader(new FileReader(inputFileName)); BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(outputFileName))) {
+      decodeStream(in, out);
+      out.flush();
+   }
+}
 
 private static void decodeStream (BufferedReader in, OutputStream out) throws IOException {
    while (true) {

@@ -17,26 +17,26 @@ import at.redeye.FrameWork.widgets.calendarday.InfoRenderer;
  */
 public interface DisplayMonth {
 
-    public void setMonth( int Month, int year );
-    
-    public int getDaysOfMonth();
-    
+    void setMonth(int Month, int year);
+
+    int getDaysOfMonth();
+
     /*
      * @param day : value 1 - 31 if the day does not exists null is returned
      */
-    public DisplayDay getDay( int day );    
-    
-    public void setListener( DayEventListener listener );
-    
-    public int isWhatDayOfMonth( DisplayDay day );
-    
-    public void setHolidays( Holidays holidays );
+    DisplayDay getDay(int day);
 
-    public Holidays getHolidays();
-    
-    public void setInfoRenderer( InfoRenderer renderer );
-    
-    public int getMonth();
-    
-    public int getYear();
+    void setListener(DayEventListener listener);
+
+    int isWhatDayOfMonth(DisplayDay day);
+
+    void setHolidays(Holidays holidays);
+
+    Holidays getHolidays();
+
+    void setInfoRenderer(InfoRenderer renderer);
+
+    int getMonth();
+
+    int getYear();
 }

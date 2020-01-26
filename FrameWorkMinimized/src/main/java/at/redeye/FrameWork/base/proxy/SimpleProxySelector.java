@@ -40,10 +40,10 @@ public class SimpleProxySelector extends ProxySelector
                 entry = entry.replace("*", ".*");
             }
         }
-    };
+    }
 
-    ArrayList<Proxy> proxy_list = new ArrayList<Proxy>();
-    ArrayList<WhiteListEntry> white_list = new ArrayList<WhiteListEntry>();
+    ArrayList<Proxy> proxy_list = new ArrayList<>();
+    ArrayList<WhiteListEntry> white_list = new ArrayList<>();
 
     public SimpleProxySelector( String host, int port )
     {
@@ -54,7 +54,7 @@ public class SimpleProxySelector extends ProxySelector
 
         if( no_proxy_list == null )
         {
-            no_proxy_list = new ArrayList<Proxy>();
+            no_proxy_list = new ArrayList<>();
             no_proxy_list.add(Proxy.NO_PROXY);
         }
 
@@ -127,7 +127,7 @@ public class SimpleProxySelector extends ProxySelector
 
     public void exludeFromProxy( String url )
     {
-        String urls[] = url.split("[,; ]");
+        String[] urls = url.split("[,; ]");
 
         for( String peace : urls )
         {

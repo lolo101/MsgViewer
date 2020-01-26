@@ -54,7 +54,7 @@ enum Ptyp {
     private final boolean variableLength;
     private final Function<DocumentInputStream, ?> conversion;
 
-    private Ptyp(int type, boolean variableLength, Function<DocumentInputStream, ?> conversion) {
+    Ptyp(int type, boolean variableLength, Function<DocumentInputStream, ?> conversion) {
         this.type = type;
         this.variableLength = variableLength;
         this.conversion = conversion;

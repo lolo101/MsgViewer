@@ -235,7 +235,7 @@ public class AutoProxyHandler
 
         auth = auth.substring(0,index);
 
-        String sl[] = auth.split(":");
+        String[] sl = auth.split(":");
 
         if( sl.length != 2 )
             return false;

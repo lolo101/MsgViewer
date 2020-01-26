@@ -30,9 +30,9 @@ public class HTMLColor {
             return null;
         }
 
-        Integer r = Integer.parseInt(s_color.substring(0, 2),16);
-        Integer b = Integer.parseInt(s_color.substring(2, 4),16);
-        Integer g = Integer.parseInt(s_color.substring(4, 6),16);
+        int r = Integer.parseInt(s_color.substring(0, 2),16);
+        int b = Integer.parseInt(s_color.substring(2, 4),16);
+        int g = Integer.parseInt(s_color.substring(4, 6),16);
 
         return new Color( r, b, g );
     }

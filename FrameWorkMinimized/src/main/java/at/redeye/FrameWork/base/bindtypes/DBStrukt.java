@@ -8,12 +8,13 @@
 
 package at.redeye.FrameWork.base.bindtypes;
 
+import at.redeye.SqlDBInterface.SqlDBIO.impl.ColumnAttribute;
+
 import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Set;
-import at.redeye.SqlDBInterface.SqlDBIO.impl.ColumnAttribute;
-import java.util.ArrayList;
 
 /**
  * @author martin
@@ -24,34 +25,34 @@ public abstract class DBStrukt {
 	protected String strukt_name;
         protected String strukt_name_lower_case;
 	protected String title;
-	protected HashMap<String, DBValue> element_by_name = new HashMap<String, DBValue>();
-	protected ArrayList<DBStrukt> sub_strukts = new ArrayList<DBStrukt>();
+	protected HashMap<String, DBValue> element_by_name = new HashMap<>();
+	protected ArrayList<DBStrukt> sub_strukts = new ArrayList<>();
 	protected Integer version = null;
-	protected ArrayList<Entry<Integer, DBValue>> elements_with_version = new ArrayList<Entry<Integer, DBValue>>();
+	protected ArrayList<Entry<Integer, DBValue>> elements_with_version = new ArrayList<>();
 
 	public DBStrukt(String name) {
-		this.strukt_name = name;                
-		title = new String();
+		this.strukt_name = name;
+		title = "";
 	}
 
 	public DBStrukt(String name, String title) {
-		this.strukt_name = name;                
+		this.strukt_name = name;
 		this.title = title;
 	}
 
 	public void add(DBValue value) {
-		add(value,1);		
+		add(value,1);
 	}
 
         /**
          * removes an element. The DBValue has to be from the same instance
          * as this object
-         * @param value 
+         * @param value
          */
-	public void remove(DBValue value) {		
+	public void remove(DBValue value) {
 		element_by_name.remove(value.getName());
-                
-                for( Entry<Integer, DBValue> entry : elements_with_version ) 
+
+                for( Entry<Integer, DBValue> entry : elements_with_version )
                 {
                     if( entry.getValue().getName().equals(value.getName()) )
                     {
@@ -61,9 +62,9 @@ public abstract class DBStrukt {
                 }
 	}
 
-	public void add(DBValue value, Integer version) {		
+	public void add(DBValue value, Integer version) {
 		element_by_name.put(value.getName(), value);
-		elements_with_version.add(new SimpleEntry<Integer, DBValue>(version,
+		elements_with_version.add(new SimpleEntry<>(version,
 				value));
 
 		if (this.version == null)
@@ -82,13 +83,13 @@ public abstract class DBStrukt {
 
 	public void consume(HashMap<String, Object> map, String prefix) {
 		// Set<String> keys = map.keySet();
-        
+
         Set<Entry<String, Object>> entries = map.entrySet();
         String k;
-        
+
 		for (Entry<String, Object> entry : entries) {
 			if (prefix != null && entry.getKey().length() <= prefix.length())
-				continue;			
+				continue;
 
 			if (prefix != null)
 				k = entry.getKey().substring(prefix.length());
@@ -105,7 +106,7 @@ public abstract class DBStrukt {
 			for (int i = 0; i < sub_strukts.size(); i++) {
 				DBStrukt strukt = sub_strukts.get(i);
 
-				if (k.startsWith(strukt.getName()) && (k.charAt(strukt.getName().length()) == '_')) {                    
+				if (k.startsWith(strukt.getName()) && (k.charAt(strukt.getName().length()) == '_')) {
 					if (prefix != null)
 						strukt.consume(map, prefix + strukt.getName() + "_");
 					else
@@ -116,30 +117,30 @@ public abstract class DBStrukt {
 			}
 		}
 	}
-        
+
         /**
-         * Same as consume(), but all column names has to be lower case 
+         * Same as consume(), but all column names has to be lower case
          * @param map
          */
 	public void consumeFast(HashMap<String, Object> map) {
 		consumeFast(map, null);
-	}        
+	}
 
         /**
-         * Same as consume(), but all column names and the prefix has to be lower case 
+         * Same as consume(), but all column names and the prefix has to be lower case
          * @param map
-         * @param prefix 
+         * @param prefix
          */
 	public void consumeFast(HashMap<String, Object> map, String prefix) {
 
             FastArray consumed = null;
-            
+
              if( !sub_strukts.isEmpty() )
                 consumed = new FastArray(map.size());
-            
+
             consumeFast(map, prefix, consumed);
-        }        
-        
+        }
+
     /**
      * Simple array wrapper of an initial fixed size
      * This is much more simplier than ArrayList but it's
@@ -149,20 +150,20 @@ public abstract class DBStrukt {
     {
         Object[] data;
         int idx;
-        
+
         FastArray( int capacity )
         {
             data = new Object[capacity];
             idx = 0;
         }
-        
+
         void add( Object o )
         {
             data[idx] = o;
             idx++;
         }
-        
-        /**         
+
+        /**
          * @param o
          * @return true if the same object was found in the array
          */
@@ -173,24 +174,24 @@ public abstract class DBStrukt {
                 if( data[i] == o )
                     return true;
             }
-            
+
             return false;
         }
     }
-    
 
-	private void consumeFast(HashMap<String, Object> map, String prefix, FastArray consumed) {        
+
+	private void consumeFast(HashMap<String, Object> map, String prefix, FastArray consumed) {
 
         Set<Entry<String, Object>> entries = map.entrySet();
         String k;
 
         for (Entry<String, Object> entry : entries) {
-            
+
             // bereits geladene Einträge überspringen
             if( consumed != null && consumed.contains(entry.getKey()) ) {
                     continue;
              }
-            
+
             if (prefix != null && entry.getKey().length() <= prefix.length()) {
                 continue;
             }
@@ -204,8 +205,8 @@ public abstract class DBStrukt {
             DBValue val = getValueByNameLowerCase(k);
 
             if (val != null) {
-                val.loadFromDB(entry.getValue()); 
-                
+                val.loadFromDB(entry.getValue());
+
                 if( consumed != null )
                     consumed.add(entry.getKey());
                 continue;
@@ -226,24 +227,24 @@ public abstract class DBStrukt {
             }
         }
     }
-    
+
 	public String getName() {
 		return strukt_name;
 	}
-        
+
 	public String getNameLowerCase() {
             if( strukt_name_lower_case == null )
                 strukt_name_lower_case = strukt_name.toLowerCase();
-            
+
             return strukt_name_lower_case;
-	}        
+	}
 
         /**
          * Get DBValue by its index. Each member that is added to DBStrukt by using the add()
          * method is stored in a vector. So the elements can also be accessed by the idx of this
          * vector.
          * @param idx
-         * @return DBValue 
+         * @return DBValue
          */
 	public DBValue getValue(int idx) {
 		return elements_with_version.get(idx).getValue();
@@ -259,7 +260,7 @@ public abstract class DBStrukt {
 	}
 
 	public DBValue getValue(String name) {
-		return getValueByName(name);       
+		return getValueByName(name);
 	}
 
 	public int countValues() {
@@ -273,7 +274,7 @@ public abstract class DBStrukt {
         public ArrayList<DBStrukt> getSubStrukts() {
 		return sub_strukts;
 	}
-        
+
 	public DBStrukt getSubStrukt(int idx) {
 		return sub_strukts.get(idx);
 	}
@@ -288,7 +289,7 @@ public abstract class DBStrukt {
 
 	protected boolean VersionExists(DBValue val, Integer Version) {
 		for (Entry<Integer, DBValue> pair : elements_with_version) {
-			if ((int) pair.getKey() == (int) Version) {
+			if (pair.getKey() == Version) {
 				if (pair.getValue() == val)
 					return true;
 			}
@@ -303,7 +304,7 @@ public abstract class DBStrukt {
 
 	protected HashMap<String, ColumnAttribute> getHashMap(String prefix,
 			Integer Version) {
-		HashMap<String, ColumnAttribute> colls = new HashMap<String, ColumnAttribute>();
+		HashMap<String, ColumnAttribute> colls = new HashMap<>();
 
 		for (int i = 0; i < elements_with_version.size(); i++) {
 			DBValue val = elements_with_version.get(i).getValue();
@@ -318,7 +319,7 @@ public abstract class DBStrukt {
 			attr.setPrimaryKey(val.isPrimaryKey());
 			attr.setHasIndex(val.shouldHaveIndex());
 
-			if (DBString.class.isInstance(val)) {
+			if (val instanceof DBString) {
 				attr.setWidth(((DBString) val).getMaxLen());
 			} else if (val instanceof DBEnum) {
 				attr.setWidth(((DBEnum) val).getMaxLen());
@@ -348,7 +349,7 @@ public abstract class DBStrukt {
 	}
 
 	protected HashMap<String, Object> getHashMapAndData(String prefix) {
-		HashMap<String, Object> colls = new HashMap<String, Object>();
+		HashMap<String, Object> colls = new HashMap<>();
 
 		for (int i = 0; i < elements_with_version.size(); i++) {
 			DBValue val = elements_with_version.get(i).getValue();
@@ -372,7 +373,7 @@ public abstract class DBStrukt {
 	}
 
 	public ArrayList<DBValue> getAllValues() {
-		ArrayList<DBValue> values = new ArrayList<DBValue>();
+		ArrayList<DBValue> values = new ArrayList<>();
 
 		for (int i = 0; i < elements_with_version.size(); i++) {
 			DBValue val = elements_with_version.get(i).getValue();
@@ -394,7 +395,7 @@ public abstract class DBStrukt {
 	}
 
 	protected ArrayList<String> getAllNames(String prefix) {
-		ArrayList<String> values = new ArrayList<String>();
+		ArrayList<String> values = new ArrayList<>();
 
 		for (int i = 0; i < elements_with_version.size(); i++) {
 			DBValue val = elements_with_version.get(i).getValue();
@@ -427,29 +428,29 @@ public abstract class DBStrukt {
 		return element_by_name.get(key.toLowerCase());
 
 		/*
-		 * 
+		 *
 		 * for( int i = 0; i < elements.size(); i++ ) { if(
 		 * key.equalsIgnoreCase(elements.get(i).getName()) ) return
 		 * elements.get(i); }
-		 * 
+		 *
 		 * return null;
 		 */
 	}
-        
+
         /**
          * find Value by name without converting the name to lower case
-         * @param key has to be lower case 
-         * @return 
+         * @param key has to be lower case
+         * @return
          */
         private DBValue getValueByNameLowerCase(String key) {
 		return element_by_name.get(key);
 
 		/*
-		 * 
+		 *
 		 * for( int i = 0; i < elements.size(); i++ ) { if(
 		 * key.equalsIgnoreCase(elements.get(i).getName()) ) return
 		 * elements.get(i); }
-		 * 
+		 *
 		 * return null;
 		 */
 	}
@@ -484,7 +485,7 @@ public abstract class DBStrukt {
 
 		return version;
 	}
-        
+
         public void setTitle( String title )
         {
             this.title = title;

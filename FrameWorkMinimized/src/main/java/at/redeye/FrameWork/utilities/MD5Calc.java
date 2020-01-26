@@ -14,7 +14,7 @@ import java.security.NoSuchAlgorithmException;
  *
  */
 public class MD5Calc {
-	
+
 	private MessageDigest md5;
 	private byte[] digest;
 
@@ -44,8 +44,8 @@ public class MD5Calc {
 	}
 
 	public String calcChecksum(String data) {
-		
-		StringBuffer strbuf = new StringBuffer();
+
+		StringBuilder strbuf = new StringBuilder();
 
 		md5.update(data.getBytes(), 0, data.length());
 		digest = md5.digest();
@@ -56,9 +56,9 @@ public class MD5Calc {
 
 		return strbuf.toString();
 	}
-	
+
 	public String calcChecksum(byte [] data) {
-		StringBuffer strbuf = new StringBuffer();
+		StringBuilder strbuf = new StringBuilder();
 
 		md5.update(data, 0, data.length);
 		digest = md5.digest();
@@ -77,7 +77,7 @@ public class MD5Calc {
          */
         public static String bytes2hex( byte [] data )
         {
-            StringBuffer strbuf = new StringBuffer();
+            StringBuilder strbuf = new StringBuilder();
 
             for (int i = 0; i < data.length; i++) {
                 strbuf.append(toHexString(data[i]));
@@ -111,7 +111,7 @@ public class MD5Calc {
     }
 
 
-    public static void main( String argv[] )
+    public static void main(String[] argv)
     {
         MD5Calc calc = new MD5Calc("MD5");
 
@@ -121,6 +121,6 @@ public class MD5Calc {
             } catch( IOException ex ) {
                 System.out.println(ex);
             }
-        
+
     }
 }

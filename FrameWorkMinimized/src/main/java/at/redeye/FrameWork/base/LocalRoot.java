@@ -31,7 +31,7 @@ public class LocalRoot extends Root {
 	protected DBConnection db_connection;
 	//protected DBPb userEntry = null;
 //	protected DBManager dbmanager = null;
-	protected Vector<BaseDialogBase> dialogs = new Vector<BaseDialogBase>();
+	protected Vector<BaseDialogBase> dialogs = new Vector<>();
 	protected boolean appExitAllowed = true;
 	private static Logger logger = LogManager.getLogger(LocalRoot.class);
 	// EncryptedDBPasswd enc;
@@ -165,8 +165,7 @@ public class LocalRoot extends Root {
 
 	@Override
 	public void closeAllWindowsExceptThisOne(BaseDialogBase dlg) {
-		Vector<BaseDialogBase> dlgs = new Vector<BaseDialogBase>();
-		dlgs.addAll(dialogs);
+        Vector<BaseDialogBase> dlgs = new Vector<BaseDialogBase>(dialogs);
 
 		for (BaseDialogBase frame : dlgs) {
 			if (frame != dlg)
@@ -279,7 +278,7 @@ public class LocalRoot extends Root {
     public void registerPlugin( Plugin plugin )
     {
         if( plugins == null )
-            plugins = new ArrayList<Plugin>();
+            plugins = new ArrayList<>();
         else
         {
             for( Plugin p : plugins )

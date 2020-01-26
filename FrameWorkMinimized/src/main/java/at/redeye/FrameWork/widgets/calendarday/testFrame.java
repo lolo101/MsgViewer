@@ -14,15 +14,15 @@ public class testFrame extends javax.swing.JFrame implements DayEventListener {
 
     CalendarDay day1 = null;
     boolean setActive = true;
-    
+
     /** Creates new form testFrame */
     public testFrame() {
         initComponents();
-        
+
         day1 = new CalendarDay();
-        
+
         setContentPane(day1);
-        
+
         day1.setInactive();
         day1.clear();
         day1.setListener(this);
@@ -56,7 +56,7 @@ public class testFrame extends javax.swing.JFrame implements DayEventListener {
     /**
     * @param args the command line arguments
     */
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new testFrame().setVisible(true);
@@ -67,13 +67,13 @@ public class testFrame extends javax.swing.JFrame implements DayEventListener {
     public void onClicked(CalendarDay day) {
         if( setActive == true )
         {
-            day.setSelected();            
+            day.setSelected();
         }
         else
         {
             day.setUnSelected();
         }
-        
+
         setActive = !setActive;
     }
 

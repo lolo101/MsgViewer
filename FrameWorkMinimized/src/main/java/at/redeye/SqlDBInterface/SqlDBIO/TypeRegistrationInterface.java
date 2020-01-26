@@ -11,50 +11,43 @@ import at.redeye.SqlDBInterface.SqlDBIO.impl.WrongBindFileFormatException;
 public interface TypeRegistrationInterface {
 
 	/**
-	 * 
+	 *
 	 * @param filename
-	 * @throws IOException
-	 * @throws UnsupportedDBDataTypeException
-	 * @throws WrongBindFileFormatException
 	 */
-	public void registerTableBindings(String filename) throws IOException,
-			UnsupportedDBDataTypeException, WrongBindFileFormatException;
+    void registerTableBindings(String filename);
 
 	/**
-	 * 
+	 *
 	 * @param data
 	 *            Usage: <br>
 	 *            HashMap (String tablename, <br>
 	 *            &nbsp;&nbsp;&nbsp;&nbsp;HashMap(String column_name,
 	 *            ColumnAttribute column_attributes) ) <br>
-	 * @throws UnsupportedDBDataTypeException
-	 * @throws WrongBindFileFormatException
 	 */
-	public void registerTableBindings(
-			HashMap<String, HashMap<String, ColumnAttribute>> data)
-			throws UnsupportedDBDataTypeException, WrongBindFileFormatException;
+    void registerTableBindings(
+            HashMap<String, HashMap<String, ColumnAttribute>> data)
+	;
 
 	/**
-	 * 
+	 *
 	 * @param ident
 	 *            The type identifier.
 	 * @return The associated database type (DBDataType)
-	 * @throws UnsupportedDBDataTypeException
 	 */
-	public DBDataType getRealDBType(String ident)
-			throws UnsupportedDBDataTypeException;
+    DBDataType getRealDBType(String ident)
+	;
 
 	/**
-	 * 
+	 *
 	 * @return The whole registration of table bindings
 	 */
-	public HashMap<String, HashMap<String, ColumnAttribute>> getAllRegisteredTables();
+    HashMap<String, HashMap<String, ColumnAttribute>> getAllRegisteredTables();
 
 	/**
-	 * 
+	 *
 	 * @param tablename
 	 * @return The table bindings for the given table
 	 */
-	public HashMap<String, ColumnAttribute> getRegisteredTableByString(
-			String tablename);
+    HashMap<String, ColumnAttribute> getRegisteredTableByString(
+            String tablename);
 }

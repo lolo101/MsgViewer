@@ -44,15 +44,15 @@ public class RowHeaderTest extends BaseDialog {
 
         tm.setEditable(config.name);
 
-        Vector<DBConfig> data = new Vector<DBConfig>();
+        Vector<DBConfig> data = new Vector<>();
 
         for( i = 0 ; i < 19; i++ )
         {
             DBConfig c = new DBConfig();
 
             c.name.loadFromString(String.valueOf(i));
-            c.value.loadFromString("value " + String.valueOf(i));
-            c.descr.loadFromString("foobar " + String.valueOf(i));
+            c.value.loadFromString("value " + i);
+            c.descr.loadFromString("foobar " + i);
             c.hist.setAeHist("martin");
 
             data.add(c);
@@ -106,54 +106,26 @@ public class RowHeaderTest extends BaseDialog {
         jScrollPane1.setViewportView(table);
 
         jr_system.setText("System");
-        jr_system.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jr_systemActionPerformed(evt);
-            }
-        });
+        jr_system.addActionListener(this::jr_systemActionPerformed);
 
         jr_motif.setText("Motif");
-        jr_motif.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jr_motifActionPerformed(evt);
-            }
-        });
+        jr_motif.addActionListener(this::jr_motifActionPerformed);
 
         jr_nimbus.setText("Nimbus");
-        jr_nimbus.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jr_nimbusActionPerformed(evt);
-            }
-        });
+        jr_nimbus.addActionListener(this::jr_nimbusActionPerformed);
 
         jr_metal.setText("Metal");
-        jr_metal.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jr_metalActionPerformed(evt);
-            }
-        });
+        jr_metal.addActionListener(this::jr_metalActionPerformed);
 
         jButton1.setText("New");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
+        jButton1.addActionListener(this::jButton1ActionPerformed);
 
         jButton2.setText("Del");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
+        jButton2.addActionListener(this::jButton2ActionPerformed);
 
         jCShowRowHeader.setSelected(true);
         jCShowRowHeader.setText("Show RowHeader");
-        jCShowRowHeader.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCShowRowHeaderActionPerformed(evt);
-            }
-        });
+        jCShowRowHeader.addActionListener(this::jCShowRowHeaderActionPerformed);
 
         jlTest.setText("enabled");
         jlTest.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -223,8 +195,8 @@ public class RowHeaderTest extends BaseDialog {
             DBConfig c = new DBConfig();
 
             c.name.loadFromString(String.valueOf(i));
-            c.value.loadFromString("value " + String.valueOf(i));
-            c.descr.loadFromString("foobar " + String.valueOf(i));
+            c.value.loadFromString("value " + i);
+            c.descr.loadFromString("foobar " + i);
             c.hist.setAeHist("martin");
 
             i++;
@@ -319,7 +291,7 @@ public class RowHeaderTest extends BaseDialog {
     private static Root main_root;
     private static String StyleName = "metal";
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
 
         main_root = new LocalRoot("TT");
 

@@ -8,6 +8,7 @@ import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypString;
 import net.sourceforge.MSGViewer.factory.msg.properties.PropType;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 /**
  *
@@ -31,9 +32,9 @@ public class StringUTF16SubstgEntry extends SubstGEntry
     protected InputStream createEntryContent() throws UnsupportedEncodingException {
         switch(type) {
             case TYPE_ASCII:
-                return new ByteArrayInputStream(value.getBytes("ISO-8859-1"));
+                return new ByteArrayInputStream(value.getBytes(StandardCharsets.ISO_8859_1));
             case TYPE_UTF16:
-                return new ByteArrayInputStream(value.getBytes("UTF-16LE"));
+                return new ByteArrayInputStream(value.getBytes(StandardCharsets.UTF_16LE));
             default:
                 throw new IllegalArgumentException(type);
         }

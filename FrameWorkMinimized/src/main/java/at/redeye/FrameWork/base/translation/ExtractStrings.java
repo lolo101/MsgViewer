@@ -5,24 +5,14 @@
 
 package at.redeye.FrameWork.base.translation;
 
-import java.awt.Component;
-import java.awt.Container;
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TreeSet;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JRadioButton;
-import javax.swing.JRadioButtonMenuItem;
-import javax.swing.JTabbedPane;
-import javax.swing.border.Border;
-import javax.swing.border.TitledBorder;
 
 /**
  *
@@ -54,7 +44,7 @@ public class ExtractStrings
 
     static private class ToolTipWrapper extends JComponent
     {
-        JComponent parent;        
+        JComponent parent;
 
         public ToolTipWrapper( JComponent parent )
         {
@@ -100,8 +90,8 @@ public class ExtractStrings
 
     public ExtractStrings( Container cont )
     {
-        strings = new TreeSet<String>();
-        components = new HashMap<String,List<JComponent>>();
+        strings = new TreeSet<>();
+        components = new HashMap<>();
 
         extractStrings(cont);
     }
@@ -117,7 +107,7 @@ public class ExtractStrings
     }
 
     private void extractStrings( Container cont )
-    {        
+    {
         for( Component comp : cont.getComponents() )
         {
 //            System.out.println("com:" + comp);
@@ -136,7 +126,7 @@ public class ExtractStrings
 
                 Border border = jcomp.getBorder();
 
-                if( border != null && border instanceof TitledBorder )
+                if(border instanceof TitledBorder)
                 {
                     TitledBorder tborder = (TitledBorder) border;
 
@@ -169,7 +159,7 @@ public class ExtractStrings
             else if( comp instanceof JTabbedPane )
             {
                 addString((JTabbedPane)comp);
-                
+
                 try {
                     extractStrings((Container) comp);
                 } catch (Exception ex) {
@@ -187,13 +177,7 @@ public class ExtractStrings
 
     private void addComp( String text, JComponent comp )
     {
-        List<JComponent> vcomp = components.get(text);
-
-        if( vcomp == null )
-        {
-            vcomp = new ArrayList<JComponent>();
-            components.put(text, vcomp);
-        }
+        List<JComponent> vcomp = components.computeIfAbsent(text, k -> new ArrayList<JComponent>());
 
         vcomp.add(comp);
     }
@@ -238,7 +222,7 @@ public class ExtractStrings
 
         addComp(menu.getText(),menu);
 
-        extractStrings(menu.getPopupMenu());        
+        extractStrings(menu.getPopupMenu());
     }
 
     private void addString(JMenuItem menu_item) {

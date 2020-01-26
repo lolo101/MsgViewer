@@ -75,7 +75,7 @@ public class StringUtils {
 
 	public static List<String> split_str(StringBuilder s, String c) {
 
-		List<String> res = new ArrayList<String>();
+		List<String> res = new ArrayList<>();
 
 		int start = 0;
 		do {
@@ -151,7 +151,7 @@ public class StringUtils {
 		 * Diese Funktion löscht noch überschüssige Leerzeichen weg.
 		 */
 
-		String res[] = autoLineBreak_int(what, length).split("\n");
+		String[] res = autoLineBreak_int(what, length).split("\n");
 
 		StringBuilder stripped_string = new StringBuilder();
 
@@ -457,7 +457,7 @@ public class StringUtils {
 	 * @return Line numbered String
 	 */
 	public static String addLineNumbers(String text) {
-		final String lines[] = text.split("\n");
+		final String[] lines = text.split("\n");
 
 		final String max_num = String.valueOf(lines.length);
 

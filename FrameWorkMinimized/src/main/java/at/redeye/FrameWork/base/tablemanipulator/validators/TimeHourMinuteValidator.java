@@ -25,11 +25,9 @@ public class TimeHourMinuteValidator extends TableValidator {
 
         SimpleDateFormat formater_time = new SimpleDateFormat("HH:mm");
 
-        Date time = (Date) val.getValue();
+        Date time = val.getValue();
 
-        String res = formater_time.format(time.getTime());
-
-        return res;
+        return formater_time.format(time.getTime());
     }
 
     @Override
@@ -39,14 +37,14 @@ public class TimeHourMinuteValidator extends TableValidator {
 
     @Override
     public boolean loadToValue(DBValue val, String s, int row) {
-       
+
         DBDateTime time = (DBDateTime) val;
-        
+
         if( time.loadTimePart(s + ":00") == false )
         {
             return false;
         }
-        
+
         return true;
     }
 

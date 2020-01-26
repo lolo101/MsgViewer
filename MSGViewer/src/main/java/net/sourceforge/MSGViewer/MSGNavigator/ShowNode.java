@@ -1,20 +1,19 @@
 package net.sourceforge.MSGViewer.MSGNavigator;
 
-import java.io.ByteArrayInputStream;
-
-import net.sourceforge.MSGViewer.factory.msg.lib.MSTimeConvert;
-import net.sourceforge.MSGViewer.factory.msg.lib.ByteConvert;
-import net.sourceforge.MSGViewer.factory.msg.properties.Properties;
 import at.redeye.FrameWork.base.BaseDialog;
 import at.redeye.FrameWork.base.Root;
 import net.sourceforge.MSGViewer.MSGNavigator.MSGNavigator.TreeNodeContainer;
-
-import java.io.UnsupportedEncodingException;
-import java.util.Date;
-
+import net.sourceforge.MSGViewer.factory.msg.lib.ByteConvert;
+import net.sourceforge.MSGViewer.factory.msg.lib.MSTimeConvert;
+import net.sourceforge.MSGViewer.factory.msg.properties.Properties;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hmef.CompressedRTF;
+
+import java.awt.*;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
 
 /**
  *
@@ -39,105 +38,46 @@ public class ShowNode extends BaseDialog {
 
         if( cont.getEntry().isDocumentEntry() )
         {
-            if( cont.getEntry().getName().equals("__properties_version1.0") )
+            String name = cont.getEntry().getName();
+            if( name.equals("__properties_version1.0") )
             {
                 show_properties_entry(cont);
             }
-            else if( cont.getEntry().getName().equals("__substg1.0_00030102") )
-            {
-                show_entry_stream(cont);
-            }
-            else if( cont.getEntry().getName().equals("__substg1.0_00040102") )
-            {
-                show_string_stream(cont);
-            }
-            else if( cont.getEntry().getName().equals("__substg1.0_00020102") )
+            else if( name.equals("__substg1.0_00020102") )
             {
                 show_guid_stream(cont);
             }
-            else if( cont.getEntry().getName().matches("__substg1\\.0_[0-9][0-9][0-9][0-9]0102") &&
+            else if( name.equals("__substg1.0_00030102") )
+            {
+                show_entry_stream(cont);
+            }
+            else if( name.equals("__substg1.0_00040102") )
+            {
+                show_string_stream(cont);
+            }
+            else if( name.matches("__substg1\\.0_[0-9]{4}0102") &&
                    cont.getEntry().getParent().getName().equals("__nameid_version1.0") )
             {
                 show_nameid_stream(cont);
-
-            } else  {
-
-                Object data = cont.getData();
-
-                if( data instanceof String )
-                {
-                    jTHex.setText((String)data);
-                }
-                else if( data instanceof byte[] )
-                {
-                    StringBuilder sb = new StringBuilder();
-                    byte bytes[] = (byte[]) data;
-
-                    for( int i = 0; i < bytes.length; i++ ) {
-
-                        if( i > 0 && i % 20 == 0 ) {
-                            sb.append("\n");
-                        }
-
-                        if( bytes[i] == 0 ) {
-                            sb.append("__");
-                        } else {
-                            sb.append(String.format("%02X", bytes[i]));
-                        }
-
-                        sb.append(" ");
-
-                        if( bytes[i] > 30 && bytes[i] < 127 ) {
-                            sb.append(String.format("%c", (char)bytes[i]));
-                        } else {
-                            sb.append(" ");
-                        }
-
-                        sb.append("  ");
-                    }
-
-                    sb.append("\n\nASCII only\n");
-
-                    for( int i = 0; i < bytes.length; i++ ) {
-
-                        if( i > 0 && i % 20 == 0 ) {
-                            sb.append("\n");
-                        }
-
-                        if( bytes[i] > 30 && bytes[i] < 127 ) {
-                            sb.append(String.format("%c", (char)bytes[i]));
-                        }
-
-                    }
-
-                    try {
-                        byte decBytes[] = new CompressedRTF().decompress(new ByteArrayInputStream(bytes));
-                        sb.append("\n\ndecompressed TNEF\n\n");
-                        sb.append(new String(decBytes));
-                    } catch( Exception ex ) {
-                        logger.error("failed decompressing", ex);
-                    }
-
-                    sb.append("\n\n");
-                    sb.append('[').append(Hex.encodeHexString(bytes)).append(']');
-
-                    jTHex.setText(sb.toString());
-                }
+            }
+            else {
+                show_data(cont);
             }
         }
     }
 
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
+        javax.swing.JScrollPane jScrollPane1 = new javax.swing.JScrollPane();
         jTHex = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
 
         jTHex.setColumns(20);
-        jTHex.setFont(new java.awt.Font("Courier New", 0, 12)); // NOI18N
+        jTHex.setFont(new java.awt.Font("Courier New", Font.PLAIN, 12)); // NOI18N
         jTHex.setRows(5);
         jScrollPane1.setViewportView(jTHex);
 
@@ -155,17 +95,15 @@ public class ShowNode extends BaseDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JScrollPane jScrollPane1;
+
     private javax.swing.JTextArea jTHex;
     // End of variables declaration//GEN-END:variables
-
     private void show_properties_entry(TreeNodeContainer cont)
     {
 
         StringBuilder sb = new StringBuilder();
-        byte bytes[] = (byte[]) cont.getData();
+        byte[] bytes = (byte[]) cont.getData();
 
         sb.append("__properties_version1.0\n");
         sb.append("HEADER\n");
@@ -235,25 +173,22 @@ public class ShowNode extends BaseDialog {
         return String.format("%02X", b);
     }
 
-    private void dumpPropertyEntry(StringBuilder sb, byte bytes[], int offset)
+    private void dumpPropertyEntry(StringBuilder sb, byte[] bytes, int offset)
     {
         sb.append("TAG: ");
 
-        String tagname = "";
+        StringBuilder tagname = new StringBuilder();
 
         // property tag
         for( int i = offset + 3; i >= offset; i-- ) {
             sb.append(formatByte0S(bytes[i]));
-            tagname += formatByte0S(bytes[i]);
+            tagname.append(formatByte0S(bytes[i]));
         }
 
         offset += 4;
 
         sb.append(" FLAGS: ");
-/*
-        for( int i = offset; i < offset + 4; i++ )
-            sb.append(formatByte0(bytes[i]));
-  */
+
         if( (bytes[offset] & 0001) > 0 ) {
             sb.append("M");
         } else {
@@ -284,30 +219,33 @@ public class ShowNode extends BaseDialog {
 
         sb.append(" ");
 
-        String descr = Properties.get(tagname.toLowerCase().substring(0,4)).toString();
+        String lTagname = tagname.toString().toLowerCase();
+        String descr = Properties.get(lTagname.substring(0,4)).toString();
         sb.append(StringUtils.rightPad(descr,max_descr_lenght));
 
-        String tagtype = tagname.toLowerCase().substring(4);
+        String tagtype = lTagname.substring(4);
 
         switch (tagtype) {
             case "001f":
                 {
-                    String res = "";
+                    StringBuilder res = new StringBuilder();
                     for( int i = value_start_offset + 3; i >= value_start_offset; i-- ) {
-                        res += formatByte0S(bytes[i]);
-                    }        int length = Integer.valueOf(res, 16);
+                        res.append(formatByte0S(bytes[i]));
+                    }
+                    int length = Integer.valueOf(res.toString(), 16);
                     sb.append(" PtypString length: ");
-                    sb.append(String.valueOf(length - 2));
+                    sb.append(length - 2);
                     break;
                 }
             case "0102":
                 {
-                    String res = "";
+                    StringBuilder res = new StringBuilder();
                     for( int i = value_start_offset + 3; i >= value_start_offset; i-- ) {
-                        res += formatByte0S(bytes[i]);
-                    }        int length = Integer.valueOf(res, 16);
+                        res.append(formatByte0S(bytes[i]));
+                    }
+                    int length = Integer.valueOf(res.toString(), 16);
                     sb.append(" PtypBinary length: ");
-                    sb.append(String.valueOf(length));
+                    sb.append(length);
                     break;
                 }
             case "0040":
@@ -317,17 +255,17 @@ public class ShowNode extends BaseDialog {
                 sb.append(val);
                 sb.append(": ");
                 sb.append(new Date(MSTimeConvert.PtypeTime2Millis(val)).toString());
-                ;
                 break;
             case "000b":
                 sb.append(" boolean");
                 break;
             case "0003":
                 {
-                    String res = "";
+                    StringBuilder res = new StringBuilder();
                     for( int i = value_start_offset + 3; i >= value_start_offset; i-- ) {
-                        res += formatByte0S(bytes[i]);
-                    }        int length = Integer.valueOf(res, 16);
+                        res.append(formatByte0S(bytes[i]));
+                    }
+                    int length = Integer.valueOf(res.toString(), 16);
                     sb.append(" PtypInteger32 value: ");
                     sb.append(length);
                     break;
@@ -339,7 +277,7 @@ public class ShowNode extends BaseDialog {
     private void show_string_stream(TreeNodeContainer cont)
     {
         StringBuilder sb = new StringBuilder();
-        byte bytes[] = (byte[]) cont.getData();
+        byte[] bytes = (byte[]) cont.getData();
 
         sb.append("String Stream ");
         sb.append(cont.getEntry().getName());
@@ -354,22 +292,22 @@ public class ShowNode extends BaseDialog {
             sb.append(" ");
 
             // get length 4 bytes
-            String s_lenght = "";
+            StringBuilder s_lenght = new StringBuilder();
 
             for (int i = offset + 3; i >= offset; i--) {
-                s_lenght += formatByte0S(bytes[i]);
+                s_lenght.append(formatByte0S(bytes[i]));
             }
 
             offset += 4;
 
-            long len = Long.valueOf(s_lenght, 16);
+            long len = Long.valueOf(s_lenght.toString(), 16);
 
             sb.append(s_lenght);
             sb.append(" (").append(len).append(")");
             sb.append(": ");
 
             // +2 nullterminating bytes to be for sure
-            byte s_byte[] = new byte[(int) len];
+            byte[] s_byte = new byte[(int) len];
 
             for (int i = offset, count = 0; i < offset + len; i++, count++) {
                 s_byte[count] = bytes[i];
@@ -378,11 +316,7 @@ public class ShowNode extends BaseDialog {
 
             offset += len;
 
-            try {
-                sb.append(new String(s_byte, "UTF-16LE"));
-            } catch (UnsupportedEncodingException ex) {
-                logger.error(ex, ex);
-            }
+            sb.append(new String(s_byte, StandardCharsets.UTF_16LE));
 
             sb.append("\n");
 
@@ -396,7 +330,7 @@ public class ShowNode extends BaseDialog {
 
     private void show_guid_stream(TreeNodeContainer cont) {
         StringBuilder sb = new StringBuilder();
-        byte bytes[] = (byte[]) cont.getData();
+        byte[] bytes = (byte[]) cont.getData();
 
         sb.append("GUID Stream ");
         sb.append(cont.getEntry().getName());
@@ -498,7 +432,7 @@ public class ShowNode extends BaseDialog {
     private void show_entry_stream(TreeNodeContainer cont)
     {
         StringBuilder sb = new StringBuilder();
-        byte bytes[] = (byte[]) cont.getData();
+        byte[] bytes = (byte[]) cont.getData();
 
         sb.append("Entry Stream ");
         sb.append(cont.getEntry().getName());
@@ -530,7 +464,7 @@ public class ShowNode extends BaseDialog {
 
     private void show_nameid_stream(TreeNodeContainer cont) {
         StringBuilder sb = new StringBuilder();
-        byte bytes[] = (byte[]) cont.getData();
+        byte[] bytes = (byte[]) cont.getData();
 
         sb.append("NAMEID Stream ");
         sb.append(cont.getEntry().getName());
@@ -553,12 +487,76 @@ public class ShowNode extends BaseDialog {
         jTHex.setText(sb.toString());
     }
 
+    private void show_data(TreeNodeContainer cont) {
+        Object data = cont.getData();
+
+        if( data instanceof String )
+        {
+            jTHex.setText((String)data);
+        }
+        else if( data instanceof byte[] )
+        {
+            StringBuilder sb = new StringBuilder();
+            byte[] bytes = (byte[]) data;
+
+            for( int i = 0; i < bytes.length; i++ ) {
+
+                if( i > 0 && i % 20 == 0 ) {
+                    sb.append("\n");
+                }
+
+                if( bytes[i] == 0 ) {
+                    sb.append("__");
+                } else {
+                    sb.append(String.format("%02X", bytes[i]));
+                }
+
+                sb.append(" ");
+
+                if( bytes[i] > 30 && bytes[i] < 127 ) {
+                    sb.append(String.format("%c", (char)bytes[i]));
+                } else {
+                    sb.append(" ");
+                }
+
+                sb.append("  ");
+            }
+
+            sb.append("\n\nASCII only\n");
+
+            for( int i = 0; i < bytes.length; i++ ) {
+
+                if( i > 0 && i % 20 == 0 ) {
+                    sb.append("\n");
+                }
+
+                if( bytes[i] > 30 && bytes[i] < 127 ) {
+                    sb.append(String.format("%c", (char)bytes[i]));
+                }
+
+            }
+
+            try {
+                byte[] decBytes = new CompressedRTF().decompress(new ByteArrayInputStream(bytes));
+                sb.append("\n\ndecompressed TNEF\n\n");
+                sb.append(new String(decBytes));
+            } catch( Exception ex ) {
+                logger.error("failed decompressing", ex);
+            }
+
+            sb.append("\n\n");
+            sb.append('[').append(Hex.encodeHexString(bytes)).append(']');
+
+            jTHex.setText(sb.toString());
+        }
+    }
+
     private void appendGuid(int voffset, byte[] bytes, StringBuilder sb) throws NumberFormatException {
-        String s_guid = "";
+        StringBuilder s_guid = new StringBuilder();
 
         // 15 Bytes GUID
         for (int i = voffset + 1; i >= voffset; i--) {
-            s_guid += formatByte0S(bytes[i]);
+            s_guid.append(formatByte0S(bytes[i]));
         }
 
         voffset += 2;
@@ -571,7 +569,7 @@ public class ShowNode extends BaseDialog {
 
         sb.append(" GUID: ");
 
-        long guid = Long.valueOf(s_guid,16);
+        long guid = Long.valueOf(s_guid.toString(),16);
 
         boolean is_string = (guid & 0x01) > 0;
 

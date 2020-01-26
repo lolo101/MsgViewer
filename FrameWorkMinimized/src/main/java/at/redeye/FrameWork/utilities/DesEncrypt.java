@@ -97,7 +97,7 @@ public class DesEncrypt
         return new String(decoded_utf8_str, StandardCharsets.UTF_8);
     }
 
-    public static void main(String args[])
+    public static void main(String[] args)
     {
         final String passwd = "AberHallo";
         final String text = "Ein Hund kam in die Küche";

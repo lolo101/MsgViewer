@@ -16,9 +16,6 @@ import at.redeye.FrameWork.utilities.StringUtils;
 import at.redeye.FrameWork.widgets.NoticeIfChangedTextField;
 import at.redeye.FrameWork.widgets.datetime.IDateTimeComponent;
 import at.redeye.SqlDBInterface.SqlDBConnection.impl.SupportedDBMSTypes;
-import at.redeye.SqlDBInterface.SqlDBIO.impl.TableBindingNotRegisteredException;
-import at.redeye.SqlDBInterface.SqlDBIO.impl.UnsupportedDBDataTypeException;
-import at.redeye.SqlDBInterface.SqlDBIO.impl.WrongBindFileFormatException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,7 +25,6 @@ import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Timer;
@@ -208,23 +204,18 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 			parent.setPreferredSize(new Dimension(w, h));
 		}
 
-		registerActionKeyListener(
-				KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), new Runnable() {
-
-            @Override
-					public void run() {
-						if (parent.canClose()) {
-							parent.close();
-						}
-					}
-				});
-
+		registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+				() -> {
+							if (parent.canClose()) {
+								parent.close();
+							}
+						});
 		loadStuff();
 	}
 
 	/* should be removed later */
 	private void loadStuff() {
-		StringUtils.set_defaultAutoLineLenght(Integer.valueOf(root.getSetup()
+		StringUtils.set_defaultAutoLineLenght(Integer.parseInt(root.getSetup()
 				.getLocalConfig(
 						FrameWorkConfigDefinitions.DefaultAutoLineBreakWidth)));
 	}
@@ -252,11 +243,10 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 		GraphicsEnvironment ge = GraphicsEnvironment
 				.getLocalGraphicsEnvironment();
 		GraphicsDevice[] gs = ge.getScreenDevices();
-		for (int j = 0; j < gs.length; j++) {
-			GraphicsDevice gd = gs[j];
+		for (GraphicsDevice gd : gs) {
 			GraphicsConfiguration[] gc = gd.getConfigurations();
-			for (int i = 0; i < gc.length; i++) {
-				virtualBounds = virtualBounds.union(gc[i].getBounds());
+			for (GraphicsConfiguration graphicsConfiguration : gc) {
+				virtualBounds = virtualBounds.union(graphicsConfiguration.getBounds());
 			}
 		}
 		return virtualBounds.getSize();
@@ -316,14 +306,13 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 					BaseAppConfigDefinitions.HorizontalScrollingSpeed);
 		} catch (NumberFormatException ex) {
 			logger.error(ex);
-			return;
 		}
 	}
 
 	protected void adjustScrollingSpeed(JScrollBar ScrollBar, DBConfig config) {
 		String value = root.getSetup().getLocalConfig(config);
 
-		Integer i = Integer.parseInt(value);
+		int i = Integer.parseInt(value);
 
 		if (i <= 0) {
 			logger.error("invalid scrolling interval: " + i
@@ -414,7 +403,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 			return;
 
 		if (onCloseListeners == null)
-			onCloseListeners = new LinkedList<Runnable>();
+			onCloseListeners = new LinkedList<>();
 
 		onCloseListeners.add(runnable);
 	}
@@ -442,7 +431,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 	public void setEdited(boolean val) {
 		edited = val;
 
-		if (edited == false) {
+		if (!edited) {
 			setBindVarsChanged(false);
 		}
 	}
@@ -465,7 +454,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 	public int checkSave(TableManipulator tm) {
 		tm.stopEditing();
 
-		if (tm.getEditedRows().isEmpty() && edited == false) {
+		if (tm.getEditedRows().isEmpty() && !edited) {
 			return 0;
 		} else {
 			int ret = checkSave();
@@ -514,17 +503,10 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 	 * @param seqName
 	 * @return den nächsten Wert der Sequenz
 	 * @throws java.sql.SQLException
-	 * @throws at.redeye.SqlDBInterface.SqlDBIO.impl.UnsupportedDBDataTypeException
-	 * @throws WrongBindFileFormatException
-	 * @throws TableBindingNotRegisteredException
-	 * @throws IOException
 	 */
-	public int getNewSequenceValue(String seqName) throws SQLException,
-			UnsupportedDBDataTypeException, WrongBindFileFormatException,
-			TableBindingNotRegisteredException, IOException {
+	public int getNewSequenceValue(String seqName) throws SQLException {
 		if (getTransaction().getDBMSType() == SupportedDBMSTypes.DB_SQLITE) {
-			int value = getTransaction().getNewSequenceValue(seqName, 1234567);
-			return value;
+			return getTransaction().getNewSequenceValue(seqName, 1234567);
 		} else {
 
 			if (seq_transaction != null && !seq_transaction.isOpen()) {
@@ -550,19 +532,12 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 	 * @param seqName
 	 * @return den nächsten Wert der Sequenz
 	 * @throws java.sql.SQLException
-	 * @throws at.redeye.SqlDBInterface.SqlDBIO.impl.UnsupportedDBDataTypeException
-	 * @throws WrongBindFileFormatException
-	 * @throws TableBindingNotRegisteredException
-	 * @throws IOException
 	 */
 	public int getNewSequenceValues(String seqName, int number)
-			throws SQLException, UnsupportedDBDataTypeException,
-			WrongBindFileFormatException, TableBindingNotRegisteredException,
-			IOException {
+			throws SQLException {
 		if (getTransaction().getDBMSType() == SupportedDBMSTypes.DB_SQLITE) {
-			int value = getTransaction().getNewSequenceValues(seqName, number,
+			return getTransaction().getNewSequenceValues(seqName, number,
 					1234567);
-			return value;
 		} else {
 
 			if (seq_transaction != null && !seq_transaction.isOpen()) {
@@ -606,14 +581,10 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 		}
 
 		if (transaction != null) {
-			try {
 
-				if (!transaction.isOpen()) {
-					root.getDBConnection().closeTransaction(transaction);
-					transaction = null;
-				}
-			} catch (SQLException ex) {
-				logger.error(StringUtils.exceptionToString(ex));
+			if (!transaction.isOpen()) {
+				root.getDBConnection().closeTransaction(transaction);
+				transaction = null;
 			}
 		}
 
@@ -644,9 +615,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 			return null;
 		}
 
-		Transaction trans = root.getDBConnection().getNewTransaction();
-
-		return trans;
+		return root.getDBConnection().getNewTransaction();
 	}
 
 	/**
@@ -654,10 +623,8 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 	 *
 	 * @param tran
 	 *            a valid Transaction object
-	 * @throws SQLException
-	 *             if rollback fails
 	 */
-	public void closeTransaction(Transaction tran) throws SQLException {
+	public void closeTransaction(Transaction tran) {
 		if (root.getDBConnection() == null) {
 			return;
 		}
@@ -694,17 +661,13 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 		root.getSetup().setLocalConfig(id_wh.concat(Setup.WindowHeight),
 				Integer.toString(parent.getHeight()));
 
-		try {
-			if (transaction != null) {
-				transaction.rollback();
-				root.getDBConnection().closeTransaction(transaction);
-			}
-			if (seq_transaction != null) {
-				seq_transaction.rollback();
-				root.getDBConnection().closeTransaction(seq_transaction);
-			}
-		} catch (SQLException ex) {
-			logger.error(ex);
+		if (transaction != null) {
+			transaction.rollback();
+			root.getDBConnection().closeTransaction(transaction);
+		}
+		if (seq_transaction != null) {
+			seq_transaction.rollback();
+			root.getDBConnection().closeTransaction(seq_transaction);
 		}
 
 		if (onCloseListeners != null) {
@@ -751,12 +714,12 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 	public void registerActionKeyListener(KeyStroke to_listen_Key,
 			Runnable runnable) {
 		if (listen_key_events == null)
-			listen_key_events = new HashMap<KeyStroke, Vector<Runnable>>();
+			listen_key_events = new HashMap<>();
 
 		Vector<Runnable> listeners = listen_key_events.get(to_listen_Key);
 
 		if (listeners == null) {
-			listeners = new Vector<Runnable>();
+			listeners = new Vector<>();
 			listen_key_events.put(to_listen_Key, listeners);
 
 			registerActionKeyListenerOnRootPane(to_listen_Key);
@@ -788,14 +751,14 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 		if (table.getSelectedRowCount() <= 0) {
 			JOptionPane.showMessageDialog(null, StringUtils
 					.autoLineBreak(MlM("Bitte wählen Sie einen Eintrag aus.")),
-					MlM("Fehler"), JOptionPane.OK_OPTION);
+					MlM("Fehler"), JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 
 		if (table.getSelectedRowCount() > 1) {
 			JOptionPane.showMessageDialog(null,
 					MlM("Bitte nur einen Eintrag auswählen."), MlM("Fehler"),
-					JOptionPane.OK_OPTION);
+					JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 

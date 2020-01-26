@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class testRTF2HTML extends BaseModuleLauncher
 {
-    public testRTF2HTML( String args[] )
+    public testRTF2HTML(String[] args)
     {
         super(args);
 
@@ -96,7 +96,7 @@ public class testRTF2HTML extends BaseModuleLauncher
                             }
 
                         } catch ( Error ex ) {
-                            message = ex.getMessage();                            
+                            message = ex.getMessage();
                             err = ex;
                         } catch ( Exception ex ) {
                             message = ex.getMessage();
@@ -125,7 +125,7 @@ public class testRTF2HTML extends BaseModuleLauncher
                                     else
                                         col = Integer.parseInt(message.substring(start_col+7));
 
-                                    String lines[] = content.split("\n");
+                                    String[] lines = content.split("\n");
 
                                     String ll = lines[line-1];
 
@@ -141,8 +141,7 @@ public class testRTF2HTML extends BaseModuleLauncher
 
                                     StringBuilder sb = new StringBuilder();
 
-                                    for( int i = 0; i < col -1; i++ )
-                                        sb.append(' ');
+                                    sb.append(" ".repeat(Math.max(0, col - 1)));
                                     sb.append("^");
 
                                     logger.error("\n\n" + ll + "\n" + sb.toString());
@@ -158,7 +157,7 @@ public class testRTF2HTML extends BaseModuleLauncher
                                 throw exc;
                             }
                         }
-                        
+
                     }
                 };
 
@@ -171,7 +170,7 @@ public class testRTF2HTML extends BaseModuleLauncher
         return "0.1";
     }
 
-    public static void main(String args[])
+    public static void main(String[] args)
     {
         testRTF2HTML test = new testRTF2HTML(args);
 

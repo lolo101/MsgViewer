@@ -86,9 +86,7 @@ public abstract class Setup {
            name = "." + name;
         }
 
-        String config_file = config_path + File.separator + name;
-
-        return config_file;
+        return config_path + File.separator + name;
     }
 
     public static String getAppConfigDir( String app_name )
@@ -111,9 +109,8 @@ public abstract class Setup {
     public static String getAppConfigFile( String app_name, String file_name )
     {
         String dir = getAppConfigDir(app_name);
-        String file_abs_name = dir + File.separator + file_name;
 
-        return file_abs_name;
+        return dir + File.separator + file_name;
     }
 
     public String getConfig(DBConfig config) {
@@ -121,7 +118,7 @@ public abstract class Setup {
     }
 
     public String getLocalConfig(DBConfig config) {
-        return getLocalConfig( config.getConfigName(), new String(config.getConfigValue()) );
+        return getLocalConfig( config.getConfigName(), config.getConfigValue());
     }
 
     public abstract String getLocalConfig( String key, String default_value );

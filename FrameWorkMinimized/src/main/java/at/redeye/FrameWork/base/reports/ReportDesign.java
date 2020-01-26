@@ -11,16 +11,16 @@ package at.redeye.FrameWork.base.reports;
  */
 public interface ReportDesign
 {
-    public String startReport();
-    public String endReport();
-    
-    public String setTitle( String title );
-    
-    public String bold(String text);
-    public String bold_title(String text);
-    public String blockquote_start();
-    public String blockquote_end();
-    public String blockquote( String t );
-    public String newline();
-    public String normal_text(String t);
+    String startReport();
+    String endReport();
+
+    String setTitle(String title);
+
+    String bold(String text);
+    String bold_title(String text);
+    String blockquote_start();
+    String blockquote_end();
+    String blockquote(String t);
+    String newline();
+    String normal_text(String t);
 }

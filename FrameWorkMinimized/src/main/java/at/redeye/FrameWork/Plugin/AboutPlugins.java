@@ -14,6 +14,8 @@ package at.redeye.FrameWork.Plugin;
 import at.redeye.FrameWork.base.BaseDialog;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.widgets.helpwindow.HyperlinkExecuter;
+
+import java.awt.*;
 import java.util.Vector;
 
 /**
@@ -63,7 +65,7 @@ public class AboutPlugins extends BaseDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jLTitle.setFont(new java.awt.Font("Dialog", 1, 18));
+        jLTitle.setFont(new java.awt.Font("Dialog", Font.BOLD, 18));
         jLTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLTitle.setText("Installierte Erweiterungen");
 
@@ -89,11 +91,7 @@ public class AboutPlugins extends BaseDialog {
 
         jBCancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/at/redeye/FrameWork/base/resources/icons/fileclose.gif"))); // NOI18N
         jBCancel.setText("Schließen");
-        jBCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBCancelActionPerformed(evt);
-            }
-        });
+        jBCancel.addActionListener(this::jBCancelActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -139,7 +137,7 @@ public class AboutPlugins extends BaseDialog {
         jTLicenceText.setCaretPosition(0);
 
         jTChangeLog.setText(plugin.getChangeLog());
-        jTChangeLog.setCaretPosition(0);       
+        jTChangeLog.setCaretPosition(0);
 
     }//GEN-LAST:event_jLPluginsMouseClicked
 

@@ -93,9 +93,8 @@ public class EncryptedDBPasswd
            return null; // sicher kein Base64 encodeter String
        try {
            DesEncrypt cipher = new DesEncrypt(password);
-           String str = cipher.decrypt(DBPasswd);
 
-           return str;
+           return cipher.decrypt(DBPasswd);
        } catch( IllegalBlockSizeException ex ) {
            return null;
        } catch( IllegalArgumentException ex ) {

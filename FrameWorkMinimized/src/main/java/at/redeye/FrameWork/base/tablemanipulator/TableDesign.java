@@ -36,9 +36,9 @@ public class TableDesign {
 
     public Set<Integer> edited_cols;
     public Set<Integer> edited_rows;
-    public Vector<Vector<Object>> rows = new Vector<Vector<Object>>();
-    protected Vector<ColoredCell>  coloredCells = new Vector<ColoredCell>();
-    protected List<ToolTipCell> tooltipCells = new ArrayList<ToolTipCell>();
+    public Vector<Vector<Object>> rows = new Vector<>();
+    protected Vector<ColoredCell>  coloredCells = new Vector<>();
+    protected List<ToolTipCell> tooltipCells = new ArrayList<>();
 
 
     public void addColoredCell (int row, int col, Color color) {
@@ -84,7 +84,7 @@ public class TableDesign {
             this.isEditable = isEditable;
             this.dbval = val;
         }
-        
+
         void setEditable(boolean isEditable) {
             this.isEditable = isEditable;
         }
@@ -113,13 +113,13 @@ public class TableDesign {
 
     public TableDesign(Vector<Coll> colls) {
         this.colls = colls;
-        this.edited_cols = new HashSet<Integer>();
-        this.edited_rows = new HashSet<Integer>();
+        this.edited_cols = new HashSet<>();
+        this.edited_rows = new HashSet<>();
     }
 
     public Vector<String> getAllOfCollSorted(int col)
     {
-        Vector<String> all = new Vector<String>();
+        Vector<String> all = new Vector<>();
 
         TableValidator validator = null;
         Coll coll = null;

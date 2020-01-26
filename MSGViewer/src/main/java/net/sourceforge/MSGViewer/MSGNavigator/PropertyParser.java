@@ -1,16 +1,17 @@
 package net.sourceforge.MSGViewer.MSGNavigator;
 
-import net.sourceforge.MSGViewer.factory.msg.lib.MSTimeConvert;
 import net.sourceforge.MSGViewer.factory.msg.lib.ByteConvert;
+import net.sourceforge.MSGViewer.factory.msg.lib.MSTimeConvert;
 import net.sourceforge.MSGViewer.factory.msg.properties.Properties;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.poifs.filesystem.DocumentEntry;
+import org.apache.poi.poifs.filesystem.DocumentInputStream;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.poifs.filesystem.DocumentEntry;
-import org.apache.poi.poifs.filesystem.DocumentInputStream;
 
 /**
  *
@@ -45,7 +46,7 @@ public class PropertyParser
             is_toplevel = true;
         }
 
-        byte bytes[] = new byte[entry.getSize()];
+        byte[] bytes = new byte[entry.getSize()];
         try (InputStream in = new DocumentInputStream(entry)) {
 
             int len = in.read(bytes);
@@ -155,7 +156,7 @@ public class PropertyParser
             int length = Integer.valueOf(res, 16);
 
             sb.append(" PtypString length: ");
-            sb.append(String.valueOf(length - 2));
+            sb.append(length - 2);
 
         } else if( tagtype.equals("0102") ) {
             String res = formatBytes0(value_start_offset, bytes);
@@ -163,7 +164,7 @@ public class PropertyParser
             int length = Integer.valueOf(res, 16);
 
             sb.append(" PtypBinary length: ");
-            sb.append(String.valueOf(length));
+            sb.append(length);
 
         } else if( tagtype.equals("0040")) {
             sb.append(" PtypTime ");
@@ -192,11 +193,11 @@ public class PropertyParser
     }
 
     private String formatBytes0(int value_start_offset, byte[] bytes) {
-        String res = "";
+        StringBuilder res = new StringBuilder();
         for( int i = value_start_offset + 3; i >= value_start_offset; i-- ) {
-            res += formatByte0S(bytes[i]);
+            res.append(formatByte0S(bytes[i]));
         }
-        return res;
+        return res.toString();
     }
 
     private String formatByte0( byte b )

@@ -18,6 +18,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 
 import javax.swing.JPopupMenu;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -295,8 +296,8 @@ public class MSGNavigator extends BaseDialog {
         // the encoding of the binary data is most probably
         // ISO-8859-1 (not pure ASCII).
         switch (info.getType()) {
-            case "001e": return new String(read(dstream), "ISO-8859-1");
-            case "001f": return new String(read(dstream), "UTF-16LE");
+            case "001e": return new String(read(dstream), StandardCharsets.ISO_8859_1);
+            case "001f": return new String(read(dstream), StandardCharsets.UTF_16LE);
             case "0102": return read(dstream);
             case "0000":
             {

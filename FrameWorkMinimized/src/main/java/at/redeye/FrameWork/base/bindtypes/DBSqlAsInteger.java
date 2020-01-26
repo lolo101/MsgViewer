@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Vector;
 
 /**
- * 
+ *
  * @author martin
  */
 public class DBSqlAsInteger extends DBEnumAsInteger {
@@ -79,7 +79,7 @@ public class DBSqlAsInteger extends DBEnumAsInteger {
 
 			for (int i = 0; i < pairs.size(); i++) {
 				if (val.equals(pairs.get(i).text)) {
-					value = new Integer(pairs.get(i).val);
+					value = pairs.get(i).val;
 					return true;
 				}
 			}
@@ -91,7 +91,7 @@ public class DBSqlAsInteger extends DBEnumAsInteger {
 		public boolean setValue(Integer val) {
 			for (int i = 0; i < pairs.size(); i++) {
 				if (pairs.get(i).val.equals(val)) {
-					value = new Integer(val);
+					value = val;
 					return true;
 				}
 			}
@@ -101,7 +101,7 @@ public class DBSqlAsInteger extends DBEnumAsInteger {
 
 		@Override
 		public Integer getValue() {
-			return new Integer(value);
+			return value;
 		}
 
 		@Override
@@ -125,7 +125,7 @@ public class DBSqlAsInteger extends DBEnumAsInteger {
 
 		@Override
 		public Vector<String> getPossibleValues() {
-			Vector<String> res = new Vector<String>();
+			Vector<String> res = new Vector<>();
 
 			for (SqlQuery.Pair p : pairs)
 				res.add(p.text);

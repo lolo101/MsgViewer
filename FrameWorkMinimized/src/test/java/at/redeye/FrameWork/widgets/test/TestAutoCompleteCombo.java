@@ -28,7 +28,7 @@ public class TestAutoCompleteCombo extends javax.swing.JFrame {
         AutoCompleteCombo ac = (AutoCompleteCombo) combo;
         AutoCompleteTextField tf = (AutoCompleteTextField) textfield;
 
-        Vector<String> test = new Vector<String>();
+        Vector<String> test = new Vector<>();
 
         test.add("aha");
         test.add("aho");
@@ -89,7 +89,7 @@ public class TestAutoCompleteCombo extends javax.swing.JFrame {
     /**
     * @param args the command line arguments
     */
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new TestAutoCompleteCombo().setVisible(true);

@@ -121,18 +121,10 @@ public class ProxyAuth extends BaseDialogDialog {
         jCSavePasswd.setText("Kennwort Speichern");
 
         jButtonOk.setText("Ok");
-        jButtonOk.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonOkActionPerformed(evt);
-            }
-        });
+        jButtonOk.addActionListener(this::jButtonOkActionPerformed);
 
         jButtonCancel.setText("Abbrechen");
-        jButtonCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonCancelActionPerformed(evt);
-            }
-        });
+        jButtonCancel.addActionListener(this::jButtonCancelActionPerformed);
 
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel4.setText("Proxy Authentifizierung");

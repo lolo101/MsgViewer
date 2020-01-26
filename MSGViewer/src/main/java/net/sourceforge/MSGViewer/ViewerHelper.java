@@ -1,28 +1,29 @@
 package net.sourceforge.MSGViewer;
 
-import static at.redeye.FrameWork.base.BaseDialog.logger;
-
 import at.redeye.FrameWork.base.FrameWorkConfigDefinitions;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.base.Setup;
 import at.redeye.FrameWork.utilities.DeleteDir;
 import at.redeye.FrameWork.utilities.StringUtils;
 import at.redeye.FrameWork.utilities.TempDir;
-import java.io.File;
-import java.io.IOException;
-import net.htmlparser.jericho.Attributes;
-import net.htmlparser.jericho.Source;
-import net.htmlparser.jericho.StartTag;
-import net.sourceforge.MSGViewer.rtfparser.ParseException;
 import com.auxilii.msgparser.Message;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
 import com.auxilii.msgparser.attachment.MsgAttachment;
+import net.htmlparser.jericho.Attributes;
+import net.htmlparser.jericho.Source;
+import net.htmlparser.jericho.StartTag;
+import net.sourceforge.MSGViewer.rtfparser.ParseException;
+import org.apache.poi.util.IOUtils;
+
+import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
-import org.apache.poi.util.IOUtils;
+
+import static at.redeye.FrameWork.base.BaseDialog.logger;
 
 public class ViewerHelper {
 
@@ -97,7 +98,7 @@ public class ViewerHelper {
 
             logger.info("last_start: " + last_start + " start: " + start + " length: " + s.length() );
 
-            sb.append(s.substring(last_start, start));
+            sb.append(s, last_start, start);
             last_start = start;
 
             sb.append("<a href=\"");
@@ -119,7 +120,7 @@ public class ViewerHelper {
             }
 
             sb.append("\">");
-            sb.append(s.substring(start,i-1));
+            sb.append(s, start, i-1);
             sb.append("</a>");
 
             last_start = i;

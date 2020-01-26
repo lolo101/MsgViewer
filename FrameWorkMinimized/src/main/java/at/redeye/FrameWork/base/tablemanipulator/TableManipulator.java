@@ -25,7 +25,7 @@ import java.util.Map.Entry;
 public class TableManipulator {
 
     private DBStrukt binddesc = null;
-    private Vector<Integer> hidden_values = new Vector<Integer>();
+    private Vector<Integer> hidden_values = new Vector<>();
 
     TableDesign tabledesign;
     JTable table;
@@ -50,13 +50,7 @@ public class TableManipulator {
         this.root = root;
         table.setModel(model);
         table.setDefaultRenderer(Object.class, new NormalCellRenderer(root, this.tabledesign));
-        row_header = new RowHeader( table,  new Runnable() {
-
-            @Override
-            public void run() {
-                checkRowHeaderLimit();
-            }
-        } );
+        row_header = new RowHeader( table, this::checkRowHeaderLimit);
 
         editor_stopper = new TableEditorStopper(table);
 
@@ -87,7 +81,7 @@ public class TableManipulator {
 
     protected boolean isHidden( int i )
     {
-        for( Integer ii = 0; ii < hidden_values.size(); ii++ )
+        for(int ii = 0; ii < hidden_values.size(); ii++ )
         {
             if( hidden_values.get(ii).equals(i) )
                 return true;
@@ -117,7 +111,7 @@ public class TableManipulator {
             editor_stopper = new TableEditorStopper(table);
         }
 
-        Vector<TableDesign.Coll> vec = new Vector<TableDesign.Coll>();
+        Vector<TableDesign.Coll> vec = new Vector<>();
 
         ArrayList<String> names = binddesc.getAllNames();
         ArrayList<DBValue> values = binddesc.getAllValues();
@@ -133,13 +127,7 @@ public class TableManipulator {
         this.model = new NormalTableModel(tabledesign);
         table.setModel(model);
         table.setDefaultRenderer(Object.class, new NormalCellRenderer(root, this.tabledesign));
-        row_header = new RowHeader( table, new Runnable() {
-
-            @Override
-            public void run() {
-                checkRowHeaderLimit();
-            }
-        } );
+        row_header = new RowHeader( table, this::checkRowHeaderLimit);
     }
 
     public void autoResize()
@@ -159,15 +147,14 @@ public class TableManipulator {
         String smargin_default = root.getSetup().getLocalConfig(FrameWorkConfigDefinitions.SpreadSheetMarginReadOnly);
         String smargin_editable = root.getSetup().getLocalConfig(FrameWorkConfigDefinitions.SpreadSheetMarginEditable);
 
-        int margin_default = Integer.valueOf(smargin_default);
-        int margin_editable = Integer.valueOf(smargin_editable);
+        int margin_default = Integer.parseInt(smargin_default);
+        int margin_editable = Integer.parseInt(smargin_editable);
 
         int max_height = 0;
 
         for (int i = 0; i < table.getColumnCount(); i++) {
-            int                     vColIndex = i;
             DefaultTableColumnModel colModel  = (DefaultTableColumnModel) table.getColumnModel();
-            TableColumn             col       = colModel.getColumn(vColIndex);
+            TableColumn             col       = colModel.getColumn(i);
             int                     width     = 0;
 
             // Get width of column header
@@ -183,9 +170,9 @@ public class TableManipulator {
 
             // Get maximum width of column data
             for (int r = 0; r < table.getRowCount(); r++) {
-                renderer = table.getCellRenderer(r, vColIndex);
-                comp     = renderer.getTableCellRendererComponent(table, table.getValueAt(r, vColIndex), false, false,
-                        r, vColIndex);
+                renderer = table.getCellRenderer(r, i);
+                comp     = renderer.getTableCellRendererComponent(table, table.getValueAt(r, i), false, false,
+                        r, i);
 
                 Dimension dim = comp.getPreferredSize();
 
@@ -197,7 +184,7 @@ public class TableManipulator {
             }
 
 
-            if( tabledesign.colls.get(vColIndex).isEditable )
+            if( tabledesign.colls.get(i).isEditable )
             {
                 if( width_header <= width )
                     width += 2 * margin_editable;
@@ -358,8 +345,8 @@ public class TableManipulator {
          */
 
 
-        Vector<Object> table_copy = new Vector<Object>();
-        Vector<Object> db_copy = new Vector<Object>();
+        Vector<Object> table_copy = new Vector<>();
+        Vector<Object> db_copy = new Vector<>();
 
         int i = 0;
         for( Object d : data )
@@ -438,9 +425,9 @@ public class TableManipulator {
         model.removeRow(row);
         tabledesign.rows.remove(row);
 
-        Object rows[] = getEditedRows().toArray();
+        Object[] rows = getEditedRows().toArray();
 
-        HashSet<Integer> er = new HashSet<Integer>();
+        HashSet<Integer> er = new HashSet<>();
 
         for( int i = 0; i < rows.length; i++ )
         {
@@ -451,11 +438,11 @@ public class TableManipulator {
 
             if( (Integer)rows[i] < row )
             {
-                er.add( new Integer(i));
+                er.add(Integer.valueOf(i));
             }
             else
             {
-                er.add(new Integer(i-1));
+                er.add(Integer.valueOf(i - 1));
             }
         }
 
@@ -609,10 +596,7 @@ public class TableManipulator {
     {
         ArrayList<DBValue> col_list = new ArrayList();
 
-        for (DBValue column : columns)
-        {
-            col_list.add(column);
-        }
+        col_list.addAll(Arrays.asList(columns));
 
         hide( col_list );
     }
@@ -899,7 +883,7 @@ public class TableManipulator {
             String col_uid = uid + "_" + col.dbval.getName();
 
             // das j hinten drann ist die Position an der sich die Spalte befindet
-            setup.setLocalConfig(col_uid, String.valueOf(col_rect.width) + "," + j);
+            setup.setLocalConfig(col_uid, col_rect.width + "," + j);
         }
     }
 
@@ -942,18 +926,18 @@ public class TableManipulator {
             if( val.isEmpty() )
                 continue;
 
-            String values[] = val.split(",");
+            String[] values = val.split(",");
 
             try
             {
                 width = Integer.parseInt(values[0]);
 
                 if( values.length > 1 )
-                    positions.add( new AbstractMap.SimpleEntry<String, Integer>(col_uid,Integer.parseInt(values[1])));
+                    positions.add(new AbstractMap.SimpleEntry<>(col_uid, Integer.parseInt(values[1])));
 
             } catch( NumberFormatException ex ) {
                 logger.error(StringUtils.exceptionToString(ex));
-                positions.add(new AbstractMap.SimpleEntry<String, Integer>(col_uid,-1));
+                positions.add(new AbstractMap.SimpleEntry<>(col_uid, -1));
             }
 
             if( width > 5 )

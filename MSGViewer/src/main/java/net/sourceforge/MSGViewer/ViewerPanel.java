@@ -1,11 +1,6 @@
 package net.sourceforge.MSGViewer;
 
 import at.redeye.FrameWork.base.AutoMBox;
-
-import static at.redeye.FrameWork.base.BaseDialog.logger;
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
 import at.redeye.FrameWork.base.BaseDialogBase;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.base.Setup;
@@ -17,7 +12,18 @@ import com.auxilii.msgparser.RecipientEntry;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
 import com.auxilii.msgparser.attachment.MsgAttachment;
-import java.awt.Graphics2D;
+import net.htmlparser.jericho.Source;
+import net.htmlparser.jericho.StartTag;
+import net.sourceforge.MSGViewer.factory.MessageParserFactory;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.text.EditorKit;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.StyleSheet;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -30,17 +36,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JEditorPane;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-import javax.swing.text.EditorKit;
-import javax.swing.text.html.HTMLEditorKit;
-import javax.swing.text.html.StyleSheet;
-import net.htmlparser.jericho.Source;
-import net.htmlparser.jericho.StartTag;
-import net.sourceforge.MSGViewer.factory.MessageParserFactory;
+
+import static at.redeye.FrameWork.base.BaseDialog.logger;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener {
 
@@ -116,31 +115,15 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
         jScrollPane2.setViewportView(body);
 
         jRRTF.setText("RTF");
-        jRRTF.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRRTFActionPerformed(evt);
-            }
-        });
+        jRRTF.addActionListener(this::jRRTFActionPerformed);
 
         jRText.setText("Text");
-        jRText.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRTextActionPerformed(evt);
-            }
-        });
+        jRText.addActionListener(this::jRTextActionPerformed);
 
         JCBfix.setText("Fixed Font");
-        JCBfix.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                JCBfixActionPerformed(evt);
-            }
-        });
+        JCBfix.addActionListener(this::JCBfixActionPerformed);
 
-        jSFontSize.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                jSFontSizeStateChanged(evt);
-            }
-        });
+        jSFontSize.addChangeListener(this::jSFontSizeStateChanged);
 
         jLabel1.setText("Fontsize");
 
@@ -356,7 +339,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
                 String command = open_command + " \"" + url + "\"";
                 logger.info(command);
 
-                String command_array[] = new String[2];
+                String[] command_array = new String[2];
 
                 command_array[0] = open_command;
                 command_array[1] = url.toString();
@@ -394,7 +377,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
                 String command = open_command + " \"" + content.getPath() + "\"";
                 logger.info(command);
 
-                String command_array[] = new String[2];
+                String[] command_array = new String[2];
 
                 command_array[0] = open_command;
                 command_array[1] = content.getPath();
@@ -458,7 +441,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
         if (message.getFromEmail() == null && message.getFromName() == null) {
         } else if (message.getFromEmail() == null) {
-            sb.append(parent.MlM("From: ") + message.getFromName());
+            sb.append(parent.MlM("From: ")).append(message.getFromName());
         } else if (message.getFromName() == null) {
             sb.append("<a href=\"mailto:");
             sb.append(message.getFromEmail());
@@ -501,7 +484,6 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
         List<Attachment> attachments = message.getAttachments();
 
         final int max_width = Integer.parseInt(root.getSetup().getLocalConfig(AppConfigDefinitions.IconSize));
-        final int max_height = max_width;
 
         for( Attachment att : attachments )
         {
@@ -537,7 +519,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
                                     ImageIcon icon = ImageUtils.loadScaledImageIcon(fatt.getData(),
                                                                 fatt.toString(),
-                                                                max_width, max_height );
+                                                                max_width, max_width);
 
                                     BufferedImage bi = new BufferedImage(icon.getIconWidth(),icon.getIconHeight(),
                                                             BufferedImage.TYPE_INT_RGB);

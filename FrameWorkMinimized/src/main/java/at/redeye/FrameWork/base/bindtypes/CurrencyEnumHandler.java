@@ -192,7 +192,7 @@ import at.redeye.FrameWork.base.bindtypes.DBEnum.EnumHandler;
 
         public CurrencyEnumHandler()
         {
-            types = types.EUR;
+            types = CURRENCY.EUR;
         }
 
         @Override
@@ -231,7 +231,7 @@ import at.redeye.FrameWork.base.bindtypes.DBEnum.EnumHandler;
         @Override
         public Vector<String> getPossibleValues() {
 
-            Vector<String> res = new Vector<String>();
+            Vector<String> res = new Vector<>();
 
             for( CURRENCY val : CURRENCY.values() )
                 res.add(val.toString());

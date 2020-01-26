@@ -18,41 +18,28 @@ import at.redeye.FrameWork.base.Setup;
 import at.redeye.FrameWork.widgets.GridLayout2;
 import at.redeye.FrameWork.widgets.NoticeIfChangedTextField;
 import at.redeye.FrameWork.widgets.helpwindow.HelpWin;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Insets;
-import java.awt.Rectangle;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.Vector;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
+import java.util.*;
 
 /**
  *
  * @author martin
  */
-public class TranslationDialog extends BaseDialog {    
+public class TranslationDialog extends BaseDialog {
 
     public static String TRANS_LAST_LANGUAGE = "last_language";
     public static String TRANS_LAST_COUNTRY = "last_country";
     public static String TRANS_LAST_LEFT_COLCOUNT = "trans_last_right_colcount";
     public static String TRANS_LAST_RIGHT_COLCOUNT = "trans_last_left_colcount";
 
-    Vector<SimpleEntry<String,StringBuffer>> data = new Vector<SimpleEntry<String,StringBuffer>>();
-    Vector<NoticeIfChangedTextField> fields = new Vector<NoticeIfChangedTextField>();
+    Vector<SimpleEntry<String,StringBuffer>> data = new Vector<>();
+    Vector<NoticeIfChangedTextField> fields = new Vector<>();
 
     String ClassName;
 
@@ -62,8 +49,8 @@ public class TranslationDialog extends BaseDialog {
     boolean force_undo_country = false;
     boolean force_undo_language = false;
 
-    Vector<JTextField> left_cols = new Vector<JTextField>();
-    Vector<JTextField> right_cols = new Vector<JTextField>();
+    Vector<JTextField> left_cols = new Vector<>();
+    Vector<JTextField> right_cols = new Vector<>();
 
     public TranslationDialog(final Root root, Container frame , String name,  ExtractStrings es ) {
         super(root, name );
@@ -82,7 +69,7 @@ public class TranslationDialog extends BaseDialog {
 
         panel.setLayout(new GridLayout2(0,5));
 
-        
+
         for( String s : strings )
         {
             if( MLUtil.shouldBeTranslated(s))
@@ -113,7 +100,7 @@ public class TranslationDialog extends BaseDialog {
                 edit.setToolTipText(MlM("Text mehrzeilig editieren"));
 
                 edit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/at/redeye/FrameWork/base/resources/icons/edit.png")));
-                
+
                 panel.add(edit);
 
 
@@ -163,7 +150,7 @@ public class TranslationDialog extends BaseDialog {
 
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                   
+
                         final MultiLineInputDialog dialog = new MultiLineInputDialog(base, root);
 
                         final MultiLineInput mli = dialog.getMli();
@@ -175,19 +162,14 @@ public class TranslationDialog extends BaseDialog {
                             }
                         });
 
-                        mli.setCloseActionListener(new Runnable() {
-                           public void run()
-                           {
-                               dialog.dispose();
-                           }
-                        });
+                        mli.setCloseActionListener(dialog::dispose);
 
                         mli.setText(tf.getText());
 
                         String editedText =  editField.getText().trim();
                         if( !editedText.isEmpty() )
-                            mli.setTransText(editedText);                                                
-                        
+                            mli.setTransText(editedText);
+
                         // Adjust dialogs placement on screen
                         Dimension dialog_dim = dialog.getPreferredSize();
 
@@ -208,7 +190,7 @@ public class TranslationDialog extends BaseDialog {
 
                 panel.add( editField );
 
-                SimpleEntry<String,StringBuffer> pair = new SimpleEntry<String,StringBuffer>(s,new StringBuffer());
+                SimpleEntry<String,StringBuffer> pair = new SimpleEntry<>(s, new StringBuffer());
 
                 this.bindVar( editField, pair.getValue() );
 
@@ -226,7 +208,7 @@ public class TranslationDialog extends BaseDialog {
 
         language.removeAllItems();
 
-        Set<String> languages = new TreeSet<String>();
+        Set<String> languages = new TreeSet<>();
 
         for( Locale l :  Locale.getAvailableLocales() )
         {
@@ -246,7 +228,7 @@ public class TranslationDialog extends BaseDialog {
 
         country.removeAllItems();
 
-        Set<String> countries = new TreeSet<String>();
+        Set<String> countries = new TreeSet<>();
 
 
         for( Locale l :  Locale.getAvailableLocales() )
@@ -267,8 +249,8 @@ public class TranslationDialog extends BaseDialog {
         String last_col_left = root.getSetup().getLocalConfig(TRANS_LAST_LEFT_COLCOUNT, "40");
         String last_col_right = root.getSetup().getLocalConfig(TRANS_LAST_RIGHT_COLCOUNT, "40");
 
-        Integer left = 40;
-        Integer right = 40;
+        int left = 40;
+        int right = 40;
 
         try {
             left = Integer.parseInt(last_col_left);
@@ -377,21 +359,13 @@ public class TranslationDialog extends BaseDialog {
 
         jBClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/at/redeye/FrameWork/base/resources/icons/fileclose.gif"))); // NOI18N
         jBClose.setText("Schließen");
-        jBClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBCloseActionPerformed(evt);
-            }
-        });
+        jBClose.addActionListener(this::jBCloseActionPerformed);
 
         jBSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/at/redeye/FrameWork/base/resources/icons/button_ok.gif"))); // NOI18N
         jBSave.setText("Speichern");
-        jBSave.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBSaveActionPerformed(evt);
-            }
-        });
+        jBSave.addActionListener(this::jBSaveActionPerformed);
 
-        jLTitle.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        jLTitle.setFont(new java.awt.Font("Dialog", Font.BOLD, 18)); // NOI18N
         jLTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLTitle.setText("Übersetzungen");
 
@@ -409,22 +383,14 @@ public class TranslationDialog extends BaseDialog {
         jScrollPane1.setViewportView(panel);
 
         language.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        language.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                languageActionPerformed(evt);
-            }
-        });
+        language.addActionListener(this::languageActionPerformed);
 
         jLabel1.setText("Sprache:");
 
         jLabel2.setText("Ländervariante:");
 
         country.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        country.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                countryActionPerformed(evt);
-            }
-        });
+        country.addActionListener(this::countryActionPerformed);
 
         jLabel3.setText("Lokalisierungskürzel:");
 
@@ -432,19 +398,11 @@ public class TranslationDialog extends BaseDialog {
 
         jLabel4.setText("Spalten Links:");
 
-        colsLeft.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                colsLeftStateChanged(evt);
-            }
-        });
+        colsLeft.addChangeListener(this::colsLeftStateChanged);
 
         jLabel5.setText("Spalten Rechts:");
 
-        colsRight.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                colsRightStateChanged(evt);
-            }
-        });
+        colsRight.addChangeListener(this::colsRightStateChanged);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -492,11 +450,7 @@ public class TranslationDialog extends BaseDialog {
         );
 
         jBHelp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/at/redeye/FrameWork/base/resources/icons/help.png"))); // NOI18N
-        jBHelp.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBHelpActionPerformed(evt);
-            }
-        });
+        jBHelp.addActionListener(this::jBHelpActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -546,7 +500,7 @@ public class TranslationDialog extends BaseDialog {
 
         new AutoMBox(getTitle()) {
             @Override
-            public void do_stuff() throws Exception {
+            public void do_stuff() {
 
                 if (canClose()) {
                     close();
@@ -556,7 +510,7 @@ public class TranslationDialog extends BaseDialog {
     }//GEN-LAST:event_jBCloseActionPerformed
 
     private void jBSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBSaveActionPerformed
-        
+
         new AutoMBox(getTitle()) {
 
             @Override
@@ -624,7 +578,7 @@ public class TranslationDialog extends BaseDialog {
     private void countryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_countryActionPerformed
 
         if( force_undo_country || canClose() )
-        {            
+        {
             prev_country_index = country.getSelectedIndex();
             force_undo_country = false;
             updateLocale();
@@ -659,7 +613,7 @@ public class TranslationDialog extends BaseDialog {
         for( JTextField field : right_cols )
             field.setColumns(val);
 
-        panel.updateUI();        
+        panel.updateUI();
     }//GEN-LAST:event_colsRightStateChanged
 
     private void jBHelpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBHelpActionPerformed
@@ -708,7 +662,7 @@ public class TranslationDialog extends BaseDialog {
                 loadTranslationsFor( ClassName, locale_string.getText() );
             }
         };
-        
+
     }
 
     public static String getTranslationsDir( Root root )
@@ -728,7 +682,7 @@ public class TranslationDialog extends BaseDialog {
          String dir = getTranslationsDir(root);
 
          File file = new File( dir + "/" + ClassName + "_" + lang + ".properties");
-         
+
          Properties props = new Properties();
 
          if( file.isFile() )
@@ -746,7 +700,7 @@ public class TranslationDialog extends BaseDialog {
              buf.setLength(0);
 
              if( trans != null )
-             {                 
+             {
                  buf.append(trans);
              }
          }

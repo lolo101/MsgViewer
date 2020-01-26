@@ -15,10 +15,10 @@ import at.redeye.FrameWork.base.Root;
 public interface OpenNewMailInterface {
 
     /**
-     * 
+     *
      * @param root
      * @param MailUrl to a file to open
      */
-    public void openMail(Root root, String toString);
-    
+    void openMail(Root root, String toString);
+
 }

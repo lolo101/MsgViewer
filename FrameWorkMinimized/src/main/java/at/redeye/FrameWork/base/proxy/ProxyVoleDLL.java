@@ -58,7 +58,7 @@ public class ProxyVoleDLL implements DLLExtractor
     @Override
     public List<String> getNames() {
 
-        List<String> res = new ArrayList<String>();
+        List<String> res = new ArrayList<>();
 
         if (Setup.is_win_system())
         {

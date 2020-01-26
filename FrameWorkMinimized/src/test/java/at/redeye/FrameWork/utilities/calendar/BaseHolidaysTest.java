@@ -5,17 +5,11 @@
 
 package at.redeye.FrameWork.utilities.calendar;
 
-import org.joda.time.DateMidnight;
 import org.joda.time.LocalDate;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
-import static org.junit.Assert.*;
-
-import org.junit.Ignore;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  *
@@ -27,11 +21,11 @@ public class BaseHolidaysTest {
     }
 
     @BeforeClass
-    public static void setUpClass() throws Exception {
+    public static void setUpClass() {
     }
 
     @AfterClass
-    public static void tearDownClass() throws Exception {
+    public static void tearDownClass() {
     }
 
     @Before
@@ -47,21 +41,20 @@ public class BaseHolidaysTest {
      */
     @Test
     public void testGetEaster() {
-        System.out.println("getEaster");       
-        
-        LocalDate dates[] = { new LocalDate(2008,3,23),
+        System.out.println("getEaster");
+
+        LocalDate[] dates = { new LocalDate(2008,3,23),
                               new LocalDate(2009,4,12),
                               new LocalDate(2010,4,4),
                               new LocalDate(2011,4,24)
                               };
-        
+
         for( LocalDate dm : dates )
         {
             System.out.println("getEaster " + dm.getYear());
             int year = dm.getYear();
-            LocalDate expResult = dm;
             LocalDate result = BaseHolidays.getEaster(year);
-            assertEquals(expResult, result);
+            assertEquals(dm, result);
         }
 
         for( int year = 1970; year < 2030; year++ )

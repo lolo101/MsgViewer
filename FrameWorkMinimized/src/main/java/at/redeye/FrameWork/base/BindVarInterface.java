@@ -4,38 +4,33 @@
  */
 package at.redeye.FrameWork.base;
 
-import java.util.Collection;
-
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
-
 import at.redeye.FrameWork.base.bindtypes.DBDateTime;
 import at.redeye.FrameWork.base.bindtypes.DBFlagInteger;
 import at.redeye.FrameWork.base.bindtypes.DBValue;
 import at.redeye.FrameWork.widgets.datetime.IDateTimeComponent;
-import java.util.Date;
+
 import javax.swing.*;
+import java.util.Collection;
+import java.util.Date;
 
 /**
- * 
+ *
  * @author martin
  */
 public interface BindVarInterface {
 
-	static public abstract class Pair {
+	interface Pair {
 
-		public abstract void gui_to_var();
+		void gui_to_var();
 
-		public abstract void var_to_gui();
+		void var_to_gui();
 
-		public abstract Object get_first();
+		Object get_first();
 
-		public abstract Object get_second();
-	};
+		Object get_second();
+	}
 
-	static class TextStringPair extends Pair {
+	class TextStringPair implements Pair {
 
 		JTextField textfield;
 		StringBuffer value;
@@ -67,7 +62,7 @@ public interface BindVarInterface {
 		}
 	}
 
-	static class ComboStringPair extends Pair {
+	class ComboStringPair implements Pair {
 
 		JComboBox combo;
 		DBValue value;
@@ -99,7 +94,7 @@ public interface BindVarInterface {
 		}
 	}
 
-	static class DateComponentPair extends Pair {
+	class DateComponentPair implements Pair {
 
 		IDateTimeComponent comp;
 		DBDateTime value;
@@ -112,7 +107,7 @@ public interface BindVarInterface {
                 @Override
 		public void gui_to_var() {
                     String date_str = comp.getDate();
-                    
+
                     if( date_str.trim().isEmpty() )
                         value.loadFromCopy(new Date(0));
                     else
@@ -135,7 +130,7 @@ public interface BindVarInterface {
 		}
 	}
 
-	static class PasswdStringPair extends Pair {
+	class PasswdStringPair implements Pair {
 		JPasswordField textfield;
 		StringBuffer value;
 
@@ -166,7 +161,7 @@ public interface BindVarInterface {
 		}
 	}
 
-	static class TextDBStringPair extends Pair {
+	class TextDBStringPair implements Pair {
 
 		JTextField textfield;
 		DBValue value;
@@ -197,7 +192,7 @@ public interface BindVarInterface {
 		}
 	}
 
-	static class FlagCheckboxPair extends Pair {
+	class FlagCheckboxPair implements Pair {
 
 		JCheckBox checkbox;
 		DBFlagInteger value;
@@ -233,8 +228,8 @@ public interface BindVarInterface {
 			return value;
 		}
 	}
-        
-    static class TextAreaDBValuePair extends Pair {
+
+    class TextAreaDBValuePair implements Pair {
 
         JTextArea textarea;
         DBValue value;
@@ -263,10 +258,10 @@ public interface BindVarInterface {
         public DBValue get_second() {
             return value;
         }
-    }   
+    }
 
-    
-    static class TextAreaStringBufferPair extends Pair {
+
+    class TextAreaStringBufferPair implements Pair {
 
         JTextArea textarea;
         StringBuffer value;
@@ -296,25 +291,25 @@ public interface BindVarInterface {
         public StringBuffer get_second() {
             return value;
         }
-    }   
-    
-	public void bindVar(JTextField jtext, StringBuffer var);
-        
-        public void bindVar(JTextArea jtext, StringBuffer var);
-        
-        public void bindVar(JTextArea jtext, DBValue var);
+    }
 
-	public void bindVar(JTextField jtext, DBValue var);
+	void bindVar(JTextField jtext, StringBuffer var);
 
-	public void bindVar(JComboBox jComboBox, DBValue var);
+        void bindVar(JTextArea jtext, StringBuffer var);
 
-	public void bindVar(IDateTimeComponent comp, DBDateTime var);
+        void bindVar(JTextArea jtext, DBValue var);
 
-	public void bindVar(JCheckBox jCDefault, DBFlagInteger _default);
+	void bindVar(JTextField jtext, DBValue var);
 
-	public void var_to_gui();
+	void bindVar(JComboBox jComboBox, DBValue var);
 
-	public void gui_to_var();
+	void bindVar(IDateTimeComponent comp, DBDateTime var);
+
+	void bindVar(JCheckBox jCDefault, DBFlagInteger _default);
+
+	void var_to_gui();
+
+	void gui_to_var();
 
 	Collection<Pair> getBindVarPairs();
 

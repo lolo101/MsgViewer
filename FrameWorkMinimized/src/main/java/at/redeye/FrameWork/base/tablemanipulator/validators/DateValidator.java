@@ -6,6 +6,7 @@
 package at.redeye.FrameWork.base.tablemanipulator.validators;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import at.redeye.FrameWork.base.bindtypes.DBDateTime;
@@ -20,8 +21,8 @@ import java.util.GregorianCalendar;
  */
 public class DateValidator extends TableValidator {
 
-    public static long MIN_YEAR_IN_MILLIS = new GregorianCalendar(1970,1,5).getTimeInMillis();
-    
+    public static long MIN_YEAR_IN_MILLIS = new GregorianCalendar(1970, Calendar.FEBRUARY,5).getTimeInMillis();
+
     @Override
     public String formatData(Object data) {
         // System.out.println("HERE");
@@ -29,18 +30,16 @@ public class DateValidator extends TableValidator {
 
         SimpleDateFormat formater_time = new SimpleDateFormat(StmtExecInterface.SQLIF_STD_DATE_FORMAT);
 
-        Date time = (Date) val.getValue();
+        Date time = val.getValue();
 
         System.out.println(time + " " + time.getTime());
-        
+
         if( time.getTime() < MIN_YEAR_IN_MILLIS )
-        {            
+        {
             return "";
         }
-        
-        String res = formater_time.format(time.getTime());
 
-        return res;
+        return formater_time.format(time.getTime());
     }
 
     @Override
@@ -50,16 +49,16 @@ public class DateValidator extends TableValidator {
 
     @Override
     public boolean loadToValue(DBValue val, String s, int row) {
-               
+
         if( s.isEmpty() ) {
             val.loadFromDB(new Date(0));
             return true;
         }
-        
+
     	Date time = (Date) val.getValue();
         //Add dummy time for parsing
         s += " 00:00:00";
-        
+
         val.loadFromString(s);
         return true;
     }
@@ -71,7 +70,7 @@ public class DateValidator extends TableValidator {
         } else if( data.isEmpty() ) {
             return true;
         }
-        
+
         return false;
     }
 }

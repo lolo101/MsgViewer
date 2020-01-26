@@ -21,7 +21,7 @@ import javax.swing.PopupFactory;
  * @author martin
  */
 public class StartupWindow
-{      
+{
     protected Popup popup = null;
 
     public StartupWindow(String icon_path)
@@ -61,7 +61,6 @@ public class StartupWindow
         popup = factory.getPopup(null, panel, screenWidth / 2 - icon.getIconWidth() / 2, screenHeight / 2 - icon.getIconHeight() / 2);
         popup.show();
 
-        return;
     }
 
     public void close()

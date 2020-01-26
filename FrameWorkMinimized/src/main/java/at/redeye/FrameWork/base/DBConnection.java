@@ -26,6 +26,6 @@ public interface DBConnection {
 
     Transaction getNewTransaction();
 
-    boolean open(ConnectionDefinition definition) throws ClassNotFoundException, SQLException, MissingConnectionParamException, UnSupportedDatabaseException;
-    
+    boolean open(ConnectionDefinition definition);
+
 }

@@ -5,6 +5,7 @@
  */
 package at.redeye.FrameWork.base.prm.impl.gui;
 
+import java.awt.*;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
@@ -29,14 +30,14 @@ import at.redeye.FrameWork.widgets.helpwindow.HelpWin;
 import at.redeye.FrameWork.widgets.helpwindow.HelpWinHook;
 
 /**
- * 
+ *
  * @author martin
  */
 public class GlobalConfig extends BaseDialog implements CanCloseInterface,
 		PrmListener {
 
 	private static final long serialVersionUID = 1L;
-	Vector<DBStrukt> values = new Vector<DBStrukt>();
+	Vector<DBStrukt> values = new Vector<>();
 	TableManipulator tm;
 	GlobalConfig myself;
 
@@ -92,7 +93,7 @@ public class GlobalConfig extends BaseDialog implements CanCloseInterface,
 				values.clear();
 				tm.clear();
 
-				TreeMap<String, DBConfig> vals = new TreeMap<String, DBConfig>();
+				TreeMap<String, DBConfig> vals = new TreeMap<>();
 
 				Set<String> keys = GlobalConfigDefinitions.entries.keySet();
 
@@ -114,7 +115,7 @@ public class GlobalConfig extends BaseDialog implements CanCloseInterface,
 
 				for (String key : keys) {
 
-					DBConfig c = (DBConfig) vals.get(key);
+					DBConfig c = vals.get(key);
                                         c.descr.loadFromCopy(MlM(c.descr.getValue()));
 					values.add(c);
 					tm.add(c);
@@ -140,17 +141,13 @@ public class GlobalConfig extends BaseDialog implements CanCloseInterface,
 
 		setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
 
-		jLTitle.setFont(new java.awt.Font("Dialog", 1, 18));
+		jLTitle.setFont(new java.awt.Font("Dialog", Font.BOLD, 18));
 		jLTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		jLTitle.setText("Globale Einstellungen");
 
 		jBHelp.setIcon(new javax.swing.ImageIcon(getClass().getResource(
 				"/at/redeye/FrameWork/base/resources/icons/help.png"))); // NOI18N
-		jBHelp.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				jBHelpActionPerformed(evt);
-			}
-		});
+		jBHelp.addActionListener(this::jBHelpActionPerformed);
 
 		jTContent.setModel(new javax.swing.table.DefaultTableModel(
 				new Object[][] { { null, null, null, null },
@@ -162,20 +159,12 @@ public class GlobalConfig extends BaseDialog implements CanCloseInterface,
 		jBSave.setIcon(new javax.swing.ImageIcon(getClass().getResource(
 				"/at/redeye/FrameWork/base/resources/icons/button_ok.gif"))); // NOI18N
 		jBSave.setText("Speichern");
-		jBSave.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				jBSaveActionPerformed(evt);
-			}
-		});
+		jBSave.addActionListener(this::jBSaveActionPerformed);
 
 		jBClose.setIcon(new javax.swing.ImageIcon(getClass().getResource(
 				"/at/redeye/FrameWork/base/resources/icons/fileclose.gif"))); // NOI18N
 		jBClose.setText("Schließen");
-		jBClose.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				jBCloseActionPerformed(evt);
-			}
-		});
+		jBClose.addActionListener(this::jBCloseActionPerformed);
 
 		javax.swing.GroupLayout layout = new javax.swing.GroupLayout(
 				getContentPane());

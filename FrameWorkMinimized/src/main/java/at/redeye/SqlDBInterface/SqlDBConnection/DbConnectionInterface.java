@@ -13,9 +13,8 @@ import at.redeye.SqlDBInterface.SqlDBConnection.impl.UnSupportedDatabaseExceptio
  */
 public interface DbConnectionInterface {
 
-	public Connection connectToDatabase() throws ClassNotFoundException,
-			UnSupportedDatabaseException, SQLException, MissingConnectionParamException;
+	Connection connectToDatabase();
 
-	public void disconnectDatabase(Connection conn) throws SQLException;
+	void disconnectDatabase(Connection conn);
 
 }

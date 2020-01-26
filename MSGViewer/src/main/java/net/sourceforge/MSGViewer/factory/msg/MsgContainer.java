@@ -1,28 +1,26 @@
 package net.sourceforge.MSGViewer.factory.msg;
 
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-
 import com.auxilii.msgparser.Message;
 import com.auxilii.msgparser.RecipientEntry;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
 import com.auxilii.msgparser.attachment.MsgAttachment;
+import net.sourceforge.MSGViewer.factory.msg.entries.*;
+import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypInteger32;
+import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypTime;
+import net.sourceforge.MSGViewer.factory.msg.properties.PropType;
+import org.apache.poi.poifs.filesystem.DirectoryEntry;
+
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
-import net.sourceforge.MSGViewer.factory.msg.entries.*;
-import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypInteger32;
-import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypTime;
-import net.sourceforge.MSGViewer.factory.msg.properties.PropType;
-import org.apache.poi.poifs.filesystem.DirectoryEntry;
+
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 public class MsgContainer
 {
@@ -257,7 +255,7 @@ public class MsgContainer
     }
 
     private static void writeMsgAttachment(MsgAttachment attachment, DirectoryEntry att_dir) throws IOException {
-        List<? extends SubstGEntry> entries = Arrays.asList();
+        List<? extends SubstGEntry> entries = Collections.emptyList();
 
         for (SubstGEntry entry : entries) {
             entry.createEntry(att_dir);

@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -144,7 +145,7 @@ public class HelpFileLoader {
 
 		StringBuilder res = new StringBuilder();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(
-				stream, "UTF-8"));
+				stream, StandardCharsets.UTF_8));
 
 		while (reader.ready()) {
 			String line = reader.readLine();
@@ -159,7 +160,7 @@ public class HelpFileLoader {
 		return res.toString();
 	}
 
-	public static void main(String argv[]) {
+	public static void main(String[] argv) {
 		HelpFileLoader hfl = new HelpFileLoader();
 
 		try {

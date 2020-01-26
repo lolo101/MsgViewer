@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package at.redeye.FrameWork.utilities;
 
@@ -12,7 +12,7 @@ public class Rounding {
 
 		long exp = (long) Math.pow(10, digits);
 
-		return new Double(Math.round(d * exp) / (double) exp);
+		return Math.round(d * exp) / (double) exp;
 
 	}
 
