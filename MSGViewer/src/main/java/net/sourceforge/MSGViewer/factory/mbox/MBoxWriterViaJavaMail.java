@@ -10,18 +10,19 @@ import net.sourceforge.MSGViewer.HtmlFromRtf;
 import net.sourceforge.MSGViewer.ModuleLauncher;
 import net.sourceforge.MSGViewer.factory.MessageParserFactory;
 import net.sourceforge.MSGViewer.factory.mbox.headers.DateHeader;
-import net.sourceforge.MSGViewer.rtfparser.ParseException;
 
 import javax.activation.DataHandler;
 import javax.mail.BodyPart;
 import javax.mail.MessagingException;
 import javax.mail.Session;
-import javax.mail.internet.AddressException;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
@@ -34,7 +35,7 @@ public class MBoxWriterViaJavaMail
      private final Session session = Session.getInstance(System.getProperties());
      private File tmp_dir;
 
-     public void write(Message msg, OutputStream out ) throws AddressException, MessagingException, IOException, ParseException, FileNotFoundException, Exception
+     public void write(Message msg, OutputStream out ) throws Exception
      {
          javax.mail.Message jmsg = new MimeMessage(session);
 
@@ -142,7 +143,7 @@ public class MBoxWriterViaJavaMail
          return tmp_dir;
      }
 
-     File dumpAttachment( FileAttachment fatt ) throws FileNotFoundException, IOException
+     File dumpAttachment( FileAttachment fatt ) throws IOException
      {
          File content = new File(getTmpDir(), fatt.toString());
 
@@ -153,7 +154,7 @@ public class MBoxWriterViaJavaMail
          return content;
      }
 
-    private void writeMBoxHeader(Message msg, OutputStream out) throws UnsupportedEncodingException, IOException
+    private void writeMBoxHeader(Message msg, OutputStream out) throws IOException
     {
        StringBuilder sb = new StringBuilder();
 

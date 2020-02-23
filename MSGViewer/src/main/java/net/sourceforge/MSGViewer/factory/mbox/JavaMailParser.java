@@ -95,7 +95,7 @@ public class JavaMailParser
                     msg.setBodyText(body);
                     LOGGER.debug(msg.getBodyText());
                 }
-            } else if (disp == null || disp.equalsIgnoreCase(Part.ATTACHMENT)) {
+            } else if (disp == null || disp.equalsIgnoreCase(Part.ATTACHMENT) || disp.equalsIgnoreCase(Part.INLINE)) {
                 // many mailers don't include a Content-Disposition
 
                 MimeBodyPart mpart = (MimeBodyPart)part;

@@ -16,6 +16,7 @@ import net.htmlparser.jericho.StartTag;
 import net.sourceforge.MSGViewer.rtfparser.ParseException;
 import org.apache.poi.util.IOUtils;
 
+import javax.activation.MimeType;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -43,16 +44,9 @@ public class ViewerHelper {
         }
     }
 
-   static boolean is_image_mime_type( String mime )
+   static boolean is_image_mime_type( MimeType mime )
     {
-        switch (mime) {
-            case "image/jpeg":
-            case "image/gif":
-            case "image/png":
-                return true;
-            default:
-                return false;
-        }
+        return  mime.getPrimaryType().equalsIgnoreCase("image");
     }
 
     static boolean is_mail_message( String file_name )

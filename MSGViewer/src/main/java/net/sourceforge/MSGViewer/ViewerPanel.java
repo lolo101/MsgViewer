@@ -9,6 +9,7 @@ import at.redeye.FrameWork.utilities.StringUtils;
 import at.redeye.Plugins.ShellExec.ShellExec;
 import com.auxilii.msgparser.Message;
 import com.auxilii.msgparser.RecipientEntry;
+import com.auxilii.msgparser.RecipientType;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
 import com.auxilii.msgparser.attachment.MsgAttachment;
@@ -16,6 +17,7 @@ import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.StartTag;
 import net.sourceforge.MSGViewer.factory.MessageParserFactory;
 
+import javax.activation.MimeType;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
@@ -38,7 +40,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static at.redeye.FrameWork.base.BaseDialog.logger;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener {
@@ -92,27 +94,27 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
     private void initComponents() {
 
         jSplitPane = new javax.swing.JSplitPane();
-        jScrollPane1 = new javax.swing.JScrollPane();
+        javax.swing.JScrollPane headerScrollPane = new javax.swing.JScrollPane();
         header = new javax.swing.JEditorPane();
-        jPanel1 = new javax.swing.JPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
+        javax.swing.JPanel MainPanel = new javax.swing.JPanel();
+        javax.swing.JScrollPane bodyScrollPane = new javax.swing.JScrollPane();
         body = new javax.swing.JEditorPane();
-        jPanel2 = new javax.swing.JPanel();
+        javax.swing.JPanel buttonsPanel = new javax.swing.JPanel();
         jRRTF = new javax.swing.JRadioButton();
         jRText = new javax.swing.JRadioButton();
         JCBfix = new javax.swing.JCheckBox();
         jSFontSize = new javax.swing.JSlider();
-        jLabel1 = new javax.swing.JLabel();
+        javax.swing.JLabel fontSizeLabel = new javax.swing.JLabel();
 
         jSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
         header.setEditable(false);
-        jScrollPane1.setViewportView(header);
+        headerScrollPane.setViewportView(header);
 
-        jSplitPane.setTopComponent(jScrollPane1);
+        jSplitPane.setTopComponent(headerScrollPane);
 
         body.setEditable(false);
-        jScrollPane2.setViewportView(body);
+        bodyScrollPane.setViewportView(body);
 
         jRRTF.setText("RTF");
         jRRTF.addActionListener(this::jRRTFActionPerformed);
@@ -125,13 +127,13 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
         jSFontSize.addChangeListener(this::jSFontSizeStateChanged);
 
-        jLabel1.setText("Fontsize");
+        fontSizeLabel.setText("Fontsize");
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+        javax.swing.GroupLayout buttonsPanelLayout = new javax.swing.GroupLayout(buttonsPanel);
+        buttonsPanel.setLayout(buttonsPanelLayout);
+        buttonsPanelLayout.setHorizontalGroup(
+            buttonsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(buttonsPanelLayout.createSequentialGroup()
                 .addComponent(jRRTF)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jRText)
@@ -140,38 +142,38 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSFontSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel1)
+                .addComponent(fontSizeLabel)
                 .addGap(0, 95, Short.MAX_VALUE))
         );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+        buttonsPanelLayout.setVerticalGroup(
+            buttonsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(buttonsPanelLayout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(buttonsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, buttonsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jRRTF)
                         .addComponent(jRText)
                         .addComponent(JCBfix))
                     .addComponent(jSFontSize, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING)))
+                    .addComponent(fontSizeLabel, javax.swing.GroupLayout.Alignment.TRAILING)))
         );
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING)
+        javax.swing.GroupLayout MainPanelLayout = new javax.swing.GroupLayout(MainPanel);
+        MainPanel.setLayout(MainPanelLayout);
+        MainPanelLayout.setHorizontalGroup(
+            MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(buttonsPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(bodyScrollPane, javax.swing.GroupLayout.Alignment.TRAILING)
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
+        MainPanelLayout.setVerticalGroup(
+            MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(MainPanelLayout.createSequentialGroup()
+                .addComponent(bodyScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(buttonsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
-        jSplitPane.setRightComponent(jPanel1);
+        jSplitPane.setRightComponent(MainPanel);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -413,7 +415,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
         message = null;
     }
 
-    void parse_int(final String file_name) throws IOException, FileNotFoundException, Exception
+    void parse_int(final String file_name) throws Exception
     {
         cleanUp();
 
@@ -439,32 +441,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
         logger.info("Message From:" + message.getFromName() + "\n To:" + message.getToName() + "\n Email: " + message.getFromEmail());
 
-        if (message.getFromEmail() == null && message.getFromName() == null) {
-        } else if (message.getFromEmail() == null) {
-            sb.append(parent.MlM("From: ")).append(message.getFromName());
-        } else if (message.getFromName() == null) {
-            sb.append("<a href=\"mailto:");
-            sb.append(message.getFromEmail());
-            sb.append("\">");
-            sb.append(message.getFromEmail());
-        } else {
-
-            sb.append("<a href=\"mailto:");
-            sb.append(message.getFromEmail());
-            sb.append("\">");
-            sb.append(message.getFromName());
-        }
-
-        if( message.getFromEmail() != null && message.getFromEmail().contains("@") )
-        {
-            sb.append(" [");
-            sb.append(message.getFromEmail());
-            sb.append("]");
-        }
-
-        sb.append("</a>");
-
-        sb.append("<br/>");
+        printFrom(sb);
 
         if( message.getDate() != null )
         {
@@ -473,17 +450,13 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
             sb.append("<br/>");
         }
 
-        if( !message.getRecipients().isEmpty() )
-        {
-            sb.append(parent.MlM("To: "));
-            sb.append(message.getRecipients().stream().map(ViewerPanel::asMailto).collect(toList()));
-        }
-
-        sb.append("<br>");
+        printRecipients(sb, RecipientType.TO, "To: ");
+        printRecipients(sb, RecipientType.CC, "CC: ");
+        printRecipients(sb, RecipientType.BCC, "BCC: ");
 
         List<Attachment> attachments = message.getAttachments();
 
-        final int max_width = Integer.parseInt(root.getSetup().getLocalConfig(AppConfigDefinitions.IconSize));
+        final int max_icon_size = Integer.parseInt(root.getSetup().getLocalConfig(AppConfigDefinitions.IconSize));
 
         for( Attachment att : attachments )
         {
@@ -501,7 +474,9 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
                 logger.info("<a href=\"" + content.toURI() + "\"> " + mime_type);
 
-                if( mime_type != null && ViewerHelper.is_image_mime_type(mime_type) && fatt.getSize() < 1024*1024*2 )
+                if( mime_type != null
+                        && ViewerHelper.is_image_mime_type(new MimeType(mime_type))
+                        && fatt.getSize() < 1024*1024*2 )
                 {
                     File contentIcon = new File(content.getAbsolutePath() + "-small.jpg");
                     if (!content.exists()) {
@@ -510,32 +485,26 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
                         wating_thread_pool_counter++;
 
-                        thread_pool.execute(new Runnable() {
+                        thread_pool.execute(() -> {
+                            try {
+                                ImageIcon icon = ImageUtils.loadScaledImageIcon(fatt.getData(),
+                                                            fatt.toString(),
+                                                            max_icon_size, max_icon_size);
 
-                            @Override
-                            public void run() {
+                                BufferedImage bi = new BufferedImage(icon.getIconWidth(),icon.getIconHeight(),
+                                                        BufferedImage.TYPE_INT_RGB);
 
-                                try {
+                                Graphics2D g2 = bi.createGraphics();
+                                g2.drawImage(icon.getImage(), 0, 0, null);
+                                g2.dispose();
 
-                                    ImageIcon icon = ImageUtils.loadScaledImageIcon(fatt.getData(),
-                                                                fatt.toString(),
-                                                                max_width, max_width);
+                                ImageIO.write(bi, "jpg", contentIcon);
 
-                                    BufferedImage bi = new BufferedImage(icon.getIconWidth(),icon.getIconHeight(),
-                                                            BufferedImage.TYPE_INT_RGB);
-
-                                    Graphics2D g2 = bi.createGraphics();
-                                    g2.drawImage(icon.getImage(), 0, 0, null);
-                                    g2.dispose();
-
-                                    ImageIO.write(bi, "jpg", contentIcon);
-
-                                } catch( IOException ex ) {
-                                    logger.error(ex,ex);
-                                }
-
-                                wating_thread_pool_counter--;
+                            } catch( IOException ex ) {
+                                logger.error(ex,ex);
                             }
+
+                            wating_thread_pool_counter--;
                         });
                     }
 
@@ -566,25 +535,15 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
                 File sub_file = helper.getTempFile(msgAtt);
 
-                thread_pool.execute(new Runnable() {
-
+                thread_pool.execute(() -> new AutoMBox(file_name) {
                     @Override
-                    public void run() {
+                    public void do_stuff() throws Exception {
 
-                        new AutoMBox(file_name) {
+                        MessageParserFactory factory = new MessageParserFactory();
+                        factory.saveMessage(msg, sub_file);
 
-                            @Override
-                            public void do_stuff() throws Exception {
-
-                                MessageParserFactory factory = new MessageParserFactory();
-                                factory.saveMessage(msg, sub_file);
-
-                            }
-                        };
                     }
-
                 });
-
 
                 sb.append("<a href=\"");
                 sb.append(sub_file.toURI());
@@ -636,27 +595,62 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
     private void write(File content, byte[] data) {
         wating_thread_pool_counter++;
 
-        thread_pool.execute(new Runnable() {
-
-            @Override
-            public void run() {
-
-                try (FileOutputStream fout = new FileOutputStream(content)) {
-                    fout.write(data);
-                } catch( IOException ex ) {
-                    logger.error(ex,ex);
-                }
-
-                wating_thread_pool_counter--;
+        thread_pool.execute(() -> {
+            try (FileOutputStream fout = new FileOutputStream(content)) {
+                fout.write(data);
+            } catch( IOException ex ) {
+                logger.error(ex,ex);
             }
+
+            wating_thread_pool_counter--;
         });
+    }
+
+    private void printFrom(StringBuilder sb) {
+        sb.append(parent.MlM("From: "));
+        if (message.getFromEmail() == null && message.getFromName() == null) {
+        } else if (message.getFromEmail() == null) {
+            sb.append(parent.MlM("From: ")).append(message.getFromName());
+        } else if (message.getFromName() == null) {
+            sb.append("<a href=\"mailto:");
+            sb.append(message.getFromEmail());
+            sb.append("\">");
+            sb.append(message.getFromEmail());
+        } else {
+            sb.append("<a href=\"mailto:");
+            sb.append(message.getFromEmail());
+            sb.append("\">");
+            sb.append(message.getFromName());
+        }
+
+        if( message.getFromEmail() != null && message.getFromEmail().contains("@") )
+        {
+            sb.append(" &lt;");
+            sb.append(message.getFromEmail());
+            sb.append("&gt;");
+        }
+
+        sb.append("</a>");
+        sb.append("<br/>");
+    }
+
+    private void printRecipients(StringBuilder sb, RecipientType to, String s) {
+        String recipientsTo = message.getRecipients().stream()
+                .filter(r -> r.getType() == to)
+                .map(ViewerPanel::asMailto)
+                .collect(joining("; "));
+        if (isNotBlank(recipientsTo)) {
+            sb.append(parent.MlM(s));
+            sb.append(recipientsTo);
+            sb.append("<br/>");
+        }
     }
 
     private static String asMailto(RecipientEntry recipient) {
         String name = recipient.getName();
         String email = recipient.getEmail();
         if (isNotBlank(email)) {
-            return "<a href='mailto:" + email + "'>" + (isNotBlank(name) ? name + " [" + email + "]" : email) + "</a>";
+            return "<a href='mailto:" + email + "'>" + (isNotBlank(name) ? name + " &lt;" + email + "&gt;" : email) + "</a>";
         }
         return name;
     }
@@ -674,14 +668,9 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
     private javax.swing.JCheckBox JCBfix;
     private javax.swing.JEditorPane body;
     private javax.swing.JEditorPane header;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JRadioButton jRRTF;
     private javax.swing.JRadioButton jRText;
     private javax.swing.JSlider jSFontSize;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSplitPane jSplitPane;
     // End of variables declaration//GEN-END:variables
 
@@ -691,11 +680,6 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
     public void exportFile(File export_file) throws Exception {
         parser_factory.saveMessage(message, export_file);
-    }
-
-    public void exportFile( File file, Message message ) throws FileNotFoundException, Exception
-    {
-        parser_factory.saveMessage(message, file);
     }
 
     public String getFileName()
