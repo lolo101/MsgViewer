@@ -1,15 +1,8 @@
-/*
- * TestFrame.java
- *
- * Created on 2. Januar 2009, 15:08
- */
-
 package at.redeye.FrameWork.widgets.calendar;
 
 import at.redeye.FrameWork.utilities.calendar.AustrianHolidays;
 import at.redeye.FrameWork.widgets.calendarday.CalendarDay;
 import at.redeye.FrameWork.widgets.calendarday.DayEventListener;
-
 
 /**
  *

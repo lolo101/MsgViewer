@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package net.sourceforge.MSGViewer.rtfparser;
 
 import at.redeye.FrameWork.base.AutoLogger;
@@ -14,10 +9,6 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.util.List;
 
-/**
- *
- * @author martin
- */
 public class testRTF2HTML extends BaseModuleLauncher
 {
     public testRTF2HTML(String[] args)
@@ -70,13 +61,6 @@ public class testRTF2HTML extends BaseModuleLauncher
 
                             for( RTFGroup group : groups )
                             {
-                                /*
-                                for( String cmd : group.getCommands() )
-                                {
-                                    System.out.println("cmd: " + cmd);
-
-                                }*/
-
                                 if( !group.isEmptyText() )
                                 {
                                     String content = group.getTextContent();
@@ -90,9 +74,9 @@ public class testRTF2HTML extends BaseModuleLauncher
 
                             if( file_name != null )
                             {
-                                FileWriter fout = new FileWriter(file_name);
-                                fout.write(sb.toString());
-                                fout.close();
+								try (FileWriter fout = new FileWriter(file_name)) {
+									fout.write(sb.toString());
+								}
                             }
 
                         } catch ( Error ex ) {
@@ -118,7 +102,7 @@ public class testRTF2HTML extends BaseModuleLauncher
                                     System.out.println(message);
 
                                     int line = Integer.parseInt(message.substring(start+8,end));
-                                    int col = 0;
+                                    int col;
 
                                     if( end_col > 0 )
                                         col = Integer.parseInt(message.substring(start_col+7,end_col));
