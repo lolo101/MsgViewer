@@ -1,8 +1,8 @@
 package net.sourceforge.MSGViewer.MSGNavigator;
 
+import com.auxilii.msgparser.PidTag;
 import net.sourceforge.MSGViewer.factory.msg.lib.ByteConvert;
 import net.sourceforge.MSGViewer.factory.msg.lib.MSTimeConvert;
-import net.sourceforge.MSGViewer.factory.msg.properties.Properties;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.poifs.filesystem.DocumentEntry;
 import org.apache.poi.poifs.filesystem.DocumentInputStream;
@@ -31,7 +31,7 @@ public class PropertyParser
     {
         this.entry = entry;
 
-        for (Properties descr : Properties.values()) {
+        for (PidTag descr : PidTag.values()) {
             if (descr.toString().length() > max_descr_lenght) {
                 max_descr_lenght = descr.toString().length();
             }
@@ -127,9 +127,9 @@ public class PropertyParser
 
         sb.append( " " );
 
-        sb.append((bytes[offset] & 0001) > 0 ? "M" : "_");
-        sb.append((bytes[offset] & 0002) > 0 ? "R" : "_");
-        sb.append((bytes[offset] & 0004) > 0 ? "W" : "_");
+        sb.append((bytes[offset] & 0x0001) > 0 ? "M" : "_");
+        sb.append((bytes[offset] & 0x0002) > 0 ? "R" : "_");
+        sb.append((bytes[offset] & 0x0004) > 0 ? "W" : "_");
 
         offset += 4;
 
@@ -143,16 +143,13 @@ public class PropertyParser
 
         sb.append(" ");
 
-        String descr = Properties.get(tagname.toLowerCase().substring(0, 4)).toString();
-        sb.append(StringUtils.rightPad(descr, max_descr_lenght));
+        PidTag descr = PidTag.from(Integer.parseInt(tagname.substring(0, 4), 16));
+        sb.append(StringUtils.rightPad(descr.toString(), max_descr_lenght));
 
         String tagtype = tagname.toLowerCase().substring(4);
 
         if( tagtype.equals("001f")) {
-
-
             String res = formatBytes0(value_start_offset, bytes);
-
             int length = Integer.valueOf(res, 16);
 
             sb.append(" PtypString length: ");
@@ -160,7 +157,6 @@ public class PropertyParser
 
         } else if( tagtype.equals("0102") ) {
             String res = formatBytes0(value_start_offset, bytes);
-
             int length = Integer.valueOf(res, 16);
 
             sb.append(" PtypBinary length: ");
@@ -168,10 +164,7 @@ public class PropertyParser
 
         } else if( tagtype.equals("0040")) {
             sb.append(" PtypTime ");
-
-
             long time = ByteConvert.convertByteArrayToLong(bytes, value_start_offset);
-
             Date date = new Date(MSTimeConvert.PtypeTime2Millis(time));
 
             sb.append( date.toString() );
@@ -180,9 +173,7 @@ public class PropertyParser
             sb.append(" boolean");
 
         } else if( tagtype.equals("0003")) {
-
             String res = formatBytes0(value_start_offset, bytes);
-
             int length = Long.valueOf(res, 16).intValue();
 
             sb.append(" PtypInteger32 value: ");

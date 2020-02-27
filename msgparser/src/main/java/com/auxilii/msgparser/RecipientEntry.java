@@ -32,44 +32,21 @@ public class RecipientEntry {
     private RecipientType type;
 
     void setProperty(Property property) {
-        setProperty(property.getPid(), property.getValue());
-    }
-
-    /**
-     * Sets the name/value pair in the {@link #properties}
-     * map. Some properties are put into
-     * special attributes (e.g., {@link #email} when
-     * the property name is '0076').
-     *
-     * @param name The property name (i.e., the class
-     *  of the document entry).
-     * @param value The value of the field.
-     * @throws ClassCastException Thrown if the detected data
-     *  type does not match the expected data type.
-     */
-    public void setProperty(String name, Object value) throws ClassCastException {
-
-        if ((name == null) || (value == null)) {
-            return;
-        }
-
-        // we know that the name is lower case
-        // because this is done in MsgParser.analyzeDocumentEntry
-        switch(name) {
-            case "0c15":
-                setType(RecipientType.from((int) value));
+        switch(property.getPid()) {
+            case PidTagRecipientType:
+                setType(RecipientType.from((int) property.getValue()));
                 break;
-            case "3001":
-                setName((String) value);
+            case PidTagDisplayName:
+                setName((String) property.getValue());
                 break;
-            case "3002":
-                setAddressType((String) value);
+            case PidTagAddressType:
+                setAddressType((String) property.getValue());
                 break;
-            case "3003":
-                setEmail((String) value);
+            case PidTagEmailAddress:
+                setEmail((String) property.getValue());
                 break;
-            case "39fe":
-                setSmtp((String) value);
+            case PidTagSmtpAddress:
+                setSmtp((String) property.getValue());
                 break;
         }
     }

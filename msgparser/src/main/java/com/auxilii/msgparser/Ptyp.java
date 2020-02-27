@@ -1,5 +1,9 @@
 package com.auxilii.msgparser;
 
+import org.apache.poi.poifs.filesystem.DirectoryEntry;
+import org.apache.poi.poifs.filesystem.DocumentEntry;
+import org.apache.poi.poifs.filesystem.DocumentInputStream;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.math.BigDecimal;
@@ -10,11 +14,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import org.apache.poi.poifs.filesystem.DirectoryEntry;
-import org.apache.poi.poifs.filesystem.DocumentEntry;
-import org.apache.poi.poifs.filesystem.DocumentInputStream;
 
-enum Ptyp {
+public enum Ptyp {
     PtypInteger16(0x0002, false, s -> (short) s.readLong()),
     PtypInteger32(0x0003, false, s -> (int) s.readLong()),
     PtypFloating32(0x0004, false, s -> Float.intBitsToFloat((int) s.readLong())),
@@ -38,7 +39,7 @@ enum Ptyp {
     PtypMultipleCurrency(0x1006, false, s -> BigDecimal.valueOf(s.readLong(), 4)),
     PtypMultipleFloatingTime(0x1007, false, Ptyp::toFloatingTime),
     PtypMultipleTime(0x1040, false, Ptyp::toTime),
-    PtypMultipleGuid(0x1048, false, s -> getBytes(s, 16)),
+    PtypMultipleGuid(0x1048, false, Ptyp::getGuid),
     PtypMultipleInteger64(0x1014, false, DocumentInputStream::readLong),
 
     PtypMultipleBinary(0x1102, true, Ptyp::toBinaryLengths),
@@ -127,9 +128,9 @@ enum Ptyp {
         }
     }
 
-    private static byte[] getBytes(DocumentInputStream s, int len) {
+    private static byte[] getGuid(DocumentInputStream s) {
         try {
-            return s.readNBytes(len);
+            return s.readNBytes(16);
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
         }

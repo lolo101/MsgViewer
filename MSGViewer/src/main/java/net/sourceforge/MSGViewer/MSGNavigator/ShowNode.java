@@ -2,10 +2,10 @@ package net.sourceforge.MSGViewer.MSGNavigator;
 
 import at.redeye.FrameWork.base.BaseDialog;
 import at.redeye.FrameWork.base.Root;
+import com.auxilii.msgparser.PidTag;
 import net.sourceforge.MSGViewer.MSGNavigator.MSGNavigator.TreeNodeContainer;
 import net.sourceforge.MSGViewer.factory.msg.lib.ByteConvert;
 import net.sourceforge.MSGViewer.factory.msg.lib.MSTimeConvert;
-import net.sourceforge.MSGViewer.factory.msg.properties.Properties;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hmef.CompressedRTF;
@@ -30,7 +30,7 @@ public class ShowNode extends BaseDialog {
         super( root, root.MlM("Navigate:") + " " + cont.getEntry().getName());
         initComponents();
 
-        for( Properties descr : Properties.values() ) {
+        for( PidTag descr : PidTag.values() ) {
             if( descr.toString().length() > max_descr_lenght ) {
                 max_descr_lenght = descr.toString().length();
             }
@@ -189,19 +189,19 @@ public class ShowNode extends BaseDialog {
 
         sb.append(" FLAGS: ");
 
-        if( (bytes[offset] & 0001) > 0 ) {
+        if( (bytes[offset] & 0x0001) > 0 ) {
             sb.append("M");
         } else {
             sb.append("_");
         }
 
-        if( (bytes[offset] & 0002) > 0 ) {
+        if( (bytes[offset] & 0x0002) > 0 ) {
             sb.append("R");
         } else {
             sb.append("_");
         }
 
-        if( (bytes[offset] & 0004) > 0 ) {
+        if( (bytes[offset] & 0x0004) > 0 ) {
             sb.append("W");
         } else {
             sb.append("_");
@@ -220,8 +220,8 @@ public class ShowNode extends BaseDialog {
         sb.append(" ");
 
         String lTagname = tagname.toString().toLowerCase();
-        String descr = Properties.get(lTagname.substring(0,4)).toString();
-        sb.append(StringUtils.rightPad(descr,max_descr_lenght));
+        PidTag descr = PidTag.from(Integer.parseInt(lTagname.substring(0,4), 16));
+        sb.append(StringUtils.rightPad(descr.toString(),max_descr_lenght));
 
         String tagtype = lTagname.substring(4);
 

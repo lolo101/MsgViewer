@@ -28,15 +28,15 @@ import org.apache.poi.poifs.filesystem.DocumentEntry;
 public class FieldInformation {
 
     /**
-     * The default value for both the {@link #clazz} and
+     * The default value for both the {@link #tag} and
      * the {@link #type} properties.
      */
-    public static final String UNKNOWN = "unknown";
+    public static final String UNKNOWN = "0000";
 
     /**
      * The class of the {@link DocumentEntry}.
      */
-    private String clazz = UNKNOWN;
+    private String tag = UNKNOWN;
     /**
      * The type of the {@link DocumentEntry}.
      */
@@ -53,26 +53,26 @@ public class FieldInformation {
      * Constructor that allows to set the class
      * and type properties.
      *
-     * @param clazz The class of the {@link DocumentEntry}.
+     * @param tag The class of the {@link DocumentEntry}.
      * @param type The type of the {@link DocumentEntry}.
      */
-    public FieldInformation(String clazz, String type) {
-        this.setClazz(clazz);
+    public FieldInformation(String tag, String type) {
+        this.setTag(tag);
         this.setType(type);
     }
 
     /**
      * @return the clazz
      */
-    public String getClazz() {
-        return clazz;
+    public String getTag() {
+        return tag;
     }
 
     /**
-     * @param clazz the clazz to set
+     * @param tag the clazz to set
      */
-    public final void setClazz(String clazz) {
-        this.clazz = clazz;
+    public final void setTag(String tag) {
+        this.tag = tag;
     }
 
     /**

@@ -4,33 +4,18 @@ import at.redeye.FrameWork.base.AutoMBox;
 import at.redeye.FrameWork.base.BaseDialog;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.utilities.StringUtils;
-import net.sourceforge.MSGViewer.factory.msg.properties.Properties;
-
 import com.auxilii.msgparser.FieldInformation;
+import com.auxilii.msgparser.PidTag;
+import org.apache.poi.poifs.filesystem.*;
 
-import java.awt.EventQueue;
-import java.awt.event.MouseEvent;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-
-import javax.swing.JPopupMenu;
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
-
-import org.apache.poi.poifs.filesystem.DirectoryEntry;
-import org.apache.poi.poifs.filesystem.DirectoryNode;
-import org.apache.poi.poifs.filesystem.DocumentEntry;
-import org.apache.poi.poifs.filesystem.DocumentInputStream;
-import org.apache.poi.poifs.filesystem.Entry;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 /**
  *
@@ -107,23 +92,15 @@ public class MSGNavigator extends BaseDialog {
 
         setting_show_size = StringUtils.isYes(root.getSetup().getLocalConfig(SETTING_SHOW_SIZE,"true") );
 
-         EventQueue.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                new AutoMBox(MSGNavigator.class.getName()) {
-
-                    @Override
-                    public void do_stuff() throws Exception {
-                        parse(file);
-                    }
-                };
-
-            }
-        });
+         EventQueue.invokeLater(() -> new AutoMBox(MSGNavigator.class.getName()) {
+             @Override
+             public void do_stuff() throws Exception {
+                 parse(file);
+             }
+         });
     }
 
-    void parse( File file ) throws FileNotFoundException, IOException
+    void parse( File file ) throws IOException
     {
         InputStream in = new FileInputStream(file);
 
@@ -188,7 +165,7 @@ public class MSGNavigator extends BaseDialog {
                 sb.append("&nbsp;&nbsp;&nbsp;");
 
 
-                Properties property_name =  Properties.get(info.getClazz());
+                PidTag property_name =  PidTag.from(Integer.parseInt(info.getTag(), 16));
 
                 sb.append(" <code style=\"color: green\">").append(property_name).append("</code> ");
 
@@ -257,9 +234,9 @@ public class MSGNavigator extends BaseDialog {
             // defines the field class (or field name)
             // and the last 4 digits indicate the
             // data type.
-            String clazz = val.substring(0, 4);
-            String type = val.substring(4);
-            return new FieldInformation(clazz, type);
+            String tag = val.substring(0, 4);
+            String type = val.substring(4, 8);
+            return new FieldInformation(tag, type);
         }
         // we are not interested in the field
         // and return an empty FieldInformation object
@@ -421,7 +398,7 @@ public class MSGNavigator extends BaseDialog {
     private javax.swing.JTree tree;
     // End of variables declaration//GEN-END:variables
 
-    void save() throws FileNotFoundException, IOException
+    void save() throws IOException
     {
        if( fs == null ) {
            return;
@@ -465,7 +442,7 @@ public class MSGNavigator extends BaseDialog {
         invokeDialog(new EditNode(root, this, cont));
     }
 
-    void edited() throws FileNotFoundException, IOException {
+    void edited() throws IOException {
 
         if (StringUtils.isYes(root.getSetup().getLocalConfig(SETTING_AUTOSAVE, "false"))) {
             save();
