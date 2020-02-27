@@ -1,10 +1,10 @@
 package net.sourceforge.MSGViewer.factory.msg.entries;
 
+import static com.auxilii.msgparser.PidTag.PidTagGuidStream;
+
 public class GuidStreamEntry extends BinaryEntry {
 
-    private static final String NAME = "0002";
-
     public GuidStreamEntry(byte[] guid) {
-        super(NAME, guid);
+        super(PidTagGuidStream, guid);
     }
 }

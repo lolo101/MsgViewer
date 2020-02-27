@@ -1,23 +1,20 @@
 package net.sourceforge.MSGViewer.factory.msg.properties;
 
-/**
- *
- * @author martin
- */
+import com.auxilii.msgparser.PidTag;
+
+import static com.auxilii.msgparser.Ptyp.PtypInteger32;
+
 public class PropPtypInteger32 extends PropType {
 
-    static final String TYPE_NAME = "0003";
     private final int value;
 
-    public PropPtypInteger32(String tagname, int value)
-    {
-        super( tagname, TYPE_NAME );
+    public PropPtypInteger32(PidTag tag, int value) {
+        super(tag, PtypInteger32);
         this.value = value;
     }
 
     @Override
-    protected long getPropertiesContent()
-    {
-       return value;
+    protected long getPropertiesContent() {
+        return value;
     }
 }

@@ -1,6 +1,10 @@
 package com.auxilii.msgparser;
 
 public enum PidTag {
+    PidTagGuidStream(0x0002),
+    PidTagEntryStream(0x0003),
+    PidTagStringStream(0x0004),
+
     // 0x0001-0x0BFF Message object envelope property; reserved
     PidTagMessageClass(0x001a),
     PidTagSubject(0x0037),
@@ -135,15 +139,15 @@ public enum PidTag {
 
     Unknown(0);
 
-    private final int propId;
+    public final int id;
 
-    PidTag(int propId) {
-        this.propId = propId;
+    PidTag(int id) {
+        this.id = id;
     }
 
     public static PidTag from(int id) {
         for (PidTag value : PidTag.values()) {
-            if (value.propId == id) {
+            if (value.id == id) {
                 return value;
             }
         }

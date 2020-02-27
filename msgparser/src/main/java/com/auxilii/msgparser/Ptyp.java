@@ -51,23 +51,23 @@ public enum Ptyp {
     private static final LocalDateTime FLOATING_TIME_EPOCH = LocalDateTime.of(1899, Month.DECEMBER, 30, 0, 0);
     private static final LocalDateTime TIME_EPOCH = LocalDateTime.of(1601, Month.JANUARY, 1, 0, 0);
 
-    private final int type;
+    public final int id;
     private final boolean variableLength;
     private final Function<DocumentInputStream, ?> conversion;
 
-    Ptyp(int type, boolean variableLength, Function<DocumentInputStream, ?> conversion) {
-        this.type = type;
+    Ptyp(int id, boolean variableLength, Function<DocumentInputStream, ?> conversion) {
+        this.id = id;
         this.variableLength = variableLength;
         this.conversion = conversion;
     }
 
-    public static Ptyp from(int type) {
+    public static Ptyp from(int id) {
         for (Ptyp value : values()) {
-            if (value.type == type) {
+            if (value.id == id) {
                 return value;
             }
         }
-        throw new IllegalArgumentException(String.format("Unknown type: %04x", type));
+        throw new IllegalArgumentException(String.format("Unknown type: %04x", id));
     }
 
     public Object parseValue(DocumentInputStream propertyStream, DirectoryEntry dir, String pTag) throws IOException {
@@ -113,7 +113,7 @@ public enum Ptyp {
     }
 
     private boolean isMultipleValued() {
-        return (type & MULTIPLE_VALUED_FLAG) == MULTIPLE_VALUED_FLAG;
+        return (id & MULTIPLE_VALUED_FLAG) == MULTIPLE_VALUED_FLAG;
     }
 
     private Object convert(DocumentInputStream value) {
@@ -158,7 +158,7 @@ public enum Ptyp {
     }
 
     private static int[] toStringLengths(DocumentInputStream subStream) {
-        int[] lengths = new int[subStream.available()/ 4];
+        int[] lengths = new int[subStream.available() / 4];
         for (int i = 0; i < lengths.length; i++) {
             lengths[i] = subStream.readInt();
         }
