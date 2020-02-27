@@ -1,6 +1,6 @@
 package net.sourceforge.MSGViewer.factory.msg.entries;
 
-import com.auxilii.msgparser.PidTag;
+import com.auxilii.msgparser.Pid;
 import com.auxilii.msgparser.Ptyp;
 import net.sourceforge.MSGViewer.factory.msg.properties.PropType;
 import org.apache.poi.poifs.filesystem.DirectoryEntry;
@@ -13,9 +13,9 @@ import java.io.InputStream;
  */
 public abstract class SubstGEntry {
     protected final Ptyp type;
-    protected final PidTag tag;
+    protected final Pid tag;
 
-    public SubstGEntry(PidTag tag, Ptyp type) {
+    public SubstGEntry(Pid tag, Ptyp type) {
         this.tag = tag;
         this.type = type;
     }
@@ -24,7 +24,7 @@ public abstract class SubstGEntry {
         return type;
     }
 
-    public PidTag getTag() {
+    public Pid getTag() {
         return tag;
     }
 

@@ -1,6 +1,6 @@
 package net.sourceforge.MSGViewer.factory.msg.properties;
 
-import com.auxilii.msgparser.PidTag;
+import com.auxilii.msgparser.Pid;
 
 import static com.auxilii.msgparser.Ptyp.PtypBinary;
 
@@ -8,8 +8,8 @@ public class PropPtypByteArray extends PropType {
 
     private final int length;
 
-    public PropPtypByteArray(PidTag tag, int length) {
-        super(tag, PtypBinary);
+    public PropPtypByteArray(Pid id, int length) {
+        super(id, PtypBinary);
         this.length = length + 4;
     }
 

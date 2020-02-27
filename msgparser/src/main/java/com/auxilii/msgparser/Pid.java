@@ -1,6 +1,6 @@
 package com.auxilii.msgparser;
 
-public enum PidTag {
+public enum Pid {
     PidTagGuidStream(0x0002),
     PidTagEntryStream(0x0003),
     PidTagStringStream(0x0004),
@@ -141,12 +141,12 @@ public enum PidTag {
 
     public final int id;
 
-    PidTag(int id) {
+    Pid(int id) {
         this.id = id;
     }
 
-    public static PidTag from(int id) {
-        for (PidTag value : PidTag.values()) {
+    public static Pid from(int id) {
+        for (Pid value : Pid.values()) {
             if (value.id == id) {
                 return value;
             }

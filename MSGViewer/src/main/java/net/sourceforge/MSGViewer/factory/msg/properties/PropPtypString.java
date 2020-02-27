@@ -1,6 +1,6 @@
 package net.sourceforge.MSGViewer.factory.msg.properties;
 
-import com.auxilii.msgparser.PidTag;
+import com.auxilii.msgparser.Pid;
 
 import static com.auxilii.msgparser.Ptyp.PtypString;
 
@@ -8,8 +8,8 @@ public class PropPtypString extends PropType {
 
     private final int length;
 
-    public PropPtypString(PidTag tag, int length) {
-        super(tag, PtypString);
+    public PropPtypString(Pid id, int length) {
+        super(id, PtypString);
         this.length = length * 2 + 2;
     }
 

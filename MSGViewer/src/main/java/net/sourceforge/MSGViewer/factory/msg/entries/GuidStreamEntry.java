@@ -1,6 +1,6 @@
 package net.sourceforge.MSGViewer.factory.msg.entries;
 
-import static com.auxilii.msgparser.PidTag.PidTagGuidStream;
+import static com.auxilii.msgparser.Pid.PidTagGuidStream;
 
 public class GuidStreamEntry extends BinaryEntry {
 

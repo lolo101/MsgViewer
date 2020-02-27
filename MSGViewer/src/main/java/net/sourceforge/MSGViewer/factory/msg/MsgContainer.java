@@ -20,7 +20,7 @@ import java.nio.ByteOrder;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.auxilii.msgparser.PidTag.*;
+import static com.auxilii.msgparser.Pid.*;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 public class MsgContainer {

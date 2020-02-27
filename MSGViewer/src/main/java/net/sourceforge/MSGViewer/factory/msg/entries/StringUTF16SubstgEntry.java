@@ -1,6 +1,6 @@
 package net.sourceforge.MSGViewer.factory.msg.entries;
 
-import com.auxilii.msgparser.PidTag;
+import com.auxilii.msgparser.Pid;
 import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypString;
 import net.sourceforge.MSGViewer.factory.msg.properties.PropType;
 
@@ -16,7 +16,7 @@ import static com.auxilii.msgparser.Ptyp.PtypString;
 public class StringUTF16SubstgEntry extends SubstGEntry {
     private final String value;
 
-    public StringUTF16SubstgEntry(PidTag tag, String value) {
+    public StringUTF16SubstgEntry(Pid tag, String value) {
         super(tag, PtypString);
         this.value = value == null ? "" : value;
     }

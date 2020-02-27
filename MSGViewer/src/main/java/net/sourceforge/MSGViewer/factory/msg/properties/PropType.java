@@ -1,6 +1,6 @@
 package net.sourceforge.MSGViewer.factory.msg.properties;
 
-import com.auxilii.msgparser.PidTag;
+import com.auxilii.msgparser.Pid;
 import com.auxilii.msgparser.Ptyp;
 
 import java.nio.ByteBuffer;
@@ -12,15 +12,15 @@ import java.nio.ByteBuffer;
  */
 public abstract class PropType {
     private final Ptyp type;
-    private final PidTag tag;
+    private final Pid id;
 
-    public PropType(PidTag tag, Ptyp type) {
-        this.tag = tag;
+    public PropType(Pid id, Ptyp type) {
+        this.id = id;
         this.type = type;
     }
 
-    public PidTag getTag() {
-        return tag;
+    public Pid getId() {
+        return id;
     }
 
     public Ptyp getType() {
@@ -30,8 +30,8 @@ public abstract class PropType {
     /* writes the 16 byte entry of the property stream into the given bytes
      */
     public final void writePropertiesEntry(ByteBuffer bytes) {
-        bytes.putShort((short) type.id);
-        bytes.putShort((short) tag.id);
+        int tag = (id.id << 16) + type.id;
+        bytes.putInt(tag);
         bytes.putInt(0x2 | 0x4);
         bytes.putLong(getPropertiesContent());
     }

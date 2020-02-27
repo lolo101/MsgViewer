@@ -2,7 +2,7 @@ package net.sourceforge.MSGViewer.MSGNavigator;
 
 import at.redeye.FrameWork.base.BaseDialog;
 import at.redeye.FrameWork.base.Root;
-import com.auxilii.msgparser.PidTag;
+import com.auxilii.msgparser.Pid;
 import net.sourceforge.MSGViewer.MSGNavigator.MSGNavigator.TreeNodeContainer;
 import net.sourceforge.MSGViewer.factory.msg.lib.ByteConvert;
 import net.sourceforge.MSGViewer.factory.msg.lib.MSTimeConvert;
@@ -30,7 +30,7 @@ public class ShowNode extends BaseDialog {
         super( root, root.MlM("Navigate:") + " " + cont.getEntry().getName());
         initComponents();
 
-        for( PidTag descr : PidTag.values() ) {
+        for( Pid descr : Pid.values() ) {
             if( descr.toString().length() > max_descr_lenght ) {
                 max_descr_lenght = descr.toString().length();
             }
@@ -220,7 +220,7 @@ public class ShowNode extends BaseDialog {
         sb.append(" ");
 
         String lTagname = tagname.toString().toLowerCase();
-        PidTag descr = PidTag.from(Integer.parseInt(lTagname.substring(0,4), 16));
+        Pid descr = Pid.from(Integer.parseInt(lTagname.substring(0,4), 16));
         sb.append(StringUtils.rightPad(descr.toString(),max_descr_lenght));
 
         String tagtype = lTagname.substring(4);

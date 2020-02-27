@@ -1,6 +1,6 @@
 package net.sourceforge.MSGViewer.factory.msg.entries;
 
-import com.auxilii.msgparser.PidTag;
+import com.auxilii.msgparser.Pid;
 import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypByteArray;
 import net.sourceforge.MSGViewer.factory.msg.properties.PropType;
 
@@ -13,7 +13,7 @@ public class BinaryEntry extends SubstGEntry {
 
     private final byte[] value;
 
-    public BinaryEntry(PidTag tag, byte[] value) {
+    public BinaryEntry(Pid tag, byte[] value) {
         super(tag, PtypBinary);
         this.value = value;
     }

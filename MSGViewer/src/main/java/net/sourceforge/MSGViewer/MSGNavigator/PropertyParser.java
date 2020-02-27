@@ -1,6 +1,6 @@
 package net.sourceforge.MSGViewer.MSGNavigator;
 
-import com.auxilii.msgparser.PidTag;
+import com.auxilii.msgparser.Pid;
 import net.sourceforge.MSGViewer.factory.msg.lib.ByteConvert;
 import net.sourceforge.MSGViewer.factory.msg.lib.MSTimeConvert;
 import org.apache.commons.lang3.StringUtils;
@@ -31,7 +31,7 @@ public class PropertyParser
     {
         this.entry = entry;
 
-        for (PidTag descr : PidTag.values()) {
+        for (Pid descr : Pid.values()) {
             if (descr.toString().length() > max_descr_lenght) {
                 max_descr_lenght = descr.toString().length();
             }
@@ -143,7 +143,7 @@ public class PropertyParser
 
         sb.append(" ");
 
-        PidTag descr = PidTag.from(Integer.parseInt(tagname.substring(0, 4), 16));
+        Pid descr = Pid.from(Integer.parseInt(tagname.substring(0, 4), 16));
         sb.append(StringUtils.rightPad(descr.toString(), max_descr_lenght));
 
         String tagtype = tagname.toLowerCase().substring(4);

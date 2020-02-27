@@ -1,6 +1,6 @@
 package net.sourceforge.MSGViewer.factory.msg.properties;
 
-import com.auxilii.msgparser.PidTag;
+import com.auxilii.msgparser.Pid;
 
 import static com.auxilii.msgparser.Ptyp.PtypBoolean;
 
@@ -8,8 +8,8 @@ public class PropPtypBoolean extends PropType {
 
     private final boolean value;
 
-    public PropPtypBoolean(PidTag tag, boolean value) {
-        super(tag, PtypBoolean);
+    public PropPtypBoolean(Pid id, boolean value) {
+        super(id, PtypBoolean);
         this.value = value;
     }
 

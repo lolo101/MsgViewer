@@ -5,7 +5,7 @@ import at.redeye.FrameWork.base.BaseDialog;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.utilities.StringUtils;
 import com.auxilii.msgparser.FieldInformation;
-import com.auxilii.msgparser.PidTag;
+import com.auxilii.msgparser.Pid;
 import org.apache.poi.poifs.filesystem.*;
 
 import javax.swing.*;
@@ -165,7 +165,7 @@ public class MSGNavigator extends BaseDialog {
                 sb.append("&nbsp;&nbsp;&nbsp;");
 
 
-                PidTag property_name =  PidTag.from(Integer.parseInt(info.getTag(), 16));
+                Pid property_name =  Pid.from(Integer.parseInt(info.getTag(), 16));
 
                 sb.append(" <code style=\"color: green\">").append(property_name).append("</code> ");
 
