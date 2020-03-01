@@ -174,10 +174,13 @@ public class MSGNavigator extends BaseDialog {
     private static Object getData(DocumentInputStream dstream, FieldInformation info) throws IOException {
         switch (info.getType()) {
             case PtypString8:
+            case PtypMultipleString8:
                 return new String(read(dstream), StandardCharsets.ISO_8859_1);
             case PtypString:
+            case PtypMultipleString:
                 return new String(read(dstream), StandardCharsets.UTF_16LE);
             case PtypBinary:
+            case PtypMultipleBinary:
                 return read(dstream);
         }
         logger.warn("Unsupported field type " + info.getType());
