@@ -26,67 +26,26 @@ import org.apache.poi.poifs.filesystem.DocumentEntry;
  * @author roman.kurmanowytsch
  */
 public class FieldInformation {
+    private final Pid id;
+    private final Ptyp type;
 
     /**
-     * The default value for both the {@link #tag} and
-     * the {@link #type} properties.
-     */
-    public static final String UNKNOWN = "0000";
-
-    /**
-     * The class of the {@link DocumentEntry}.
-     */
-    private String tag = UNKNOWN;
-    /**
-     * The type of the {@link DocumentEntry}.
-     */
-    private String type  = UNKNOWN;
-
-    /**
-     * Empty constructor that uses the default
-     * values.
-     */
-    public FieldInformation() {
-    }
-
-    /**
-     * Constructor that allows to set the class
-     * and type properties.
+     * Constructor that allows to set the id
+     * and type of the properties.
      *
-     * @param tag The class of the {@link DocumentEntry}.
+     * @param id   The id of the {@link DocumentEntry}.
      * @param type The type of the {@link DocumentEntry}.
      */
-    public FieldInformation(String tag, String type) {
-        this.setTag(tag);
-        this.setType(type);
+    public FieldInformation(String id, String type) {
+        this.id = Pid.from(Integer.valueOf(id, 16));
+        this.type = Ptyp.from(Integer.parseInt(type, 16));
     }
 
-    /**
-     * @return the clazz
-     */
-    public String getTag() {
-        return tag;
+    public Pid getId() {
+        return id;
     }
 
-    /**
-     * @param tag the clazz to set
-     */
-    public final void setTag(String tag) {
-        this.tag = tag;
-    }
-
-    /**
-     * @return the type
-     */
-    public String getType() {
+    public Ptyp getType() {
         return type;
     }
-
-    /**
-     * @param type the type to set
-     */
-    public final void setType(String type) {
-        this.type = type;
-    }
-
 }

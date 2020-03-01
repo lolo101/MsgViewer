@@ -46,7 +46,7 @@ public enum Ptyp {
     PtypMultipleString8(0x101e, true, Ptyp::toStringLengths),
     PtypMultipleString(0x101f, true, Ptyp::toStringLengths);
 
-    private static final String SUBENTRY_PREFIX = "__substg1.0_";
+    private static final String SUBSTORAGE_PREFIX = "__substg1.0_";
     private static final int MULTIPLE_VALUED_FLAG = 0x1000;
     private static final LocalDateTime FLOATING_TIME_EPOCH = LocalDateTime.of(1899, Month.DECEMBER, 30, 0, 0);
     private static final LocalDateTime TIME_EPOCH = LocalDateTime.of(1601, Month.JANUARY, 1, 0, 0);
@@ -74,13 +74,13 @@ public enum Ptyp {
         if (variableLength || isMultipleValued()) {
             int byteCount = propertyStream.readInt();
             int reserved = propertyStream.readInt();
-            return parseSubStream(dir, pTag);
+            return parseSubStorage(dir, pTag);
         }
         return convert(propertyStream);
     }
 
-    private Object parseSubStream(DirectoryEntry dir, String pTag) throws IOException {
-        DocumentEntry subEntry = (DocumentEntry) dir.getEntry(SUBENTRY_PREFIX + pTag);
+    private Object parseSubStorage(DirectoryEntry dir, String pTag) throws IOException {
+        DocumentEntry subEntry = (DocumentEntry) dir.getEntry(SUBSTORAGE_PREFIX + pTag);
         try (DocumentInputStream subStream = new DocumentInputStream(subEntry)) {
             if (isMultipleValued()) {
                 if (variableLength) {
@@ -96,7 +96,7 @@ public enum Ptyp {
         int[] lengths = (int[]) convert(subStream);
         Object[] pValues = new Object[lengths.length];
         for (int index = 0; index < lengths.length; index++) {
-            DocumentEntry valueEntry = (DocumentEntry) dir.getEntry(String.format("%s%s-%08X", SUBENTRY_PREFIX, pTag, index));
+            DocumentEntry valueEntry = (DocumentEntry) dir.getEntry(String.format("%s%s-%08X", SUBSTORAGE_PREFIX, pTag, index));
             try (DocumentInputStream valueStream = new DocumentInputStream(valueEntry)) {
                 pValues[index] = convert(valueStream);
             }

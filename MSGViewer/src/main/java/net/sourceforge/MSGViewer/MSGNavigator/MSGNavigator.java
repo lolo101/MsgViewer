@@ -5,81 +5,58 @@ import at.redeye.FrameWork.base.BaseDialog;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.utilities.StringUtils;
 import com.auxilii.msgparser.FieldInformation;
-import com.auxilii.msgparser.Pid;
 import org.apache.poi.poifs.filesystem.*;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
-/**
- *
- * @author martin
- */
 public class MSGNavigator extends BaseDialog {
 
     public static final String SETTING_SHOW_SIZE = "MSG_NAVIGATOR_SHOW_SIZE";
     public static final String SETTING_AUTOSAVE = "MSG_SETTING_AUTOSAVE";
+    public static final String PROPERTIES_ENTRY = "__properties_version1.0";
+    public static final String SUBSTORAGE_PREFIX = "__substg1.0_";
 
     private POIFSFileSystem fs;
     private final File file;
 
     private boolean setting_show_size = false;
 
+    public static class TreeNodeContainer extends DefaultMutableTreeNode {
+        private final Entry entry;
+        private Object data;
 
+        public TreeNodeContainer(Entry entry, String name) {
+            super(name);
+            this.entry = entry;
+        }
 
-     public static class TreeNodeContainer extends DefaultMutableTreeNode
-     {
-         private final Entry entry;
-         private Object data;
+        public Entry getEntry() {
+            return entry;
+        }
 
-         public TreeNodeContainer( Entry entry, String name  )
-         {
-             super( name );
-             this.entry = entry;
-         }
+        public Object getData() {
+            return data;
+        }
 
-         public Entry getEntry() {
-             return entry;
-         }
+        public void setData(Object data) {
+            this.data = data;
+        }
 
-         public Object getData() {
-             return data;
-         }
+    }
 
-         public void setData( Object data ) {
-             this.data = data;
-         }
-
-     }
-
-     public static class PropertyContainer extends TreeNodeContainer
-     {
-         private final String tag;
-
-         public PropertyContainer( Entry entry, String name, String property_tag )
-         {
-             super( entry, name );
-             this.tag = property_tag;
-         }
-
-         public String getPropertyTag()
-         {
-             return tag;
-         }
-     }
-
-
-
-    /** Creates new form MSGNavigator */
-    public MSGNavigator(Root root, File file)
-    {
-        super( root, root.MlM("Navigate:") + " " + file.getName());
+    /**
+     * Creates new form MSGNavigator
+     */
+    public MSGNavigator(Root root, File file) {
+        super(root, root.MlM("Navigate:") + " " + file.getName());
 
         initComponents();
 
@@ -90,222 +67,131 @@ public class MSGNavigator extends BaseDialog {
 
     final void reload() {
 
-        setting_show_size = StringUtils.isYes(root.getSetup().getLocalConfig(SETTING_SHOW_SIZE,"true") );
+        setting_show_size = StringUtils.isYes(root.getSetup().getLocalConfig(SETTING_SHOW_SIZE, "true"));
 
-         EventQueue.invokeLater(() -> new AutoMBox(MSGNavigator.class.getName()) {
-             @Override
-             public void do_stuff() throws Exception {
-                 parse(file);
-             }
-         });
+        EventQueue.invokeLater(() -> new AutoMBox(MSGNavigator.class.getName()) {
+            @Override
+            public void do_stuff() throws Exception {
+                parse(file);
+            }
+        });
     }
 
-    void parse( File file ) throws IOException
-    {
-        InputStream in = new FileInputStream(file);
+    void parse(File file) throws IOException {
+        try (InputStream in = new FileInputStream(file)) {
+            fs = new POIFSFileSystem(in);
+            DirectoryNode fs_root = fs.getRoot();
 
-        fs = new POIFSFileSystem(in);
-        DirectoryNode fs_root = fs.getRoot();
+            DefaultMutableTreeNode localRoot = new DefaultMutableTreeNode(fs_root.getShortDescription());
 
-        DefaultMutableTreeNode localRoot = new DefaultMutableTreeNode(fs_root.getShortDescription());
+            parse(localRoot, fs_root);
 
-        parse( localRoot, fs_root );
-
-        tree.setModel(new DefaultTreeModel(localRoot));
+            tree.setModel(new DefaultTreeModel(localRoot));
+        }
     }
 
-    private void parse(DefaultMutableTreeNode root_node, DirectoryEntry fs_root) throws IOException
-    {
+    private void parse(DefaultMutableTreeNode root_node, DirectoryEntry fs_root) throws IOException {
         for (Entry entry : fs_root) {
-
-            if (entry.isDirectoryEntry()) {
-                DirectoryEntry de = (DirectoryEntry) entry;
-
-                String name = "<html><body><b style=\"color: blue\">" +  entry.getName() + "</b></body></html>";
-
-                DefaultMutableTreeNode node = new TreeNodeContainer(de,name);
-                root_node.add(node);
-
-                parse( node, de );
-            } else if( entry.isDocumentEntry() ) {
-
-                DocumentEntry de = (DocumentEntry) entry;
-
-                FieldInformation info = analyzeDocumentEntry(de);
-
-                // the data is accessed by getting an input stream
-                // for the given document entry
-                DocumentInputStream dstream = new DocumentInputStream(de);
-
-                if( de.getName().equals("__properties_version1.0") )
-                {
-                    info.setType("0102");
-                }
-
-                // create a Java object from the data provided
-                // by the input stream. depending on the field
-                // information, either a String or a byte[] will
-                // be returned. other datatypes are not yet supported
-                Object data = this.getData(dstream, info);
-
-                StringBuilder sb = new StringBuilder();
-
-                sb.append("<html><body>");
-
-                if( entry.getName().startsWith("__properties") ) {
-                    sb.append("<b>");
-                    sb.append(entry.getName());
-                    sb.append("</b>");
-                } else {
-                    // sb.append("<b>");
-                    sb.append(entry.getName());
-                    // sb.append("</b>");
-                }
-
-                sb.append("&nbsp;&nbsp;&nbsp;");
-
-
-                Pid property_name =  Pid.from(Integer.parseInt(info.getTag(), 16));
-
-                sb.append(" <code style=\"color: green\">").append(property_name).append("</code> ");
-
-                if( setting_show_size ) {
-                    sb.append(" ").append(de.getSize()).append("b ");
-                }
-
-                if( data instanceof String )
-                {
-                    String s = (String)data;
-                    if( s.length() > 100 ) {
-                        s = s.substring(0,100) + "...";
-                    }
-
-                     sb.append("     <i>").append(s).append("</i>");
-                } else if( data instanceof byte[] ) {
-                    sb.append("     <i style=\"color: dd5555\">byte array</i>");
-                }
-
-                sb.append("</body></html>");
-
-                TreeNodeContainer node = new TreeNodeContainer(entry,sb.toString());
-                node.setData(data);
-
-                if( de.getName().equals("__properties_version1.0") )
-                {
-                    try {
-                        PropertyParser pp = new PropertyParser(de);
-                        for (String tag : pp.getPropertyTags()) {
-                            TreeNodeContainer pnode = new PropertyContainer(entry,
-                                        "<html><body><pre style=\"font-family: monospace; fonz-size:8px\">"  + tag + "</pre></body></html>",
-                                        tag);
-                            node.add(pnode);
-                        }
-                    } catch (IOException ex) {
-                        logger.error(ex, ex);
-                    }
-                }
-
-                root_node.add(node);
-            }
+            root_node.add(toNode(entry));
         }
     }
 
-    /**
-     * Analyzes the {@link DocumentEntry} and returns
-     * a {@link FieldInformation} object containing the
-     * class (the field name, so to say) and type of
-     * the entry.
-     *
-     * @param de The {@link DocumentEntry} that should be examined.
-     * @return A {@link FieldInformation} object containing class
-     *  and type of the document entry or, if the entry is
-     *  not an interesting field, an empty {@link FieldInformation}
-     *  object containing {@link FieldInformation#UNKNOWN} class
-     *  and type.
-     */
-    public static FieldInformation analyzeDocumentEntry(DocumentEntry de) {
+    private MutableTreeNode toNode(Entry entry) throws IOException {
+        if (entry.isDirectoryEntry()) {
+            return parseDirectory((DirectoryEntry) entry);
+        }
+        DocumentEntry de = (DocumentEntry) entry;
+        if (de.getName().startsWith(SUBSTORAGE_PREFIX)) {
+            return parseSubStrorage(de);
+        }
+        if (de.getName().equals(PROPERTIES_ENTRY)) {
+            return parseProperties(de);
+        }
+        return new DefaultMutableTreeNode(de.getName());
+    }
+
+    private MutableTreeNode parseDirectory(DirectoryEntry entry) throws IOException {
+        DefaultMutableTreeNode node = new TreeNodeContainer(entry,
+                "<html><body><b style=\"color: blue\">" + entry.getName() + "</b></body></html>");
+        parse(node, entry);
+        return node;
+    }
+
+    private MutableTreeNode parseSubStrorage(DocumentEntry de) throws IOException {
+        try (DocumentInputStream dstream = new DocumentInputStream(de)) {
+            FieldInformation info = analyzeSubStorage(de);
+
+            StringBuilder sb = new StringBuilder()
+                    .append("<html><body>")
+                    .append(de.getName())
+                    .append("&nbsp;&nbsp;&nbsp;")
+                    .append("<code style=\"color: green\">")
+                    .append(info.getId())
+                    .append("</code> ");
+
+            if (setting_show_size) {
+                sb.append(" ").append(de.getSize()).append("b ");
+            }
+
+            Object data = getData(dstream, info);
+            if (data instanceof String) {
+                String s = (String) data;
+                if (s.length() > 100) {
+                    s = s.substring(0, 100) + "...";
+                }
+
+                sb.append("     <i>").append(s).append("</i>");
+            }
+            if (data instanceof byte[]) {
+                sb.append("     <i style=\"color: dd5555\">byte array</i>");
+            }
+            sb.append("</body></html>");
+            TreeNodeContainer node = new TreeNodeContainer(de, sb.toString());
+            node.setData(data);
+            return node;
+        }
+    }
+
+    private static MutableTreeNode parseProperties(DocumentEntry de) throws IOException {
+        TreeNodeContainer node = new TreeNodeContainer(de, "<html><body><b>" + de.getName() + "</b></body></html>");
+        PropertyParser pp = new PropertyParser(de);
+        for (String tag : pp.getPropertyTags()) {
+            TreeNodeContainer pnode = new TreeNodeContainer(de,
+                    "<html><body><pre style=\"font-family: monospace; fonz-size:8px\">" + tag + "</pre></body></html>");
+            node.add(pnode);
+        }
+        return node;
+    }
+
+    public static FieldInformation analyzeSubStorage(DocumentEntry de) {
         String name = de.getName();
-        // we are only interested in document entries
-        // with names starting with __substg1.0_
-        String key = "__substg1.0_";
-        if (name.startsWith(key)) {
-            String val = name.substring(key.length()).toLowerCase();
-            // the first 4 digits of the remainder
-            // defines the field class (or field name)
-            // and the last 4 digits indicate the
-            // data type.
-            String tag = val.substring(0, 4);
-            String type = val.substring(4, 8);
-            return new FieldInformation(tag, type);
-        }
-        // we are not interested in the field
-        // and return an empty FieldInformation object
-        return new FieldInformation();
+        String val = name.substring(SUBSTORAGE_PREFIX.length()).toLowerCase();
+        String tag = val.substring(0, 4);
+        String type = val.substring(4, 8);
+        return new FieldInformation(tag, type);
     }
 
-    /**
-     * Reads the information from the InputStream and
-     * creates, based on the information in the
-     * {@link FieldInformation} object, either a String
-     * or a byte[] (e.g., for attachments) Object
-     * containing this data.
-     *
-     * @param dstream The InputStream of the Document Entry.
-     * @param info The field information that is needed to
-     *  determine the data type of the input stream.
-     * @return The String/byte[] object representing
-     *  the data.
-     * @throws IOException Thrown if the .msg file could not
-     *  be parsed.
-     * @throws UnsupportedOperationException Thrown if
-     *  the .msg file contains unknown data.
-     */
-    private Object getData(DocumentInputStream dstream, FieldInformation info) throws IOException {
-        // if there is no field information available, we simply
-        // return null. in that case, we're not interested in the
-        // data anyway
-        if (info == null || FieldInformation.UNKNOWN.equals(info.getType())) {
-            return null;
-        }
-        // if the type is 001e (we know it is lower case
-        // because analyzeDocumentEntry stores the type in
-        // lower case), we create a String object from the data.
-        // the encoding of the binary data is most probably
-        // ISO-8859-1 (not pure ASCII).
+    private static Object getData(DocumentInputStream dstream, FieldInformation info) throws IOException {
         switch (info.getType()) {
-            case "001e": return new String(read(dstream), StandardCharsets.ISO_8859_1);
-            case "001f": return new String(read(dstream), StandardCharsets.UTF_16LE);
-            case "0102": return read(dstream);
-            case "0000":
-            {
-                // the data is read into a byte[] object
-                byte[] buffer = new byte[1024];
-
-                StringBuilder sb = new StringBuilder();
-
-                for (int read; (read = dstream.read(buffer)) > 0;) {
-                    for (int i = 0; i < read; i++) {
-                        sb.append(buffer[i]);
-                        sb.append(" ");
-                    }
-                }
-                return sb.toString();
-            }
+            case PtypString8:
+                return new String(read(dstream), StandardCharsets.ISO_8859_1);
+            case PtypString:
+                return new String(read(dstream), StandardCharsets.UTF_16LE);
+            case PtypBinary:
+                return read(dstream);
         }
-
-        // this should not happen
-        logger.trace("Unknown field type " + info.getType());
+        logger.trace("Unsupported field type " + info.getType());
         return null;
     }
 
-	private byte[] read(InputStream stream) throws IOException {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		byte[] buffer = new byte[1024];
-		for (int read; (read = stream.read(buffer)) > 0;) {
-			baos.write(buffer, 0, read);
-		}
-		return baos.toByteArray();
-	}
+    private static byte[] read(InputStream stream) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        for (int read; (read = stream.read(buffer)) > 0; ) {
+            baos.write(buffer, 0, read);
+        }
+        return baos.toByteArray();
+    }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -326,12 +212,12 @@ public class MSGNavigator extends BaseDialog {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 611, Short.MAX_VALUE)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 611, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 463, Short.MAX_VALUE)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 463, Short.MAX_VALUE)
         );
 
         pack();
@@ -339,14 +225,13 @@ public class MSGNavigator extends BaseDialog {
 
     private void treeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_treeMouseClicked
 
-        if( evt.getButton() == MouseEvent.BUTTON3 )
-        {
+        if (evt.getButton() == MouseEvent.BUTTON3) {
 
             TreePath path = tree.getPathForLocation(evt.getX(), evt.getY());
 
-            if( path == null ) {
+            if (path == null) {
                 // retry it with lower X value
-                for( int x = evt.getX(); x > 0 && path == null; x -= 10 ) {
+                for (int x = evt.getX(); x > 0 && path == null; x -= 10) {
                     path = tree.getPathForLocation(x, evt.getY());
                 }
             }
@@ -362,8 +247,7 @@ public class MSGNavigator extends BaseDialog {
         }
     }//GEN-LAST:event_treeMouseClicked
 
-    public void deleteSelectedElement()
-    {
+    public void deleteSelectedElement() {
         new AutoMBox(this.getClass().getName()) {
 
             @Override
@@ -384,8 +268,7 @@ public class MSGNavigator extends BaseDialog {
                 cont.removeFromParent();
                 tree.updateUI();
 
-                if( StringUtils.isYes(root.getSetup().getLocalConfig(SETTING_AUTOSAVE,"false")) )
-                {
+                if (StringUtils.isYes(root.getSetup().getLocalConfig(SETTING_AUTOSAVE, "false"))) {
                     save();
                     reload();
                 }
@@ -397,11 +280,10 @@ public class MSGNavigator extends BaseDialog {
     private javax.swing.JTree tree;
     // End of variables declaration//GEN-END:variables
 
-    void save() throws IOException
-    {
-       if( fs == null ) {
-           return;
-       }
+    void save() throws IOException {
+        if (fs == null) {
+            return;
+        }
 
         try (OutputStream out = new FileOutputStream(file)) {
             fs.writeFilesystem(out);
@@ -409,17 +291,15 @@ public class MSGNavigator extends BaseDialog {
     }
 
     @Override
-    public void close()
-    {
+    public void close() {
         root.getSetup().setLocalConfig(SETTING_SHOW_SIZE, String.valueOf(setting_show_size));
         super.close();
     }
 
-    void showSelectedElement()
-    {
+    void showSelectedElement() {
         TreePath path = tree.getSelectionPath();
 
-        if( path == null ) {
+        if (path == null) {
             return;
         }
 
@@ -432,7 +312,7 @@ public class MSGNavigator extends BaseDialog {
     void editSelectedElement() {
         TreePath path = tree.getSelectionPath();
 
-        if( path == null ) {
+        if (path == null) {
             return;
         }
 
