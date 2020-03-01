@@ -27,6 +27,7 @@ public enum Ptyp {
     PtypInteger64(0x0014, false, DocumentInputStream::readLong),
     PtypTime(0x0040, false, Ptyp::toTime),
 
+    PtypObject(0x000d, true, Ptyp::getBytes),
     PtypString8(0x001e, true, s -> new String(getBytes(s), StandardCharsets.ISO_8859_1)),
     PtypString(0x001f, true, s -> new String(getBytes(s), StandardCharsets.UTF_16LE)),
     PtypGuid(0x0048, true, Ptyp::getBytes),
@@ -52,13 +53,15 @@ public enum Ptyp {
     private static final LocalDateTime TIME_EPOCH = LocalDateTime.of(1601, Month.JANUARY, 1, 0, 0);
 
     public final int id;
-    private final boolean variableLength;
+    public final boolean variableLength;
+    public final boolean multipleValued;
     private final Function<DocumentInputStream, ?> conversion;
 
     Ptyp(int id, boolean variableLength, Function<DocumentInputStream, ?> conversion) {
         this.id = id;
         this.variableLength = variableLength;
         this.conversion = conversion;
+        this.multipleValued = (id & MULTIPLE_VALUED_FLAG) == MULTIPLE_VALUED_FLAG;
     }
 
     public static Ptyp from(int id) {
@@ -71,7 +74,7 @@ public enum Ptyp {
     }
 
     public Object parseValue(DocumentInputStream propertyStream, DirectoryEntry dir, String pTag) throws IOException {
-        if (variableLength || isMultipleValued()) {
+        if (variableLength || multipleValued) {
             int byteCount = propertyStream.readInt();
             int reserved = propertyStream.readInt();
             return parseSubStorage(dir, pTag);
@@ -82,7 +85,7 @@ public enum Ptyp {
     private Object parseSubStorage(DirectoryEntry dir, String pTag) throws IOException {
         DocumentEntry subEntry = (DocumentEntry) dir.getEntry(SUBSTORAGE_PREFIX + pTag);
         try (DocumentInputStream subStream = new DocumentInputStream(subEntry)) {
-            if (isMultipleValued()) {
+            if (multipleValued) {
                 if (variableLength) {
                     return parseMultipleVariableLengthValues(subStream, dir, pTag);
                 }
@@ -112,11 +115,7 @@ public enum Ptyp {
         return pValues.toArray();
     }
 
-    private boolean isMultipleValued() {
-        return (id & MULTIPLE_VALUED_FLAG) == MULTIPLE_VALUED_FLAG;
-    }
-
-    private Object convert(DocumentInputStream value) {
+    public Object convert(DocumentInputStream value) {
         return conversion.apply(value);
     }
 

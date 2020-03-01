@@ -180,7 +180,7 @@ public class MSGNavigator extends BaseDialog {
             case PtypBinary:
                 return read(dstream);
         }
-        logger.trace("Unsupported field type " + info.getType());
+        logger.warn("Unsupported field type " + info.getType());
         return null;
     }
 

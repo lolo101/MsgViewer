@@ -1,208 +1,94 @@
 package net.sourceforge.MSGViewer.MSGNavigator;
 
 import com.auxilii.msgparser.Pid;
-import net.sourceforge.MSGViewer.factory.msg.lib.ByteConvert;
-import net.sourceforge.MSGViewer.factory.msg.lib.MSTimeConvert;
+import com.auxilii.msgparser.Ptyp;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.poifs.filesystem.DocumentEntry;
 import org.apache.poi.poifs.filesystem.DocumentInputStream;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Arrays;
 import java.util.List;
 
-/**
- *
- * @author martin
- */
-public class PropertyParser
-{
+public class PropertyParser {
     private final DocumentEntry entry;
 
-    private boolean is_toplevel = false;
-
-    private int max_descr_lenght = 20;
+    private final int max_id_lenght;
+    private final int max_type_lenght;
 
     private final List<String> props = new ArrayList<>();
 
-    public PropertyParser(DocumentEntry entry) throws IOException
-    {
+    public PropertyParser(DocumentEntry entry) throws IOException {
         this.entry = entry;
 
-        for (Pid descr : Pid.values()) {
-            if (descr.toString().length() > max_descr_lenght) {
-                max_descr_lenght = descr.toString().length();
-            }
-        }
+        max_id_lenght = Arrays.stream(Pid.values())
+                .map(Pid::toString)
+                .mapToInt(String::length)
+                .max()
+                .getAsInt();
+        max_type_lenght = Arrays.stream(Ptyp.values())
+                .map(Ptyp::toString)
+                .mapToInt(String::length)
+                .max()
+                .getAsInt();
 
         parse();
     }
 
-    final void parse() throws IOException
-    {
-        if (entry.getParent().getParent() == null) {
-            is_toplevel = true;
-        }
+    final void parse() throws IOException {
+        boolean is_toplevel = entry.getParent().getParent() == null;
+        boolean is_msg = is_toplevel || entry.getParent().getName().equals("__substg1.0_3701000D");
 
-        byte[] bytes = new byte[entry.getSize()];
-        try (InputStream in = new DocumentInputStream(entry)) {
+        try (DocumentInputStream in = new DocumentInputStream(entry)) {
+            // RESERVED 8 bytes (should by zero)
+            in.skip(8);
+            if (is_msg) {
+                int nextRecipientId = in.readInt();
+                int nextAttachmentId = in.readInt();
+                int recipientCount = in.readInt();
+                int attachmentCount = in.readInt();
 
-            int len = in.read(bytes);
-            if( len != bytes.length ) {
-                throw new IOException("Not all Data read");
+                if (is_toplevel) {
+                    // RESERVED 8 bytes (should by zero)
+                    in.skip(8);
+                }
             }
-        }
 
-        // RESERVED 8 bytes (should by zero)
-        int offset = 8;
-
-        if (is_toplevel) {
-            // NEXT Recipient ID 4 bytes
-
-            // todo read Recipient id
-            offset+= 4;
-
-            /*
-            for (int i = 0; i < 4; i++, offset++) {
-                sb.append(formatByte(bytes[offset]));
+            while (in.available() > 0) {
+                parsePropertyEntry(in);
             }
-             */
-
-            // NEXT Attachment ID 4 bytes
-
-            // todo read next Attachment id
-            offset+= 4;
-
-            /*
-            for (int i = 0; i < 4; i++, offset++) {
-                sb.append(formatByte(bytes[offset]));
-            }*/
-
-
-            // Recipient Count 4 bytes
-
-            // todo read Recipient count
-            offset+= 4;
-
-            /*
-            for (int i = 0; i < 4; i++, offset++) {
-                sb.append(formatByte(bytes[offset]));
-            }*/
-
-
-
-            // Attachment Count 4 bytes
-
-            // todo readAttachment Count
-            offset+= 4;
-            /*
-            for (int i = 0; i < 4; i++, offset++) {
-                sb.append(formatByte(bytes[offset]));
-            }*/
-
-            // Reserved 8 bytes (should by zero)
-
-            offset += 8;
-        }
-
-        for( ; offset < bytes.length; offset += 16) {
-            parsePropertyEntry( bytes, offset );
         }
     }
 
-    private void parsePropertyEntry(byte[] bytes, int offset) {
-
+    private void parsePropertyEntry(DocumentInputStream in) {
+        int tag = in.readInt();
         StringBuilder sb = new StringBuilder();
+        sb.append(String.format("%08X ", tag));
 
-        // property tag
-        for( int i = offset + 3; i >= offset; i-- ) {
-            sb.append(formatByte0S(bytes[i]));
-        }
+        int flags = in.readInt();
+        sb.append((flags & 0x0001) > 0 ? "M" : "_");
+        sb.append((flags & 0x0002) > 0 ? "R" : "_");
+        sb.append((flags & 0x0004) > 0 ? "W" : "_");
 
-        String tagname = sb.toString();
-
-        offset += 4;
-
-        sb.append( " " );
-
-        sb.append((bytes[offset] & 0x0001) > 0 ? "M" : "_");
-        sb.append((bytes[offset] & 0x0002) > 0 ? "R" : "_");
-        sb.append((bytes[offset] & 0x0004) > 0 ? "W" : "_");
-
-        offset += 4;
-
-        sb.append(" VALUE: ");
-
-        int value_start_offset = offset;
-
-        for( int i = 0; i < 8; i++, offset++ ) {
-            sb.append(formatByte0(bytes[offset]));
-        }
-
+        Pid id = Pid.from(tag >> 16);
+        Ptyp typ = Ptyp.from(tag & 0xffff);
+        sb.append(StringUtils.rightPad(id.toString(), max_id_lenght));
         sb.append(" ");
+        sb.append(StringUtils.rightPad(typ.toString(), max_type_lenght));
 
-        Pid descr = Pid.from(Integer.parseInt(tagname.substring(0, 4), 16));
-        sb.append(StringUtils.rightPad(descr.toString(), max_descr_lenght));
-
-        String tagtype = tagname.toLowerCase().substring(4);
-
-        if( tagtype.equals("001f")) {
-            String res = formatBytes0(value_start_offset, bytes);
-            int length = Integer.valueOf(res, 16);
-
-            sb.append(" PtypString length: ");
-            sb.append(length - 2);
-
-        } else if( tagtype.equals("0102") ) {
-            String res = formatBytes0(value_start_offset, bytes);
-            int length = Integer.valueOf(res, 16);
-
-            sb.append(" PtypBinary length: ");
-            sb.append(length);
-
-        } else if( tagtype.equals("0040")) {
-            sb.append(" PtypTime ");
-            long time = ByteConvert.convertByteArrayToLong(bytes, value_start_offset);
-            Date date = new Date(MSTimeConvert.PtypeTime2Millis(time));
-
-            sb.append( date.toString() );
-
-        } else if( tagtype.equals("000b")) {
-            sb.append(" boolean");
-
-        } else if( tagtype.equals("0003")) {
-            String res = formatBytes0(value_start_offset, bytes);
-            int length = Long.valueOf(res, 16).intValue();
-
-            sb.append(" PtypInteger32 value: ");
-            sb.append(length);
+        if (typ.variableLength || typ.multipleValued) {
+            int size = in.readInt();
+            int reserved = in.readInt();
+            sb.append(" size: ").append(size);
+        } else {
+            sb.append(" value: ").append(typ.convert(in));
         }
 
         props.add(sb.toString());
     }
 
-    private String formatBytes0(int value_start_offset, byte[] bytes) {
-        StringBuilder res = new StringBuilder();
-        for( int i = value_start_offset + 3; i >= value_start_offset; i-- ) {
-            res.append(formatByte0S(bytes[i]));
-        }
-        return res.toString();
-    }
-
-    private String formatByte0( byte b )
-    {
-        return String.format("%02X ", b);
-    }
-
-    private String formatByte0S( byte b )
-    {
-        return String.format("%02X", b);
-    }
-
-    public List<String> getPropertyTags()
-    {
+    public List<String> getPropertyTags() {
         return props;
     }
 }
