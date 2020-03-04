@@ -14,14 +14,12 @@ import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.regex.Pattern;
 
-/**
- *
- * @author martin
- */
 public class ShowNode extends BaseDialog {
 
     private static final long serialVersionUID = 3130592579862038804L;
+    private static final Pattern NAMED_PROPERTY_SUBSTORAGE = Pattern.compile("__substg1\\.0_[0-9]{4}0102");
 
     private int max_descr_lenght = 20;
 
@@ -55,7 +53,7 @@ public class ShowNode extends BaseDialog {
             {
                 show_string_stream(cont);
             }
-            else if( name.matches("__substg1\\.0_[0-9]{4}0102") &&
+            else if( NAMED_PROPERTY_SUBSTORAGE.matcher(name).matches() &&
                    cont.getEntry().getParent().getName().equals("__nameid_version1.0") )
             {
                 show_nameid_stream(cont);

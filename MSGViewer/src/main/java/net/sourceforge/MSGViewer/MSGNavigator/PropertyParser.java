@@ -37,26 +37,30 @@ public class PropertyParser {
     }
 
     final void parse() throws IOException {
-        boolean is_toplevel = entry.getParent().getParent() == null;
-        boolean is_msg = is_toplevel || entry.getParent().getName().equals("__substg1.0_3701000D");
-
         try (DocumentInputStream in = new DocumentInputStream(entry)) {
-            // RESERVED 8 bytes (should by zero)
-            in.skip(8);
-            if (is_msg) {
-                int nextRecipientId = in.readInt();
-                int nextAttachmentId = in.readInt();
-                int recipientCount = in.readInt();
-                int attachmentCount = in.readInt();
-
-                if (is_toplevel) {
-                    // RESERVED 8 bytes (should by zero)
-                    in.skip(8);
-                }
-            }
+            parseHeader(in);
 
             while (in.available() > 0) {
                 parsePropertyEntry(in);
+            }
+        }
+    }
+
+    private void parseHeader(DocumentInputStream in) throws IOException {
+        boolean is_toplevel = entry.getParent().getParent() == null;
+        boolean is_msg = is_toplevel || entry.getParent().getName().equals("__substg1.0_3701000D");
+
+        // RESERVED 8 bytes (should by zero)
+        in.skip(8);
+        if (is_msg) {
+            int nextRecipientId = in.readInt();
+            int nextAttachmentId = in.readInt();
+            int recipientCount = in.readInt();
+            int attachmentCount = in.readInt();
+
+            if (is_toplevel) {
+                // RESERVED 8 bytes (should by zero)
+                in.skip(8);
             }
         }
     }

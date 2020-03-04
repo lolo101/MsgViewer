@@ -31,11 +31,12 @@ public class MSGNavigator extends BaseDialog {
 
     public static class TreeNodeContainer extends DefaultMutableTreeNode {
         private final Entry entry;
-        private Object data;
+        private final Object data;
 
-        public TreeNodeContainer(Entry entry, String name) {
+        public TreeNodeContainer(Entry entry, String name, Object data) {
             super(name);
             this.entry = entry;
+            this.data = data;
         }
 
         public Entry getEntry() {
@@ -45,11 +46,6 @@ public class MSGNavigator extends BaseDialog {
         public Object getData() {
             return data;
         }
-
-        public void setData(Object data) {
-            this.data = data;
-        }
-
     }
 
     /**
@@ -112,7 +108,8 @@ public class MSGNavigator extends BaseDialog {
 
     private MutableTreeNode parseDirectory(DirectoryEntry entry) throws IOException {
         DefaultMutableTreeNode node = new TreeNodeContainer(entry,
-                "<html><body><b style=\"color: blue\">" + entry.getName() + "</b></body></html>");
+                "<html><body><b style=\"color: blue\">" + entry.getName() + "</b></body></html>",
+                null);
         parse(node, entry);
         return node;
     }
@@ -146,18 +143,19 @@ public class MSGNavigator extends BaseDialog {
                 sb.append("     <i style=\"color: dd5555\">byte array</i>");
             }
             sb.append("</body></html>");
-            TreeNodeContainer node = new TreeNodeContainer(de, sb.toString());
-            node.setData(data);
-            return node;
+            return new TreeNodeContainer(de, sb.toString(), data);
         }
     }
 
     private static MutableTreeNode parseProperties(DocumentEntry de) throws IOException {
-        TreeNodeContainer node = new TreeNodeContainer(de, "<html><body><b>" + de.getName() + "</b></body></html>");
         PropertyParser pp = new PropertyParser(de);
+        TreeNodeContainer node = new TreeNodeContainer(de,
+                "<html><body><b>" + de.getName() + "</b></body></html>",
+                new DocumentInputStream(de).readAllBytes());
         for (String tag : pp.getPropertyTags()) {
             TreeNodeContainer pnode = new TreeNodeContainer(de,
-                    "<html><body><pre style=\"font-family: monospace; fonz-size:8px\">" + tag + "</pre></body></html>");
+                    "<html><body><pre style=\"font-family: monospace; fonz-size:8px\">" + tag + "</pre></body></html>",
+                    null);
             node.add(pnode);
         }
         return node;
@@ -175,25 +173,16 @@ public class MSGNavigator extends BaseDialog {
         switch (info.getType()) {
             case PtypString8:
             case PtypMultipleString8:
-                return new String(read(dstream), StandardCharsets.ISO_8859_1);
+                return new String(dstream.readAllBytes(), StandardCharsets.ISO_8859_1);
             case PtypString:
             case PtypMultipleString:
-                return new String(read(dstream), StandardCharsets.UTF_16LE);
+                return new String(dstream.readAllBytes(), StandardCharsets.UTF_16LE);
             case PtypBinary:
             case PtypMultipleBinary:
-                return read(dstream);
+                return dstream.readAllBytes();
         }
         logger.warn("Unsupported field type " + info.getType());
         return null;
-    }
-
-    private static byte[] read(InputStream stream) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        for (int read; (read = stream.read(buffer)) > 0; ) {
-            baos.write(buffer, 0, read);
-        }
-        return baos.toByteArray();
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
