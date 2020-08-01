@@ -5,29 +5,18 @@
 
 package at.redeye.FrameWork.base;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-
 import at.redeye.FrameWork.base.bindtypes.DBStrukt;
 import at.redeye.FrameWork.base.prm.bindtypes.DBConfig;
 import at.redeye.FrameWork.base.prm.impl.GlobalConfigDefinitions;
 import at.redeye.FrameWork.base.prm.impl.LocalConfigDefinitions;
 import at.redeye.FrameWork.base.prm.impl.PrmActionEvent;
 import at.redeye.FrameWork.base.transaction.Transaction;
-import at.redeye.FrameWork.utilities.StringUtils;
-import at.redeye.SqlDBInterface.SqlDBIO.impl.SqlDriverException;
+
+import java.io.*;
+import java.util.*;
 
 /**
- * 
+ *
  * @author martin
  */
 public class LocalSetup extends Setup {
@@ -70,12 +59,7 @@ public class LocalSetup extends Setup {
 
 	private boolean checkGlobal() {
 		if (global_config == null) {
-
-			if (loadGlobalProps()) {
-				return true;
-			}
-
-			return false;
+			return loadGlobalProps();
 		}
 
 		return true;
@@ -118,12 +102,9 @@ public class LocalSetup extends Setup {
 			}
 
 			Set keys = oldProps.keySet();
-			Iterator<String> it = keys.iterator();
 
-			DBConfig c = null;
-			while (it.hasNext()) {
-				String currKey = it.next();
-				c = LocalConfigDefinitions.get(currKey);
+			for (String currKey : (Iterable<String>) keys) {
+				DBConfig c = LocalConfigDefinitions.get(currKey);
 				if (c != null) {
 					PrmActionEvent event = new PrmActionEvent();
 					event.setOldPrmValue(oldProps.getProperty(currKey, ""));
@@ -155,39 +136,28 @@ public class LocalSetup extends Setup {
 			return false;
 		}
 
-		boolean result = false;
+		Transaction trans = conn.getNewTransaction();
 
-		try {
-			Transaction trans = conn.getNewTransaction();
+		List<DBStrukt> all = trans.fetchTable(new DBConfig());
 
-			List<DBStrukt> all = trans.fetchTable(new DBConfig());
-
-			for (int i = 0; i < all.size(); i++) {
-				DBConfig c = (DBConfig) all.get(i);
-
-				if (global_config == null) {
-					global_config = new HashMap<String, DBConfig>();
-				}
-
-				global_config.put(c.getConfigName(), c);
-			}
-
-			conn.closeTransaction(trans);
+		for (DBStrukt dbStrukt : all) {
+			DBConfig c = (DBConfig) dbStrukt;
 
 			if (global_config == null) {
-				// Noch kein Eintrag in der DB vorhanden...
-				global_config = new HashMap<String, DBConfig>();
+				global_config = new HashMap<>();
 			}
 
-			result = true;
-
-		} catch (SqlDriverException ex) {
-			logger.error(StringUtils.exceptionToString(ex));
-		} catch (SQLException ex) {
-			logger.error(StringUtils.exceptionToString(ex));
+			global_config.put(c.getConfigName(), c);
 		}
 
-		return result;
+		conn.closeTransaction(trans);
+
+		if (global_config == null) {
+			// Noch kein Eintrag in der DB vorhanden...
+			global_config = new HashMap<>();
+		}
+
+		return true;
 	}
 
 	public boolean saveGlobalProps() {
@@ -203,7 +173,7 @@ public class LocalSetup extends Setup {
 
 			@Override
 			public void do_stuff() throws Exception {
-				result = new Boolean(false);
+				result = Boolean.FALSE;
 
 				Transaction trans = conn.getNewTransaction();
 
@@ -227,7 +197,7 @@ public class LocalSetup extends Setup {
 				trans.commit();
 				conn.closeTransaction(trans);
 
-				result = new Boolean(true);
+				result = Boolean.TRUE;
 			}
 
 		};
@@ -294,7 +264,7 @@ public class LocalSetup extends Setup {
 
 		DBConfig c = global_config.get(key);
 
-		if (c != null && if_not_exists == true)
+		if (c != null && if_not_exists)
 			return;
 
 		if (c == null) {
@@ -310,7 +280,6 @@ public class LocalSetup extends Setup {
 			c = new DBConfig(key, value);
 			c.setChanged();
 			global_config.put(key, c);
-			return;
 
 		} else {
 
@@ -332,7 +301,7 @@ public class LocalSetup extends Setup {
 
 	@Override
 	public DBConfig getConfig(String key) {
-		if (checkGlobal() == false) {
+		if (!checkGlobal()) {
 			return null;
 		}
 		return (global_config.get(key));
@@ -344,7 +313,7 @@ public class LocalSetup extends Setup {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return true if local property file was now created
 	 */
 	@Override

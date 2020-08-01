@@ -24,27 +24,27 @@ public class DBEnumAsInteger extends DBValue {
         public abstract int getMaxSize();
         public abstract boolean setValue( String val );
         public abstract boolean setValue( Integer val );
-        public abstract Integer getValue();        
-        public abstract String getValueAsString();        
+        public abstract Integer getValue();
+        public abstract String getValueAsString();
         public abstract EnumAsIntegerHandler getNewOne();
         public abstract Vector<String> getPossibleValues();
         public abstract void refresh();
     }
-    
-    public EnumAsIntegerHandler handler; 
-    
+
+    public EnumAsIntegerHandler handler;
+
     public DBEnumAsInteger( String name, EnumAsIntegerHandler enumval )
     {
         super( name );
         handler = enumval;
     }
-    
+
     public DBEnumAsInteger( String name, String title, EnumAsIntegerHandler enumval )
     {
         super( name, title );
         handler = enumval;
     }
-    
+
     @Override
     public DBDataType getDBType() {
         return DBDataType.DB_TYPE_INTEGER;
@@ -87,14 +87,14 @@ public class DBEnumAsInteger extends DBValue {
     {
         return handler.getMaxSize();
     }
-    
+
     @Override
     public String toString()
     {
         return getLocalizedString();
         // return handler.getValueAsString();
     }
-    
+
     public List<String> getPossibleValues()
     {
         return getLocalizedPossibleValues();
@@ -125,8 +125,8 @@ public class DBEnumAsInteger extends DBValue {
         if( localized_values_map == null )
         {
             initLocalization( root );
-            localized_values_map = new HashMap<String,String>();
-            localized_values = new ArrayList<String>();
+            localized_values_map = new HashMap<>();
+            localized_values = new ArrayList<>();
 
             for (String original : handler.getPossibleValues()) {
                 String translated = root.MlM(original);

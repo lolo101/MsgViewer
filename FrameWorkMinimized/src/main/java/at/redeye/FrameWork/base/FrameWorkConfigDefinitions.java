@@ -68,9 +68,9 @@ public class FrameWorkConfigDefinitions {
         addLocal(ProxyEnabled);
 
         if( Setup.is_win_system() )
-            OpenCommand.value.loadFromCopy((String)"explorer");
+            OpenCommand.value.loadFromCopy("explorer");
         else if( Setup.is_mac_system() )
-            OpenCommand.value.loadFromCopy((String)"open");
+            OpenCommand.value.loadFromCopy("open");
 
         addLocal(OpenCommand);
 

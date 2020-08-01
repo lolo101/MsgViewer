@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package net.sourceforge.MSGViewer.rtfparser;
 
 import at.redeye.FrameWork.base.AutoLogger;
@@ -14,13 +9,9 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.util.List;
 
-/**
- *
- * @author martin
- */
 public class testRTF2HTML extends BaseModuleLauncher
 {
-    public testRTF2HTML( String args[] )
+    public testRTF2HTML(String[] args)
     {
         super(args);
 
@@ -70,13 +61,6 @@ public class testRTF2HTML extends BaseModuleLauncher
 
                             for( RTFGroup group : groups )
                             {
-                                /*
-                                for( String cmd : group.getCommands() )
-                                {
-                                    System.out.println("cmd: " + cmd);
-
-                                }*/
-
                                 if( !group.isEmptyText() )
                                 {
                                     String content = group.getTextContent();
@@ -90,13 +74,13 @@ public class testRTF2HTML extends BaseModuleLauncher
 
                             if( file_name != null )
                             {
-                                FileWriter fout = new FileWriter(file_name);
-                                fout.write(sb.toString());
-                                fout.close();
+								try (FileWriter fout = new FileWriter(file_name)) {
+									fout.write(sb.toString());
+								}
                             }
 
                         } catch ( Error ex ) {
-                            message = ex.getMessage();                            
+                            message = ex.getMessage();
                             err = ex;
                         } catch ( Exception ex ) {
                             message = ex.getMessage();
@@ -118,14 +102,14 @@ public class testRTF2HTML extends BaseModuleLauncher
                                     System.out.println(message);
 
                                     int line = Integer.parseInt(message.substring(start+8,end));
-                                    int col = 0;
+                                    int col;
 
                                     if( end_col > 0 )
                                         col = Integer.parseInt(message.substring(start_col+7,end_col));
                                     else
                                         col = Integer.parseInt(message.substring(start_col+7));
 
-                                    String lines[] = content.split("\n");
+                                    String[] lines = content.split("\n");
 
                                     String ll = lines[line-1];
 
@@ -141,8 +125,7 @@ public class testRTF2HTML extends BaseModuleLauncher
 
                                     StringBuilder sb = new StringBuilder();
 
-                                    for( int i = 0; i < col -1; i++ )
-                                        sb.append(' ');
+                                    sb.append(" ".repeat(Math.max(0, col - 1)));
                                     sb.append("^");
 
                                     logger.error("\n\n" + ll + "\n" + sb.toString());
@@ -158,7 +141,7 @@ public class testRTF2HTML extends BaseModuleLauncher
                                 throw exc;
                             }
                         }
-                        
+
                     }
                 };
 
@@ -171,7 +154,7 @@ public class testRTF2HTML extends BaseModuleLauncher
         return "0.1";
     }
 
-    public static void main(String args[])
+    public static void main(String[] args)
     {
         testRTF2HTML test = new testRTF2HTML(args);
 

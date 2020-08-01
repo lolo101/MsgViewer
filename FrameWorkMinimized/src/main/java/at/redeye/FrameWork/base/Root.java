@@ -8,7 +8,6 @@ package at.redeye.FrameWork.base;
 import at.redeye.FrameWork.base.bindtypes.DBStrukt;
 import at.redeye.FrameWork.base.dll_cache.DLLExtractor;
 import at.redeye.FrameWork.Plugin.Plugin;
-import at.redeye.FrameWork.base.prm.impl.gui.GlobalConfig;
 import at.redeye.FrameWork.utilities.calendar.Holidays;
 import java.util.List;
 import java.util.Locale;
@@ -31,7 +30,7 @@ public abstract class Root {
      * This is set to "en" by default.
      */
     String base_language;
-    
+
     /**
      * fallback language if the target language is not
      * available.
@@ -41,7 +40,7 @@ public abstract class Root {
      * Here you can define the default language which can be
      * diferrent from the language the dialog was translated
      * for.
-     * 
+     *
      * This is set to "en" by default
      */
     String default_language;
@@ -74,35 +73,35 @@ public abstract class Root {
     }
 
     public abstract Setup getSetup();
-    
+
     public abstract boolean saveSetup();
-    
+
     public abstract void setDBConnection( DBConnection con );
     public abstract DBConnection getDBConnection();
     public abstract boolean loadDBConnectionFromSetup();
-    
+
     public void informWindowOpened( BaseDialogBase dlg ) {}
     public void informWindowClosed( BaseDialogBase dlg ) {}
     public void closeAllWindowsExceptThisOne( BaseDialogBase dlg ) {}
     public void closeAllWindowsNoAppExit() {}
 
     public void appExit() {}
-    
+
     public void setAktivUser( DBStrukt pb )
-    { 
-    
+    {
+
     }
     /*
     public int getUserPermissionLevel()
     {
         return UserManagementInterface.UM_PERMISSIONLEVEL_ADMIN;
     }*/
-    
+
     public String getUserName()
     {
         return "";
     }
-    
+
     public String getLogin()
     {
         return "";
@@ -111,13 +110,13 @@ public abstract class Root {
     public DBBindtypeManager getBindtypeManager()
     {
         return null;
-    }        
-    
+    }
+
     public DBManager getDBManager()
     {
         return null;
     }
-  */  
+  */
     public int getUserId()
     {
         return 0;
@@ -150,7 +149,7 @@ public abstract class Root {
 
     public void noProxyFor(String address)
     {
-        
+
     }
 
     public void addDllExtractorToCache( DLLExtractor extractor )
@@ -160,7 +159,7 @@ public abstract class Root {
 
     public void updateDllCache()
     {
-    
+
     }
 
     public void registerPlugin( Plugin plugin )
@@ -261,7 +260,7 @@ public abstract class Root {
         language_resource_path = path;
     }
 
-    /**     
+    /**
      * @return language that should be used for translations
      * can be Locale.getDefault() or something userdefined
      */
@@ -339,8 +338,8 @@ public abstract class Root {
     {
         return static_root;
     }
-    
-    /**     
+
+    /**
      * @return the number of currently open windows
      */
     public abstract int countOpenWindows();

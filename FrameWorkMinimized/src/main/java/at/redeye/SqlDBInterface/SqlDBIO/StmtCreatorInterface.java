@@ -10,14 +10,14 @@ import at.redeye.SqlDBInterface.SqlDBIO.impl.ColumnAttribute;
 import at.redeye.SqlDBInterface.SqlDBIO.impl.TableBindingNotRegisteredException;
 
 /**
- * 
+ *
  * @author Mario Mattl
- * 
+ *
  */
 public interface StmtCreatorInterface {
 
 	/**
-	 * 
+	 *
 	 * @param tablenames
 	 *            The tables names
 	 * @param whereStmt
@@ -27,36 +27,33 @@ public interface StmtCreatorInterface {
 	 * @param columnNames
 	 * @return The created statement
 	 */
-	public String buildStmtForTable(String[] tablenames, String whereStmt,
-			HashMap<String, ColumnAttribute> columnNames);
+    String buildStmtForTable(String[] tablenames, String whereStmt,
+                             HashMap<String, ColumnAttribute> columnNames);
 
 	/**
-	 * 
+	 *
 	 * @param tablename
 	 *            The tablename
 	 * @param values
 	 *            Filled Primary Key data for rows that shall be read
 	 * @return The created statement
-	 * @throws SQLException
-	 * @throws TableBindingNotRegisteredException
 	 */
-	public String buildStmtForTable(String tablename,
-			HashMap<String, Object> values) throws SQLException,
-			TableBindingNotRegisteredException;
+    String buildStmtForTable(String tablename,
+                             HashMap<String, Object> values);
 
 	/**
-	 * 
+	 *
 	 * @param table
 	 *            The table's name
 	 * @param values
 	 *            Columns and associated values
 	 * @return The created statement.
 	 */
-	public String buildInsertStmtForTable(String table,
-			HashMap<String, Object> values);
+    String buildInsertStmtForTable(String table,
+                                   HashMap<String, Object> values);
 
 	/**
-	 * 
+	 *
 	 * @param table
 	 *            The table's name
 	 * @param values
@@ -66,32 +63,29 @@ public interface StmtCreatorInterface {
 	 *            exist <br>
 	 *            in the given map "values".
 	 * @return The created statement.
-	 * @throws SQLException
-	 *             If data is invalid or missing.
-	 * @throws TableBindingNotRegisteredException
 	 */
-	public String buildUpdateStmtForTable(String table,
-			HashMap<String, Object> values, String whereStmt)
-			throws SQLException, TableBindingNotRegisteredException;
+    String buildUpdateStmtForTable(String table,
+                                   HashMap<String, Object> values, String whereStmt)
+	;
 
-	public String markTableName(String tableName);
+	String markTableName(String tableName);
 
-	public String markColumnName(String columnName);
+	String markColumnName(String columnName);
 
 	/**
 	 * Get names of columns that are bound to {@link PreparedStatement} with an
 	 * "?". <br>
 	 * Those have to be post-processed
-	 * 
+	 *
 	 * @return The where-column names of the recent statements creation
 	 */
-	public List<String> getCols2Handle();
+    List<String> getCols2Handle();
 
 	/**
 	 * @param date
 	 *            The given date
 	 * @return Formatted date string
 	 */
-	public String toDateString(Date date);
+    String toDateString(Date date);
 
 }

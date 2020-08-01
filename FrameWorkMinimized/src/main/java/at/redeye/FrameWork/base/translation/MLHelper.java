@@ -75,10 +75,10 @@ public class MLHelper
             resource_name = resource_name.replaceAll("//", "/");
 
             InputStream in = this.getClass().getResourceAsStream(resource_name);
-            
+
             if( in != null )
             {
-                props.load(in);            
+                props.load(in);
                 in.close();
                 loaded_something = true;
             }
@@ -105,10 +105,10 @@ public class MLHelper
         if( current_lang != null && locale.equals(current_lang) )
             return;
         */
-        
+
         if (loadTrans(locale)) {
             return;
-        }        
+        }
 
         if (locale.length() == 2  && !MLUtil.compareLanguagesOnly(locale, root.getBaseLanguage()) ) {
             loadTrans(root.getDefaultLanguage());
@@ -224,7 +224,7 @@ public class MLHelper
         String key = name + locale + impl_language;
 
         if( loaded_object_files == null )
-             loaded_object_files = new LinkedList<String>();
+             loaded_object_files = new LinkedList<>();
 
         if( loaded_object_files.contains(key) )
              return true;
@@ -279,7 +279,7 @@ public class MLHelper
             {
                 addMissing( message );
                 return message;
-            } 
+            }
 
             return msg;
         }

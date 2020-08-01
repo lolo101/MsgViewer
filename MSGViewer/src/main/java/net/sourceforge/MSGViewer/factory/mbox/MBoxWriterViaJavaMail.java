@@ -2,34 +2,29 @@ package net.sourceforge.MSGViewer.factory.mbox;
 
 import at.redeye.FrameWork.utilities.DeleteDir;
 import at.redeye.FrameWork.utilities.TempDir;
-import net.sourceforge.MSGViewer.HtmlFromRtf;
-import net.sourceforge.MSGViewer.ModuleLauncher;
-import net.sourceforge.MSGViewer.factory.MessageParserFactory;
-import net.sourceforge.MSGViewer.factory.mbox.headers.DateHeader;
-import net.sourceforge.MSGViewer.rtfparser.ParseException;
-
 import com.auxilii.msgparser.Message;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
 import com.auxilii.msgparser.attachment.MsgAttachment;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.Date;
+import net.sourceforge.MSGViewer.HtmlFromRtf;
+import net.sourceforge.MSGViewer.ModuleLauncher;
+import net.sourceforge.MSGViewer.factory.MessageParserFactory;
+import net.sourceforge.MSGViewer.factory.mbox.headers.DateHeader;
 
 import javax.activation.DataHandler;
 import javax.mail.BodyPart;
 import javax.mail.MessagingException;
 import javax.mail.Session;
-import javax.mail.internet.AddressException;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
 
 /**
  *
@@ -40,7 +35,7 @@ public class MBoxWriterViaJavaMail
      private final Session session = Session.getInstance(System.getProperties());
      private File tmp_dir;
 
-     public void write(Message msg, OutputStream out ) throws AddressException, MessagingException, IOException, ParseException, FileNotFoundException, Exception
+     public void write(Message msg, OutputStream out ) throws Exception
      {
          javax.mail.Message jmsg = new MimeMessage(session);
 
@@ -148,7 +143,7 @@ public class MBoxWriterViaJavaMail
          return tmp_dir;
      }
 
-     File dumpAttachment( FileAttachment fatt ) throws FileNotFoundException, IOException
+     File dumpAttachment( FileAttachment fatt ) throws IOException
      {
          File content = new File(getTmpDir(), fatt.toString());
 
@@ -159,7 +154,7 @@ public class MBoxWriterViaJavaMail
          return content;
      }
 
-    private void writeMBoxHeader(Message msg, OutputStream out) throws UnsupportedEncodingException, IOException
+    private void writeMBoxHeader(Message msg, OutputStream out) throws IOException
     {
        StringBuilder sb = new StringBuilder();
 
@@ -176,7 +171,7 @@ public class MBoxWriterViaJavaMail
        sb.append(DateHeader.date_format.format(date));
        sb.append("\r\n");
 
-       out.write(sb.toString().getBytes("ASCII"));
+       out.write(sb.toString().getBytes(StandardCharsets.US_ASCII));
     }
 
     void addHeaders( Message msg, javax.mail.Message jmsg ) throws MessagingException
@@ -185,7 +180,7 @@ public class MBoxWriterViaJavaMail
             return;
         }
 
-        String headers[] = msg.getHeaders().split("\n");
+        String[] headers = msg.getHeaders().split("\n");
 
         StringBuilder sb = new StringBuilder();
 
@@ -229,7 +224,7 @@ public class MBoxWriterViaJavaMail
         tmp_dir = null;
     }
 
-     public static void main( String args[] )
+     public static void main(String[] args)
      {
          ModuleLauncher.BaseConfigureLogging();
 

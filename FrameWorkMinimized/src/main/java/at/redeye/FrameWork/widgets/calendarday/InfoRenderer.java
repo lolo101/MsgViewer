@@ -11,16 +11,16 @@ import org.joda.time.DateMidnight;
  *
  * @author martin
  */
-public interface InfoRenderer 
+public interface InfoRenderer
 {
-    public void clear();
+    void clear();
 
-    public InfoRenderer getNewInstance();    
-    public void setInfo( String info );
-    public void update();
-    public String render();
-    public void addContent( Object data );    
-    public void setDay( DateMidnight day );
-    public String renderSum();
-    public DateMidnight getDay();
+    InfoRenderer getNewInstance();
+    void setInfo(String info);
+    void update();
+    String render();
+    void addContent(Object data);
+    void setDay(DateMidnight day);
+    String renderSum();
+    DateMidnight getDay();
 }

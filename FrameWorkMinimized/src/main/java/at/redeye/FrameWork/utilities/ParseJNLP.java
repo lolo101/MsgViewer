@@ -5,6 +5,15 @@
 
 package at.redeye.FrameWork.utilities;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,14 +21,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 /**
  *
@@ -29,17 +30,17 @@ public class ParseJNLP {
 
     private Node rootNode;
     private Properties properties = new Properties();
-    private List<String> jars = new ArrayList<String>();
+    private List<String> jars = new ArrayList<>();
     private String mainJar;
     private String codeBase;
 
     public ParseJNLP( File file ) throws ParserConfigurationException, IOException, SAXException
-    {    
+    {
          DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
          DocumentBuilder builder  = factory.newDocumentBuilder();
 
          Document document = builder.parse( file );
-         
+
          rootNode = document.getDocumentElement();
 
          findRedeyeContent(document);
@@ -75,7 +76,7 @@ public class ParseJNLP {
          findRedeyeContentJars(document,"jar");
          findRedeyeContentJars(document,"nativelib");
     }
-    
+
     private void findRedeyeContentJars(Document document, String tagname)
     {
         // property values
@@ -137,9 +138,8 @@ public class ParseJNLP {
 
         if( name != null && !name.isEmpty() )
         {
-            for( int i = 0; i < depth; i++ )
-                stream.append("\n    ");
-            
+            stream.append("\n    ".repeat(Math.max(0, depth)));
+
             stream.append(name);
 
             if( node.hasAttributes() )
@@ -154,7 +154,7 @@ public class ParseJNLP {
 
                     stream.append(attr.getNodeName());
                     stream.append("=");
-                    stream.append(attr.getNodeValue());                   
+                    stream.append(attr.getNodeValue());
                 }
             }
         }
@@ -179,7 +179,7 @@ public class ParseJNLP {
         codeBase = n.getNodeValue();
     }
 
-    static public void main( final String argv[] )
+    static public void main( final String[] argv)
     {
         for (String arg : argv) {
             try {
@@ -196,7 +196,7 @@ public class ParseJNLP {
                     else
                         System.out.println(jar);
                 }
-                
+
             } catch (ParserConfigurationException ex) {
                 Logger.getLogger(ParseJNLP.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {

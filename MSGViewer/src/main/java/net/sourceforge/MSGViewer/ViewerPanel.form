@@ -33,7 +33,7 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout"/>
       <SubComponents>
-        <Container class="javax.swing.JScrollPane" name="jScrollPaneHeader">
+        <Container class="javax.swing.JScrollPane" name="headerScrollPane">
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_VariableLocal" type="java.lang.Boolean" value="true"/>
             <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
@@ -52,12 +52,12 @@
                 <Property name="editable" type="boolean" value="false"/>
               </Properties>
               <AuxValues>
-                <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="header.addPropertyChangeListener(&quot;paintingForPrint&quot;, new PrintListener());&#xa;"/>
+                <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="header.addPropertyChangeListener(&quot;paintingForPrint&quot;, new PrintListener());"/>
               </AuxValues>
             </Component>
           </SubComponents>
         </Container>
-        <Container class="javax.swing.JPanel" name="jPanel1">
+        <Container class="javax.swing.JPanel" name="MainPanel">
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_VariableLocal" type="java.lang.Boolean" value="true"/>
             <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
@@ -71,22 +71,22 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jPanel2" alignment="1" max="32767" attributes="0"/>
-                  <Component id="jScrollPaneBody" alignment="1" max="32767" attributes="0"/>
+                  <Component id="buttonsPanel" alignment="1" max="32767" attributes="0"/>
+                  <Component id="bodyScrollPane" alignment="1" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="jScrollPaneBody" pref="276" max="32767" attributes="0"/>
+                      <Component id="bodyScrollPane" pref="276" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
+                      <Component id="buttonsPanel" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
           </Layout>
           <SubComponents>
-            <Container class="javax.swing.JScrollPane" name="jScrollPaneBody">
+            <Container class="javax.swing.JScrollPane" name="bodyScrollPane">
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_VariableLocal" type="java.lang.Boolean" value="true"/>
                 <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
@@ -105,7 +105,7 @@
                 </Component>
               </SubComponents>
             </Container>
-            <Container class="javax.swing.JPanel" name="jPanel2">
+            <Container class="javax.swing.JPanel" name="buttonsPanel">
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_VariableLocal" type="java.lang.Boolean" value="true"/>
                 <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
@@ -123,7 +123,7 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jSFontSize" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                          <Component id="fontSizeLabel" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="0" pref="95" max="32767" attributes="0"/>
                       </Group>
                   </Group>
@@ -139,7 +139,7 @@
                                   <Component id="JCBfix" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Component id="jSFontSize" alignment="1" min="-2" max="-2" attributes="0"/>
-                              <Component id="jLabel1" alignment="1" min="-2" max="-2" attributes="0"/>
+                              <Component id="fontSizeLabel" alignment="1" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -175,7 +175,7 @@
                     <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="jSFontSizeStateChanged"/>
                   </Events>
                 </Component>
-                <Component class="javax.swing.JLabel" name="jLabel1">
+                <Component class="javax.swing.JLabel" name="fontSizeLabel">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Fontsize"/>
                   </Properties>

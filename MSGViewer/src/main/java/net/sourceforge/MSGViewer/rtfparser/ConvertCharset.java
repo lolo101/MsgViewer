@@ -1,12 +1,14 @@
 package net.sourceforge.MSGViewer.rtfparser;
 
 import at.redeye.FrameWork.utilities.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.UnsupportedEncodingException;
-import org.apache.log4j.Logger;
 
 public class ConvertCharset
 {
-    private static final Logger logger = Logger.getLogger(ConvertCharset.class.getName());
+    private static final Logger logger = LogManager.getLogger(ConvertCharset.class);
 
     static String convertCharacter( String characterSet, String text )
     {

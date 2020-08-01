@@ -14,10 +14,10 @@ import java.util.Vector;
  * @author martin
  */
 public class DBConfig extends DBStrukt implements PrmAttachInterface
-{    
+{
     public static String TABLENAME = "CONFIG";
 
-    private Vector <PrmListener> prmListeners = new Vector<PrmListener>();
+    private Vector <PrmListener> prmListeners = new Vector<>();
     private String oldValue = "";
     private String [] possibleValues = {};
 
@@ -37,14 +37,14 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface
         super(TABLENAME);
 
         register();
-    }                
-    
+    }
+
     public DBConfig( String name, String value, String descr )
     {
         super(TABLENAME);
-        
+
         register();
-        
+
         this.name.loadFromString(name);
         this.value.loadFromString(value);
         this.descr.loadFromString(descr);
@@ -54,11 +54,11 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface
     public DBConfig( String name, String value )
     {
         super(TABLENAME);
-        
+
         register();
-        
+
         this.name.loadFromString(name);
-        this.value.loadFromString(value);        
+        this.value.loadFromString(value);
     }
 
     public DBConfig( String name, String value, String descr, PrmDefaultChecksInterface checks )
@@ -113,42 +113,42 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface
         this.customChecks = specialChecks;
     }
 
-    
+
     public boolean differs(DBConfig c_db) {
         if( getConfigName().equals(c_db.getConfigName() ) == false )
             return true;
         if( getConfigValue().equals(c_db.getConfigValue()) == false )
             return true;
-        
+
         return false;
     }
-    
+
     private void register()
     {
         add( name );
         add( value );
         add( descr );
         add( hist );
-        
-        name.setAsPrimaryKey();        
+
+        name.setAsPrimaryKey();
     }
-    
+
     public String getConfigName()
     {
-        return name.getValue().toString();
+        return name.getValue();
     }
-    
+
     public String getConfigValue()
     {
-        return value.getValue().toString();
+        return value.getValue();
     }
-    
+
     public void setConfigValue( String val )
     {
-        oldValue = new String (value.toString());
+        oldValue = value.toString();
         value.loadFromString(val);
-    }             
-    
+    }
+
     @Override
     public DBStrukt getNewOne() {
         return new DBConfig();
@@ -170,11 +170,11 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface
     @Override
     public void updateListeners(PrmActionEvent prmActionEvent) {
 
-        System.out.println ("PRM " + name.toString()+ 
+        System.out.println ("PRM " + name.toString()+
                 " has " + prmListeners.size() + " listener(s) registered!");
 
         for (PrmListener currentListener : prmListeners) {
-            
+
             if (defaultChecks != null) {
                 // Only send, if value has changed
                 if (!prmActionEvent.getNewPrmValue().toString().equals(prmActionEvent.getOldPrmValue().toString()))
@@ -205,7 +205,7 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface
     public void setPossibleValues(String[] possibleValues) {
         this.possibleValues = possibleValues;
     }
-    
+
     public void setCustomChecks(PrmCustomChecksInterface customChecks) {
         this.customChecks = customChecks;
     }
@@ -222,7 +222,7 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface
         return defaultChecks;
     }
 
-    
+
     public boolean hasChanged()
     {
         return changed;
@@ -237,5 +237,5 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface
     {
         changed = state;
     }
-    
+
 }

@@ -12,27 +12,27 @@ import at.redeye.SqlDBInterface.SqlDBIO.impl.DBDataType;
  * @author martin
  */
 public class DBString extends DBValue {
-    protected String value = new String();   
+    protected String value = "";
     protected int max_len;
 
     public DBString( String name, int max_len )
     {
         super( name );
         this.max_len = max_len;
-    } 
-    
+    }
+
     public DBString( String name, String title, int max_len )
     {
         super( name, title );
         this.max_len = max_len;
-    }         
+    }
 
     public DBString( String name, String title, int max_len, boolean is_already_lowercase )
     {
         super( name, title, is_already_lowercase );
         this.max_len = max_len;
-    }    
-    
+    }
+
     @Override
     public DBDataType getDBType() {
         return DBDataType.DB_TYPE_STRING;
@@ -47,7 +47,7 @@ public class DBString extends DBValue {
     public String getValue() {
         return value;
     }
-    
+
     @Override
     public String toString()
     {
@@ -55,15 +55,15 @@ public class DBString extends DBValue {
     }
 
     @Override
-    public void loadFromString(String s) {        
-        value = s;        
+    public void loadFromString(String s) {
+        value = s;
     }
 
     @Override
     public boolean acceptString(String s) {
         if( s.length() > max_len )
             return false;
-        
+
         return true;
     }
 
@@ -78,7 +78,7 @@ public class DBString extends DBValue {
     public void loadFromCopy(Object obj) {
         value = (String)obj;
     }
-    
+
     public int getMaxLen()
     {
         return max_len;

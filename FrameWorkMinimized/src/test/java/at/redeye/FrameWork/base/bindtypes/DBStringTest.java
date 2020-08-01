@@ -22,13 +22,13 @@ import org.junit.Ignore;
  * @author martin
  */
 public class DBStringTest {
-    
+
     static class TestCases
     {
         DBString instance;
         String db_value;
-        String exp_value;        
-        
+        String exp_value;
+
         public TestCases( DBString instance, String db_value, String exp_value )
         {
             this.instance = instance;
@@ -36,33 +36,33 @@ public class DBStringTest {
             this.exp_value = exp_value;
         }
     }
-    
+
     private static ArrayList<TestCases> test_cases;
     private static final int MAX_LEN = 10;
     private static final String NORMAL_STRING = "12345";
     private static final String LONG_STRING = "12345678901234567890";
-    
+
     public DBStringTest() {
     }
 
     @BeforeClass
-    public static void setUpClass() throws Exception {
-        
+    public static void setUpClass() {
+
         test_cases = new ArrayList();
-        
+
         test_cases.add( new TestCases( new DBString("name_only", MAX_LEN ), NORMAL_STRING, NORMAL_STRING ) );
         test_cases.add( new TestCases( new DBString("with title", "With Title", MAX_LEN ), LONG_STRING, LONG_STRING ) );
         test_cases.add( new TestCases( new DBString("empty", "empty With Title", MAX_LEN ), "", "" ) );
     }
 
     @AfterClass
-    public static void tearDownClass() throws Exception {
+    public static void tearDownClass() {
     }
-    
+
     @Before
     public void setUp() {
     }
-    
+
     @After
     public void tearDown() {
     }
@@ -73,13 +73,13 @@ public class DBStringTest {
     @Test
     public void testGetDBType() {
         System.out.println("getDBType");
-        
-        for (TestCases test : test_cases) 
+
+        for (TestCases test : test_cases)
         {
             DBString instance = test.instance;
             DBDataType expResult = DBDataType.DB_TYPE_STRING;
             DBDataType result = instance.getDBType();
-            assertEquals(expResult, result);            
+            assertEquals(expResult, result);
         }
     }
 
@@ -89,8 +89,8 @@ public class DBStringTest {
     @Test
     public void testLoadFromDB() {
         System.out.println("loadFromDB");
-        
-        for (TestCases test : test_cases) 
+
+        for (TestCases test : test_cases)
         {
             Object obj = test.db_value;
             DBString instance = test.instance;
@@ -105,8 +105,8 @@ public class DBStringTest {
     @Test
     public void testGetValue() {
         System.out.println("getValue");
-        
-        for (TestCases test : test_cases) 
+
+        for (TestCases test : test_cases)
         {
             Object obj = test.db_value;
             DBString instance = test.instance;
@@ -121,14 +121,14 @@ public class DBStringTest {
     @Test
     public void testToString() {
         System.out.println("toString");
-        
-        for (TestCases test : test_cases) 
+
+        for (TestCases test : test_cases)
         {
             DBString instance = test.instance;
             String expResult = test.exp_value;
             String result = instance.toString();
             assertEquals(expResult, result);
-        }                        
+        }
     }
 
     /**
@@ -137,14 +137,14 @@ public class DBStringTest {
     @Test
     public void testLoadFromString() {
         System.out.println("loadFromString");
-        
-        for (TestCases test : test_cases) 
+
+        for (TestCases test : test_cases)
         {
             String obj = test.db_value;
             DBString instance = test.instance;
             instance.loadFromString(obj);
             assertEquals(test.exp_value, instance.getValue());
-        }     
+        }
     }
 
     /**
@@ -153,14 +153,14 @@ public class DBStringTest {
     @Test
     public void testAcceptString() {
         System.out.println("acceptString");
-        
+
         ArrayList<SimpleEntry<String,Boolean>> test_strings = new ArrayList();
-        
-        test_strings.add(new SimpleEntry<String, Boolean>(NORMAL_STRING,true));
-        test_strings.add(new SimpleEntry<String, Boolean>(LONG_STRING,false));
-        
-        for (TestCases test : test_cases) 
-        {      
+
+        test_strings.add(new SimpleEntry<>(NORMAL_STRING, true));
+        test_strings.add(new SimpleEntry<>(LONG_STRING, false));
+
+        for (TestCases test : test_cases)
+        {
             for( SimpleEntry<String,Boolean> e : test_strings )
             {
                 String s = e.getKey();
@@ -178,12 +178,12 @@ public class DBStringTest {
     @Test
     public void testGetCopy() {
         System.out.println("getCopy");
-        
-        for (TestCases test : test_cases) 
+
+        for (TestCases test : test_cases)
         {
             DBString instance = test.instance;
             DBString result = instance.getCopy();
-            
+
             assertNotSame(result, instance);
         }
     }
@@ -194,13 +194,13 @@ public class DBStringTest {
     @Test
     public void testLoadFromCopy() {
         System.out.println("loadFromCopy");
-        
-        for (TestCases test : test_cases) 
+
+        for (TestCases test : test_cases)
         {
             Object obj = NORMAL_STRING;
             DBString instance = test.instance;
             instance.loadFromCopy(obj);
-            
+
             assertEquals(obj, instance.value);
         }
     }
@@ -211,13 +211,12 @@ public class DBStringTest {
     @Test
     public void testGetMaxLen() {
         System.out.println("getMaxLen");
-        
-        for (TestCases test : test_cases) 
+
+        for (TestCases test : test_cases)
         {
             DBString instance = test.instance;
-            int expResult = MAX_LEN;
             int result = instance.getMaxLen();
-            assertEquals(expResult, result);        
+            assertEquals(MAX_LEN, result);
         }
     }
 
@@ -227,8 +226,8 @@ public class DBStringTest {
     @Test
     public void testIsEmpty() {
         System.out.println("isEmpty");
-        
-        for (TestCases test : test_cases) 
+
+        for (TestCases test : test_cases)
         {
             DBString instance = test.instance;
             boolean expResult = false;

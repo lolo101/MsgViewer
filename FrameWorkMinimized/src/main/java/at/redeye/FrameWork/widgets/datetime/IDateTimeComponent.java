@@ -4,14 +4,14 @@ import java.awt.Font;
 
 public interface IDateTimeComponent {
 
-	public String getDate();
+	String getDate();
 
-	public void setDate(String dateStr);
+	void setDate(String dateStr);
 
-	public void setFont(Font font);
+	void setFont(Font font);
 
-	public void setName(String name);
+	void setName(String name);
 
-	public String getName();
+	String getName();
 
 }

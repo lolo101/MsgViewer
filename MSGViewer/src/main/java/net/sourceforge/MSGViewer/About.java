@@ -9,6 +9,8 @@ package net.sourceforge.MSGViewer;
 import at.redeye.FrameWork.base.BaseDialog;
 import at.redeye.FrameWork.base.Root;
 
+import java.awt.*;
+
 /**
  *
  * @author  martin
@@ -16,11 +18,11 @@ import at.redeye.FrameWork.base.Root;
 public class About extends BaseDialog {
 
     /** Creates new form About */
-    public About(Root root) 
+    public About(Root root)
     {
         super(root,"About");
         initComponents();
-        
+
         jLVersion.setText(MlM("Version") + " " + Version.getVersion());
         jLTitle.setText(MlM("About") + " " + MlM(root.getAppTitle()));
     }
@@ -38,32 +40,24 @@ public class About extends BaseDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jLTitle.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        jLTitle.setFont(new java.awt.Font("Dialog", Font.BOLD, 18)); // NOI18N
         jLTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLTitle.setText("About Redeye Barcode Editor");
 
         jBCancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/at/redeye/FrameWork/base/resources/icons/fileclose.gif"))); // NOI18N
         jBCancel.setText("Close");
-        jBCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBCancelActionPerformed(evt);
-            }
-        });
+        jBCancel.addActionListener(this::jBCancelActionPerformed);
 
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/at/redeye/FrameWork/base/resources/pictures/redeye.png"))); // NOI18N
 
-        jLVersion.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        jLVersion.setFont(new java.awt.Font("Dialog", Font.BOLD, 14)); // NOI18N
         jLVersion.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLVersion.setText("Version");
 
         jBLicence.setIcon(new javax.swing.ImageIcon(getClass().getResource("/at/redeye/FrameWork/base/resources/icons/history.png"))); // NOI18N
         jBLicence.setText("Licence");
-        jBLicence.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBLicenceActionPerformed(evt);
-            }
-        });
+        jBLicence.addActionListener(this::jBLicenceActionPerformed);
 
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("Licence: GPL Version 3");
@@ -113,7 +107,7 @@ public class About extends BaseDialog {
     }// </editor-fold>//GEN-END:initComponents
 
 private void jBCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCancelActionPerformed
-    if( canClose() )    
+    if( canClose() )
         close();
 }//GEN-LAST:event_jBCancelActionPerformed
 

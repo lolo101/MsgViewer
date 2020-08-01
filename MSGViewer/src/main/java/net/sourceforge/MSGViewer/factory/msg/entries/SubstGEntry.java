@@ -1,47 +1,38 @@
 package net.sourceforge.MSGViewer.factory.msg.entries;
 
+import com.auxilii.msgparser.Pid;
+import com.auxilii.msgparser.Ptyp;
 import net.sourceforge.MSGViewer.factory.msg.properties.PropType;
-import java.io.IOException;
-import java.io.InputStream;
 import org.apache.poi.poifs.filesystem.DirectoryEntry;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 /**
- *
  * @author martin
  */
-public abstract class SubstGEntry
-{
-    public static final String TYPE_ASCII = "001e";
-    public static final String TYPE_UTF16 = "001f";
-    public static final String TYPE_BYTES = "0102";
+public abstract class SubstGEntry {
+    protected final Ptyp type;
+    protected final Pid tag;
 
-    protected final String type;
-    protected final String name;
-
-    public SubstGEntry(String name,  String type )
-    {
-        this.name = name;
+    public SubstGEntry(Pid tag, Ptyp type) {
+        this.tag = tag;
         this.type = type;
     }
 
-    public String getTypeName() {
+    public Ptyp getType() {
         return type;
     }
 
-    public String getTagName() {
-        return name;
-    }
-
-    @Override
-    public String toString() {
-        return name + type;
+    public Pid getTag() {
+        return tag;
     }
 
     public abstract PropType getPropType();
 
     public final void createEntry(DirectoryEntry dir) throws IOException {
         InputStream stream = createEntryContent();
-        dir.createDocument("__substg1.0_" + name.toUpperCase() + type.toUpperCase(), stream);
+        dir.createDocument(String.format("__substg1.0_%04X%04X", tag.id, type.id), stream);
     }
 
     protected abstract InputStream createEntryContent() throws IOException;

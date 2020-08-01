@@ -17,9 +17,10 @@
  */
 package com.auxilii.msgparser.attachment;
 
+import com.auxilii.msgparser.Property;
+
 import java.util.Objects;
 import java.util.stream.Stream;
-import org.apache.poi.poifs.filesystem.DocumentEntry;
 
 /**
  * Implementation of the {@link Attachment} interface that represents a file attachment. It contains some useful
@@ -175,45 +176,34 @@ public class FileAttachment implements Attachment {
         this.contentLocation = contentLocation;
     }
 
-    /**
-     * Sets the property specified by the name parameter. Unknown names are ignored.
-     *
-     * @param name The name of the property (i.e., the class of the {@link DocumentEntry}).
-     * @param value The value of the field.
-     */
-    public void setProperty(String name, Object value) throws ClassCastException {
-
-        if (name == null || value == null) {
-            return;
-        }
-
-        switch (name) {
-            case "0FF9":
+    public void setProperty(Property property) throws ClassCastException {
+        switch (property.getPid()) {
+            case PidTagRecordKey:
                 //TODO setRecordKey((byte[]) value);
                 break;
-            case "3001":
-                setDisplayName((String) value);
+            case PidTagDisplayName:
+                setDisplayName((String) property.getValue());
                 break;
-            case "3701":
-                setData((byte[]) value);
+            case PidTagAttachDataBinary:
+                setData((byte[]) property.getValue());
                 break;
-            case "3703":
-                setExtension((String) value);
+            case PidTagAttachExtension:
+                setExtension((String) property.getValue());
                 break;
-            case "3704":
-                setFilename((String) value);
+            case PidTagAttachFilename:
+                setFilename((String) property.getValue());
                 break;
-            case "3707":
-                setLongFilename((String) value);
+            case PidTagAttachLongFilename:
+                setLongFilename((String) property.getValue());
                 break;
-            case "370e":
-                setMimeTag((String) value);
+            case PidTagAttachMimeTag:
+                setMimeTag((String) property.getValue());
                 break;
-            case "3712":
-                setContentId((String) value);
+            case PidTagAttachContentId:
+                setContentId((String) property.getValue());
                 break;
-            case "3713":
-                setContentLocation((String) value);
+            case PidTagAttachContentLocation:
+                setContentLocation((String) property.getValue());
                 break;
         }
     }

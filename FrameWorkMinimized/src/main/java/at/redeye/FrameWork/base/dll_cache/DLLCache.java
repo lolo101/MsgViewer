@@ -8,7 +8,8 @@ package at.redeye.FrameWork.base.dll_cache;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.base.Setup;
 import at.redeye.FrameWork.utilities.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,12 +22,12 @@ import java.util.ArrayList;
  */
 public class DLLCache
 {
-   private static Logger logger = Logger.getLogger(DLLCache.class.getName());
+   private static Logger logger = LogManager.getLogger(DLLCache.class);
 
    String cache_dir;
 
    // das ist absichtlich ein Vector; eben wegen Sychronized
-   ArrayList<DLLExtractor> extractors = new ArrayList<DLLExtractor>();
+   ArrayList<DLLExtractor> extractors = new ArrayList<>();
 
     public DLLCache(Root root) {
         cache_dir = Setup.getAppConfigDir(root.getAppName() + "/jar/dll_cache");
@@ -39,10 +40,10 @@ public class DLLCache
             String env = extractor.getPropertyNameForDllDir();
 
             logger.debug(env + "=" + cache_dir);
-            
-            try {                
+
+            try {
                 System.setProperty(env, cache_dir);
-            } catch( AccessControlException ex ) {                
+            } catch( AccessControlException ex ) {
                 logger.debug("System.setProperty now allowed",ex);
             }
         }
@@ -76,7 +77,7 @@ public class DLLCache
                         extractor.extractDlls();
                         break;
                     } catch( AccessControlException ex ) {
-                        logger.error(StringUtils.exceptionToString(ex));                                      
+                        logger.error(StringUtils.exceptionToString(ex));
                     } catch( IOException ex ) {
                         logger.error(StringUtils.exceptionToString(ex));
                     }

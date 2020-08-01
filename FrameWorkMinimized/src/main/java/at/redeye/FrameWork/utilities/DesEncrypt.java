@@ -7,29 +7,24 @@ package at.redeye.FrameWork.utilities;
 
 import at.redeye.FrameWork.base.AutoLogger;
 import at.redeye.FrameWork.utilities.base64.Base64Coder;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+
+import javax.crypto.*;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.PBEParameterSpec;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.PBEParameterSpec;
 
 /**
  *
  * @author martin
  */
 public class DesEncrypt
-{    
+{
     private static final byte[] salt = {
         (byte)0x79,(byte)0x73,(byte)0xE3,(byte)0x67,(byte)0xE0,(byte)0xB9,(byte)0x31,(byte)0x08
     };
@@ -68,17 +63,16 @@ public class DesEncrypt
      * Ciphers a text with the given password. The resulting cyphered text is base64 encoded.
      * @param str
      * @return
-     * @throws UnsupportedEncodingException
      * @throws IllegalBlockSizeException
      * @throws BadPaddingException
      */
-    public String encrypt( String str ) throws UnsupportedEncodingException, IllegalBlockSizeException, BadPaddingException
+    public String encrypt( String str ) throws IllegalBlockSizeException, BadPaddingException
     {
         if (str == null || encode == null ) {
             return null;
         }
 
-        byte[] utf8_str = str.getBytes("UTF8");
+        byte[] utf8_str = str.getBytes(StandardCharsets.UTF_8);
         byte[] encoded = encode.doFinal(utf8_str);
 
         return new String(Base64Coder.encode(encoded));
@@ -90,10 +84,8 @@ public class DesEncrypt
      * @return
      * @throws IllegalBlockSizeException
      * @throws BadPaddingException
-     * @throws UnsupportedEncodingException
      */
-    public String decrypt(String str) throws IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException, IOException
-    {
+    public String decrypt(String str) throws IllegalBlockSizeException, BadPaddingException {
         if (str == null) {
             return null;
         }
@@ -102,13 +94,11 @@ public class DesEncrypt
 
         byte[] decoded_utf8_str = decode.doFinal(encoded);
 
-        return new String(decoded_utf8_str, "UTF8");
+        return new String(decoded_utf8_str, StandardCharsets.UTF_8);
     }
 
-    public static void main(String args[])
+    public static void main(String[] args)
     {
-        org.apache.log4j.BasicConfigurator.configure();
-
         final String passwd = "AberHallo";
         final String text = "Ein Hund kam in die Küche";
 
@@ -126,6 +116,6 @@ public class DesEncrypt
                 System.out.println(de_cipher.decrypt(encoded));
             }
         };
-        
+
     }
 }

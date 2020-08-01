@@ -4,8 +4,8 @@ import at.redeye.FrameWork.base.BaseModuleLauncher;
 import at.redeye.FrameWork.base.Setup;
 import com.auxilii.msgparser.Message;
 import net.sourceforge.MSGViewer.factory.MessageParserFactory;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
@@ -106,7 +106,6 @@ public abstract class CLIFileConverter {
 				openFile(targetFile);
 			}
 		} catch (Exception ex) {
-			System.err.print(ex);
 			ex.printStackTrace();
 		}
 	}

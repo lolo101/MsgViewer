@@ -10,9 +10,9 @@ package at.redeye.FrameWork.widgets.helpwindow;
  * @author martin
  */
 public interface HelpWinHook {
-    
-    public String getKeyword();
-            
-    public String getText();
-    
+
+    String getKeyword();
+
+    String getText();
+
 }

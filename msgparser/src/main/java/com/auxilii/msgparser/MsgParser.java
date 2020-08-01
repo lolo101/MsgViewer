@@ -17,19 +17,18 @@
  */
 package com.auxilii.msgparser;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
+import com.auxilii.msgparser.attachment.Attachment;
+import com.auxilii.msgparser.attachment.FileAttachment;
+import com.auxilii.msgparser.attachment.MsgAttachment;
 import org.apache.poi.poifs.filesystem.DirectoryEntry;
 import org.apache.poi.poifs.filesystem.DocumentEntry;
 import org.apache.poi.poifs.filesystem.DocumentInputStream;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 
-import com.auxilii.msgparser.attachment.Attachment;
-import com.auxilii.msgparser.attachment.FileAttachment;
-import com.auxilii.msgparser.attachment.MsgAttachment;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Main parser class that does the actual
@@ -62,6 +61,9 @@ import com.auxilii.msgparser.attachment.MsgAttachment;
  * @author roman.kurmanowytsch
  */
 public class MsgParser {
+
+    public static final String PROPERTIES_ENTRY = "__properties_version1.0";
+
     /**
      * Parses a .msg file provided in the specified file.
      *
@@ -108,7 +110,7 @@ public class MsgParser {
     }
 
     private void parseMsg(DirectoryEntry dir, Message msg) throws IOException {
-        DocumentEntry propertyEntry = (DocumentEntry) dir.getEntry("__properties_version1.0");
+        DocumentEntry propertyEntry = (DocumentEntry) dir.getEntry(PROPERTIES_ENTRY);
         try ( DocumentInputStream propertyStream = new DocumentInputStream(propertyEntry)) {
             propertyStream.skip(8);
             int nextRecipientId = propertyStream.readInt();
@@ -145,7 +147,7 @@ public class MsgParser {
      */
     protected void parseRecipient(DirectoryEntry dir, Message msg) throws IOException {
         RecipientEntry recipient = new RecipientEntry();
-        DocumentEntry propertyEntry = (DocumentEntry) dir.getEntry("__properties_version1.0");
+        DocumentEntry propertyEntry = (DocumentEntry) dir.getEntry(PROPERTIES_ENTRY);
         try ( DocumentInputStream propertyStream = new DocumentInputStream(propertyEntry)) {
             propertyStream.skip(8);
             while (propertyStream.available() > 0) {
@@ -192,12 +194,12 @@ public class MsgParser {
 
     private void ParseFileAttachment(DirectoryEntry dir, Message msg) throws IOException {
         FileAttachment fileAttachment = new FileAttachment();
-        DocumentEntry propertyEntry = (DocumentEntry) dir.getEntry("__properties_version1.0");
+        DocumentEntry propertyEntry = (DocumentEntry) dir.getEntry(PROPERTIES_ENTRY);
         try ( DocumentInputStream propertyStream = new DocumentInputStream(propertyEntry)) {
             propertyStream.skip(8);
             while (propertyStream.available() > 0) {
                 Property property = new Property(propertyStream, dir);
-                fileAttachment.setProperty(property.getPid(), property.getValue());
+                fileAttachment.setProperty(property);
             }
         }
 

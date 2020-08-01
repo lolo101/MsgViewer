@@ -5,24 +5,25 @@
 
 package at.redeye.FrameWork.widgets.helpwindow;
 
+import at.redeye.FrameWork.utilities.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
-import at.redeye.FrameWork.utilities.StringUtils;
-
 /**
- * 
+ *
  * @author martin
  */
 public class HelpFileLoader {
 
-	private static Logger logger = Logger.getLogger(HelpFileLoader.class);
+	private static Logger logger = LogManager.getLogger(HelpFileLoader.class);
 
 	public int findImgTag(StringBuilder s, int start) {
 		int pos;
@@ -144,7 +145,7 @@ public class HelpFileLoader {
 
 		StringBuilder res = new StringBuilder();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(
-				stream, "UTF-8"));
+				stream, StandardCharsets.UTF_8));
 
 		while (reader.ready()) {
 			String line = reader.readLine();
@@ -159,7 +160,7 @@ public class HelpFileLoader {
 		return res.toString();
 	}
 
-	public static void main(String argv[]) {
+	public static void main(String[] argv) {
 		HelpFileLoader hfl = new HelpFileLoader();
 
 		try {

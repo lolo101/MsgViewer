@@ -11,5 +11,5 @@ package at.redeye.FrameWork.widgets.helpwindow;
  */
 public interface OpenUrlInterface
 {
-    public void openUrl(String url);
+    void openUrl(String url);
 }

@@ -1,23 +1,20 @@
 package net.sourceforge.MSGViewer.factory.msg.properties;
 
-/**
- *
- * @author martin
- */
+import com.auxilii.msgparser.Pid;
+
+import static com.auxilii.msgparser.Ptyp.PtypBinary;
+
 public class PropPtypByteArray extends PropType {
 
-    static final String TYPE_NAME = "0102";
     private final int length;
 
-    public PropPtypByteArray(String tagname, int length)
-    {
-        super( tagname, TYPE_NAME );
+    public PropPtypByteArray(Pid id, int length) {
+        super(id, PtypBinary);
         this.length = length + 4;
     }
 
     @Override
-    protected long getPropertiesContent()
-    {
-       return length;
+    protected long getPropertiesContent() {
+        return length;
     }
 }

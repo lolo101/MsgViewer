@@ -16,6 +16,7 @@ import at.redeye.FrameWork.widgets.calendarday.DayEventListener;
 import at.redeye.FrameWork.widgets.calendarday.DisplayDay;
 import at.redeye.FrameWork.widgets.calendarday.InfoRenderer;
 
+import java.awt.*;
 import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.Vector;
@@ -28,21 +29,21 @@ import org.joda.time.LocalDate;
  */
 public class CalendarComponent extends javax.swing.JPanel implements DisplayMonth, DayEventListener {
 
-    protected Vector<DisplayDay> days = new Vector<DisplayDay>();
+    protected Vector<DisplayDay> days = new Vector<>();
     protected int daysOfMonth = 0;
     protected int offset = 0;
-    protected DayEventListener listener = null;    
+    protected DayEventListener listener = null;
     protected Holidays holidays = null;
     protected InfoRenderer info_renderer = new CommonInfoRenderer();
     protected int month = 0;
     protected int year = 0;
     protected boolean showMonth = true;
     protected boolean allowClickOnInactiveDays = false;
-    
+
     /** Creates new form CalendarComponent */
     public CalendarComponent() {
         initComponents();
-        
+
         days.add(calendarDay1);
         days.add(calendarDay2);
         days.add(calendarDay3);
@@ -85,13 +86,13 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
         days.add(calendarDay40);
         days.add(calendarDay41);
         days.add(calendarDay42);
-        
+
         for( DisplayDay day : days )
         {
             day.setListener(this);
             day.setInfoRenderer(info_renderer.getNewInstance());
         }
-        
+
     }
 
     public DisplayDay getDay(CalendarDay day) {
@@ -250,7 +251,7 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
         jLabel7.setText("Sonntag");
         jPanel2.add(jLabel7);
 
-        jLTitle.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        jLTitle.setFont(new java.awt.Font("Dialog", Font.BOLD, 18)); // NOI18N
         jLTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLTitle.setText("Jänner 2009");
 
@@ -350,111 +351,111 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
 
     @Override
     public void setMonth(int Month, int Year) {
-        
+
         clear();
-        
+
         month = Month;
         year = Year;
-        
+
         DateMidnight cal = new DateMidnight(Year, Month, 1 );
 
         int dayOfWeek = cal.getDayOfWeek();
         int maxDays = cal.toGregorianCalendar().getActualMaximum(GregorianCalendar.DAY_OF_MONTH);
         daysOfMonth = maxDays;
-        
-        System.out.println("Day of Week:" + dayOfWeek + " Month: " + maxDays );                                                    
-        
+
+        System.out.println("Day of Week:" + dayOfWeek + " Month: " + maxDays );
+
         // an dieser Stelle beginnen die Tage des aktuellen Monats
         offset = dayOfWeek - 1;
-                
-        
+
+
         // weils einfach besser aussieht.
         if( offset == 0 )
             offset = 7;
-                
+
         System.out.println("offset:" + offset);
-        
+
         /* das aktuelle Monat durchnummerieren */
         for( int i = offset, count=1; count <= maxDays && i < 42; i++, count++ )
         {
             days.get(i).setDay(Integer.toString(count));
             days.get(i).setActive();
             InfoRenderer renderer = days.get(i).getInfoRenderer();
-            
+
             if( renderer != null )
                 renderer.setDay(cal.plusDays(count-1));
-            
-            days.get(i).setWeekDay(cal.plusDays(count-1).getDayOfWeek());            
-        } 
-        
+
+            days.get(i).setWeekDay(cal.plusDays(count-1).getDayOfWeek());
+        }
+
         // Samstage hervorheben
         for( int i = 5; i < 42; i += 7  )
             days.get(i).setSaturdayBackground();
-        
+
         // Sonntage hervorheben
         for( int i = 6; i < 42; i += 7 ) {
-            days.get(i).setSundayBackground();            
+            days.get(i).setSundayBackground();
         }
-        
+
         /* das nächste Monat durchnummerieren */
         for( int i = maxDays+(offset), count=1; i < 42; i++, count++ )
         {
             days.get(i).setDay(Integer.toString(count));
             days.get(i).setInactive();
-            
+
             InfoRenderer renderer = days.get(i).getInfoRenderer();
-            
+
             if( renderer != null )
                 renderer.setDay(cal.plusDays(maxDays + count - 1));
         }
-        
+
         DateMidnight cal2 = new DateMidnight(Year,Month,1);
         DateMidnight cal3 = cal2.minusMonths(1);
-             
-        int maxDaysbefore = cal3.toGregorianCalendar().getActualMaximum(GregorianCalendar.DAY_OF_MONTH);        
-        
+
+        int maxDaysbefore = cal3.toGregorianCalendar().getActualMaximum(GregorianCalendar.DAY_OF_MONTH);
+
         System.out.println( "maxDaysBefore:" + maxDaysbefore );
-        
+
         /* das vorhergehende Monat durchnummerieren */
         for( int i = 0, count=maxDaysbefore-offset+1; i < offset; i++, count++ )
         {
             days.get(i).setDay(Integer.toString(count));
             days.get(i).setInactive();
-            
+
             InfoRenderer renderer = days.get(i).getInfoRenderer();
-            
+
             if( renderer != null )
                 renderer.setDay(cal3.plusDays(count - 1));
-        }                        
-        
-        jLTitle.setText( MonthNames.getFullMonthName(month)+ " " + Integer.toString(cal.getYear()) );
-        
+        }
+
+        jLTitle.setText( MonthNames.getFullMonthName(month)+ " " + cal.getYear());
+
         /* Feiertage anzeigen */
         if( holidays != null )
         {
             Collection<HolidayInfo> hdays = holidays.getHolidays(Year);
-            
+
             for( HolidayInfo hinfo : hdays )
-            {        
+            {
                     LocalDate d = hinfo.date;
-                
+
                     if( d.getMonthOfYear() == Month )
                     {
                         DisplayDay day = getDay(d.getDayOfMonth());
-                        
+
                         if( day != null )
-                        {                            
+                        {
                             String extra = "";
-                            
+
                             if( holidays.getNumberOfCountryCodes() > 1 )
                                 extra = hinfo.CountryCode;
-                            day.getInfoRenderer().setInfo(extra + " " + hinfo.name );                            
+                            day.getInfoRenderer().setInfo(extra + " " + hinfo.name );
 
                             if( hinfo.official_holiday ) {
                                 day.setSundayBackground();
                                 day.setHoliday(true);
                             }
-                            
+
                         } else {
                             System.out.println( "cant get " + d + "day: " + d.getDayOfMonth() );
                         }
@@ -463,13 +464,13 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
                     }
             }
         }
-        
+
         setAktualDay();
-        
+
         for( DisplayDay day : days )
-            day.update();                
+            day.update();
     }
-    
+
     public void clear()
     {
         for( DisplayDay day : days )
@@ -481,18 +482,18 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
     // from DayEventListener
     @Override
     public void onClicked(CalendarDay day) {
-        
+
         if( !day.isActive() && !allowClickOnInactiveDays )
             return;
-        
+
         for( DisplayDay d : days )
         {
             if( d.isSelected() && d != day )
                 d.setUnSelected();
         }
-        
+
         day.setSelected();
-        
+
         if( listener != null )
             listener.onClicked(day);
     }
@@ -506,10 +507,10 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
     public DisplayDay getDay(int day) {
         if( day > daysOfMonth )
             return null;
-        
+
         if( day < 1 )
             return null;
-        
+
         return days.get(day-1+offset);
     }
 
@@ -521,10 +522,10 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
     @Override
     public int isWhatDayOfMonth(DisplayDay day) {
         int i = days.indexOf(day);
-        
+
         if( i < 0 )
             return i;
-        
+
         return (i - offset) + 1;
     }
 
@@ -536,7 +537,7 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
     @Override
     public void setInfoRenderer(InfoRenderer renderer) {
         info_renderer = renderer;
-        
+
         for( DisplayDay day : days )
         {
             day.setInfoRenderer(renderer.getNewInstance());
@@ -555,22 +556,22 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
 
     private void setAktualDay() {
         DateMidnight today = new DateMidnight();
-        
-        int this_year = today.getYear();        
+
+        int this_year = today.getYear();
         int this_mon = today.getMonthOfYear();
         int this_day = today.getDayOfMonth();
-        
+
         if( year != this_year )
             return;
-        
+
         if( month != this_mon )
             return;
-        
+
         DisplayDay dd = getDay(this_day);
-        
+
         if( dd == null )
             return;
-        
+
         dd.setToday();
     }
 

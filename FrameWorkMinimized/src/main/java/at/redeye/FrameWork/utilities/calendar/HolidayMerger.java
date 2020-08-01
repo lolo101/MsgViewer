@@ -19,7 +19,7 @@ import org.joda.time.LocalDate;
  */
 public class HolidayMerger implements Holidays {
 
-    Vector<Holidays> country_holidays = new Vector<Holidays>();
+    Vector<Holidays> country_holidays = new Vector<>();
     int numCountryCodes = 0;
     String primaryCountry = "";
     Holidays primHolidays = null;
@@ -37,7 +37,7 @@ public class HolidayMerger implements Holidays {
         remove( holiday );
         country_holidays.add(holiday);
         numCountryCodes++;
-        
+
         if( is_extra )
             extraHolidays = holiday;
     }
@@ -54,7 +54,7 @@ public class HolidayMerger implements Holidays {
             }
         }
     }
-    
+
     public void remove( Holidays holiday )
     {
         for( int i = 0; i < country_holidays.size(); i++ )
@@ -67,17 +67,17 @@ public class HolidayMerger implements Holidays {
             }
         }
     }
-    
+
     @Override
     public Collection<HolidayInfo> getHolidays(int year) {
-        
+
         Collection<HolidayInfo> all = null;
-                        
+
         if( primHolidays != null ) {
             Collection<HolidayInfo> clone = primHolidays.getHolidays(year);
-            
-            all = new Vector<HolidayInfo>();
-            
+
+            all = new Vector<>();
+
             for( HolidayInfo hi : clone )
                 all.add( new HolidayInfo(hi) );
 
@@ -89,40 +89,40 @@ public class HolidayMerger implements Holidays {
                     all.add( new HolidayInfo(hi) );
             }
         }
-        
+
         for( Holidays holidays : country_holidays )
         {
             Collection<HolidayInfo> local = holidays.getHolidays(year);
-                                    
+
             if( all == null )
             {
-                all = new Vector<HolidayInfo>();
-                
+                all = new Vector<>();
+
                 for( HolidayInfo hi : local ) {
                     all.add( new HolidayInfo( hi ) );
                 }
-                
+
                 continue;
             }
-            
+
             for( HolidayInfo hi_lo : local )
             {
-                boolean found = false;                
-                
+                boolean found = false;
+
                 for( HolidayInfo hi_all : all )
                 {
                     if( hi_all.date.equals(hi_lo.date) )
                     {
                         found = true;
-                        
+
                         if( hi_all.CountryCode.contains(hi_lo.CountryCode) )
                             continue;
-                        
-                        hi_all.CountryCode += "," + hi_lo.CountryCode;                        
+
+                        hi_all.CountryCode += "," + hi_lo.CountryCode;
                         break;
                     }
                 }
-                
+
                 if( !found )
                 {
                     // System.out.println( "added: " + hi_lo.CountryCode + " " + hi_lo.name );
@@ -130,10 +130,10 @@ public class HolidayMerger implements Holidays {
                 }
             }
         }
-        
+
         if( all == null )
-            all = new Vector<HolidayInfo>();
-        
+            all = new Vector<>();
+
         for( HolidayInfo hi : all )
         {
             if( hi.merge_to_primary == false )
@@ -141,10 +141,10 @@ public class HolidayMerger implements Holidays {
                 if( hi.CountryCode.contains(primaryCountry) == false )
                 {
                     hi.official_holiday = false;
-                }                                    
+                }
             }
         }
-        
+
         return all;
     }
 
@@ -154,12 +154,12 @@ public class HolidayMerger implements Holidays {
     }
 
     public void setPrimaryCalendar( Holidays holidays )
-    {        
+    {
         primaryCountry = holidays.getPrimaryCountryCode();
         primHolidays  = holidays;
         add(holidays);
     }
-        
+
     @Override
     public String getPrimaryCountryCode() {
         return primaryCountry;

@@ -2,12 +2,10 @@ package net.sourceforge.MSGViewer.MSGNavigator;
 
 import at.redeye.FrameWork.base.AutoMBox;
 import at.redeye.FrameWork.utilities.StringUtils;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 
 /**
  *
@@ -111,7 +109,7 @@ public class NavActionPopup extends JPopupMenu {
                     new AutoMBox(NavActionPopup.class.getName()) {
 
                         @Override
-                        public void do_stuff() throws Exception {
+                        public void do_stuff() {
 
                             mainwin.deleteSelectedElement();
                         }
@@ -133,7 +131,7 @@ public class NavActionPopup extends JPopupMenu {
                     new AutoMBox(NavActionPopup.class.getName()) {
 
                         @Override
-                        public void do_stuff() throws Exception {
+                        public void do_stuff() {
 
                             mainwin.showSelectedElement();
                         }
@@ -155,7 +153,7 @@ public class NavActionPopup extends JPopupMenu {
                     new AutoMBox(NavActionPopup.class.getName()) {
 
                         @Override
-                        public void do_stuff() throws Exception {
+                        public void do_stuff() {
 
                             mainwin.editSelectedElement();
                         }

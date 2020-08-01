@@ -27,11 +27,10 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */ 
+ */
 
 package at.redeye.FrameWork.base.imagestorage;
 
-import at.redeye.FrameWork.base.AutoLogger;
 // import at.redeye.FrameWork.base.imagestorage.bindtypes.DBImage;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -101,7 +100,7 @@ public class ImageUtils {
     {
         return loadScaledImageIcon(path, width, height, -1 );
     }
-    
+
     public static ImageIcon loadScaledImageIcon(String path, int width, int height, int max_height) {
 
         try {
@@ -123,7 +122,7 @@ public class ImageUtils {
                             return null;
 
                         icon = new ImageIcon(bimg);
-                            
+
                     } catch( IOException ex) {
                         return null;
                     }
@@ -145,23 +144,22 @@ public class ImageUtils {
             Logger.getLogger(ImageUtils.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
-        
-    }
-    
-    public static ImageIcon loadImageIcon(byte bytes[], String descr) 
-    {
-        ImageIcon image = new ImageIcon(bytes,descr);
-        return image;        
+
     }
 
-    public static ImageIcon loadScaledImageIcon(byte bytes[], String descr, int width, int height) 
+    public static ImageIcon loadImageIcon(byte[] bytes, String descr)
+    {
+        return new ImageIcon(bytes,descr);
+    }
+
+    public static ImageIcon loadScaledImageIcon(byte[] bytes, String descr, int width, int height)
     {
         ImageIcon image = loadImageIcon(bytes,descr);
         image.setImage(scaleImage(image.getImage(),width,height));
         return image;
     }
-    
-    public static ImageIcon loadScaledImageIcon(byte bytes[], String descr) 
+
+    public static ImageIcon loadScaledImageIcon(byte[] bytes, String descr)
     {
         return loadScaledImageIcon(bytes, descr, 50, 50);
     }
@@ -224,27 +222,27 @@ public class ImageUtils {
     {
         int image_width = image.getWidth(null);
         int image_height = image.getHeight(null);
-        
+
         int scale_width = width;
         int scale_height = height;
-        
+
         if( image_width < width )
             scale_width = image_width;
-        
+
         if( image_height < height )
             scale_height = image_height;
-        
+
         if( image_height < height &&
             image_width < width )
         {
-            // do not scale            
+            // do not scale
             return image;
         }
-        
+
         double ratio = (double)image_width / (double)image_height;
-        
+
         scale_width = width;
-        
+
         scale_height = (int)((double)width / ratio);
 
         if( scale_width <= 0 )
@@ -255,9 +253,9 @@ public class ImageUtils {
 
         if( max_height != -1 && scale_height > max_height )
             scale_height = max_height;
-        
+
         image = image.getScaledInstance(scale_width, scale_height, Image.SCALE_SMOOTH);
-            
+
         return image;
     }
 
@@ -335,13 +333,12 @@ public class ImageUtils {
      * @param descr
      * @return Dimensions
      */
-    public static Dimension calcDimensions( byte bytes[], String descr )
+    public static Dimension calcDimensions(byte[] bytes, String descr )
     {
         // TODO implement better code for that, without rendering the image
         ImageIcon image = loadImageIcon(bytes, descr );
-        Dimension dim = new Dimension(image.getIconWidth(),image.getIconHeight());
 
-        return dim;
+        return new Dimension(image.getIconWidth(),image.getIconHeight());
     }
 /*
     public static Dimension calcDimensions( DBImage img )

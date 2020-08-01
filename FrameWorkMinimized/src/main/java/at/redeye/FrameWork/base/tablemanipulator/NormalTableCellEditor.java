@@ -7,7 +7,6 @@ package at.redeye.FrameWork.base.tablemanipulator;
 import at.redeye.FrameWork.widgets.documentfields.DocumentFieldDateTime;
 import at.redeye.FrameWork.widgets.documentfields.DocumentFieldInteger;
 import at.redeye.FrameWork.widgets.documentfields.DocumentFieldLimit;
-import at.redeye.FrameWork.base.*;
 import at.redeye.FrameWork.base.bindtypes.DBDateTime;
 import at.redeye.FrameWork.base.bindtypes.DBInteger;
 import at.redeye.FrameWork.base.bindtypes.DBString;
@@ -79,18 +78,18 @@ public class NormalTableCellEditor extends AbstractCellEditor implements TableCe
                 return component;
             }
 
-        } else if (DBValue.class.isInstance(current_value)) {
+        } else if (current_value instanceof DBValue) {
 
 
-            if (DBString.class.isInstance(current_value)) {
+            if (current_value instanceof DBString) {
                 DBString s = (DBString) current_value;
                 component.setDocument(new DocumentFieldLimit(s.getMaxLen()));
 
-            } else if (DBInteger.class.isInstance(current_value)) {
+            } else if (current_value instanceof DBInteger) {
 
                 component.setDocument(new DocumentFieldInteger());
 
-            } else if (DBDateTime.class.isInstance(current_value)) {
+            } else if (current_value instanceof DBDateTime) {
 
                 component.setDocument(new DocumentFieldDateTime());
 
@@ -122,13 +121,13 @@ public class NormalTableCellEditor extends AbstractCellEditor implements TableCe
         System.out.println("Normal stopCellEditing");
 
         if (tabledesign.colls.get(last_col).validator != null) {
-            if (!tabledesign.colls.get(last_col).validator.acceptData(((JTextField) component).getText())) {
+            if (!tabledesign.colls.get(last_col).validator.acceptData(component.getText())) {
                 component.setBorder(new LineBorder(Color.RED));
                 return false;
             }
         }
 
-        if (DBValue.class.isInstance(current_value)) {
+        if (current_value instanceof DBValue) {
             DBValue val = (DBValue) current_value;
             String s = component.getText();
 

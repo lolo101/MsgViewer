@@ -6,8 +6,10 @@
 package at.redeye.FrameWork.base;
 
 import at.redeye.FrameWork.base.prm.bindtypes.DBConfig;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.File;
-import org.apache.log4j.Logger;
 
 
 
@@ -30,13 +32,13 @@ public abstract class Setup {
     static public final String H1Port = "H1Port";
     static public final String H1LTSAP = "H1LTSAP";
     static public final String H1RTSAP = "H1RTSAP";
-    
+
     static public final String WindowX = "WindowX";
     static public final String WindowY = "WindowY";
     static public final String WindowWidth = "WindowWidth";
     static public final String WindowHeight = "WindowHeight";
 
-    public static Logger logger = Logger.getLogger(Setup.class);
+    public static Logger logger = LogManager.getLogger(Setup.class);
 
     private static final boolean b_is_win_system = System.getProperty("os.name").matches(".*[Ww][Ii][Nn].*");
     private static final boolean b_is_win_7_system  = System.getProperty("os.name").matches("Windows 7");
@@ -63,13 +65,13 @@ public abstract class Setup {
     public static boolean is_64bit_system()
     {
         return b_is_65bit_system;
-    }    
-    
+    }
+
     public static boolean is_mac_system()
     {
         return b_is_mac;
     }
-    
+
     public static boolean is_sun_system()
     {
         return b_is_sun;
@@ -84,9 +86,7 @@ public abstract class Setup {
            name = "." + name;
         }
 
-        String config_file = config_path + File.separator + name;
-
-        return config_file;
+        return config_path + File.separator + name;
     }
 
     public static String getAppConfigDir( String app_name )
@@ -109,21 +109,20 @@ public abstract class Setup {
     public static String getAppConfigFile( String app_name, String file_name )
     {
         String dir = getAppConfigDir(app_name);
-        String file_abs_name = dir + File.separator + file_name;
 
-        return file_abs_name;
+        return dir + File.separator + file_name;
     }
 
     public String getConfig(DBConfig config) {
         return getConfig( config.getConfigName(), config.getConfigValue() );
     }
-    
+
     public String getLocalConfig(DBConfig config) {
-        return getLocalConfig( config.getConfigName(), new String(config.getConfigValue()) );
+        return getLocalConfig( config.getConfigName(), config.getConfigValue());
     }
-    
+
     public abstract String getLocalConfig( String key, String default_value );
-    
+
     public abstract String getConfig( String key, String default_value );
 
     public abstract DBConfig getConfig( String key);
@@ -145,11 +144,11 @@ public abstract class Setup {
      * @param value your data
      */
     public abstract void setLocalConfig( String key, String value );
-        
+
     public abstract void setConfig( String key, String value, boolean if_not_exists );
-    
+
     public abstract void setConfig( String key, String value );
-    
+
     public void saveConfig() {}
 
     /**

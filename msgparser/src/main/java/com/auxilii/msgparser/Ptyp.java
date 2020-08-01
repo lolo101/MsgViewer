@@ -1,5 +1,9 @@
 package com.auxilii.msgparser;
 
+import org.apache.poi.poifs.filesystem.DirectoryEntry;
+import org.apache.poi.poifs.filesystem.DocumentEntry;
+import org.apache.poi.poifs.filesystem.DocumentInputStream;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.math.BigDecimal;
@@ -10,11 +14,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import org.apache.poi.poifs.filesystem.DirectoryEntry;
-import org.apache.poi.poifs.filesystem.DocumentEntry;
-import org.apache.poi.poifs.filesystem.DocumentInputStream;
 
-enum Ptyp {
+public enum Ptyp {
     PtypInteger16(0x0002, false, s -> (short) s.readLong()),
     PtypInteger32(0x0003, false, s -> (int) s.readLong()),
     PtypFloating32(0x0004, false, s -> Float.intBitsToFloat((int) s.readLong())),
@@ -26,6 +27,7 @@ enum Ptyp {
     PtypInteger64(0x0014, false, DocumentInputStream::readLong),
     PtypTime(0x0040, false, Ptyp::toTime),
 
+    PtypObject(0x000d, true, Ptyp::getBytes),
     PtypString8(0x001e, true, s -> new String(getBytes(s), StandardCharsets.ISO_8859_1)),
     PtypString(0x001f, true, s -> new String(getBytes(s), StandardCharsets.UTF_16LE)),
     PtypGuid(0x0048, true, Ptyp::getBytes),
@@ -38,50 +40,52 @@ enum Ptyp {
     PtypMultipleCurrency(0x1006, false, s -> BigDecimal.valueOf(s.readLong(), 4)),
     PtypMultipleFloatingTime(0x1007, false, Ptyp::toFloatingTime),
     PtypMultipleTime(0x1040, false, Ptyp::toTime),
-    PtypMultipleGuid(0x1048, false, s -> getBytes(s, 16)),
+    PtypMultipleGuid(0x1048, false, Ptyp::getGuid),
     PtypMultipleInteger64(0x1014, false, DocumentInputStream::readLong),
 
     PtypMultipleBinary(0x1102, true, Ptyp::toBinaryLengths),
     PtypMultipleString8(0x101e, true, Ptyp::toStringLengths),
     PtypMultipleString(0x101f, true, Ptyp::toStringLengths);
 
-    private static final String SUBENTRY_PREFIX = "__substg1.0_";
+    private static final String SUBSTORAGE_PREFIX = "__substg1.0_";
     private static final int MULTIPLE_VALUED_FLAG = 0x1000;
     private static final LocalDateTime FLOATING_TIME_EPOCH = LocalDateTime.of(1899, Month.DECEMBER, 30, 0, 0);
     private static final LocalDateTime TIME_EPOCH = LocalDateTime.of(1601, Month.JANUARY, 1, 0, 0);
 
-    private final int type;
-    private final boolean variableLength;
+    public final int id;
+    public final boolean variableLength;
+    public final boolean multipleValued;
     private final Function<DocumentInputStream, ?> conversion;
 
-    private Ptyp(int type, boolean variableLength, Function<DocumentInputStream, ?> conversion) {
-        this.type = type;
+    Ptyp(int id, boolean variableLength, Function<DocumentInputStream, ?> conversion) {
+        this.id = id;
         this.variableLength = variableLength;
         this.conversion = conversion;
+        this.multipleValued = (id & MULTIPLE_VALUED_FLAG) == MULTIPLE_VALUED_FLAG;
     }
 
-    public static Ptyp from(int type) {
+    public static Ptyp from(int id) {
         for (Ptyp value : values()) {
-            if (value.type == type) {
+            if (value.id == id) {
                 return value;
             }
         }
-        throw new IllegalArgumentException(String.format("Unknown type: %04x", type));
+        throw new IllegalArgumentException(String.format("Unknown type: %04x", id));
     }
 
     public Object parseValue(DocumentInputStream propertyStream, DirectoryEntry dir, String pTag) throws IOException {
-        if (variableLength || isMultipleValued()) {
+        if (variableLength || multipleValued) {
             int byteCount = propertyStream.readInt();
             int reserved = propertyStream.readInt();
-            return parseSubStream(dir, pTag);
+            return parseSubStorage(dir, pTag);
         }
         return convert(propertyStream);
     }
 
-    private Object parseSubStream(DirectoryEntry dir, String pTag) throws IOException {
-        DocumentEntry subEntry = (DocumentEntry) dir.getEntry(SUBENTRY_PREFIX + pTag);
+    private Object parseSubStorage(DirectoryEntry dir, String pTag) throws IOException {
+        DocumentEntry subEntry = (DocumentEntry) dir.getEntry(SUBSTORAGE_PREFIX + pTag);
         try (DocumentInputStream subStream = new DocumentInputStream(subEntry)) {
-            if (isMultipleValued()) {
+            if (multipleValued) {
                 if (variableLength) {
                     return parseMultipleVariableLengthValues(subStream, dir, pTag);
                 }
@@ -95,7 +99,7 @@ enum Ptyp {
         int[] lengths = (int[]) convert(subStream);
         Object[] pValues = new Object[lengths.length];
         for (int index = 0; index < lengths.length; index++) {
-            DocumentEntry valueEntry = (DocumentEntry) dir.getEntry(String.format("%s%s-%08X", SUBENTRY_PREFIX, pTag, index));
+            DocumentEntry valueEntry = (DocumentEntry) dir.getEntry(String.format("%s%s-%08X", SUBSTORAGE_PREFIX, pTag, index));
             try (DocumentInputStream valueStream = new DocumentInputStream(valueEntry)) {
                 pValues[index] = convert(valueStream);
             }
@@ -111,11 +115,7 @@ enum Ptyp {
         return pValues.toArray();
     }
 
-    private boolean isMultipleValued() {
-        return (type & MULTIPLE_VALUED_FLAG) == MULTIPLE_VALUED_FLAG;
-    }
-
-    private Object convert(DocumentInputStream value) {
+    public Object convert(DocumentInputStream value) {
         return conversion.apply(value);
     }
 
@@ -127,9 +127,9 @@ enum Ptyp {
         }
     }
 
-    private static byte[] getBytes(DocumentInputStream s, int len) {
+    private static byte[] getGuid(DocumentInputStream s) {
         try {
-            return s.readNBytes(len);
+            return s.readNBytes(16);
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
         }
@@ -157,7 +157,7 @@ enum Ptyp {
     }
 
     private static int[] toStringLengths(DocumentInputStream subStream) {
-        int[] lengths = new int[subStream.available()/ 4];
+        int[] lengths = new int[subStream.available() / 4];
         for (int i = 0; i < lengths.length; i++) {
             lengths[i] = subStream.readInt();
         }

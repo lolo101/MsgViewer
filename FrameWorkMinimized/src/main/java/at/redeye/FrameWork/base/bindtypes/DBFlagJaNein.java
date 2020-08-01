@@ -13,15 +13,15 @@ import java.util.List;
  *
  * @author martin
  */
-public class DBFlagJaNein extends DBEnum 
+public class DBFlagJaNein extends DBEnum
 {
-    public static enum FLAGTYPES
+    public enum FLAGTYPES
     {
         NEIN,
-        JA        
-    };
-           
-    
+        JA
+    }
+
+
     public static class FlagEnumHandler extends DBEnum.EnumHandler
     {
         FLAGTYPES types;
@@ -30,17 +30,17 @@ public class DBFlagJaNein extends DBEnum
         {
             types = FLAGTYPES.NEIN;
         }
-        
+
         @Override
         public int getMaxSize() {
             int max=0;
-            
+
             for( FLAGTYPES val :FLAGTYPES.values() )
             {
                 if( max < val.toString().length() )
                     max = val.toString().length();
             }
-            
+
             return max;
         }
 
@@ -66,15 +66,15 @@ public class DBFlagJaNein extends DBEnum
 
         @Override
         public List<String> getPossibleValues() {
-            List<String> res = new ArrayList<String>();
-            
+            List<String> res = new ArrayList<>();
+
             for( FLAGTYPES t : FLAGTYPES.values() )
                 res.add( t.toString() );
-            
+
             return res;
         }
     }
-    
+
     public DBFlagJaNein( String name, String title )
     {
         super( name, title, new FlagEnumHandler() );
@@ -106,5 +106,5 @@ public class DBFlagJaNein extends DBEnum
     {
         root.loadMlM4Class(this, "de");
     }
- 
+
 }

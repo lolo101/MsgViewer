@@ -9,6 +9,8 @@ package at.redeye.FrameWork.base;
 import at.redeye.FrameWork.utilities.FreeMemory;
 import at.redeye.FrameWork.utilities.MemoryInformation;
 
+import java.awt.*;
+
 /**
  *
  * @author  martin
@@ -20,22 +22,20 @@ public class MemInfo extends BaseDialog {
         super(root, "Speicherinformationen");
         setBaseLanguage("de");
         initComponents();
-        
+
         reload();
     }
 
     private void reload()
     {
-        StringBuilder info = new StringBuilder();
-        
-        info.append(FreeMemory.getMeminfo());
-        info.append("\n------------------------\n");
-        info.append(MemoryInformation.createMemoryInfo());
-        
-        jTextMeminfo.setText( info.toString() );                 
+
+        String info = FreeMemory.getMeminfo() +
+                "\n------------------------\n" +
+                MemoryInformation.createMemoryInfo();
+        jTextMeminfo.setText(info);
         jTextMeminfo.setCaretPosition(0);
     }
-    
+
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -47,30 +47,22 @@ public class MemInfo extends BaseDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jLTitle.setFont(new java.awt.Font("Dialog", 1, 18));
+        jLTitle.setFont(new java.awt.Font("Dialog", Font.BOLD, 18));
         jLTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLTitle.setText("Speicherinformationen");
 
         jBCancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/at/redeye/FrameWork/base/resources/icons/fileclose.gif"))); // NOI18N
         jBCancel.setText("Schließen");
-        jBCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBCancelActionPerformed(evt);
-            }
-        });
+        jBCancel.addActionListener(this::jBCancelActionPerformed);
 
         jTextMeminfo.setColumns(20);
         jTextMeminfo.setRows(5);
         jScrollPane1.setViewportView(jTextMeminfo);
 
-        jButtonReaload.setFont(new java.awt.Font("Monospaced", 0, 12));
+        jButtonReaload.setFont(new java.awt.Font("Monospaced", Font.PLAIN, 12));
         jButtonReaload.setIcon(new javax.swing.ImageIcon(getClass().getResource("/at/redeye/FrameWork/base/resources/icons/reload.png"))); // NOI18N
         jButtonReaload.setText("Aktualisieren");
-        jButtonReaload.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonRealoadActionPerformed(evt);
-            }
-        });
+        jButtonReaload.addActionListener(this::jButtonRealoadActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -105,7 +97,7 @@ public class MemInfo extends BaseDialog {
     }// </editor-fold>//GEN-END:initComponents
 
 private void jBCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCancelActionPerformed
-    if( canClose() )    
+    if( canClose() )
         close();
 }//GEN-LAST:event_jBCancelActionPerformed
 
@@ -113,7 +105,7 @@ private void jButtonRealoadActionPerformed(java.awt.event.ActionEvent evt) {//GE
 // TODO add your handling code here:
     reload();
 }//GEN-LAST:event_jButtonRealoadActionPerformed
-    
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBCancel;

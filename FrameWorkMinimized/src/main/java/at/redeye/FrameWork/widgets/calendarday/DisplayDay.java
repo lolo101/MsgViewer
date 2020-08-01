@@ -9,33 +9,33 @@ package at.redeye.FrameWork.widgets.calendarday;
  *
  * @author martin
  */
-public interface DisplayDay {    
+public interface DisplayDay {
 
-    public void setInfo( String info );
-    public void setSum( String sum );
-    public void setDay( String day );
-    public void setListener( DayEventListener ev );
-    public void clear();
-    public void setActive();
-    public void setInactive();
-    public void setSelected();
-    public void setUnSelected();
-    public boolean isActive();
-    public boolean isSelected();
-    public void setNormalBackground();
-    public void setSaturdayBackground();
-    public void setSundayBackground();
-    public void setInfoRenderer(InfoRenderer renderer);
-    public void update();
-    public InfoRenderer getInfoRenderer();
-    public void setToday();
+    void setInfo(String info);
+    void setSum(String sum);
+    void setDay(String day);
+    void setListener(DayEventListener ev);
+    void clear();
+    void setActive();
+    void setInactive();
+    void setSelected();
+    void setUnSelected();
+    boolean isActive();
+    boolean isSelected();
+    void setNormalBackground();
+    void setSaturdayBackground();
+    void setSundayBackground();
+    void setInfoRenderer(InfoRenderer renderer);
+    void update();
+    InfoRenderer getInfoRenderer();
+    void setToday();
     /*
      * param day: 1 - Monday; 7 - Sunday
-     */ 
-    public void    setWeekDay( int day );
-    public int     getWeekDay();
-    public boolean isSunday();
-    public boolean isSaturday();    
-    public void    setHoliday( boolean is_holiday );
-    public boolean isHoliday();
+     */
+    void    setWeekDay(int day);
+    int     getWeekDay();
+    boolean isSunday();
+    boolean isSaturday();
+    void    setHoliday(boolean is_holiday);
+    boolean isHoliday();
 }

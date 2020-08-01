@@ -11,13 +11,11 @@ import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.utilities.StringUtils;
 import com.github.markusbernhardt.proxy.ProxySearch;
 import com.github.markusbernhardt.proxy.selector.whitelist.UseProxyWhiteListSelector;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.awt.Dialog.ModalityType;
-import java.net.Authenticator;
-import java.net.MalformedURLException;
-import java.net.PasswordAuthentication;
-import java.net.ProxySelector;
-import java.net.URL;
-import org.apache.log4j.Logger;
+import java.net.*;
 
 /**
  *
@@ -25,7 +23,7 @@ import org.apache.log4j.Logger;
  */
 public class AutoProxyHandler
 {
-    public static Logger logger = Logger.getLogger(AutoProxyHandler.class.getName());
+    public static Logger logger = LogManager.getLogger(AutoProxyHandler.class);
     public static final String HTTP_PROXY_USER="HTTP_PROXY_USER";
     public static final String HTTP_PROXY_DOMAIN="HTTP_PROXY_DOMAIN";
     public static final String HTTP_PROXY_PASS="HTTP_PROXY_PASS";
@@ -96,7 +94,7 @@ public class AutoProxyHandler
 
         Authenticator.setDefault(new Authenticator() {
 
-             private String last_host;             
+             private String last_host;
 
 
              void checkWrongPass()
@@ -115,7 +113,7 @@ public class AutoProxyHandler
              }
 
             @Override
-            protected PasswordAuthentication getPasswordAuthentication() {                
+            protected PasswordAuthentication getPasswordAuthentication() {
 
                 if (getRequestorType() == RequestorType.PROXY) {
 
@@ -151,7 +149,7 @@ public class AutoProxyHandler
                         auth.toFront();
 
                         auth.setVisible(true);
-                        
+
                         if( !auth.execOk() )
                         {
                             return super.getPasswordAuthentication();
@@ -203,7 +201,7 @@ public class AutoProxyHandler
 
         } catch ( NoClassDefFoundError ex ) {
             return null;
-        }        
+        }
     }
 
     private boolean detectUserAndPassFromEnv()
@@ -237,7 +235,7 @@ public class AutoProxyHandler
 
         auth = auth.substring(0,index);
 
-        String sl[] = auth.split(":");
+        String[] sl = auth.split(":");
 
         if( sl.length != 2 )
             return false;
@@ -306,7 +304,7 @@ public class AutoProxyHandler
     }
 
     private boolean loadFromSettings()
-    {        
+    {
         if (!StringUtils.isYes(root.getSetup().getLocalConfig(FrameWorkConfigDefinitions.ProxyEnabled))) {
             logger.info("proxy disabled at all");
             return true;
@@ -342,7 +340,7 @@ public class AutoProxyHandler
          String proxy_disabled_for = root.getSetup().getLocalConfig(FrameWorkConfigDefinitions.ProxyDisabledFor);
 
          if( proxy_disabled_for != null && !proxy_disabled_for.isEmpty() )
-         {  
+         {
              sel.exludeFromProxy(proxy_disabled_for);
          }
 

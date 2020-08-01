@@ -7,8 +7,10 @@ package at.redeye.FrameWork.base;
 
 import at.redeye.FrameWork.utilities.DesEncrypt;
 import at.redeye.FrameWork.utilities.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javax.crypto.IllegalBlockSizeException;
-import org.apache.log4j.Logger;
 
 /**
  *
@@ -16,7 +18,7 @@ import org.apache.log4j.Logger;
  */
 public class EncryptedDBPasswd
 {
-   protected static Logger logger = Logger.getLogger(EncryptedDBPasswd.class.getName());
+   protected static Logger logger = LogManager.getLogger(EncryptedDBPasswd.class);
 
    DesEncrypt cipher;
 
@@ -61,7 +63,7 @@ public class EncryptedDBPasswd
 
        return str;
    }
-   
+
 
    public static String encryptDBPassword( final String DBPasswd, final String password )
    {
@@ -91,9 +93,8 @@ public class EncryptedDBPasswd
            return null; // sicher kein Base64 encodeter String
        try {
            DesEncrypt cipher = new DesEncrypt(password);
-           String str = cipher.decrypt(DBPasswd);
 
-           return str;
+           return cipher.decrypt(DBPasswd);
        } catch( IllegalBlockSizeException ex ) {
            return null;
        } catch( IllegalArgumentException ex ) {

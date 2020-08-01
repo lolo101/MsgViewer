@@ -11,6 +11,8 @@
 
 package at.redeye.FrameWork.base;
 
+import java.awt.*;
+
 /**
  *
  * @author martin
@@ -48,7 +50,7 @@ public class LogWin extends BaseDialog {
     {
         JText.setLineWrap(val);
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -65,17 +67,13 @@ public class LogWin extends BaseDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jLTitle.setFont(new java.awt.Font("Dialog", 1, 18));
+        jLTitle.setFont(new java.awt.Font("Dialog", Font.BOLD, 18));
         jLTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLTitle.setText("Globale Einstellungen");
 
         jBClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/at/redeye/FrameWork/base/resources/icons/fileclose.gif"))); // NOI18N
         jBClose.setText("Schließen");
-        jBClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBCloseActionPerformed(evt);
-            }
-        });
+        jBClose.addActionListener(this::jBCloseActionPerformed);
 
         JText.setColumns(20);
         JText.setLineWrap(true);

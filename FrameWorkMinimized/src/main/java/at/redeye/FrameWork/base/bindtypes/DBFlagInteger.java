@@ -11,12 +11,12 @@ import java.util.Vector;
  *
  * @author martin
  */
-public class DBFlagInteger extends DBEnumAsInteger 
+public class DBFlagInteger extends DBEnumAsInteger
 {
     public static class FlagIntegerHandler extends EnumAsIntegerHandler
     {
         Integer value = 0;
-        
+
         @Override
         public int getMaxSize() {
             return 1;
@@ -28,7 +28,7 @@ public class DBFlagInteger extends DBEnumAsInteger
                 value = 1;
             else
                 value = 0;
-            
+
             return true;
         }
 
@@ -38,7 +38,7 @@ public class DBFlagInteger extends DBEnumAsInteger
                 value = 1;
             else
                 val = 0;
-            
+
             return true;
         }
 
@@ -62,11 +62,11 @@ public class DBFlagInteger extends DBEnumAsInteger
 
         @Override
         public Vector<String> getPossibleValues() {
-           Vector<String> res = new Vector<String>();
-           
+           Vector<String> res = new Vector<>();
+
            res.add( "X" );
            res.add( " " );
-           
+
            return res;
         }
 
@@ -74,19 +74,19 @@ public class DBFlagInteger extends DBEnumAsInteger
         public void refresh() {
             // nothing to do
         }
-        
+
     }
 
     public DBFlagInteger( String name )
-    {        
+    {
         super( name, name, new FlagIntegerHandler() );
     }
-    
+
     public DBFlagInteger( String name, String title )
-    {        
+    {
         super( name, title, new FlagIntegerHandler() );
     }
-    
+
     public DBFlagInteger getNewOne()
     {
         return new DBFlagInteger(name, title);

@@ -1,13 +1,9 @@
 package net.sourceforge.MSGViewer.factory.msg.entries;
 
-import java.io.UnsupportedEncodingException;
+import static com.auxilii.msgparser.Pid.PidTagRtfCompressed;
 
-public class CompressedRTFEntry extends BinaryEntry
-{
-    public static final String NAME = "1009";
-
-    public CompressedRTFEntry(byte[] compressedRTF) throws UnsupportedEncodingException
-    {
-        super(NAME, compressedRTF);
+public class CompressedRTFEntry extends BinaryEntry {
+    public CompressedRTFEntry(byte[] compressedRTF) {
+        super(PidTagRtfCompressed, compressedRTF);
     }
 }

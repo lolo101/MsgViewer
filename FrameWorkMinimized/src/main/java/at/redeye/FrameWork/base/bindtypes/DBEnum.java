@@ -26,21 +26,21 @@ public class DBEnum extends DBValue {
         public abstract EnumHandler getNewOne();
         public abstract List<String> getPossibleValues();
     }
-    
-    public EnumHandler handler; 
-    
+
+    public EnumHandler handler;
+
     public DBEnum( String name, EnumHandler enumval )
     {
         super( name );
         handler = enumval;
     }
-    
+
     public DBEnum( String name, String title, EnumHandler enumval )
     {
         super( name, title );
         handler = enumval;
     }
-    
+
     @Override
     public DBDataType getDBType() {
         return DBDataType.DB_TYPE_STRING;
@@ -83,13 +83,13 @@ public class DBEnum extends DBValue {
     {
         return handler.getMaxSize();
     }
-    
+
     @Override
     public String toString()
     {
         return handler.getValue();
     }
-    
+
     public List<String> getPossibleValues()
     {
         return handler.getPossibleValues();
@@ -108,9 +108,9 @@ public class DBEnum extends DBValue {
         if( localized_values_map == null )
         {
             initLocalization( root );
-            localized_values_map = new HashMap<String,String>();
-            localized_values = new ArrayList<String>();
-            
+            localized_values_map = new HashMap<>();
+            localized_values = new ArrayList<>();
+
             for (String original : handler.getPossibleValues()) {
                 String translated = root.MlM(original);
 
@@ -121,7 +121,7 @@ public class DBEnum extends DBValue {
 
         return localized_values;
     }
-    
+
     public List<String> getLocalizedPossibleValues()
     {
         return getLocalizedPossibleValues(Root.getLastRoot());
@@ -146,7 +146,7 @@ public class DBEnum extends DBValue {
      */
     public void initLocalization(Root root)
     {
-    
+
     }
 
     public String getLocalizedString(Root root)

@@ -9,7 +9,7 @@ public enum RecipientType {
     private static final int MUST_RESEND = 0x10000000;
     private final int type;
 
-    private RecipientType(int type) {
+    RecipientType(int type) {
         this.type = type;
     }
 

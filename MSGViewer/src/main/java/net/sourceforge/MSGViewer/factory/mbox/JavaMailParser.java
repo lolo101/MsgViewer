@@ -3,30 +3,16 @@ package net.sourceforge.MSGViewer.factory.mbox;
 import at.redeye.FrameWork.utilities.StringUtils;
 import com.auxilii.msgparser.Message;
 import com.auxilii.msgparser.attachment.FileAttachment;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.Enumeration;
-import javax.mail.Address;
-import javax.mail.BodyPart;
-import javax.mail.Header;
+import net.sourceforge.MSGViewer.factory.mbox.headers.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import javax.mail.*;
 import javax.mail.Message.RecipientType;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.Part;
-import javax.mail.Session;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
-import net.sourceforge.MSGViewer.factory.mbox.headers.BccEmailHeader;
-import net.sourceforge.MSGViewer.factory.mbox.headers.CcEmailHeader;
-import net.sourceforge.MSGViewer.factory.mbox.headers.DateHeader;
-import net.sourceforge.MSGViewer.factory.mbox.headers.EmailHeader;
-import net.sourceforge.MSGViewer.factory.mbox.headers.FromEmailHeader;
-import net.sourceforge.MSGViewer.factory.mbox.headers.ToEmailHeader;
-import org.apache.log4j.Logger;
+import java.io.*;
+import java.util.Enumeration;
 
 /**
  *
@@ -34,7 +20,7 @@ import org.apache.log4j.Logger;
  */
 public class JavaMailParser
 {
-    private static final Logger LOGGER = Logger.getLogger(JavaMailParser.class.getName());
+    private static final Logger LOGGER = LogManager.getLogger(JavaMailParser.class);
 
     private static final EmailHeader FROM_PARSER = new FromEmailHeader();
     private static final EmailHeader TO_PARSER =  new ToEmailHeader();
@@ -109,7 +95,7 @@ public class JavaMailParser
                     msg.setBodyText(body);
                     LOGGER.debug(msg.getBodyText());
                 }
-            } else if (disp == null || disp.equalsIgnoreCase(Part.ATTACHMENT)) {
+            } else if (disp == null || disp.equalsIgnoreCase(Part.ATTACHMENT) || disp.equalsIgnoreCase(Part.INLINE)) {
                 // many mailers don't include a Content-Disposition
 
                 MimeBodyPart mpart = (MimeBodyPart)part;
@@ -146,14 +132,14 @@ public class JavaMailParser
 
             String charset = content.substring(idx+1);
 
-            byte c[] = new byte[2];
+            byte[] c = new byte[2];
             c[0] = ' ';
             c[1] = '\0';
 
             charset = StringUtils.strip(charset,"\"");
 
             try {
-                String test = new String(c,charset);
+                new String(c,charset);
             } catch( UnsupportedEncodingException ex ) {
                 LOGGER.error("Invalid encoding: " + content + "=>'" + charset +"'", ex);
                 return "ASCII";
@@ -169,7 +155,7 @@ public class JavaMailParser
     {
         InputStream in = mp.getInputStream();
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        byte bytes[] = new byte[1024];
+        byte[] bytes = new byte[1024];
 
         for (int len; (len = in.read(bytes)) > 0;) {
             bos.write(bytes, 0, len);
@@ -190,7 +176,7 @@ public class JavaMailParser
         return StringUtils.strip_post(mime,";");
     }
 
-    private String getFirstHeader(String headers[] )
+    private String getFirstHeader(String[] headers)
     {
         if( headers == null ) {
             return "";
@@ -199,7 +185,7 @@ public class JavaMailParser
         return headers[0];
     }
 
-    private static String getAddresses( Address addresses[] )
+    private static String getAddresses(Address[] addresses)
     {
         if( addresses == null ) {
             return "";

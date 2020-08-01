@@ -32,41 +32,36 @@ import org.joda.time.LocalDate;
  */
 public interface Transaction {
 
-    boolean close() throws SQLException;
+    boolean close();
 
-    void commit() throws SQLException;
+    void commit();
 
     /**
      * Deletes a entry using the binddescs primary key
      * @param binddesc
      * @return true on success, false when not found
-     * @throws UnsupportedDBDataTypeException
-     * @throws WrongBindFileFormatException
-     * @throws SQLException
-     * @throws TableBindingNotRegisteredException
-     * @throws IOException
      */
-    boolean deleteWithPrimarayKey(DBStrukt binddesc) throws UnsupportedDBDataTypeException, WrongBindFileFormatException, SQLException, TableBindingNotRegisteredException, IOException;
+    boolean deleteWithPrimarayKey(DBStrukt binddesc);
 
-    List<List<?>> fetchColumnValue(String stmt, List<DBDataType> typelist) throws SQLException, UnsupportedDBDataTypeException;
+    List<List<?>> fetchColumnValue(String stmt, List<DBDataType> typelist);
 
-    List<List<?>> fetchColumnValue(String stmt, DBDataType... typelist) throws SQLException, UnsupportedDBDataTypeException;
+    List<List<?>> fetchColumnValue(String stmt, DBDataType... typelist);
 
-    List<?> fetchOneColumnValue(String stmt, DBDataType type) throws SQLException, UnsupportedDBDataTypeException;
+    List<?> fetchOneColumnValue(String stmt, DBDataType type);
 
-    List<DBStrukt> fetchTable(DBStrukt binddesc) throws SQLException, TableBindingNotRegisteredException, UnsupportedDBDataTypeException, WrongBindFileFormatException;
+    List<DBStrukt> fetchTable(DBStrukt binddesc);
 
-    List<DBStrukt> fetchTable(DBStrukt binddesc, String where) throws SQLException, TableBindingNotRegisteredException, UnsupportedDBDataTypeException, WrongBindFileFormatException;
+    List<DBStrukt> fetchTable(DBStrukt binddesc, String where);
 
-    <T extends DBStrukt> List<T> fetchTable2(T binddesc) throws SQLException, TableBindingNotRegisteredException, UnsupportedDBDataTypeException, WrongBindFileFormatException;
+    <T extends DBStrukt> List<T> fetchTable2(T binddesc);
 
-    <T extends DBStrukt> List<T> fetchTable2(T binddesc, String where) throws SQLException, TableBindingNotRegisteredException, UnsupportedDBDataTypeException, WrongBindFileFormatException;
+    <T extends DBStrukt> List<T> fetchTable2(T binddesc, String where);
 
-    <T extends DBStrukt> ArrayList<T> fetchTableList(T binddesc) throws SQLException, TableBindingNotRegisteredException, UnsupportedDBDataTypeException, WrongBindFileFormatException;
+    <T extends DBStrukt> ArrayList<T> fetchTableList(T binddesc);
 
-    <T extends DBStrukt> ArrayList<T> fetchTableList(T binddesc, String where) throws SQLException, TableBindingNotRegisteredException, UnsupportedDBDataTypeException, WrongBindFileFormatException;
+    <T extends DBStrukt> ArrayList<T> fetchTableList(T binddesc, String where);
 
-    boolean fetchTableWithPrimkey(DBStrukt binddesc) throws UnsupportedDBDataTypeException, WrongBindFileFormatException, SQLException, TableBindingNotRegisteredException, IOException;
+    boolean fetchTableWithPrimkey(DBStrukt binddesc);
 
     SupportedDBMSTypes getDBMSType();
 
@@ -118,9 +113,9 @@ public interface Transaction {
 
     String getLowerDateExl(DBDateTime column, LocalDate dm_from);
 
-    int getNewSequenceValue(String seqName, int magic) throws SQLException, UnsupportedDBDataTypeException, WrongBindFileFormatException, TableBindingNotRegisteredException, IOException;
+    int getNewSequenceValue(String seqName, int magic);
 
-    int getNewSequenceValues(String seqName, int number, int magic) throws SQLException, UnsupportedDBDataTypeException, WrongBindFileFormatException, TableBindingNotRegisteredException, IOException;
+    int getNewSequenceValues(String seqName, int number, int magic);
 
     String getPeriodStmt(String column, DBDateTime begin, DBDateTime end);
 
@@ -167,9 +162,9 @@ public interface Transaction {
 
     TypeRegistrationInterface getTypeRegistration();
 
-    int insertValues(DBStrukt binddesc) throws UnsupportedDBDataTypeException, WrongBindFileFormatException, SQLException, IOException;
+    int insertValues(DBStrukt binddesc);
 
-    boolean isOpen() throws SQLException;
+    boolean isOpen();
 
     String markColumn(String in);
 
@@ -187,12 +182,12 @@ public interface Transaction {
 
     String markTable(DBStrukt table);
 
-    void rollback() throws SQLException;
+    void rollback();
 
-    int updateValues(String stmt) throws SQLException;
+    int updateValues(String stmt);
 
-    int updateValues(DBStrukt binddesc) throws SQLException, UnsupportedDBDataTypeException, WrongBindFileFormatException, TableBindingNotRegisteredException, IOException;
+    int updateValues(DBStrukt binddesc);
 
-    int updateValues(DBStrukt binddesc, String where) throws SQLException, UnsupportedDBDataTypeException, WrongBindFileFormatException, TableBindingNotRegisteredException, IOException;
-    
+    int updateValues(DBStrukt binddesc, String where);
+
 }

@@ -12,14 +12,14 @@ import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.base.translation.MLUtil;
 
 /**
- * 
+ *
  * @author martin
  */
 public class HelpWinModal extends BaseDialogDialog {
 
 	private static final long serialVersionUID = 1L;
 
-	String base = new String();
+	String base = "";
 	HelpWinHook hook = null;
 
 	/** Creates new form HelpWin */
@@ -55,9 +55,9 @@ public class HelpWinModal extends BaseDialogDialog {
 			public void do_stuff() throws Exception {
 
                             String locale = root.getDisplayLanguage();
-                            
+
                             String module_name = null;
-                                    
+
                             if( MLUtil.haveResource(HelpFileLoader.getResourceName(base, ModuleName + "_" + locale) ) )
                             {
                                 module_name = ModuleName + "_" + locale;
@@ -90,7 +90,7 @@ public class HelpWinModal extends BaseDialogDialog {
 
                             // logger.debug(res.toString());
 
-                            jHelp.setText(res.toString());
+                            jHelp.setText(res);
                             jHelp.setCaretPosition(0);
 			}
 		};
@@ -111,11 +111,7 @@ public class HelpWinModal extends BaseDialogDialog {
 
         jBClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/at/redeye/FrameWork/base/resources/icons/fileclose.gif"))); // NOI18N
         jBClose.setText("Schließen");
-        jBClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBCloseActionPerformed(evt);
-            }
-        });
+        jBClose.addActionListener(this::jBCloseActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -154,5 +150,5 @@ public class HelpWinModal extends BaseDialogDialog {
     // End of variables declaration//GEN-END:variables
 
 
-    
+
 }

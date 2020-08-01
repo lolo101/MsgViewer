@@ -30,7 +30,7 @@ public class RowHeader
     static class RowHeaderRenderer extends JLabel implements ListCellRenderer {
 
         JTable table;
-        Font font;        
+        Font font;
 
         RowHeaderRenderer(JTable table) {
             this.table = table;
@@ -51,13 +51,13 @@ public class RowHeader
                 int index, boolean isSelected, boolean cellHasFocus) {
 
             // weil sonst wird plötzlich die Schrift fett
-            setFont(font);           
+            setFont(font);
 
             if( value == null )
                 setText( "" );
             else
                 setText( value.toString() + " " );
-            
+
             return this;
         }
 
@@ -74,7 +74,7 @@ public class RowHeader
             if( dim.width == 0 )
                 dim.width = 50;
 
-            setPreferredSize(dim);            
+            setPreferredSize(dim);
         }
     }
 
@@ -99,7 +99,7 @@ public class RowHeader
 
         public Object getElementAt(int index)
         {
-            return (Integer)index+1;
+            return index +1;
         }
     }
 

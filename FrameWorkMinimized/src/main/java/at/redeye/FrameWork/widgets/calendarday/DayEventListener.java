@@ -14,6 +14,6 @@ package at.redeye.FrameWork.widgets.calendarday;
  */
 public interface DayEventListener {
 
-    public void onClicked( CalendarDay day );
-    
+    void onClicked(CalendarDay day);
+
 }

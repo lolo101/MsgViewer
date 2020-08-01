@@ -1,15 +1,8 @@
-/*
- * TestFrame.java
- *
- * Created on 2. Januar 2009, 15:08
- */
-
 package at.redeye.FrameWork.widgets.calendar;
 
 import at.redeye.FrameWork.utilities.calendar.AustrianHolidays;
 import at.redeye.FrameWork.widgets.calendarday.CalendarDay;
 import at.redeye.FrameWork.widgets.calendarday.DayEventListener;
-
 
 /**
  *
@@ -18,15 +11,15 @@ import at.redeye.FrameWork.widgets.calendarday.DayEventListener;
 public class TestFrame extends javax.swing.JFrame implements DayEventListener {
 
     CalendarComponent  month = null;
-    
+
     /** Creates new form TestFrame */
     public TestFrame() {
         initComponents();
-        
+
         month = new CalendarComponent();
-        
+
         setContentPane( month );
-        
+
         month.setHolidays(new AustrianHolidays());
         month.setMonth(6, 2009);
         month.setListener(this);
@@ -60,7 +53,7 @@ public class TestFrame extends javax.swing.JFrame implements DayEventListener {
     /**
     * @param args the command line arguments
     */
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new TestFrame().setVisible(true);

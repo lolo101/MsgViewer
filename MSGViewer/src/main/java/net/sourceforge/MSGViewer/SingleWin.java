@@ -18,6 +18,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import javax.swing.JFileChooser;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
@@ -123,35 +124,19 @@ public class SingleWin extends BaseDialog implements MainDialog, OpenNewMailInte
         jMFileOpen.setText("Program");
 
         jFileOpen.setText("File Open ...");
-        jFileOpen.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jFileOpenActionPerformed(evt);
-            }
-        });
+        jFileOpen.addActionListener(this::jFileOpenActionPerformed);
         jMFileOpen.add(jFileOpen);
 
         jMFileSave.setText("Save File as ...");
-        jMFileSave.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMFileSaveActionPerformed(evt);
-            }
-        });
+        jMFileSave.addActionListener(this::jMFileSaveActionPerformed);
         jMFileOpen.add(jMFileSave);
 
         jMOptions.setText("Options");
-        jMOptions.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMOptionsActionPerformed(evt);
-            }
-        });
+        jMOptions.addActionListener(this::jMOptionsActionPerformed);
         jMFileOpen.add(jMOptions);
 
         jMQuit.setText("Quit");
-        jMQuit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMQuitActionPerformed(evt);
-            }
-        });
+        jMQuit.addActionListener(this::jMQuitActionPerformed);
         jMFileOpen.add(jMQuit);
 
         menubar.add(jMFileOpen);
@@ -159,45 +144,25 @@ public class SingleWin extends BaseDialog implements MainDialog, OpenNewMailInte
         jMenu4.setText("Info");
 
         jMDetail.setText("Details");
-        jMDetail.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMDetailActionPerformed(evt);
-            }
-        });
+        jMDetail.addActionListener(this::jMDetailActionPerformed);
         jMenu4.add(jMDetail);
 
         jMNav.setText("MSG Navigator");
         jMNav.setEnabled(false);
-        jMNav.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMNavActionPerformed(evt);
-            }
-        });
+        jMNav.addActionListener(this::jMNavActionPerformed);
         jMenu4.add(jMNav);
         jMenu4.add(jSeparator1);
 
         jMenuItem7.setText("About");
-        jMenuItem7.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem7ActionPerformed(evt);
-            }
-        });
+        jMenuItem7.addActionListener(this::jMenuItem7ActionPerformed);
         jMenu4.add(jMenuItem7);
 
         jMenuItem8.setText("Changelog");
-        jMenuItem8.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem8ActionPerformed(evt);
-            }
-        });
+        jMenuItem8.addActionListener(this::jMenuItem8ActionPerformed);
         jMenu4.add(jMenuItem8);
 
         jMenuItem9.setText("Plugins");
-        jMenuItem9.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem9ActionPerformed(evt);
-            }
-        });
+        jMenuItem9.addActionListener(this::jMenuItem9ActionPerformed);
         jMenu4.add(jMenuItem9);
 
         menubar.add(jMenu4);
@@ -333,15 +298,9 @@ public class SingleWin extends BaseDialog implements MainDialog, OpenNewMailInte
 
         if( file_name.startsWith("file://") )
         {
-            try
-            {
-                file_name = URLDecoder.decode(file_name,"UTF-8");
-                file_name = file_name.substring(7);
+            file_name = URLDecoder.decode(file_name, StandardCharsets.UTF_8);
+            file_name = file_name.substring(7);
 
-            } catch( UnsupportedEncodingException ex ) {
-                logger.error(StringUtils.exceptionToString(ex));
-                file_name = file_name.substring(7);
-            }
         }
 
         jMNav.setEnabled(file_name.toLowerCase().endsWith(".msg"));

@@ -13,10 +13,10 @@ import at.redeye.FrameWork.base.prm.impl.PrmActionEvent;
  */
 public interface PrmAttachInterface {
 
-    public void addPrmListener(PrmListener listener);
+    void addPrmListener(PrmListener listener);
 
-    public void removePrmListener(PrmListener listener);
+    void removePrmListener(PrmListener listener);
 
-    public void updateListeners(PrmActionEvent prmActionEvent);
+    void updateListeners(PrmActionEvent prmActionEvent);
 
 }

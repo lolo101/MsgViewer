@@ -13,20 +13,20 @@ import javax.swing.text.PlainDocument;
  *
  * @author martin
  */
-public class DocumentFieldDouble extends PlainDocument {        
-            
+public class DocumentFieldDouble extends PlainDocument {
+
 
     /**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
 	@Override
-    public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {                
-        
-        if( str != null )                    
-            if( str.matches("[0-9,\\.\\-\\+]+"))
+    public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
+
+        if( str != null )
+            if( str.matches("[0-9,.\\-+]+"))
                 super.insertString(offs, str, a);
     }
-        
+
 }

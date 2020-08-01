@@ -13,7 +13,7 @@ import java.util.HashMap;
  */
 public class UniqueDialogHelper
 {
-    HashMap<String,BaseDialogBase> dialogs = new HashMap<String,BaseDialogBase>();
+    HashMap<String,BaseDialogBase> dialogs = new HashMap<>();
 
     public static final String ID_STRING = "invokeDialogUnique";
 

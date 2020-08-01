@@ -17,25 +17,19 @@
  */
 package com.auxilii.msgparser;
 
-import static org.apache.poi.util.StringUtil.getFromUnicodeLE;
-
-import java.io.ByteArrayInputStream;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
 import com.auxilii.msgparser.attachment.MsgAttachment;
-import java.io.IOException;
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.hmef.CompressedRTF;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import static org.apache.poi.util.StringUtil.getFromUnicodeLE;
 
 /**
  * Class that represents a .msg file. Some
@@ -50,7 +44,7 @@ import org.apache.poi.hmef.CompressedRTF;
  * @author roman.kurmanowytsch
  */
 public class Message {
-    private static final Logger LOGGER = Logger.getLogger(Message.class.getName());
+    private static final Logger LOGGER = LogManager.getLogger(Message.class);
 
     /**
      * The message class as defined in the .msg file.
@@ -121,7 +115,7 @@ public class Message {
      * Contains all properties that are not
      * covered by the special properties.
      */
-    private final Map<String,Object> properties = new HashMap<>();
+    private final Map<String, Object> properties = new HashMap<>();
     /**
      * A list containing all recipients for this message
      * (which can be set in the 'to:', 'cc:' and 'bcc:' field, respectively).
@@ -138,71 +132,48 @@ public class Message {
 
 
     void setProperty(Property property) {
-        setProperty(property.getPid(), property.getValue());
-    }
-
-    /**
-     * Sets the name/value pair in the {@link #properties}
-     * map. Some properties are put into
-     * special attributes (e.g., {@link #toEmail} when
-     * the property name is '0076').
-     *
-     * @param name The property name (i.e., the class
-     *  of the document entry).
-     * @param value The value of the field.
-     * @throws ClassCastException Thrown if the detected data
-     *  type does not match the expected data type.
-     */
-    public void setProperty(String name, Object value) throws ClassCastException {
-
-        if (name == null || value == null) {
-            return;
-        }
-
-        // we know that the name is lower case
-        // because this is done in MsgParser.analyzeDocumentEntry
-        switch (name) {
-            case "001a":
-                this.setMessageClass((String) value);
+        switch (property.getPid()) {
+            case PidTagMessageClass:
+                this.setMessageClass((String) property.getValue());
                 break;
-            case "1035":
-                this.setMessageId((String) value);
+            case PidTagInternetMessageId:
+                this.setMessageId((String) property.getValue());
                 break;
-            case "0037":
-                this.setSubject((String) value);
+            case PidTagSubject:
+                this.setSubject((String) property.getValue());
                 break;
-            case "0c1f": // PidTagSenderEmailAddress
-            case "0065": // PidTagSentRepresentingEmailAddress
-                this.setFromEmail((String) value);
+            case PidTagSenderEmailAddress:
+            case PidTagSentRepresentingEmailAddress:
+                this.setFromEmail((String) property.getValue());
                 break;
-            case "0c1a": // PidTagSenderName
-            case "0042": // PidTagSentRepresentingName
-                this.setFromName((String) value);
+            case PidTagSenderName:
+            case PidTagSentRepresentingName:
+                this.setFromName((String) property.getValue());
                 break;
-            case "0076":
-                this.addToEmail((String) value);
+            case PidTagReceivedByEmailAddress:
+                this.addToEmail((String) property.getValue());
                 break;
-            case "3001":
-                this.addToName((String) value);
+            case PidTagDisplayName:
+                this.addToName((String) property.getValue());
                 break;
-            case "0e04":
-                this.setDisplayTo((String) value);
+            case PidTagDisplayTo:
+                this.setDisplayTo((String) property.getValue());
                 break;
-            case "0e03":
-                this.setDisplayCc((String) value);
+            case PidTagDisplayCc:
+                this.setDisplayCc((String) property.getValue());
                 break;
-            case "0e02":
-                this.setDisplayBcc((String) value);
+            case PidTagDisplayBcc:
+                this.setDisplayBcc((String) property.getValue());
                 break;
-            case "1000":
-                this.setBodyText((String) value);
+            case PidTagBody:
+                this.setBodyText((String) property.getValue());
                 break;
-            case "1009":
-                this.setCompressedRTF((byte[]) value);
+            case PidTagRtfCompressed:
+                this.setCompressedRTF((byte[]) property.getValue());
                 break;
-            case "007d":
+            case PidTagTransportMessageHeaders:
                 // email headers
-                String headers = (String) value;
+                String headers = (String) property.getValue();
                 this.setHeaders(headers);
                 // try to parse the date from the headers
                 Date date = Message.getDateFromHeaders(headers);
@@ -213,19 +184,7 @@ public class Message {
         }
 
         // save all properties (incl. those identified above)
-        this.properties.put(name, value);
-
-        // other possible values (some are duplicates)
-        // 0044: recv name
-        // 004d: author
-        // 0050: reply
-        // 005a: sender
-        // 0065: sent email
-        // 0078: repr. email
-        // 0e1d: subject normalized
-        // 1046: sender email
-        // 3003: email address
-        // 1008 rtf sync
+        this.properties.put(property.getPid().toString(), property.getValue());
     }
 
     /**
@@ -236,7 +195,7 @@ public class Message {
     @Override
     public String toString() {
         StringBuilder sb = headerString();
-        sb.append("").append(this.attachments.size()).append(" attachments.");
+        sb.append(this.attachments.size()).append(" attachments.");
         return sb.toString();
     }
 
@@ -253,7 +212,7 @@ public class Message {
         }
         if (this.attachments.size() > 0) {
             sb.append("\n");
-            sb.append("").append(this.attachments.size()).append(" attachments.\n");
+            sb.append(this.attachments.size()).append(" attachments.\n");
             for (Attachment att : this.attachments) {
                 sb.append(att.toString()).append("\n");
             }

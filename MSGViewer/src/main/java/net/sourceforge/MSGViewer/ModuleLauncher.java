@@ -5,7 +5,7 @@ import at.redeye.FrameWork.base.FrameWorkConfigDefinitions;
 import at.redeye.FrameWork.base.LocalRoot;
 import at.redeye.FrameWork.base.Setup;
 import at.redeye.FrameWork.widgets.StartupWindow;
-import org.apache.log4j.Level;
+import org.apache.logging.log4j.Level;
 
 /**
  *

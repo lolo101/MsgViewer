@@ -6,15 +6,13 @@
 package at.redeye.FrameWork.base.proxy;
 
 import at.redeye.FrameWork.utilities.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.net.ProxySelector;
-import java.net.SocketAddress;
-import java.net.URI;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
 
 /**
  *
@@ -22,7 +20,7 @@ import org.apache.log4j.Logger;
  */
 public class SimpleProxySelector extends ProxySelector
 {
-    public static Logger logger = Logger.getLogger(SimpleProxySelector.class.getName());
+    public static Logger logger = LogManager.getLogger(SimpleProxySelector.class);
     private static ArrayList<Proxy> no_proxy_list;
 
     public static class WhiteListEntry
@@ -42,21 +40,21 @@ public class SimpleProxySelector extends ProxySelector
                 entry = entry.replace("*", ".*");
             }
         }
-    };
+    }
 
-    ArrayList<Proxy> proxy_list = new ArrayList<Proxy>();
-    ArrayList<WhiteListEntry> white_list = new ArrayList<WhiteListEntry>();
+    ArrayList<Proxy> proxy_list = new ArrayList<>();
+    ArrayList<WhiteListEntry> white_list = new ArrayList<>();
 
     public SimpleProxySelector( String host, int port )
     {
         super();
-        
-        Proxy proxy = new Proxy(Proxy.Type.HTTP, InetSocketAddress.createUnresolved(host, port));        
+
+        Proxy proxy = new Proxy(Proxy.Type.HTTP, InetSocketAddress.createUnresolved(host, port));
         proxy_list.add(proxy);
 
         if( no_proxy_list == null )
         {
-            no_proxy_list = new ArrayList<Proxy>();
+            no_proxy_list = new ArrayList<>();
             no_proxy_list.add(Proxy.NO_PROXY);
         }
 
@@ -91,7 +89,7 @@ public class SimpleProxySelector extends ProxySelector
         {
             int i = suri.lastIndexOf(':');
             suri = suri.substring(0,i);
-        }        
+        }
 
         logger.info("suri: " + suri);
 
@@ -101,7 +99,7 @@ public class SimpleProxySelector extends ProxySelector
             {
                 logger.debug("not using proxy because this host is on the white list");
                 return no_proxy_list;
-            }            
+            }
             else if (!white_host.is_ip_address )
             {
                 try
@@ -124,12 +122,12 @@ public class SimpleProxySelector extends ProxySelector
     @Override
     public void connectFailed(URI uri, SocketAddress sa, IOException ioe)
     {
-        
+
     }
 
     public void exludeFromProxy( String url )
     {
-        String urls[] = url.split("[,; ]");
+        String[] urls = url.split("[,; ]");
 
         for( String peace : urls )
         {

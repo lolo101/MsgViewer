@@ -7,8 +7,6 @@ package at.redeye.FrameWork.base.prm.impl.gui;
 
 import at.redeye.FrameWork.base.prm.impl.*;
 import at.redeye.FrameWork.base.*;
-import at.redeye.FrameWork.base.BaseDialog;
-import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.base.prm.bindtypes.DBConfig;
 import at.redeye.FrameWork.base.bindtypes.DBStrukt;
 import at.redeye.FrameWork.base.prm.PrmCustomChecksInterface;
@@ -18,6 +16,7 @@ import at.redeye.FrameWork.base.tablemanipulator.TableManipulator;
 import at.redeye.FrameWork.widgets.helpwindow.HelpWin;
 import at.redeye.FrameWork.widgets.helpwindow.HelpWinHook;
 
+import java.awt.*;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
@@ -29,7 +28,7 @@ import java.util.Vector;
 public class LocalConfig extends BaseDialog implements CanCloseInterface, PrmListener {
 
     private static final long serialVersionUID = 1L;
-    Vector<DBStrukt> values = new Vector<DBStrukt>();
+    Vector<DBStrukt> values = new Vector<>();
     TableManipulator tm;
 
     /** Creates new form Config */
@@ -50,18 +49,18 @@ public class LocalConfig extends BaseDialog implements CanCloseInterface, PrmLis
         tm.hide(config.hist.ae_user);
 
         tm.setEditable(config.value);
-        tm.setAutoCompleteForAllOfThisColl(config.value, false);        
+        tm.setAutoCompleteForAllOfThisColl(config.value, false);
 
         tm.prepareTable();
 
         feed_table();
 
         tm.autoResize();
-        
+
         // Register all local PRM
         Set<String> keys = LocalConfigDefinitions.entries.keySet();
         for (String key : keys) {
-            LocalConfigDefinitions.get(key).addPrmListener(this);           
+            LocalConfigDefinitions.get(key).addPrmListener(this);
         }
     }
 
@@ -70,7 +69,7 @@ public class LocalConfig extends BaseDialog implements CanCloseInterface, PrmLis
         values.clear();
         tm.clear();
 
-        TreeMap<String, DBConfig> vals = new TreeMap<String, DBConfig>();
+        TreeMap<String, DBConfig> vals = new TreeMap<>();
 
         Set<String> keys = LocalConfigDefinitions.entries.keySet();
 
@@ -81,7 +80,7 @@ public class LocalConfig extends BaseDialog implements CanCloseInterface, PrmLis
         for (String key : keys) {
 
             DBConfig c = (DBConfig) vals.get(key).getCopy();
-            
+
             String val = root.getSetup().getLocalConfig(c.getConfigName(), c.getConfigValue());
 
             c.descr.loadFromCopy(MlM(c.descr.getValue()));
@@ -105,16 +104,12 @@ public class LocalConfig extends BaseDialog implements CanCloseInterface, PrmLis
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
 
-        jLTitle.setFont(new java.awt.Font("Dialog", 1, 18));
+        jLTitle.setFont(new java.awt.Font("Dialog", Font.BOLD, 18));
         jLTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLTitle.setText("Lokale Einstellungen");
 
         jBHelp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/at/redeye/FrameWork/base/resources/icons/help.png"))); // NOI18N
-        jBHelp.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBHelpActionPerformed(evt);
-            }
-        });
+        jBHelp.addActionListener(this::jBHelpActionPerformed);
 
         jTContent.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -131,19 +126,11 @@ public class LocalConfig extends BaseDialog implements CanCloseInterface, PrmLis
 
         jBSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/at/redeye/FrameWork/base/resources/icons/button_ok.gif"))); // NOI18N
         jBSave.setText("Speichern");
-        jBSave.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBSaveActionPerformed(evt);
-            }
-        });
+        jBSave.addActionListener(this::jBSaveActionPerformed);
 
         jBCancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/at/redeye/FrameWork/base/resources/icons/fileclose.gif"))); // NOI18N
         jBCancel.setText("Schließen");
-        jBCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBCancelActionPerformed(evt);
-            }
-        });
+        jBCancel.addActionListener(this::jBCancelActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);

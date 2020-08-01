@@ -5,11 +5,13 @@
 
 package at.redeye.FrameWork.utilities;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import org.apache.log4j.Logger;
 
 /**
  *
@@ -17,7 +19,7 @@ import org.apache.log4j.Logger;
  */
 public class CopyFile
 {
-     protected static Logger logger = Logger.getLogger(CopyFile.class.getName());
+     protected static Logger logger = LogManager.getLogger(CopyFile.class);
 
 
     public static boolean copy( File from, File to )
@@ -31,10 +33,9 @@ public class CopyFile
 
             FileOutputStream fout = new FileOutputStream(to);
 
-            int len = 0;
             byte[] buf =  new byte[1024*4];
 
-            while ((len = fin.read(buf)) > 0) {
+            for (int len; (len = fin.read(buf)) > 0;) {
                 fout.write(buf, 0, len);
             }
 

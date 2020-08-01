@@ -27,12 +27,12 @@ import javax.swing.KeyStroke;
  */
 public interface BaseDialogBase
 {
-    public void close();
-    public boolean canClose();
+    void close();
+    boolean canClose();
 
-    public void setTitle(String title);
+    void setTitle(String title);
 
-    public String getTitle();
+    String getTitle();
 
     /**
      * @param requester The calling object (can be used to implement different behavoir for eg
@@ -46,67 +46,67 @@ public interface BaseDialogBase
      * each one has a different title.
      */
 
-    public String getUniqueDialogIdentifier(Object requester);
+    String getUniqueDialogIdentifier(Object requester);
 
-    public void addWindowListener(WindowListener windowListener);
+    void addWindowListener(WindowListener windowListener);
 
-    public int getWidth();
+    int getWidth();
 
-    public int getHeight();
+    int getHeight();
 
-    public void setBounds(int x, int y, int i, int i0);
+    void setBounds(int x, int y, int i, int i0);
 
-    public boolean openWithLastWidthAndHeight();
+    boolean openWithLastWidthAndHeight();
 
-    public void setPreferredSize(Dimension dimension);
+    void setPreferredSize(Dimension dimension);
 
     /**
      * Registers a listener for a F1, ESC, or somthing global keypressed Event
      * @param to_listen_Key Keyboard Key
      * @param runnable      Method to call
      */
-    public void registerActionKeyListener(KeyStroke keyStroke, Runnable runnable);
+    void registerActionKeyListener(KeyStroke keyStroke, Runnable runnable);
 
-    public Container getContainer();
+    Container getContainer();
 
-    public void doAutoRefresh();
+    void doAutoRefresh();
 
-    public void setCursor(Cursor predefinedCursor);
+    void setCursor(Cursor predefinedCursor);
 
-    public void adjustScrollingSpeed( JScrollPane scroll_panel );
+    void adjustScrollingSpeed(JScrollPane scroll_panel);
 
-    public void setVisible(boolean b);
+    void setVisible(boolean b);
 
-    public void toFront();
+    void toFront();
 
-    public void invokeDialog( JFrame frame );
+    void invokeDialog(JFrame frame);
 
-    public void invokeDialog( BaseDialogBase dlg );
+    void invokeDialog(BaseDialogBase dlg);
 
-    public void invokeDialogModal( BaseDialogDialog dlg );
+    void invokeDialogModal(BaseDialogDialog dlg);
 
-    public void invokeDialogUnique( BaseDialogBase dialog );
+    void invokeDialogUnique(BaseDialogBase dialog);
 
     /**
      * opens the dialog as a new main Dialog. So if the source Dialog
      * is closed, the subdialog won't be closed, because it's a new main dialog.
      * @param dialog
      */
-    public void invokeMainDialog( BaseDialogBase dialog );
+    void invokeMainDialog(BaseDialogBase dialog);
 
-    public void registerOnCloseListener(Runnable runnable);
+    void registerOnCloseListener(Runnable runnable);
 
-    public void deregisterOnCloseListener( Runnable runnable );
+    void deregisterOnCloseListener(Runnable runnable);
 
-    public boolean closeSubdialogsOnClose();
+    boolean closeSubdialogsOnClose();
 
-    public void setEdited();
+    void setEdited();
 
-    public boolean isEdited();
+    boolean isEdited();
 
-    public void setEdited(boolean val);
+    void setEdited(boolean val);
 
-    public void clearEdited();
+    void clearEdited();
 
     /**
      * Checks, if data within the table have been change, asks the
@@ -118,14 +118,14 @@ public interface BaseDialogBase
      *  -1 cancel current operation <br/>
      *
      */
-    public int checkSave(TableManipulator tm);
+    int checkSave(TableManipulator tm);
 
     /**
      * @return 1 on Save Data  <br/>
      *         0 on Don't Save <br/>
      *        -1 on Cancel <br/>
      */
-    public int checkSave();
+    int checkSave();
 
     /**
      * @return The Transaction object for this dialog
@@ -134,7 +134,7 @@ public interface BaseDialogBase
      * of the dialog. So caching the Transaction object is not required.
      * <b>Can return null, in case of no database connection.</b>
      */
-    public Transaction getTransaction();
+    Transaction getTransaction();
 
     /**
      * @return A new Transaction object, of the current database connection
@@ -144,14 +144,14 @@ public interface BaseDialogBase
      *
      * The Transaction object will by destroyed atomatically on appliaction shutdown
      */
-     public Transaction getNewTransaction();
+    Transaction getNewTransaction();
 
     /**
      * closes a given Transaction object. Rollback is done automatically.
      * @param tran a valid Transaction object
      * @throws SQLException if rollback fails
      */
-    public void closeTransaction(Transaction tran) throws SQLException;
+    void closeTransaction(Transaction tran) throws SQLException;
 
 /**
      * Ermittelt den nächsten Wert für eine gegebene Sequenz
@@ -163,7 +163,7 @@ public interface BaseDialogBase
      * @throws TableBindingNotRegisteredException
      * @throws IOException
      */
-    public int getNewSequenceValue(String seqName) throws SQLException, UnsupportedDBDataTypeException, WrongBindFileFormatException, TableBindingNotRegisteredException, IOException;
+int getNewSequenceValue(String seqName) throws SQLException, UnsupportedDBDataTypeException, WrongBindFileFormatException, TableBindingNotRegisteredException, IOException;
 
 /**
      * Ermittelt den nächsten Wert für eine gegebene Sequenz. Die <b>number</b> gibt dabei an wieviele
@@ -178,41 +178,41 @@ public interface BaseDialogBase
      * @throws TableBindingNotRegisteredException
      * @throws IOException
      */
-    public int getNewSequenceValues(String seqName, int number) throws SQLException, UnsupportedDBDataTypeException, WrongBindFileFormatException, TableBindingNotRegisteredException, IOException;
-    
-    public void dispose();
+int getNewSequenceValues(String seqName, int number) throws SQLException, UnsupportedDBDataTypeException, WrongBindFileFormatException, TableBindingNotRegisteredException, IOException;
 
-    public int getX();
+    void dispose();
 
-    public int getY();
+    int getX();
 
-    public void closeNoAppExit();
+    int getY();
 
-    public void setBindVarsChanged( boolean state );
+    void closeNoAppExit();
 
-    public void setBindVars( BindVarInterface bind_vars );
+    void setBindVarsChanged(boolean state);
+
+    void setBindVars(BindVarInterface bind_vars);
 
     /**
     * language the dialog is programmed in
-    * if not set, the settings from Root.getBaseLangague() are used     
+    * if not set, the settings from Root.getBaseLangague() are used
     */
-    public void setBaseLanguage( String language );
+    void setBaseLanguage(String language);
 
     /**
     * @return language the dialog is programmed in
     * if not set, the settings from Root.getBaseLangague() are used
-    */    
-    public String getBaseLanguage();
+    */
+    String getBaseLanguage();
 
     /**
      * @param message native langauge message
      * @return translated message, if available
      */
-    public String MlM( String message );
+    String MlM(String message);
 
-    public Timer getAutoRefreshTimer();
-    
-    
+    Timer getAutoRefreshTimer();
+
+
     /**
      * Returns the minimum size of this container.  If the minimum size has
      * not been set explicitly by {@link Component#setMinimumSize(Dimension)}
@@ -235,11 +235,11 @@ public interface BaseDialogBase
      * @see       Component#getMinimumSize
      * @since     JDK1.1
      */
-    public Dimension getMinimumSize();
-    
-    public void setWaitCursor();
-    
-    public void setWaitCursor(boolean state);
-    
-    public void setNormalCursor();
+    Dimension getMinimumSize();
+
+    void setWaitCursor();
+
+    void setWaitCursor(boolean state);
+
+    void setNormalCursor();
 }

@@ -9,17 +9,12 @@ import at.redeye.FrameWork.base.AutoLogger;
 import at.redeye.FrameWork.base.BaseDialogBase;
 import at.redeye.FrameWork.base.BaseDialogBaseHelper;
 import at.redeye.FrameWork.base.Root;
+
+import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-import javax.swing.JComponent;
-import javax.swing.KeyStroke;
+import java.util.*;
 
 /**
  *
@@ -49,10 +44,7 @@ public class TranslationHelper
                  {
                      Set<Object> keys = currentProps.keySet();
 
-                     Iterator<Object> it = keys.iterator();
-
-                     while( it.hasNext() )
-                        extract_strings.strings.add((String)it.next());
+                     for (Object key : keys) extract_strings.strings.add((String) key);
                  }
              }
 
@@ -70,7 +62,7 @@ public class TranslationHelper
          String lang_current;
 
          public void run() {
-             if (lang_current != null && lang_b.equals(lang_current)) {
+             if (lang_b.equals(lang_current)) {
                  lang_current = lang_a;
              } else {
                  lang_current = lang_b;
@@ -93,7 +85,7 @@ public class TranslationHelper
         this.helper = helper;
 
         helper.registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_F12, 0), new OpenTransDialog() );
-        helper.registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_F11, 0), new SwitchTrans_DE_EN() );        
+        helper.registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_F11, 0), new SwitchTrans_DE_EN() );
     }
 
     private boolean loadTranslation( String new_trans ) throws FileNotFoundException, IOException
@@ -106,8 +98,7 @@ public class TranslationHelper
         return switchTranslation(new_trans, false);
     }
 
-    private boolean switchTranslation( String new_trans, boolean load_only ) throws FileNotFoundException, IOException
-    {
+    private boolean switchTranslation( String new_trans, boolean load_only ) {
         boolean not_found = false;
 
         Properties props = MLUtil.autoLoadFile4Class(root, base_dlg, new_trans, true);
@@ -158,7 +149,7 @@ public class TranslationHelper
 
         } catch (IOException ex) {
             return false;
-        }        
+        }
     }
 
     public boolean loadTrans(String trans) {
@@ -218,7 +209,7 @@ public class TranslationHelper
 
         if (loadTrans(locale)) {
             return;
-        }        
+        }
 
         if (locale.length() == 2  && !MLUtil.compareLanguagesOnly(root.getDefaultLanguage(), helper.getBaseLanguage())) {
             loadTrans(root.getDefaultLanguage());

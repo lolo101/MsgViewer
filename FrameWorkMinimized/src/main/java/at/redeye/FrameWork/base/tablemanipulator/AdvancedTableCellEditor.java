@@ -51,7 +51,7 @@ public class AdvancedTableCellEditor extends AbstractCellEditor implements Table
     }
 
     @Override
-    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {        
+    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
 
         last_row = TableDesign.getModelRow(table, row);
         last_col =  TableDesign.getModelCol(table, column);
@@ -89,18 +89,18 @@ public class AdvancedTableCellEditor extends AbstractCellEditor implements Table
                 return component;
             }
 
-        } else if (DBValue.class.isInstance(current_value)) {
+        } else if (current_value instanceof DBValue) {
 
 
-            if (DBString.class.isInstance(current_value)) {
+            if (current_value instanceof DBString) {
                 DBString s = (DBString) current_value;
                 component.setDocument(new DocumentFieldLimit(s.getMaxLen()));
 
-            } else if (DBInteger.class.isInstance(current_value)) {
+            } else if (current_value instanceof DBInteger) {
 
                 component.setDocument(new DocumentFieldInteger());
 
-            } else if (DBDateTime.class.isInstance(current_value)) {
+            } else if (current_value instanceof DBDateTime) {
 
                 component.setDocument(new DocumentFieldDateTime());
 
@@ -134,13 +134,13 @@ public class AdvancedTableCellEditor extends AbstractCellEditor implements Table
         System.out.println("Advanced stopCellEditing");
 
         if (tabledesign.colls.get(last_col).validator != null) {
-            if (!tabledesign.colls.get(last_col).validator.acceptData(((JTextField) component).getText())) {
+            if (!tabledesign.colls.get(last_col).validator.acceptData(component.getText())) {
                 component.setBorder(new LineBorder(Color.RED));
                 return false;
             }
         }
 
-        if (DBValue.class.isInstance(current_value)) {
+        if (current_value instanceof DBValue) {
             DBValue val = (DBValue) current_value;
             String s = component.getText();
 

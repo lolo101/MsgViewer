@@ -60,21 +60,21 @@ public class NormalCellRenderer extends DefaultTableCellRenderer {
 
     public NormalCellRenderer(Root root, TableDesign tabledesign) {
         this.tabledesign = tabledesign;
-        
+
         Color c;
 
         c = HTMLColor.loadLocalColor(root, FrameWorkConfigDefinitions.SpreadSheetColorEven);
         if( c != null )
             hColor  = c;
-        
+
         c = HTMLColor.loadLocalColor(root, FrameWorkConfigDefinitions.SpreadSheetColorEvenEditable );
         if( c != null )
             heColor  = c;
-        
+
         c  = HTMLColor.loadLocalColor(root, FrameWorkConfigDefinitions.SpreadSheetColorOdd );
         if( c != null )
             lColor  = c;
-        
+
         c = HTMLColor.loadLocalColor(root, FrameWorkConfigDefinitions.SpreadSheetColorOddEditable );
         if( c != null )
             leColor  = c;
@@ -82,7 +82,7 @@ public class NormalCellRenderer extends DefaultTableCellRenderer {
 
     @Override
     public Component getTableCellRendererComponent(JTable tbl, Object v, boolean isSelected, boolean isFocused, int row, int col) {
-        //Store this info for later use            
+        //Store this info for later use
 
         if (row % 2 != 0) {
             hightlight = true;
@@ -107,9 +107,9 @@ public class NormalCellRenderer extends DefaultTableCellRenderer {
     protected void setValue(Object v) {
         // System.out.println("setValue: " + row + " " + " col " + col + " " + v.toString());
 
-        // System.out.println( tabledesign.colls.get(col).Title ); 
+        // System.out.println( tabledesign.colls.get(col).Title );
         if (tabledesign.colls.get(model_col).validator != null) {
-            if (DBValue.class.isInstance(v)) {
+            if (v instanceof DBValue) {
                 String res = tabledesign.colls.get(model_col).validator.formatData(v);
                 super.setValue(res);
             } else {
@@ -145,7 +145,7 @@ public class NormalCellRenderer extends DefaultTableCellRenderer {
 
                 if( v instanceof DBEnum )
                     super.setValue( ((DBEnum)v).getLocalizedString() );
-                else                    
+                else
                     super.setValue(v);
             }
         }

@@ -1,18 +1,21 @@
 package net.sourceforge.MSGViewer;
 
 import at.redeye.FrameWork.Plugin.AboutPlugins;
-import at.redeye.FrameWork.base.*;
+import at.redeye.FrameWork.base.AutoMBox;
+import at.redeye.FrameWork.base.BaseDialog;
+import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.base.prm.impl.gui.LocalConfig;
-import at.redeye.FrameWork.utilities.StringUtils;
 import net.sourceforge.MSGViewer.MSGNavigator.MSGNavigator;
-import java.awt.EventQueue;
-import java.awt.event.KeyEvent;
-import java.awt.print.PrinterJob;
-import java.io.*;
-import java.net.URLDecoder;
+
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.print.PrinterJob;
+import java.io.File;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterface, LoadMessageInterface
 {
@@ -107,44 +110,23 @@ public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterf
         jMenuProgram.setText("Program");
 
         jMOpenFile.setText("File Open ...");
-        jMOpenFile.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMOpenFileActionPerformed(evt);
-            }
-        });
+        jMOpenFile.addActionListener(this::jMOpenFileActionPerformed);
         jMenuProgram.add(jMOpenFile);
 
         jMSaveAs.setText("Save File as ...");
-        jMSaveAs.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMSaveAsActionPerformed(evt);
-            }
-        });
+        jMSaveAs.addActionListener(this::jMSaveAsActionPerformed);
         jMenuProgram.add(jMSaveAs);
 
         jMPrint.setText("Print...");
-        jMPrint.setToolTipText("");
-        jMPrint.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMPrintActionPerformed(evt);
-            }
-        });
+        jMPrint.addActionListener(this::jMPrintActionPerformed);
         jMenuProgram.add(jMPrint);
 
         jMSettings.setText("Options");
-        jMSettings.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMSettingsActionPerformed(evt);
-            }
-        });
+        jMSettings.addActionListener(this::jMSettingsActionPerformed);
         jMenuProgram.add(jMSettings);
 
         jMQuit.setText("Quit");
-        jMQuit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMQuitActionPerformed(evt);
-            }
-        });
+        jMQuit.addActionListener(this::jMQuitActionPerformed);
         jMenuProgram.add(jMQuit);
 
         menubar.add(jMenuProgram);
@@ -152,45 +134,25 @@ public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterf
         jMenuInfo.setText("Info");
 
         jMDetail.setText("Details");
-        jMDetail.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMDetailActionPerformed(evt);
-            }
-        });
+        jMDetail.addActionListener(this::jMDetailActionPerformed);
         jMenuInfo.add(jMDetail);
 
         jMNav.setText("MSG Navigator");
         jMNav.setEnabled(false);
-        jMNav.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMNavActionPerformed(evt);
-            }
-        });
+        jMNav.addActionListener(this::jMNavActionPerformed);
         jMenuInfo.add(jMNav);
         jMenuInfo.add(jSeparator1);
 
         jMAbout.setText("About");
-        jMAbout.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMAboutActionPerformed(evt);
-            }
-        });
+        jMAbout.addActionListener(this::jMAboutActionPerformed);
         jMenuInfo.add(jMAbout);
 
         jMChangeLog.setText("Changelog");
-        jMChangeLog.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMChangeLogActionPerformed(evt);
-            }
-        });
+        jMChangeLog.addActionListener(this::jMChangeLogActionPerformed);
         jMenuInfo.add(jMChangeLog);
 
         jMPlugin.setText("Plugins");
-        jMPlugin.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMPluginActionPerformed(evt);
-            }
-        });
+        jMPlugin.addActionListener(this::jMPluginActionPerformed);
         jMenuInfo.add(jMPlugin);
 
         menubar.add(jMenuInfo);
@@ -347,15 +309,9 @@ public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterf
 
         if( file_name.startsWith("file://") )
         {
-            try
-            {
-                file_name = URLDecoder.decode(file_name,"UTF-8");
-                file_name = file_name.substring(7);
+            file_name = URLDecoder.decode(file_name, StandardCharsets.UTF_8);
+            file_name = file_name.substring(7);
 
-            } catch( UnsupportedEncodingException ex ) {
-                logger.error(StringUtils.exceptionToString(ex));
-                file_name = file_name.substring(7);
-            }
         }
 
         jMNav.setEnabled(file_name.toLowerCase().endsWith(".msg"));
@@ -375,23 +331,8 @@ public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterf
         }
     }
 
-    public String getLastOpenPath()
-    {
-        return last_path;
-    }
-
-    public void setLastOpenPath(String path)
-    {
-        last_path = path;
-    }
-
     @Override
     public void hideMenuBar() {
        menubar.setVisible(false);
-    }
-
-
-    public ViewerHelper getHelper() {
-        return helper;
     }
 }

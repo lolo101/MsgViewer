@@ -14,8 +14,7 @@ import javax.swing.JComponent;
 public abstract class TableValidator {
 
     public String formatData(Object data) {
-        String result = String.valueOf(data);
-        return result;
+        return String.valueOf(data);
     }
 
     public boolean acceptData(String data) {
@@ -39,6 +38,5 @@ public abstract class TableValidator {
      * column: column of the table
      */
     public void updateComponentBeforeEdit(JComponent component, Object value, TableDesign tabledesign, int row, int column) {
-        return;
     }
 }

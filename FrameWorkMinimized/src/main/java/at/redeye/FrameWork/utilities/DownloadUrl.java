@@ -5,17 +5,12 @@
 
 package at.redeye.FrameWork.utilities;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import org.apache.log4j.Logger;
 
 /**
  *
@@ -23,7 +18,7 @@ import org.apache.log4j.Logger;
  */
 public class DownloadUrl
 {
-    protected static Logger logger = Logger.getLogger(DownloadUrl.class.getName());
+    protected static Logger logger = LogManager.getLogger(DownloadUrl.class);
 
     URL from;
     File to;
@@ -109,10 +104,10 @@ public class DownloadUrl
             try {
                 if( stream != null )
                     stream.close();
-                
+
                 if( out != null )
                     out.close();
-                
+
                 if( bis != null )
                     bis.close();
             } catch( IOException ex ) {
@@ -158,7 +153,7 @@ public class DownloadUrl
    public boolean download(StringBuffer buffer) {
            return download(buffer, null);
    }
-   
+
     public boolean download(StringBuffer buffer, String encoding) {
         BufferedReader bis = null;
         InputStream stream = null;

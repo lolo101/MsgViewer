@@ -10,7 +10,7 @@ package at.redeye.FrameWork.base.reports;
  * @author martin
  */
 public interface ReportRenderer {
-    
-    public boolean collectData();
-    public String render();
+
+    boolean collectData();
+    String render();
 }
