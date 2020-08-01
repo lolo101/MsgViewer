@@ -90,7 +90,8 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
     @Override
     public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) {
         int pageTop = (int) (pageFormat.getImageableHeight() * pageIndex);
-        if (pageTop >= fullHeight()) {
+        double bodyScale = pageFormat.getImageableWidth() / body.getWidth();
+        if (pageTop >= fullHeight(bodyScale)) {
             return NO_SUCH_PAGE;
         }
         Graphics2D g2d = (Graphics2D)graphics.create(
@@ -100,21 +101,29 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
                 (int)pageFormat.getImageableHeight());
         int headerHeight = header.getHeight();
         if (pageTop < headerHeight) {
-            int pageWidth = (int) pageFormat.getImageableWidth();
-            int lineY = headerHeight - pageTop;
-            header.print(g2d.create(0, pageTop, pageWidth, headerHeight));
-            g2d.drawLine(0, lineY, pageWidth, lineY);
-            g2d.translate(0, headerHeight);
+            printHeader(g2d, pageTop, headerHeight, (int) pageFormat.getImageableWidth());
         }
-        g2d.translate(0, -pageTop);
-        body.print(g2d);
-        g2d.dispose();
+        printBody(g2d, pageTop, headerHeight, bodyScale);
 
         return PAGE_EXISTS;
     }
 
-    private int fullHeight() {
-        return header.getHeight() + 1 + body.getHeight();
+    private void printHeader(Graphics2D g2d, int pageTop, int headerHeight, int pageWidth) {
+        int lineY = headerHeight - pageTop - 1;
+        g2d.translate(0, - pageTop);
+        header.print(g2d);
+        g2d.drawLine(0, lineY, pageWidth, lineY);
+    }
+
+    private void printBody(Graphics2D g2d, int pageTop, int headerHeight, double scale) {
+        g2d.translate(0, headerHeight - pageTop);
+        g2d.scale(scale, scale);
+        body.print(g2d);
+        g2d.dispose();
+    }
+
+    private double fullHeight(double bodyScale) {
+        return header.getHeight() + body.getHeight() * bodyScale;
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -127,7 +136,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
         javax.swing.JPanel jPanel1 = new javax.swing.JPanel();
         javax.swing.JScrollPane jScrollPaneBody = new javax.swing.JScrollPane();
         body = new javax.swing.JEditorPane();
-        header.addPropertyChangeListener("paintingForPrint", new PrintListener());
+        body.addPropertyChangeListener("paintingForPrint", new PrintListener());
         javax.swing.JPanel jPanel2 = new javax.swing.JPanel();
         jRRTF = new javax.swing.JRadioButton();
         jRText = new javax.swing.JRadioButton();
@@ -385,7 +394,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
                 String command = open_command + " \"" + url + "\"";
                 logger.info(command);
 
-                String command_array[] = new String[2];
+                String[] command_array = new String[2];
 
                 command_array[0] = open_command;
                 command_array[1] = url.toString();
@@ -423,7 +432,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
                 String command = open_command + " \"" + content.getPath() + "\"";
                 logger.info(command);
 
-                String command_array[] = new String[2];
+                String[] command_array = new String[2];
 
                 command_array[0] = open_command;
                 command_array[1] = content.getPath();
@@ -458,7 +467,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
         message = null;
     }
 
-    void parse_int(final String file_name) throws IOException, FileNotFoundException, Exception
+    void parse_int(final String file_name) throws Exception
     {
         cleanUp();
 
@@ -608,17 +617,15 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
                 File sub_file = helper.getTempFile(msgAtt);
 
-                thread_pool.execute(() -> {
-                    new AutoMBox(file_name) {
+                thread_pool.execute(() -> new AutoMBox(file_name) {
 
-                        @Override
-                        public void do_stuff() throws Exception {
+                    @Override
+                    public void do_stuff() throws Exception {
 
-                            MessageParserFactory factory = new MessageParserFactory();
-                            factory.saveMessage(msg, sub_file);
+                        MessageParserFactory factory = new MessageParserFactory();
+                        factory.saveMessage(msg, sub_file);
 
-                        }
-                    };
+                    }
                 });
 
                 sb.append("<a href=\"");
@@ -716,11 +723,6 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
     public void exportFile(File export_file) throws Exception {
         parser_factory.saveMessage(message, export_file);
-    }
-
-    public void exportFile( File file, Message message ) throws FileNotFoundException, Exception
-    {
-        parser_factory.saveMessage(message, file);
     }
 
     public String getFileName()

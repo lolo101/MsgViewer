@@ -100,7 +100,7 @@
                     <Property name="editable" type="boolean" value="false"/>
                   </Properties>
                   <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="header.addPropertyChangeListener(&quot;paintingForPrint&quot;, new PrintListener());"/>
+                    <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="body.addPropertyChangeListener(&quot;paintingForPrint&quot;, new PrintListener());"/>
                   </AuxValues>
                 </Component>
               </SubComponents>
