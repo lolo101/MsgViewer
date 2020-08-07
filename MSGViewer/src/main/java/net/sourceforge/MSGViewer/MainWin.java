@@ -220,9 +220,9 @@ public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterf
 
         final JFileChooser fc = new JFileChooser();
         fc.setAcceptAllFileFilterUsed(false);
-        final FileFilter msg_filter = new FileNameExtensionFilter(MlM("Outlook *.msg Datei"), "msg");
-        final FileFilter mbox_filter = new FileNameExtensionFilter(MlM("Unix *.mbox Datei"), "mbox");
-        final FileFilter eml_filter = new FileNameExtensionFilter(MlM("Thunderbird *.eml Datei"), "eml");
+        final FileFilter msg_filter = new FileNameExtensionFilter(MlM("Outlook *.msg File"), "msg");
+        final FileFilter mbox_filter = new FileNameExtensionFilter(MlM("Unix *.mbox File"), "mbox");
+        final FileFilter eml_filter = new FileNameExtensionFilter(MlM("Thunderbird *.eml File"), "eml");
         fc.addChoosableFileFilter(msg_filter);
         fc.addChoosableFileFilter(mbox_filter);
         fc.addChoosableFileFilter(eml_filter);
@@ -231,7 +231,7 @@ public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterf
             fc.setCurrentDirectory(new File(last_path));
         }
         int retval = fc.showSaveDialog(this);
-        if (retval != 0) {
+        if (retval != JFileChooser.APPROVE_OPTION) {
             return;
         }
         final File file = fc.getSelectedFile();

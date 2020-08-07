@@ -1,34 +1,21 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package net.sourceforge.MSGViewer;
 
 import at.redeye.FrameWork.Plugin.AboutPlugins;
 import at.redeye.FrameWork.base.AutoMBox;
 import at.redeye.FrameWork.base.BaseDialog;
-import static at.redeye.FrameWork.base.BaseDialog.logger;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.base.prm.impl.gui.LocalConfig;
-import at.redeye.FrameWork.utilities.StringUtils;
-import java.awt.EventQueue;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import javax.swing.JFileChooser;
-import javax.swing.KeyStroke;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import net.sourceforge.MSGViewer.MSGNavigator.MSGNavigator;
 
-/**
- *
- * @author martin
- */
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
 public class SingleWin extends BaseDialog implements MainDialog, OpenNewMailInterface, LoadMessageInterface {
 
     private static String last_path = null;
@@ -58,13 +45,9 @@ public class SingleWin extends BaseDialog implements MainDialog, OpenNewMailInte
         }
 
 
-        registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_N,0), new Runnable() {
-
-            @Override
-            public void run() {
-                if( jMNav.isEnabled() )
-                    jMNavActionPerformed(null);
-            }
+        registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_N,0), () -> {
+            if( jMNav.isEnabled() )
+                jMNavActionPerformed(null);
         });
 
         new EditorDropTarget(this,viewerPanel.getHeaderPane());
@@ -106,18 +89,18 @@ public class SingleWin extends BaseDialog implements MainDialog, OpenNewMailInte
 
         viewerPanel = new net.sourceforge.MSGViewer.ViewerPanel();
         menubar = new javax.swing.JMenuBar();
-        jMFileOpen = new javax.swing.JMenu();
-        jFileOpen = new javax.swing.JMenuItem();
-        jMFileSave = new javax.swing.JMenuItem();
-        jMOptions = new javax.swing.JMenuItem();
-        jMQuit = new javax.swing.JMenuItem();
-        jMenu4 = new javax.swing.JMenu();
-        jMDetail = new javax.swing.JMenuItem();
+        javax.swing.JMenu jMFileOpen = new javax.swing.JMenu();
+        javax.swing.JMenuItem jFileOpen = new javax.swing.JMenuItem();
+        javax.swing.JMenuItem jMFileSave = new javax.swing.JMenuItem();
+        javax.swing.JMenuItem jMOptions = new javax.swing.JMenuItem();
+        javax.swing.JMenuItem jMQuit = new javax.swing.JMenuItem();
+        javax.swing.JMenu jMInfo = new javax.swing.JMenu();
+        javax.swing.JMenuItem jMDetail = new javax.swing.JMenuItem();
         jMNav = new javax.swing.JMenuItem();
-        jSeparator1 = new javax.swing.JPopupMenu.Separator();
-        jMenuItem7 = new javax.swing.JMenuItem();
-        jMenuItem8 = new javax.swing.JMenuItem();
-        jMenuItem9 = new javax.swing.JMenuItem();
+        javax.swing.JPopupMenu.Separator jSeparator1 = new javax.swing.JPopupMenu.Separator();
+        javax.swing.JMenuItem jMAbout = new javax.swing.JMenuItem();
+        javax.swing.JMenuItem jMChangelog = new javax.swing.JMenuItem();
+        javax.swing.JMenuItem jMPlugins = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -141,31 +124,31 @@ public class SingleWin extends BaseDialog implements MainDialog, OpenNewMailInte
 
         menubar.add(jMFileOpen);
 
-        jMenu4.setText("Info");
+        jMInfo.setText("Info");
 
         jMDetail.setText("Details");
         jMDetail.addActionListener(this::jMDetailActionPerformed);
-        jMenu4.add(jMDetail);
+        jMInfo.add(jMDetail);
 
         jMNav.setText("MSG Navigator");
         jMNav.setEnabled(false);
         jMNav.addActionListener(this::jMNavActionPerformed);
-        jMenu4.add(jMNav);
-        jMenu4.add(jSeparator1);
+        jMInfo.add(jMNav);
+        jMInfo.add(jSeparator1);
 
-        jMenuItem7.setText("About");
-        jMenuItem7.addActionListener(this::jMenuItem7ActionPerformed);
-        jMenu4.add(jMenuItem7);
+        jMAbout.setText("About");
+        jMAbout.addActionListener(this::jMAboutActionPerformed);
+        jMInfo.add(jMAbout);
 
-        jMenuItem8.setText("Changelog");
-        jMenuItem8.addActionListener(this::jMenuItem8ActionPerformed);
-        jMenu4.add(jMenuItem8);
+        jMChangelog.setText("Changelog");
+        jMChangelog.addActionListener(this::jMChangelogActionPerformed);
+        jMInfo.add(jMChangelog);
 
-        jMenuItem9.setText("Plugins");
-        jMenuItem9.addActionListener(this::jMenuItem9ActionPerformed);
-        jMenu4.add(jMenuItem9);
+        jMPlugins.setText("Plugins");
+        jMPlugins.addActionListener(this::jMPluginsActionPerformed);
+        jMInfo.add(jMPlugins);
 
-        menubar.add(jMenu4);
+        menubar.add(jMInfo);
 
         setJMenuBar(menubar);
 
@@ -235,7 +218,7 @@ public class SingleWin extends BaseDialog implements MainDialog, OpenNewMailInte
             fc.setCurrentDirectory(new File(last_path));
         }
         int retval = fc.showSaveDialog(this);
-        if (retval != 0) {
+        if (retval != JFileChooser.APPROVE_OPTION) {
             return;
         }
         final File file = fc.getSelectedFile();
@@ -259,23 +242,23 @@ public class SingleWin extends BaseDialog implements MainDialog, OpenNewMailInte
 
     }//GEN-LAST:event_jMFileSaveActionPerformed
 
-    private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem7ActionPerformed
+    private void jMAboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMAboutActionPerformed
 
         invokeDialogUnique(new About(root));
 
-    }//GEN-LAST:event_jMenuItem7ActionPerformed
+    }//GEN-LAST:event_jMAboutActionPerformed
 
-    private void jMenuItem8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem8ActionPerformed
+    private void jMChangelogActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMChangelogActionPerformed
 
         invokeDialogUnique(new LocalHelpWin(root, "ChangeLog"));
 
-    }//GEN-LAST:event_jMenuItem8ActionPerformed
+    }//GEN-LAST:event_jMChangelogActionPerformed
 
-    private void jMenuItem9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem9ActionPerformed
+    private void jMPluginsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMPluginsActionPerformed
 
         invokeDialogUnique(new AboutPlugins(root));
 
-    }//GEN-LAST:event_jMenuItem9ActionPerformed
+    }//GEN-LAST:event_jMPluginsActionPerformed
 
     private void jMDetailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMDetailActionPerformed
 
@@ -338,18 +321,7 @@ public class SingleWin extends BaseDialog implements MainDialog, OpenNewMailInte
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JMenuItem jFileOpen;
-    private javax.swing.JMenuItem jMDetail;
-    private javax.swing.JMenu jMFileOpen;
-    private javax.swing.JMenuItem jMFileSave;
     private javax.swing.JMenuItem jMNav;
-    private javax.swing.JMenuItem jMOptions;
-    private javax.swing.JMenuItem jMQuit;
-    private javax.swing.JMenu jMenu4;
-    private javax.swing.JMenuItem jMenuItem7;
-    private javax.swing.JMenuItem jMenuItem8;
-    private javax.swing.JMenuItem jMenuItem9;
-    private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JMenuBar menubar;
     private net.sourceforge.MSGViewer.ViewerPanel viewerPanel;
     // End of variables declaration//GEN-END:variables

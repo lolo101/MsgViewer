@@ -31,7 +31,7 @@ public abstract class AutoMBox
     protected Logger logger;
     protected Exception thrown_ex = null;
     protected boolean failed = true;
-    protected boolean do_mbox = true;
+    protected final boolean do_mbox;
     public boolean logical_failure = false;
 
     protected static ArrayList<ShowAdvancedException> show_exception_handlers = null;
@@ -45,9 +45,7 @@ public abstract class AutoMBox
 
     public AutoMBox( String className )
     {
-        logger = LogManager.getLogger(className);
-
-        invoke();
+        this(className, true);
     }
 
     public static void addShowAdvancedExceptionHandle( ShowAdvancedException handler )
