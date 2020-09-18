@@ -2,7 +2,7 @@ package net.sourceforge.MSGViewer.factory.msg;
 
 import com.auxilii.msgparser.Message;
 import net.sourceforge.MSGViewer.ModuleLauncher;
-import net.sourceforge.MSGViewer.factory.MessageParserFactory;
+import net.sourceforge.MSGViewer.factory.MessageParser;
 import org.apache.poi.poifs.filesystem.DirectoryNode;
 import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
 
@@ -12,7 +12,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class MsgWriter {
-    public void write(Message msg, OutputStream out) throws IOException {
+    private final Message msg;
+
+    public MsgWriter(Message msg) {
+        this.msg = msg;
+    }
+
+    public void write(OutputStream out) throws IOException {
         NPOIFSFileSystem fs = new NPOIFSFileSystem();
         DirectoryNode root = fs.getRoot();
 
@@ -26,12 +32,8 @@ public class MsgWriter {
         ModuleLauncher.BaseConfigureLogging();
 
         try {
-            MessageParserFactory factory = new MessageParserFactory();
-            Message msg = factory.parseMessage(new File("src/test/resources/danke.msg"));
-
-            MsgWriter writer = new MsgWriter();
-
-            writer.write(msg, new FileOutputStream("src/test/resources/test_out.msg"));
+            Message msg = new MessageParser(new File("src/test/resources/danke.msg")).parseMessage();
+            new MsgWriter(msg).write(new FileOutputStream("src/test/resources/test_out.msg"));
 
         } catch (Exception ex) {
             ex.printStackTrace();

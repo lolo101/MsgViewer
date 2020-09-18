@@ -216,7 +216,7 @@ public class MsgContainer {
         createPropertyStreamEntry(bytes, rec_dir);
     }
 
-    private void writeAttachment(DirectoryEntry root, Attachment attachment, int id) throws IOException {
+    private static void writeAttachment(DirectoryEntry root, Attachment attachment, int id) throws IOException {
         DirectoryEntry att_dir = root.createDirectory(String.format("__attach_version1.0_#%08X", id));
         if (attachment instanceof FileAttachment) {
             writeFileAttachment((FileAttachment) attachment, att_dir);
@@ -249,17 +249,7 @@ public class MsgContainer {
     }
 
     private static void writeMsgAttachment(MsgAttachment attachment, DirectoryEntry att_dir) throws IOException {
-        List<? extends SubstGEntry> entries = Collections.emptyList();
-
-        for (SubstGEntry entry : entries) {
-            entry.createEntry(att_dir);
-        }
-
-        List<PropType> props = entries.stream()
-                .map(SubstGEntry::getPropType)
-                .collect(Collectors.toList());
-
-        ByteBuffer bytes = createPropertiesEntryContent(props);
+        ByteBuffer bytes = createPropertiesEntryContent(Collections.emptyList());
 
         createPropertyStreamEntry(bytes, att_dir);
 

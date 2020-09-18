@@ -15,7 +15,8 @@ import com.auxilii.msgparser.attachment.FileAttachment;
 import com.auxilii.msgparser.attachment.MsgAttachment;
 import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.StartTag;
-import net.sourceforge.MSGViewer.factory.MessageParserFactory;
+import net.sourceforge.MSGViewer.factory.MessageParser;
+import net.sourceforge.MSGViewer.factory.MessageSaver;
 
 import javax.activation.MimeType;
 import javax.imageio.ImageIO;
@@ -53,7 +54,6 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
     private String file_name;
     private OpenNewMailInterface open_new_mail_handler = null;
     private BaseDialogBase parent = null;
-    private final MessageParserFactory parser_factory = new MessageParserFactory();
 
     private final ExecutorService thread_pool = Executors.newCachedThreadPool();
     private int wating_thread_pool_counter = 0;
@@ -463,7 +463,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
         if( !file.exists() )
             throw new FileNotFoundException( parent.MlM( String.format("File %s not found",file_name)) );
 
-        message = parser_factory.parseMessage(file);
+        message = new MessageParser(file).parseMessage();
 
         final StringBuilder sb = new StringBuilder();
 
@@ -575,10 +575,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
                 thread_pool.execute(() -> new AutoMBox(file_name) {
                     @Override
                     public void do_stuff() throws Exception {
-
-                        MessageParserFactory factory = new MessageParserFactory();
-                        factory.saveMessage(msg, sub_file);
-
+                        new MessageSaver(msg).saveMessage(sub_file);
                     }
                 });
 
@@ -716,7 +713,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
     }
 
     public void exportFile(File export_file) throws Exception {
-        parser_factory.saveMessage(message, export_file);
+        new MessageSaver(message).saveMessage(export_file);
     }
 
     public String getFileName()

@@ -8,7 +8,8 @@ import com.auxilii.msgparser.attachment.FileAttachment;
 import com.auxilii.msgparser.attachment.MsgAttachment;
 import net.sourceforge.MSGViewer.HtmlFromRtf;
 import net.sourceforge.MSGViewer.ModuleLauncher;
-import net.sourceforge.MSGViewer.factory.MessageParserFactory;
+import net.sourceforge.MSGViewer.factory.MessageParser;
+import net.sourceforge.MSGViewer.factory.MessageSaver;
 import net.sourceforge.MSGViewer.factory.mbox.headers.DateHeader;
 
 import javax.activation.DataHandler;
@@ -26,11 +27,13 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
+import static java.util.Objects.requireNonNullElse;
+
 /**
  *
  * @author martin
  */
-public class MBoxWriterViaJavaMail
+public class MBoxWriterViaJavaMail implements AutoCloseable
 {
      private final Session session = Session.getInstance(System.getProperties());
      private File tmp_dir;
@@ -68,11 +71,7 @@ public class MBoxWriterViaJavaMail
              MimeBodyPart plain_text = new MimeBodyPart();
              String plain_text_string = msg.getBodyText();
 
-             if (plain_text_string != null) {
-                 plain_text.setText(plain_text_string);
-             } else {
-                 plain_text.setText("");
-             }
+             plain_text.setText(requireNonNullElse(plain_text_string, ""));
 
              mp_alternate.addBodyPart(plain_text);
 
@@ -101,16 +100,14 @@ public class MBoxWriterViaJavaMail
 
                 Message message = msgAtt.getMessage();
 
-                MessageParserFactory factory = new MessageParserFactory();
-
                 String message_file_name = message.getSubject();
                 if( message_file_name == null || message_file_name.isEmpty() ) {
                     message_file_name = String.valueOf(message.hashCode());
                 }
-                message_file_name = message_file_name.replaceAll("/", " ");
+                message_file_name = message_file_name.replace("/", " ");
 
                 File subMessage = new File(getTmpDir() + "/" + message_file_name + "." + getExtension());
-                factory.saveMessage(message, subMessage);
+                new MessageSaver(message).saveMessage(subMessage);
 
                 MimeBodyPart part = new MimeBodyPart();
                 part.setDisposition(BodyPart.ATTACHMENT);
@@ -154,7 +151,7 @@ public class MBoxWriterViaJavaMail
          return content;
      }
 
-    private void writeMBoxHeader(Message msg, OutputStream out) throws IOException
+    private static void writeMBoxHeader(Message msg, OutputStream out) throws IOException
     {
        StringBuilder sb = new StringBuilder();
 
@@ -174,7 +171,7 @@ public class MBoxWriterViaJavaMail
        out.write(sb.toString().getBytes(StandardCharsets.US_ASCII));
     }
 
-    void addHeaders( Message msg, javax.mail.Message jmsg ) throws MessagingException
+    static void addHeaders(Message msg, javax.mail.Message jmsg) throws MessagingException
     {
         if( msg.getHeaders() == null ) {
             return;
@@ -215,6 +212,7 @@ public class MBoxWriterViaJavaMail
         }
     }
 
+    @Override
     public void close()
     {
         if( tmp_dir != null ) {
@@ -229,15 +227,13 @@ public class MBoxWriterViaJavaMail
          ModuleLauncher.BaseConfigureLogging();
 
          try {
-            MessageParserFactory factory = new MessageParserFactory();
-            Message msg = factory.parseMessage(new File( "/home/martin/NetBeansProjects/redeye/MSGViewer/test/data/Logminer.mbox"));
+            Message msg = new MessageParser(new File( "/home/martin/NetBeansProjects/redeye/MSGViewer/test/data/Logminer.mbox")).parseMessage();
 
             MBoxWriterViaJavaMail writer = new MBoxWriterViaJavaMail();
 
             writer.write(msg, new FileOutputStream("/home/martin/test_out.mbox"));
 
          } catch( Exception ex ) {
-             System.out.println(ex);
              ex.printStackTrace();
          }
      }
