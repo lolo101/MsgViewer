@@ -14,10 +14,6 @@ import javax.mail.internet.MimeMessage;
 import java.io.*;
 import java.util.Enumeration;
 
-/**
- *
- * @author martin
- */
 public class JavaMailParser
 {
     private static final Logger LOGGER = LogManager.getLogger(JavaMailParser.class);
@@ -27,10 +23,15 @@ public class JavaMailParser
     private static final EmailHeader CC_PARSER =  new CcEmailHeader();
     private static final EmailHeader BCC_PARSER =  new BccEmailHeader();
     private static final DateHeader DATE_PARSER = new DateHeader();
+    private final File file;
 
-    public Message parse( File file ) throws Exception
+    public JavaMailParser(File file) {
+        this.file = file;
+    }
+
+    public Message parse() throws Exception
     {
-        javax.mail.Message jmsg = parseJMessage(file);
+        javax.mail.Message jmsg = parseJMessage();
 
         Message msg = new Message();
 
@@ -52,14 +53,14 @@ public class JavaMailParser
         return msg;
     }
 
-    private javax.mail.Message parseJMessage(File file) throws MessagingException, IOException {
+    private javax.mail.Message parseJMessage() throws MessagingException, IOException {
         try (InputStream stream = new FileInputStream(file)) {
             Session session = Session.getInstance(System.getProperties());
             return new MimeMessage(session, stream);
         }
     }
 
-    private void parse( Message msg, Part part ) throws MessagingException, IOException
+    private static void parse(Message msg, Part part) throws MessagingException, IOException
     {
         LOGGER.info("Content Type: " + part.getContentType());
 
@@ -124,7 +125,7 @@ public class JavaMailParser
         }
     }
 
-    private String getCharset( String content )
+    private static String getCharset(String content)
     {
         if( content.matches(".*;\\s*charset=.*") )
         {
@@ -134,7 +135,6 @@ public class JavaMailParser
 
             byte[] c = new byte[2];
             c[0] = ' ';
-            c[1] = '\0';
 
             charset = StringUtils.strip(charset,"\"");
 
@@ -151,7 +151,7 @@ public class JavaMailParser
         return "ASCII";
     }
 
-    private byte[] getContent(Part mp) throws IOException, MessagingException
+    private static byte[] getContent(Part mp) throws IOException, MessagingException
     {
         InputStream in = mp.getInputStream();
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -164,7 +164,7 @@ public class JavaMailParser
         return bos.toByteArray();
     }
 
-    private String getMime( String content_type )
+    private static String getMime(String content_type)
     {
         int idx = content_type.indexOf('\n');
         if( idx < 0 ) {
@@ -176,7 +176,7 @@ public class JavaMailParser
         return StringUtils.strip_post(mime,";");
     }
 
-    private String getFirstHeader(String[] headers)
+    private static String getFirstHeader(String[] headers)
     {
         if( headers == null ) {
             return "";
@@ -204,7 +204,7 @@ public class JavaMailParser
         return sb.toString();
     }
 
-    private String getHeaders(Enumeration<Header> allHeaders)
+    private static String getHeaders(Enumeration<Header> allHeaders)
     {
        StringBuilder sb = new StringBuilder();
 

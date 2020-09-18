@@ -31,7 +31,7 @@ public class RTFParser {
 
         for( RTFGroup group : groups )
         {
-            if( !group.isEmptyText() )
+            if( group.isNotEmptyText() )
             {
                 String content = group.getTextContent();
                 sb.append(content);

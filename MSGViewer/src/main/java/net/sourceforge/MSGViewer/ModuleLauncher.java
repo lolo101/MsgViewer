@@ -102,7 +102,7 @@ public class ModuleLauncher extends BaseModuleLauncher
 
         registerPlugins();
 
-        setLookAndFeel(root);
+        setLookAndFeel();
 
         configureLogging();
 

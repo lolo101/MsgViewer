@@ -1,12 +1,13 @@
 package net.sourceforge.MSGViewer.rtfparser;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 
 public class RTFGroup
 {
-    private StringBuilder text_content;
+    private final StringBuilder text_content = new StringBuilder();
     private final List<String> commands = new ArrayList<>();
     private String last_command = "";
 
@@ -31,22 +32,13 @@ public class RTFGroup
 
     public void addTextContent( String text )
     {
-        if( text_content == null )
-            text_content = new StringBuilder();
-
         if( last_command.startsWith("\\html") )
             text_content.append(text);
     }
 
     public boolean isEmpty()
     {
-        if( text_content == null && commands.isEmpty() )
-            return true;
-
-        if( text_content.length() > 0 )
-            return false;
-
-        return false;
+        return text_content.length() == 0 && commands.isEmpty();
     }
 
     public String getTextContent()
@@ -59,9 +51,9 @@ public class RTFGroup
         return commands;
     }
 
-    boolean isEmptyText() {
+    boolean isNotEmptyText() {
 
-       return StringUtils.isEmpty(text_content);
+       return !StringUtils.isEmpty(text_content);
     }
 
 }

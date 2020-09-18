@@ -13,7 +13,7 @@ import at.redeye.SqlDBInterface.SqlDBIO.impl.DBDataType;
  */
 public class DBInteger extends DBValue {
 
-    Integer value = Integer.valueOf(0);
+    Integer value = 0;
 
     public DBInteger( String name )
     {

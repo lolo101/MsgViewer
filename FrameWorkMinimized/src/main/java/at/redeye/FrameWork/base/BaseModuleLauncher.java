@@ -67,7 +67,7 @@ public abstract class BaseModuleLauncher {
 				return value;
 			} catch (MalformedURLException ex) {
 				System.err.println("invalid url specified: " + value);
-				System.err.println(ex);
+				ex.printStackTrace();
 			}
 		}
 
@@ -308,7 +308,7 @@ public abstract class BaseModuleLauncher {
 	 * be called after the PrmInit was done, but it has to be done before the UI
 	 * starts.
 	 */
-	public void setLookAndFeel(Root root) {
+	public void setLookAndFeel() {
 
 		String config = root.getSetup().getLocalConfig(
 				FrameWorkConfigDefinitions.LookAndFeel);

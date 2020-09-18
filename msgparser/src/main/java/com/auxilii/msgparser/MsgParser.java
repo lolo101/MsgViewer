@@ -30,63 +30,24 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-/**
- * Main parser class that does the actual
- * parsing of the Outlook .msg file. It uses the
- * <a href="http://poi.apache.org/poifs/">POI</a>
- * library for parsing the .msg container file
- * and is based on a description posted by
- * Peter Fiskerstrand at
- * <a href="http://www.fileformat.info/format/outlookmsg/">fileformat.info</a>.
- * <p>
- * It parses the .msg file and stores the information
- * in a {@link Message} object. Attachments are
- * put into an {@link FileAttachment} object. Hence, please
- * keep in mind that the complete mail is held in the memory!
- * If an attachment is another .msg file, this
- * attachment is not processed as a normal attachment
- * but rather included as a {@link MsgAttachment}. This
- * attached mail is, again, a {@link Message} object
- * and may have further attachments and so on.
- * <p>
- * Note: this code has not been tested on a wide
- * range of .msg files. Use in production level
- * (as in any other level) at your own risk.
- * <p>
- * Usage:<br>
- * <code>
- * MsgParser msgp = new MsgParser();<br>
- * Message msg = msgp.parseMsg("test.msg");
- * </code>
- * @author roman.kurmanowytsch
- */
 public class MsgParser {
 
     public static final String PROPERTIES_ENTRY = "__properties_version1.0";
+    private final File msgFile;
 
-    /**
-     * Parses a .msg file provided in the specified file.
-     *
-     * @param msgFile The .msg file.
-     * @return A {@link Message} object representing the .msg file.
-     * @throws IOException Thrown if the file could not be loaded or parsed.
-     */
-    public Message parseMsg(File msgFile) throws IOException {
-        try (InputStream stream = new FileInputStream(msgFile)) {
-            return this.parseMsg(stream);
-        }
+    public MsgParser(File msgFile) {
+        this.msgFile = msgFile;
     }
 
     /**
      * Parses a .msg file provided in the specified file.
      *
-     * @param msgFile The .msg file as a String path.
      * @return A {@link Message} object representing the .msg file.
      * @throws IOException Thrown if the file could not be loaded or parsed.
      */
-    public Message parseMsg(String msgFile) throws IOException {
+    public Message parseMsg() throws IOException {
         try (InputStream stream = new FileInputStream(msgFile)) {
-            return this.parseMsg(stream);
+            return parseMsg(stream);
         }
     }
 
@@ -97,7 +58,7 @@ public class MsgParser {
      * @return A {@link Message} object representing the .msg file.
      * @throws IOException Thrown if the file could not be loaded or parsed.
      */
-    public Message parseMsg(InputStream msgFileStream) throws IOException {
+    private static Message parseMsg(InputStream msgFileStream) throws IOException {
         // the .msg file, like a file system, contains directories
         // and documents within this directories
         // we now gain access to the root node
@@ -109,7 +70,7 @@ public class MsgParser {
         return msg;
     }
 
-    private void parseMsg(DirectoryEntry dir, Message msg) throws IOException {
+    private static void parseMsg(DirectoryEntry dir, Message msg) throws IOException {
         DocumentEntry propertyEntry = (DocumentEntry) dir.getEntry(PROPERTIES_ENTRY);
         try ( DocumentInputStream propertyStream = new DocumentInputStream(propertyEntry)) {
             propertyStream.skip(8);
@@ -145,7 +106,7 @@ public class MsgParser {
      * @throws IOException Thrown if the .msg file could not
      *  be parsed.
      */
-    protected void parseRecipient(DirectoryEntry dir, Message msg) throws IOException {
+    protected static void parseRecipient(DirectoryEntry dir, Message msg) throws IOException {
         RecipientEntry recipient = new RecipientEntry();
         DocumentEntry propertyEntry = (DocumentEntry) dir.getEntry(PROPERTIES_ENTRY);
         try ( DocumentInputStream propertyStream = new DocumentInputStream(propertyEntry)) {
@@ -173,7 +134,7 @@ public class MsgParser {
      * @throws IOException Thrown if the attachment could
      *  not be parsed/read.
      */
-    protected void parseAttachment(DirectoryEntry dir, Message msg) throws IOException {
+    protected static void parseAttachment(DirectoryEntry dir, Message msg) throws IOException {
         if (dir.hasEntry("__substg1.0_3701000D")) {
             parseEmbeddedMessage(dir, msg);
         } else {
@@ -181,7 +142,7 @@ public class MsgParser {
         }
     }
 
-    private void parseEmbeddedMessage(DirectoryEntry dir, Message msg) throws IOException {
+    private static void parseEmbeddedMessage(DirectoryEntry dir, Message msg) throws IOException {
         DirectoryEntry entry = (DirectoryEntry) dir.getEntry("__substg1.0_3701000D");
         Message attachmentMsg = new Message();
         MsgAttachment msgAttachment = new MsgAttachment();
@@ -192,7 +153,7 @@ public class MsgParser {
         msg.addAttachment(msgAttachment);
     }
 
-    private void ParseFileAttachment(DirectoryEntry dir, Message msg) throws IOException {
+    private static void ParseFileAttachment(DirectoryEntry dir, Message msg) throws IOException {
         FileAttachment fileAttachment = new FileAttachment();
         DocumentEntry propertyEntry = (DocumentEntry) dir.getEntry(PROPERTIES_ENTRY);
         try ( DocumentInputStream propertyStream = new DocumentInputStream(propertyEntry)) {

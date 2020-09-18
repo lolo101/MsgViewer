@@ -37,12 +37,12 @@ public class MessageParser {
     }
 
     private Message parseMsgFile() throws IOException {
-        MsgParser msg_parser = new MsgParser();
-        return msg_parser.parseMsg(file);
+        MsgParser msg_parser = new MsgParser(file);
+        return msg_parser.parseMsg();
     }
 
     private Message parseJavaMailFile() throws Exception {
-        JavaMailParser jmail_parser = new JavaMailParser();
-        return jmail_parser.parse(file);
+        JavaMailParser jmail_parser = new JavaMailParser(file);
+        return jmail_parser.parse();
     }
 }

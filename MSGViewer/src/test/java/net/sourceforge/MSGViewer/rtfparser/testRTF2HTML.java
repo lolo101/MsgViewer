@@ -4,6 +4,7 @@ import at.redeye.FrameWork.base.AutoLogger;
 import at.redeye.FrameWork.base.BaseModuleLauncher;
 import at.redeye.FrameWork.base.LocalRoot;
 import at.redeye.FrameWork.utilities.ReadFile;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
@@ -61,7 +62,7 @@ public class testRTF2HTML extends BaseModuleLauncher
 
                             for( RTFGroup group : groups )
                             {
-                                if( !group.isEmptyText() )
+                                if( group.isNotEmptyText() )
                                 {
                                     String content = group.getTextContent();
 
