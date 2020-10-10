@@ -28,11 +28,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import static java.util.Objects.requireNonNullElse;
+import javax.mail.internet.MimeUtility;
 
-/**
- *
- * @author martin
- */
 public class MBoxWriterViaJavaMail implements AutoCloseable
 {
      private final Session session = Session.getInstance(System.getProperties());
@@ -92,6 +89,7 @@ public class MBoxWriterViaJavaMail implements AutoCloseable
                 part.setDisposition(BodyPart.ATTACHMENT);
 
                 part.attachFile(dumpAttachment(fatt));
+                part.setFileName(MimeUtility.encodeText(fatt.getDisplayName(), "UTF-8", null));
 
                 mp.addBodyPart(part);
              } else if( att instanceof MsgAttachment ) {
@@ -142,7 +140,7 @@ public class MBoxWriterViaJavaMail implements AutoCloseable
 
      File dumpAttachment( FileAttachment fatt ) throws IOException
      {
-         File content = new File(getTmpDir(), fatt.toString());
+         File content = new File(getTmpDir(), fatt.getFilename());
 
          try (FileOutputStream fout = new FileOutputStream(content)) {
              fout.write(fatt.getData());

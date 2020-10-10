@@ -13,6 +13,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import java.io.*;
 import java.util.Enumeration;
+import javax.mail.internet.MimeUtility;
 
 public class JavaMailParser
 {
@@ -102,9 +103,10 @@ public class JavaMailParser
                 MimeBodyPart mpart = (MimeBodyPart)part;
 
                 FileAttachment att = new FileAttachment();
+                String filename = MimeUtility.decodeText(part.getFileName());
                 att.setMimeTag(getMime(part.getContentType()));
-                att.setFilename(part.getFileName());
-                att.setExtension(part.getFileName().substring(part.getFileName().lastIndexOf('.') + 1));
+                att.setFilename(filename);
+                att.setExtension(filename.substring(filename.lastIndexOf('.') + 1));
 
                 String cid = mpart.getContentID();
                 if( cid != null ) {
