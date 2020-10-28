@@ -657,8 +657,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
             sb.append(message.getFromName());
         }
 
-        if( message.getFromEmail() != null && message.getFromEmail().contains("@") )
-        {
+        if (message.getFromEmail() != null && ViewerHelper.isValidEmail(message.getFromEmail())) {
             sb.append(" &lt;");
             sb.append(message.getFromEmail());
             sb.append("&gt;");
@@ -683,8 +682,18 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
     private static String asMailto(RecipientEntry recipient) {
         String name = recipient.getName();
         String email = recipient.getEmail();
-        if (isNotBlank(email)) {
-            return "<a href='mailto:" + email + "'>" + (isNotBlank(name) ? name + " &lt;" + email + "&gt;" : email) + "</a>";
+        String smtp = recipient.getSmtp();
+        String mailTo = "";
+
+        if (isNotBlank(email) && ViewerHelper.isValidEmail(email)) {
+            mailTo = email;
+        } else if (isNotBlank(smtp)) {
+            mailTo = smtp;
+        }
+
+        if (isNotBlank(mailTo)) {
+            return "<a href='mailto:" + mailTo + "'>" + (isNotBlank(name) ? name + " &lt;" + mailTo + "&gt;" : mailTo)
+                    + "</a>";
         }
         return name;
     }
