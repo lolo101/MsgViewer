@@ -14,6 +14,8 @@ import net.htmlparser.jericho.Attributes;
 import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.StartTag;
 import net.sourceforge.MSGViewer.rtfparser.ParseException;
+
+import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.poi.util.IOUtils;
 
 import javax.activation.MimeType;
@@ -244,4 +246,8 @@ public class ViewerHelper {
         return new File(tmp_dir, matt.getMessage().hashCode() + ".msg");
     }
 
+    public static boolean isValidEmail(String email) {
+        EmailValidator emailValidator = EmailValidator.getInstance();
+        return emailValidator.isValid(email);
+    }
 }
