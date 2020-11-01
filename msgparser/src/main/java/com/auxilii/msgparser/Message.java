@@ -20,6 +20,8 @@ package com.auxilii.msgparser;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
 import com.auxilii.msgparser.attachment.MsgAttachment;
+
+import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.hmef.CompressedRTF;
@@ -32,14 +34,11 @@ import java.util.*;
 import static org.apache.poi.util.StringUtil.getFromUnicodeLE;
 
 /**
- * Class that represents a .msg file. Some
- * fields from the .msg file are stored in special
- * parameters (e.g., {@link #fromEmail}).
- * Attachments are stored in the property
- * {@link #attachments}). An attachment may be
- * of the type {@link MsgAttachment} which
- * represents another attached (encapsulated)
- * .msg object.
+ * Class that represents a .msg file. Some fields from the .msg file are stored
+ * in special parameters (e.g., {@link #fromEmail}). Attachments are stored in
+ * the property {@link #attachments}). An attachment may be of the type
+ * {@link MsgAttachment} which represents another attached (encapsulated) .msg
+ * object.
  *
  * @author roman.kurmanowytsch
  */
@@ -58,6 +57,9 @@ public class Message {
      * The address part of From: mail address.
      */
     private String fromEmail = null;
+
+    private String fromSMTPAddress = null;
+
     /**
      * The name part of the From: mail address
      */
@@ -107,18 +109,17 @@ public class Message {
     private Date date = null;
 
     /**
-     * A list of all attachments (both {@link FileAttachment}
-     * and {@link MsgAttachment}).
+     * A list of all attachments (both {@link FileAttachment} and
+     * {@link MsgAttachment}).
      */
     private List<Attachment> attachments = new ArrayList<>();
     /**
-     * Contains all properties that are not
-     * covered by the special properties.
+     * Contains all properties that are not covered by the special properties.
      */
     private final Map<String, Object> properties = new HashMap<>();
     /**
-     * A list containing all recipients for this message
-     * (which can be set in the 'to:', 'cc:' and 'bcc:' field, respectively).
+     * A list containing all recipients for this message (which can be set in the
+     * 'to:', 'cc:' and 'bcc:' field, respectively).
      */
     private List<RecipientEntry> recipients = new ArrayList<>();
 
@@ -129,7 +130,6 @@ public class Message {
     public void addRecipient(RecipientEntry recipient) {
         this.recipients.add(recipient);
     }
-
 
     void setProperty(Property property) {
         switch (property.getPid()) {
@@ -144,6 +144,11 @@ public class Message {
                 break;
             case PidTagSenderEmailAddress:
             case PidTagSentRepresentingEmailAddress:
+                String email = (String) property.getValue();
+                EmailValidator emailValidator = EmailValidator.getInstance();
+                if (emailValidator.isValid(email)) {
+                    this.setFromSMTPAddress(email);
+                }
                 this.setFromEmail((String) property.getValue());
                 break;
             case PidTagSenderName:
@@ -250,9 +255,8 @@ public class Message {
     }
 
     /**
-     * Convenience method for creating
-     * an email address expression (including
-     * the name, the address, or both).
+     * Convenience method for creating an email address expression (including the
+     * name, the address, or both).
      *
      * @param mail The mail address.
      * @param name The name part of the address.
@@ -271,9 +275,8 @@ public class Message {
         if (mail.equalsIgnoreCase(name)) {
             return mail;
         }
-        return "\""+name+"\" <"+mail+">";
+        return "\"" + name + "\" <" + mail + ">";
     }
-
 
     /**
      * @return the attachments
@@ -281,7 +284,6 @@ public class Message {
     public List<Attachment> getAttachments() {
         return attachments;
     }
-
 
     /**
      * @param attachments the attachments to set
@@ -304,14 +306,12 @@ public class Message {
         this.recipients = recipients;
     }
 
-
     /**
      * @return the bodyText
      */
     public String getBodyText() {
         return bodyText;
     }
-
 
     /**
      * @param bodyText the bodyText to set
@@ -320,14 +320,12 @@ public class Message {
         this.bodyText = nullOrTrim(bodyText);
     }
 
-
     /**
      * @return the fromEmail
      */
     public String getFromEmail() {
         return fromEmail;
     }
-
 
     /**
      * @param fromEmail the fromEmail to set
@@ -336,6 +334,13 @@ public class Message {
         this.fromEmail = nullOrTrim(fromEmail);
     }
 
+    public String getFromSMTPAddress() {
+        return fromSMTPAddress;
+    }
+
+    public void setFromSMTPAddress(String fromSMTPAddress) {
+        this.fromSMTPAddress = fromSMTPAddress;
+    }
 
     /**
      * @return the fromName
@@ -343,7 +348,6 @@ public class Message {
     public String getFromName() {
         return fromName;
     }
-
 
     /**
      * @param fromName the fromName to set
@@ -383,14 +387,12 @@ public class Message {
         return messageClass;
     }
 
-
     /**
      * @param messageClass the messageClass to set
      */
     private void setMessageClass(String messageClass) {
         this.messageClass = messageClass;
     }
-
 
     /**
      * @return the messageId
@@ -399,7 +401,6 @@ public class Message {
         return messageId;
     }
 
-
     /**
      * @param messageId the messageId to set
      */
@@ -407,14 +408,12 @@ public class Message {
         this.messageId = messageId;
     }
 
-
     /**
      * @return the subject
      */
     public String getSubject() {
         return subject;
     }
-
 
     /**
      * @param subject the subject to set
@@ -437,14 +436,12 @@ public class Message {
         this.toEmail = nullOrTrim(toEmail);
     }
 
-
     /**
      * @return the toName
      */
     public String getToName() {
         return toName;
     }
-
 
     /**
      * @param toName the toName to set
@@ -520,7 +517,6 @@ public class Message {
         return headers;
     }
 
-
     /**
      * @param headers the headers to set
      */
@@ -532,8 +528,7 @@ public class Message {
      * Parses the message date from the mail headers.
      *
      * @param headers The headers in a single String object
-     * @return The Date object or null, if no valid Date:
-     *   has been found
+     * @return The Date object or null, if no valid Date: has been found
      */
     public static Date getDateFromHeaders(String headers) {
         if (headers == null) {
@@ -546,8 +541,8 @@ public class Message {
                 SimpleDateFormat formatter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss z", Locale.ENGLISH);
                 try {
                     return formatter.parse(dateValue);
-                } catch(Exception e) {
-                    LOGGER.info( "Could not parse date "+dateValue, e);
+                } catch (Exception e) {
+                    LOGGER.info("Could not parse date " + dateValue, e);
                 }
                 // there is only one Date: header; we can exit the loop here
                 break;
@@ -556,7 +551,6 @@ public class Message {
         return null;
     }
 
-
     /**
      * @return the date
      */
@@ -564,14 +558,12 @@ public class Message {
         return date;
     }
 
-
     /**
      * @param date the date to set
      */
     public void setDate(Date date) {
         this.date = date;
     }
-
 
     public Set<String> getProperties() {
         return this.properties.keySet();
