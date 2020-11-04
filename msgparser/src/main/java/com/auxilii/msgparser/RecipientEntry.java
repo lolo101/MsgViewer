@@ -17,9 +17,14 @@
  */
 package com.auxilii.msgparser;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
+import org.apache.commons.validator.routines.EmailValidator;
+
 /**
- * This class represents a recipient's entry of the parsed .msg file. It provides informations like the
- * email address and the display name.
+ * This class represents a recipient's entry of the parsed .msg file. It
+ * provides informations like the email address and the display name.
+ * 
  * @author thomas.misar
  * @author roman.kurmanowytsch
  */
@@ -32,7 +37,7 @@ public class RecipientEntry {
     private RecipientType type;
 
     void setProperty(Property property) {
-        switch(property.getPid()) {
+        switch (property.getPid()) {
             case PidTagRecipientType:
                 setType(RecipientType.from((int) property.getValue()));
                 break;
@@ -50,7 +55,6 @@ public class RecipientEntry {
                 break;
         }
     }
-
 
     public String getEmail() {
         return email;
@@ -90,6 +94,16 @@ public class RecipientEntry {
 
     public void setType(RecipientType type) {
         this.type = type;
+    }
+
+    public String mailTo() {
+        EmailValidator emailValidator = EmailValidator.getInstance();
+        if (isNotBlank(email) && emailValidator.isValid(email)) {
+            return email;
+        } else if (isNotBlank(smtp)) {
+            return smtp;
+        }
+        return "";
     }
 
     /**

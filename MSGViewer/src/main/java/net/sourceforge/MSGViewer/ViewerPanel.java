@@ -687,15 +687,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
     private static String asMailto(RecipientEntry recipient) {
         String name = recipient.getName();
-        String email = recipient.getEmail();
-        String smtp = recipient.getSmtp();
-        String mailTo = "";
-
-        if (isNotBlank(email) && ViewerHelper.isValidEmail(email)) {
-            mailTo = email;
-        } else if (isNotBlank(smtp)) {
-            mailTo = smtp;
-        }
+        String mailTo = recipient.mailTo();
 
         if (isNotBlank(mailTo)) {
             return "<a href='mailto:" + mailTo + "'>" + (isNotBlank(name) ? name + " &lt;" + mailTo + "&gt;" : mailTo)
