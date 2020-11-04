@@ -149,7 +149,7 @@ public class Message {
                 if (emailValidator.isValid(email)) {
                     this.setFromSMTPAddress(email);
                 }
-                this.setFromEmail((String) property.getValue());
+                this.setFromEmail(email);
                 break;
             case PidTagSenderName:
             case PidTagSentRepresentingName:
