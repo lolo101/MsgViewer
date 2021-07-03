@@ -10,7 +10,6 @@ import org.junit.*;
 import java.time.LocalDate;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 public class BaseHolidaysTest {
 
@@ -65,47 +64,31 @@ public class BaseHolidaysTest {
     /**
      * Test of getEuropeanSummerTimeBegin method, of class BaseHolidays.
      */
-    @Test @Ignore("Not implemented")
-    public static void testGetEuropeanSummerTimeBegin() {
-        System.out.println("getEuropeanSummerTimeBegin");
-        int year = 0;
-        BaseHolidays instance = null;
-        LocalDate expResult = null;
-        LocalDate result = instance.getEuropeanSummerTimeBegin(year);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    @Test
+    public void testGetEuropeanSummerTimeBegin() {
+        assertEquals(
+                LocalDate.of(2010, 3, 28),
+                BaseHolidays.getEuropeanSummerTimeBegin(2010));
     }
 
     /**
      * Test of getEuropeanSummerTimeEnd method, of class BaseHolidays.
      */
-    @Test @Ignore("Not implemented")
-    public static void testGetEuropeanSummerTimeEnd() {
-        System.out.println("getEuropeanSummerTimeEnd");
-        int year = 0;
-        BaseHolidays instance = null;
-        LocalDate expResult = null;
-        LocalDate result = instance.getEuropeanSummerTimeEnd(year);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    @Test
+    public void testGetEuropeanSummerTimeEnd() {
+        assertEquals(
+                LocalDate.of(2010, 10, 31),
+                BaseHolidays.getEuropeanSummerTimeEnd(2010));
     }
 
     /**
      * Test of getLastSundayOf method, of class BaseHolidays.
      */
-    @Test @Ignore("Not implemented")
+    @Test
     public void testGetLastSundayOf() {
-        System.out.println("getLastSundayOf");
-        int year = 0;
-        int month = 0;
-        BaseHolidays instance = null;
-        LocalDate expResult = null;
-        LocalDate result = BaseHolidays.getLastSundayOf(year, month);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertEquals(
+                LocalDate.of(2010, 2, 28),
+                BaseHolidays.getLastSundayOf(2010, 2));
     }
 
 }
