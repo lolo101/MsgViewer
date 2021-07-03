@@ -5,16 +5,10 @@
 
 package at.redeye.FrameWork.utilities.calendar;
 
-import org.joda.time.DateMidnight;
-import org.joda.time.LocalDate;
-
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Collection;
 
-/**
- *
- * @author Administrator
- */
 public interface Holidays {
 
     class HolidayInfo
@@ -29,7 +23,7 @@ public interface Holidays {
         public String CountryCode;
 
         public HolidayInfo(HolidayInfo hi) {
-            date = new LocalDate( hi.date );
+            date = hi.date;
             floating_holiday = hi.floating_holiday;
             official_holiday = hi.official_holiday;
             merge_to_primary = hi.merge_to_primary;
@@ -61,7 +55,7 @@ public interface Holidays {
 
         public HolidayInfo( int year, int month, int day, boolean floating, boolean official, String name, String CountryCode )
         {
-            date = new LocalDate( year, month, day );
+            date = LocalDate.of( year, month, day );
             floating_holiday = floating;
             official_holiday = official;
             this.name = name;
@@ -80,16 +74,10 @@ public interface Holidays {
     String getPrimaryCountryCode();
 
     /*
-     * @return returns a list of holidays a specific date.
+     * @return a list of holidays a specific date.
      * @date date for the holiday we are looking for
      */
-    HolidayInfo getHolidayForDay(DateMidnight date);
-
-/*
-     * @return returns a list of holidays a specific date.
-     * @date date for the holiday we are looking for
-     */
-HolidayInfo getHolidayForDay(LocalDate date);
+    HolidayInfo getHolidayForDay(LocalDate date);
 
 
     HolidayInfo getHolidayForDay(Calendar cal);

@@ -10,11 +10,6 @@
     <artifactId>FrameWorkMinimized</artifactId>
     <dependencies>
         <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-            <version>2.6</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
         </dependency>

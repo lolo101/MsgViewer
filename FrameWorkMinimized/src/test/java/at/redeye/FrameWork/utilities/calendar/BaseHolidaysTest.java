@@ -5,16 +5,13 @@
 
 package at.redeye.FrameWork.utilities.calendar;
 
-import org.joda.time.LocalDate;
 import org.junit.*;
+
+import java.time.LocalDate;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-/**
- *
- * @author martin
- */
 public class BaseHolidaysTest {
 
     public BaseHolidaysTest() {
@@ -43,10 +40,10 @@ public class BaseHolidaysTest {
     public void testGetEaster() {
         System.out.println("getEaster");
 
-        LocalDate[] dates = { new LocalDate(2008,3,23),
-                              new LocalDate(2009,4,12),
-                              new LocalDate(2010,4,4),
-                              new LocalDate(2011,4,24)
+        LocalDate[] dates = { LocalDate.of(2008,3,23),
+                              LocalDate.of(2009,4,12),
+                              LocalDate.of(2010,4,4),
+                              LocalDate.of(2011,4,24)
                               };
 
         for( LocalDate dm : dates )
@@ -69,7 +66,7 @@ public class BaseHolidaysTest {
      * Test of getEuropeanSummerTimeBegin method, of class BaseHolidays.
      */
     @Test @Ignore("Not implemented")
-    public void testGetEuropeanSummerTimeBegin() {
+    public static void testGetEuropeanSummerTimeBegin() {
         System.out.println("getEuropeanSummerTimeBegin");
         int year = 0;
         BaseHolidays instance = null;
@@ -84,7 +81,7 @@ public class BaseHolidaysTest {
      * Test of getEuropeanSummerTimeEnd method, of class BaseHolidays.
      */
     @Test @Ignore("Not implemented")
-    public void testGetEuropeanSummerTimeEnd() {
+    public static void testGetEuropeanSummerTimeEnd() {
         System.out.println("getEuropeanSummerTimeEnd");
         int year = 0;
         BaseHolidays instance = null;
@@ -105,7 +102,7 @@ public class BaseHolidaysTest {
         int month = 0;
         BaseHolidays instance = null;
         LocalDate expResult = null;
-        LocalDate result = instance.getLastSundayOf(year, month);
+        LocalDate result = BaseHolidays.getLastSundayOf(year, month);
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");

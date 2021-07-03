@@ -6,27 +6,16 @@
 
 package at.redeye.FrameWork.widgets.calendar;
 
-
 import at.redeye.FrameWork.utilities.calendar.Holidays;
 import at.redeye.FrameWork.utilities.calendar.Holidays.HolidayInfo;
 import at.redeye.FrameWork.utilities.calendar.MonthNames;
-import at.redeye.FrameWork.widgets.calendarday.CalendarDay;
-import at.redeye.FrameWork.widgets.calendarday.CommonInfoRenderer;
-import at.redeye.FrameWork.widgets.calendarday.DayEventListener;
-import at.redeye.FrameWork.widgets.calendarday.DisplayDay;
-import at.redeye.FrameWork.widgets.calendarday.InfoRenderer;
+import at.redeye.FrameWork.widgets.calendarday.*;
 
 import java.awt.*;
+import java.time.LocalDate;
 import java.util.Collection;
-import java.util.GregorianCalendar;
 import java.util.Vector;
-import org.joda.time.DateMidnight;
-import org.joda.time.LocalDate;
 
-/**
- *
- * @author  martin
- */
 public class CalendarComponent extends javax.swing.JPanel implements DisplayMonth, DayEventListener {
 
     protected Vector<DisplayDay> days = new Vector<>();
@@ -357,10 +346,10 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
         month = Month;
         year = Year;
 
-        DateMidnight cal = new DateMidnight(Year, Month, 1 );
+        LocalDate cal = LocalDate.of(Year, Month, 1 );
 
-        int dayOfWeek = cal.getDayOfWeek();
-        int maxDays = cal.toGregorianCalendar().getActualMaximum(GregorianCalendar.DAY_OF_MONTH);
+        int dayOfWeek = cal.getDayOfWeek().getValue();
+        int maxDays = cal.lengthOfMonth();
         daysOfMonth = maxDays;
 
         System.out.println("Day of Week:" + dayOfWeek + " Month: " + maxDays );
@@ -385,7 +374,7 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
             if( renderer != null )
                 renderer.setDay(cal.plusDays(count-1));
 
-            days.get(i).setWeekDay(cal.plusDays(count-1).getDayOfWeek());
+            days.get(i).setWeekDay(cal.plusDays(count-1).getDayOfWeek().getValue());
         }
 
         // Samstage hervorheben
@@ -409,10 +398,10 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
                 renderer.setDay(cal.plusDays(maxDays + count - 1));
         }
 
-        DateMidnight cal2 = new DateMidnight(Year,Month,1);
-        DateMidnight cal3 = cal2.minusMonths(1);
+        LocalDate cal2 = LocalDate.of(Year,Month,1);
+        LocalDate cal3 = cal2.minusMonths(1);
 
-        int maxDaysbefore = cal3.toGregorianCalendar().getActualMaximum(GregorianCalendar.DAY_OF_MONTH);
+        int maxDaysbefore = cal3.lengthOfMonth();
 
         System.out.println( "maxDaysBefore:" + maxDaysbefore );
 
@@ -439,7 +428,7 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
             {
                     LocalDate d = hinfo.date;
 
-                    if( d.getMonthOfYear() == Month )
+                    if( d.getMonthValue() == Month )
                     {
                         DisplayDay day = getDay(d.getDayOfMonth());
 
@@ -459,8 +448,6 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
                         } else {
                             System.out.println( "cant get " + d + "day: " + d.getDayOfMonth() );
                         }
-                    } else {
-                        // System.out.println( "ignoring " + d );
                     }
             }
         }
@@ -555,10 +542,10 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
     }
 
     private void setAktualDay() {
-        DateMidnight today = new DateMidnight();
+        LocalDate today = LocalDate.now();
 
         int this_year = today.getYear();
-        int this_mon = today.getMonthOfYear();
+        int this_mon = today.getMonthValue();
         int this_day = today.getDayOfMonth();
 
         if( year != this_year )

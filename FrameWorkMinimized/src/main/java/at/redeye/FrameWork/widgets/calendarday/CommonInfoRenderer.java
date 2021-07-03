@@ -5,16 +5,16 @@
 
 package at.redeye.FrameWork.widgets.calendarday;
 
-import org.joda.time.DateMidnight;
+import java.time.LocalDate;
 
 /**
  *
  * @author martin
  */
-public class CommonInfoRenderer implements InfoRenderer 
+public class CommonInfoRenderer implements InfoRenderer
 {
     protected StringBuilder info = new StringBuilder();
-    
+
     @Override
     public void clear() {
          info.delete(0, info.length());
@@ -46,7 +46,7 @@ public class CommonInfoRenderer implements InfoRenderer
     }
 
     @Override
-    public void setDay(DateMidnight day) {
+    public void setDay(LocalDate day) {
         // brauch ma net
     }
 
@@ -57,7 +57,7 @@ public class CommonInfoRenderer implements InfoRenderer
     }
 
     @Override
-    public DateMidnight getDay() {
+    public LocalDate getDay() {
         return null;
     }
 }
