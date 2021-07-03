@@ -1,39 +1,28 @@
-/*
- * Day.java
- *
- * Created on 2. Januar 2009, 11:11
- */
-
 package at.redeye.FrameWork.widgets.calendarday;
 
-import java.awt.Color;
+import java.awt.*;
 
-/**
- *
- * @author  martin
- */
 public class CalendarDay extends javax.swing.JPanel implements DisplayDay {
 
     private DayEventListener listener = null;
-    private Color INACTIVE_COLOR = new Color(214,214,214);
-    private Color ACTIVE_COLOR = null;
-    private Color SELECTED_COLOR = new Color(220,255,220);
-    private Color BG_NORMAL = new Color(255,255,255);
-    private Color BG_SATURDAY = new Color(220,240,255);
-    private Color BG_SUNDAY = new Color(240,200,200);
-    private Color BG_TODAY = new Color(236,219,166);
+    private final Color INACTIVE_COLOR = new Color(214,214,214);
+    private Color ACTIVE_COLOR;
+    private final Color SELECTED_COLOR = new Color(220,255,220);
+    private final Color BG_NORMAL = new Color(255,255,255);
+    private final Color BG_SATURDAY = new Color(220,240,255);
+    private final Color BG_SUNDAY = new Color(240,200,200);
+    private final Color BG_TODAY = new Color(236,219,166);
     private boolean isActive = true;
     private boolean isSelected = false;
     private InfoRenderer renderer = null;
     private int weekday = 0;
     private boolean is_holiday = false;
-    private boolean is_today = false;
-    
+
     /** Creates new form Day */
     public CalendarDay() {
-        
+
         ACTIVE_COLOR = BG_NORMAL;
-        
+
         initComponents();
     }
 
@@ -131,10 +120,9 @@ private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_
     private javax.swing.JLabel jSum;
     private javax.swing.JScrollPane js;
     // End of variables declaration//GEN-END:variables
-    
+
     @Override
-    public void setInfo(String info) { 
-        // System.out.println(info);
+    public void setInfo(String info) {
         String text =  jInfo.getText();
 
         if( text != null )
@@ -171,14 +159,14 @@ private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_
     public void setBackground( Color col )
     {
         super.setBackground(col);
-        
+
         if( js != null )
             js.setBackground(col);
-        
+
         if( jInfo != null )
             jInfo.setBackground(col);
     }
-    
+
     @Override
     public void clear() {
         setSum("");
@@ -186,19 +174,18 @@ private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_
         setInfo("");
         setActive();
         setNormalBackground();
-        
+
         if( renderer != null )
             renderer.clear();
-        
+
         weekday = 0;
         is_holiday = false;
-        is_today = false;
     }
 
     @Override
     public void setActive() {
         isActive = true;
-        setBackground(ACTIVE_COLOR);                
+        setBackground(ACTIVE_COLOR);
     }
 
     @Override
@@ -215,11 +202,11 @@ private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_
 
     @Override
     public void setUnSelected() {
-        if( isActive == true )
+        if(isActive)
             this.setActive();
         else
             this.setInactive();
-        
+
         isSelected = false;
     }
 
@@ -235,27 +222,27 @@ private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_
 
     @Override
     public void setNormalBackground() {
-        ACTIVE_COLOR = BG_NORMAL;        
-        setBackground(ACTIVE_COLOR);        
+        ACTIVE_COLOR = BG_NORMAL;
+        setBackground(ACTIVE_COLOR);
     }
 
     @Override
     public void setSaturdayBackground() {
-        ACTIVE_COLOR = BG_SATURDAY;        
-        setBackground(ACTIVE_COLOR);                
+        ACTIVE_COLOR = BG_SATURDAY;
+        setBackground(ACTIVE_COLOR);
     }
 
     @Override
     public void setSundayBackground() {
-        ACTIVE_COLOR = BG_SUNDAY;        
-        setBackground(ACTIVE_COLOR);                
+        ACTIVE_COLOR = BG_SUNDAY;
+        setBackground(ACTIVE_COLOR);
     }
 
     @Override
     public void setInfoRenderer(InfoRenderer renderer) {
         this.renderer = renderer;
     }
-    
+
     @Override
     public void update()
     {
@@ -264,7 +251,7 @@ private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_
             renderer.update();
             setInfo(renderer.render());
             setSum(renderer.renderSum());
-        }        
+        }
     }
 
     @Override
@@ -304,8 +291,7 @@ private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_
 
     @Override
     public void setToday() {
-        is_today = true;
         ACTIVE_COLOR = BG_TODAY;
-        setBackground(ACTIVE_COLOR);   
+        setBackground(ACTIVE_COLOR);
     }
 }

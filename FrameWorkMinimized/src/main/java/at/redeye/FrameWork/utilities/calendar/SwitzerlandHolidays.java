@@ -26,10 +26,6 @@ public class SwitzerlandHolidays extends BaseHolidays implements Holidays {
         // siehe http://de.wikipedia.org/wiki/Feiertage_in_der_Schweiz
         Vector<HolidayInfo> res = new Vector<>();
 
-        Easterformular easter_formular = new Easterformular(year);
-
-        int day = easter_formular.easterday();
-
         LocalDate easter = getEaster(year);
 
         res.add( create( easter, true, true, "Ostersonntag" ) );

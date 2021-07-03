@@ -76,19 +76,15 @@ public abstract class BaseHolidays {
 
     public static LocalDate getLastSundayOf(int year, int month)
     {
-        LocalDate dm = LocalDate.of( year, month, 31 );
-
-        while( true )
-        {
-            if( dm.getDayOfWeek() == DayOfWeek.SUNDAY )
-                return dm;
-
+        int maxDay = LocalDate.of(year, month, 1).lengthOfMonth();
+        LocalDate dm = LocalDate.of(year, month, maxDay);
+        while (dm.getDayOfWeek() != DayOfWeek.SUNDAY) {
             dm = dm.minusDays(1);
         }
+        return dm;
     }
 
     public abstract Collection<HolidayInfo> getHolidays(int year);
-
 
      public HolidayInfo getHolidayForDay( Calendar calendar )
      {
