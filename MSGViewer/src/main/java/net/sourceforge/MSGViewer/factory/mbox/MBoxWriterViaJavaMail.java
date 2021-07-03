@@ -19,6 +19,7 @@ import javax.mail.Session;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.mail.internet.MimeUtility;
 import javax.mail.util.ByteArrayDataSource;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -28,7 +29,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import static java.util.Objects.requireNonNullElse;
-import javax.mail.internet.MimeUtility;
 
 public class MBoxWriterViaJavaMail implements AutoCloseable
 {
@@ -138,7 +138,7 @@ public class MBoxWriterViaJavaMail implements AutoCloseable
          return tmp_dir;
      }
 
-     File dumpAttachment( FileAttachment fatt ) throws IOException
+     private File dumpAttachment( FileAttachment fatt ) throws IOException
      {
          File content = new File(getTmpDir(), fatt.getFilename());
 
