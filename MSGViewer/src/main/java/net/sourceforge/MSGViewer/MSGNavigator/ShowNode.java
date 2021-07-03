@@ -156,17 +156,17 @@ public class ShowNode extends BaseDialog {
         jTHex.setText(sb.toString());
     }
 
-    private String formatByte( byte b )
+    private static String formatByte(byte b)
     {
         return b == 0 ? "__ " : String.format("%02X ", b);
     }
 
-    private String formatByte0( byte b )
+    private static String formatByte0(byte b)
     {
         return String.format("%02X ", b);
     }
 
-    private String formatByte0S( byte b )
+    private static String formatByte0S(byte b)
     {
         return String.format("%02X", b);
     }
@@ -252,7 +252,7 @@ public class ShowNode extends BaseDialog {
                 sb.append(" ");
                 sb.append(val);
                 sb.append(": ");
-                sb.append(new Date(MSTimeConvert.PtypeTime2Millis(val)).toString());
+                sb.append(new Date(MSTimeConvert.PtypeTime2Millis(val)));
                 break;
             case "000b":
                 sb.append(" boolean");
@@ -389,7 +389,7 @@ public class ShowNode extends BaseDialog {
         jTHex.setText(sb.toString());
     }
 
-    private String getPropertySetById( String id )
+    private static String getPropertySetById(String id)
     {
         switch(id) {
             case "00020386-0000-0000-C000-000000000046":
@@ -549,7 +549,7 @@ public class ShowNode extends BaseDialog {
         }
     }
 
-    private void appendGuid(int voffset, byte[] bytes, StringBuilder sb) throws NumberFormatException {
+    private static void appendGuid(int voffset, byte[] bytes, StringBuilder sb) throws NumberFormatException {
         StringBuilder s_guid = new StringBuilder();
 
         // 15 Bytes GUID

@@ -5,7 +5,7 @@
 
 package at.redeye.FrameWork.widgets.calendarday;
 
-import org.joda.time.DateMidnight;
+import java.time.LocalDate;
 
 /**
  *
@@ -20,7 +20,7 @@ public interface InfoRenderer
     void update();
     String render();
     void addContent(Object data);
-    void setDay(DateMidnight day);
+    void setDay(LocalDate day);
     String renderSum();
-    DateMidnight getDay();
+    LocalDate getDay();
 }

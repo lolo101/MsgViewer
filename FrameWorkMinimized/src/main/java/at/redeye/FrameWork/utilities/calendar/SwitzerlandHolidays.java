@@ -5,15 +5,10 @@
 
 package at.redeye.FrameWork.utilities.calendar;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Vector;
-import org.joda.time.LocalDate;
 
-
-/**
- *
- * @author Administrator
- */
 public class SwitzerlandHolidays extends BaseHolidays implements Holidays {
 
     public static String myCountryCode = "CH";
