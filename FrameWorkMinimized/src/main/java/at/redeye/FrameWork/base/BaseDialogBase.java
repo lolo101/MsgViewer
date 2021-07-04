@@ -1,30 +1,12 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.base;
 
 import at.redeye.FrameWork.base.tablemanipulator.TableManipulator;
 import at.redeye.FrameWork.base.transaction.Transaction;
-import at.redeye.SqlDBInterface.SqlDBIO.impl.TableBindingNotRegisteredException;
-import at.redeye.SqlDBInterface.SqlDBIO.impl.UnsupportedDBDataTypeException;
-import at.redeye.SqlDBInterface.SqlDBIO.impl.WrongBindFileFormatException;
-import java.awt.Container;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.event.WindowListener;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Timer;
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.KeyStroke;
 
-/**
- *
- * @author martin
- */
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.WindowListener;
+
 public interface BaseDialogBase
 {
     void close();
@@ -62,7 +44,7 @@ public interface BaseDialogBase
 
     /**
      * Registers a listener for a F1, ESC, or somthing global keypressed Event
-     * @param to_listen_Key Keyboard Key
+     * @param keyStroke Keyboard Key
      * @param runnable      Method to call
      */
     void registerActionKeyListener(KeyStroke keyStroke, Runnable runnable);
@@ -83,20 +65,15 @@ public interface BaseDialogBase
 
     void invokeDialog(BaseDialogBase dlg);
 
-    void invokeDialogModal(BaseDialogDialog dlg);
-
     void invokeDialogUnique(BaseDialogBase dialog);
 
     /**
      * opens the dialog as a new main Dialog. So if the source Dialog
      * is closed, the subdialog won't be closed, because it's a new main dialog.
-     * @param dialog
      */
     void invokeMainDialog(BaseDialogBase dialog);
 
     void registerOnCloseListener(Runnable runnable);
-
-    void deregisterOnCloseListener(Runnable runnable);
 
     boolean closeSubdialogsOnClose();
 
@@ -105,8 +82,6 @@ public interface BaseDialogBase
     boolean isEdited();
 
     void setEdited(boolean val);
-
-    void clearEdited();
 
     /**
      * Checks, if data within the table have been change, asks the
@@ -136,50 +111,6 @@ public interface BaseDialogBase
      */
     Transaction getTransaction();
 
-    /**
-     * @return A new Transaction object, of the current database connection
-     * This Transactino won't be closed on dialog closing event automatically
-     * You have to close each allocated Transaction object yourself by calling
-     * <b>closeTransaction()</b>
-     *
-     * The Transaction object will by destroyed atomatically on appliaction shutdown
-     */
-    Transaction getNewTransaction();
-
-    /**
-     * closes a given Transaction object. Rollback is done automatically.
-     * @param tran a valid Transaction object
-     * @throws SQLException if rollback fails
-     */
-    void closeTransaction(Transaction tran) throws SQLException;
-
-/**
-     * Ermittelt den nächsten Wert für eine gegebene Sequenz
-     * @param seqName
-     * @return den nächsten Wert der Sequenz
-     * @throws java.sql.SQLException
-     * @throws at.redeye.SqlDBInterface.SqlDBIO.impl.UnsupportedDBDataTypeException
-     * @throws WrongBindFileFormatException
-     * @throws TableBindingNotRegisteredException
-     * @throws IOException
-     */
-int getNewSequenceValue(String seqName) throws SQLException, UnsupportedDBDataTypeException, WrongBindFileFormatException, TableBindingNotRegisteredException, IOException;
-
-/**
-     * Ermittelt den nächsten Wert für eine gegebene Sequenz. Die <b>number</b> gibt dabei an wieviele
-     * Werte benötigt werden. Im Endeffekt darf dann der zurückgegeben Wert so oft, wie durch die Varible <b>number</> angeben
-     * erhöht werden.
-     * @param seqName
-     * @param number die Anzahl der Werte die geliefert werden soll.
-     * @return den nächsten Wert der Sequenz
-     * @throws java.sql.SQLException
-     * @throws at.redeye.SqlDBInterface.SqlDBIO.impl.UnsupportedDBDataTypeException
-     * @throws WrongBindFileFormatException
-     * @throws TableBindingNotRegisteredException
-     * @throws IOException
-     */
-int getNewSequenceValues(String seqName, int number) throws SQLException, UnsupportedDBDataTypeException, WrongBindFileFormatException, TableBindingNotRegisteredException, IOException;
-
     void dispose();
 
     int getX();
@@ -187,10 +118,6 @@ int getNewSequenceValues(String seqName, int number) throws SQLException, Unsupp
     int getY();
 
     void closeNoAppExit();
-
-    void setBindVarsChanged(boolean state);
-
-    void setBindVars(BindVarInterface bind_vars);
 
     /**
     * language the dialog is programmed in
@@ -210,36 +137,7 @@ int getNewSequenceValues(String seqName, int number) throws SQLException, Unsupp
      */
     String MlM(String message);
 
-    Timer getAutoRefreshTimer();
-
-
-    /**
-     * Returns the minimum size of this container.  If the minimum size has
-     * not been set explicitly by {@link Component#setMinimumSize(Dimension)}
-     * and this {@code Container} has a {@code non-null} {@link LayoutManager},
-     * then {@link LayoutManager#minimumLayoutSize(Container)}
-     * is used to calculate the minimum size.
-     *
-     * <p>Note: some implementations may cache the value returned from the
-     * {@code LayoutManager}.  Implementations that cache need not invoke
-     * {@code minimumLayoutSize} on the {@code LayoutManager} every time
-     * this method is invoked, rather the {@code LayoutManager} will only
-     * be queried after the {@code Container} becomes invalid.
-     *
-     * @return    an instance of <code>Dimension</code> that represents
-     *                the minimum size of this container.
-     * @see       #getPreferredSize
-     * @see       #getMaximumSize
-     * @see       #getLayout
-     * @see       LayoutManager#minimumLayoutSize(Container)
-     * @see       Component#getMinimumSize
-     * @since     JDK1.1
-     */
-    Dimension getMinimumSize();
-
     void setWaitCursor();
-
-    void setWaitCursor(boolean state);
 
     void setNormalCursor();
 }

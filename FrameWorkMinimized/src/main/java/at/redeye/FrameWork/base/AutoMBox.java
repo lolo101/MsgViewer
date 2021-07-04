@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.base;
 
 import at.redeye.FrameWork.utilities.StringUtils;
@@ -12,16 +7,11 @@ import org.apache.logging.log4j.Logger;
 import javax.swing.*;
 import java.util.ArrayList;
 
-/**
- *
- * @author martin
- */
 public abstract class AutoMBox
 {
     public interface ShowAdvancedException
     {
         /**
-         * @param ex
          * @return false, if the default exceptiondialog should be shown
          */
         boolean wantShowAdvancedException( Exception ex );
@@ -46,14 +36,6 @@ public abstract class AutoMBox
     public AutoMBox( String className )
     {
         this(className, true);
-    }
-
-    public static void addShowAdvancedExceptionHandle( ShowAdvancedException handler )
-    {
-        if( show_exception_handlers == null )
-            show_exception_handlers = new ArrayList<>();
-
-        show_exception_handlers.add(handler);
     }
 
     private void invoke()

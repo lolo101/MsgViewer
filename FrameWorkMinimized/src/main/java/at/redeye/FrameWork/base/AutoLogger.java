@@ -1,17 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.base;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-/**
- *
- * @author martin
- */
 public abstract class AutoLogger {
 
     protected Logger logger;
@@ -45,13 +36,4 @@ public abstract class AutoLogger {
         return failed || logical_failure;
     }
 
-    protected void setFailed()
-    {
-        logical_failure = true;
-    }
-
-    protected void clearFailed()
-    {
-        logical_failure = false;
-    }
 }

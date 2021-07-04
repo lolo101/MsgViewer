@@ -21,7 +21,7 @@ public class ModuleLauncher extends BaseModuleLauncher
 
         BaseConfigureLogging(Level.ERROR);
 
-        root = new LocalRoot("MSGViewer", "MSGViewer", false, false);
+        root = new LocalRoot("MSGViewer", "MSGViewer", false);
 
         root.setBaseLanguage("en");
         root.setDefaultLanguage("en");

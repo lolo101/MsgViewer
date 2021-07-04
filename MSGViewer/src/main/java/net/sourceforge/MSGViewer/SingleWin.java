@@ -21,9 +21,6 @@ public class SingleWin extends BaseDialog implements MainDialog, OpenNewMailInte
     private static String last_path = null;
     private String dialog_id;
 
-    /**
-     * Creates new form SingleWin
-     */
     public SingleWin(Root root, final String file_name )
     {
         super(root, file_name != null ? (root.MlM(root.getAppTitle()) + ": " + file_name) : root.getAppTitle() );
@@ -57,26 +54,15 @@ public class SingleWin extends BaseDialog implements MainDialog, OpenNewMailInte
     @Override
     public String getUniqueDialogIdentifier(Object requester)
     {
-        /*
-         * dadurch können wir später den Titel ändern, ohne das sich dadurch
-         * die Dialog ID verändert.
-         */
         if( dialog_id == null )
          dialog_id = super.getUniqueDialogIdentifier(requester);
 
         return dialog_id;
     }
 
-    void cleanUp()
-    {
-
-    }
-
     @Override
     public void close()
     {
-        cleanUp();
-
         if( last_path != null )
             root.getSetup().setLocalConfig("LastPath", last_path);
 
