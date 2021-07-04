@@ -1,44 +1,13 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.utilities;
 
-import org.junit.*;
+import org.junit.Test;
 
 import java.util.List;
 
 import static org.junit.Assert.*;
 
-/**
- *
- * @author martin
- */
 public class StringUtilsTest {
 
-    public StringUtilsTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() {
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
-
-    /**
-     * Test of contains method, of class StringUtils.
-     */
     @Test
     public void testContains() {
         System.out.println("contains");
@@ -56,9 +25,6 @@ public class StringUtilsTest {
         }
     }
 
-    /**
-     * Test of skip_char method, of class StringUtils.
-     */
     @Test
     public void testSkip_char() {
         System.out.println("skip_char");
@@ -90,9 +56,6 @@ public class StringUtilsTest {
         }
     }
 
-    /**
-     * Test of skip_char_reverse method, of class StringUtils.
-     */
     @Test
     public void testSkip_char_reverse() {
         System.out.println("skip_char_reverse");
@@ -127,9 +90,6 @@ public class StringUtilsTest {
         }
     }
 
-    /**
-     * Test of skip_spaces_reverse method, of class StringUtils.
-     */
     @Test
     public void testSkip_spaces_reverse() {
         System.out.println("skip_spaces_reverse");
@@ -148,9 +108,6 @@ public class StringUtilsTest {
         }
     }
 
-    /**
-     * Test of skip_spaces method, of class StringUtils.
-     */
     @Test
     public void testSkip_spaces() {
         System.out.println("skip_spaces");
@@ -171,9 +128,6 @@ public class StringUtilsTest {
 
     }
 
-    /**
-     * Test of is_space method, of class StringUtils.
-     */
     @Test
     public void testIs_space() {
         System.out.println("is_space");
@@ -186,9 +140,6 @@ public class StringUtilsTest {
         assertFalse(StringUtils.is_space('x'));
     }
 
-    /**
-     * Test of split_str method, of class StringUtils.
-     */
     @Test
     public void testSplit_str() {
         System.out.println("split_str");
@@ -220,9 +171,6 @@ public class StringUtilsTest {
 
     }
 
-    /**
-     * Test of strip method, of class StringUtils.
-     */
     @Test
     public void testStrip_StringBuilder_String() {
         System.out.println("strip");
@@ -261,9 +209,6 @@ public class StringUtilsTest {
         assertEquals("xy z", StringUtils.strip( new StringBuilder("  xy z\t \n"), " \t\n"));
     }
 
-    /**
-     * Test of strip_post method, of class StringUtils.
-     */
     @Test
     public void testStrip_post_StringBuilder_String() {
         System.out.println("strip_post");
@@ -303,9 +248,6 @@ public class StringUtilsTest {
 
     }
 
-    /**
-     * Test of strip_post method, of class StringUtils.
-     */
     @Test
     public void testStrip_post_String_String() {
         System.out.println("strip_post");
@@ -345,9 +287,6 @@ public class StringUtilsTest {
 
     }
 
-    /**
-     * Test of strip method, of class StringUtils.
-     */
     @Test
     public void testStrip_String_String() {
         System.out.println("strip");
@@ -386,9 +325,6 @@ public class StringUtilsTest {
         assertEquals("xy z", StringUtils.strip("  xy z\t \n", " \t\n"));
     }
 
-    /**
-     * Test of set_defaultAutoLineLenght method, of class StringUtils.
-     */
     @Test
     public void testSet_defaultAutoLineLenght() {
         System.out.println("set_defaultAutoLineLenght");
@@ -397,9 +333,6 @@ public class StringUtilsTest {
         assertEquals(10, StringUtils.get_defaultAutoLineLenght());
     }
 
-    /**
-     * Test of get_defaultAutoLineLenght method, of class StringUtils.
-     */
     @Test
     public void testGet_defaultAutoLineLenght() {
         System.out.println("get_defaultAutoLineLenght");
@@ -522,9 +455,6 @@ public class StringUtilsTest {
         }
     }
 
-    /**
-     * Test of autoLineBreak method, of class StringUtils.
-     */
     @Test
     public void testAutoLineBreak_String() {
         System.out.println("autoLineBreak");
@@ -567,9 +497,6 @@ public class StringUtilsTest {
         assertText(testTextC50, res);
     }
 
-    /**
-     * Test of autoLineBreak method, of class StringUtils.
-     */
     @Test
     public void testAutoLineBreak_StringBuilder_int() {
         System.out.println("autoLineBreak");
@@ -605,9 +532,6 @@ public class StringUtilsTest {
         assertText(testTextC50, res);
     }
 
-    /**
-     * Test of autoLineBreak method, of class StringUtils.
-     */
     @Test
     public void testAutoLineBreak_StringBuilder() {
         System.out.println("autoLineBreak");
@@ -650,9 +574,6 @@ public class StringUtilsTest {
         assertText(testTextC50, res);
     }
 
-    /**
-     * Test of autoLineBreak method, of class StringUtils.
-     */
     @Test
     public void testAutoLineBreak_String_int() {
         System.out.println("autoLineBreak");
@@ -688,9 +609,6 @@ public class StringUtilsTest {
         assertText(testTextC50, res);
     }
 
-    /**
-     * Test of formatDouble method, of class StringUtils.
-     */
     @Test
     public void testFormatDouble_double_int() {
         System.out.println("formatDouble");
@@ -701,9 +619,6 @@ public class StringUtilsTest {
 
     }
 
-    /**
-     * Test of formatDouble method, of class StringUtils.
-     */
     @Test
     public void testFormatDouble_double() {
         System.out.println("formatDouble");
@@ -714,9 +629,6 @@ public class StringUtilsTest {
 
     }
 
-    /**
-     * Test of isYes method, of class StringUtils.
-     */
     @Test
     public void testIsYes() {
         System.out.println("isYes");
@@ -731,9 +643,6 @@ public class StringUtilsTest {
         assertFalse(StringUtils.isYes("hugo"));
     }
 
-    /**
-     * Test of exceptionToString method, of class StringUtils.
-     */
     @Test
     public void testExceptionToString() {
         System.out.println("exceptionToString");
@@ -755,9 +664,6 @@ public class StringUtilsTest {
 
     }
 
-    /**
-     * Test of skipLeadingLines method, of class StringUtils.
-     */
     @Test
     public void testSkipLeadingLines() {
         System.out.println("skipLeadingLines");
@@ -778,9 +684,6 @@ public class StringUtilsTest {
         assertEquals("", StringUtils.skipLeadingLines(testTest, 100));
     }
 
-    /**
-     * Test of byteArrayToString method, of class StringUtils.
-     */
     @Test
     public void testByteArrayToString() {
         System.out.println("byteArrayToString");

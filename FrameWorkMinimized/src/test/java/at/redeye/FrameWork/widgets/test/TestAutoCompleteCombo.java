@@ -1,27 +1,12 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
- * TestAutoCompleteCombo.java
- *
- * Created on 13.09.2009, 19:58:52
- */
-
 package at.redeye.FrameWork.widgets.test;
 
 import at.redeye.FrameWork.widgets.AutoCompleteCombo;
 import at.redeye.FrameWork.widgets.AutoCompleteTextField;
+
 import java.util.Vector;
 
-/**
- *
- * @author martin
- */
 public class TestAutoCompleteCombo extends javax.swing.JFrame {
 
-    /** Creates new form TestAutoCompleteCombo */
     public TestAutoCompleteCombo() {
         initComponents();
 
@@ -45,8 +30,8 @@ public class TestAutoCompleteCombo extends javax.swing.JFrame {
 
         combo = new AutoCompleteCombo();
         textfield = new AutoCompleteTextField();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        javax.swing.JLabel jLabel1 = new javax.swing.JLabel();
+        javax.swing.JLabel jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -90,17 +75,11 @@ public class TestAutoCompleteCombo extends javax.swing.JFrame {
     * @param args the command line arguments
     */
     public static void main(String[] args) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new TestAutoCompleteCombo().setVisible(true);
-            }
-        });
+        java.awt.EventQueue.invokeLater(() -> new TestAutoCompleteCombo().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField combo;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JTextField textfield;
     // End of variables declaration//GEN-END:variables
 

@@ -4,19 +4,12 @@ import at.redeye.FrameWork.utilities.calendar.AustrianHolidays;
 import at.redeye.FrameWork.widgets.calendarday.CalendarDay;
 import at.redeye.FrameWork.widgets.calendarday.DayEventListener;
 
-/**
- *
- * @author  martin
- */
 public class TestFrame extends javax.swing.JFrame implements DayEventListener {
 
-    CalendarComponent  month = null;
+    private final CalendarComponent month = new CalendarComponent();
 
-    /** Creates new form TestFrame */
     public TestFrame() {
         initComponents();
-
-        month = new CalendarComponent();
 
         setContentPane( month );
 
@@ -54,11 +47,7 @@ public class TestFrame extends javax.swing.JFrame implements DayEventListener {
     * @param args the command line arguments
     */
     public static void main(String[] args) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new TestFrame().setVisible(true);
-            }
-        });
+        java.awt.EventQueue.invokeLater(() -> new TestFrame().setVisible(true));
     }
 
     public void onClicked(CalendarDay day) {
