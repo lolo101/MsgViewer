@@ -1,7 +1,11 @@
 package at.redeye.FrameWork.utilities;
 
-import static org.junit.Assert.*;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -9,26 +13,16 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import javax.xml.parsers.ParserConfigurationException;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
-import org.xml.sax.SAXException;
+import static org.junit.Assert.assertEquals;
 
-/**
- *
- * @author martin
- */
 public class ParseJNLPTest {
 
     static class TestFile
     {
-        private String resource;
+        private final String resource;
         private File tempfile;
-        private String main_jar;
+        private final String main_jar;
         List<String> jar_list;
         String code_base;
 
@@ -63,7 +57,7 @@ public class ParseJNLPTest {
             return tempfile;
         }
 
-        public Properties getProperties() {
+        public static Properties getProperties() {
             return new Properties();
         }
 
@@ -123,10 +117,7 @@ public class ParseJNLPTest {
         }
     }
 
-    static List<TestFile> test_cases = new ArrayList();
-
-    public ParseJNLPTest() {
-    }
+    static List<TestFile> test_cases = new ArrayList<>();
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -146,17 +137,6 @@ public class ParseJNLPTest {
         }
     }
 
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
-
-    /**
-     * Test of getProperties method, of class ParseJNLP.
-     */
     @Test
     public void testGetProperties() throws ParserConfigurationException, IOException, SAXException {
 
@@ -164,15 +144,12 @@ public class ParseJNLPTest {
         {
             System.out.println("getProperties for " + test.resource);
             ParseJNLP instance = new ParseJNLP(test.getFile());
-            Properties expResult = test.getProperties();
+            Properties expResult = TestFile.getProperties();
             Properties result = instance.getProperties();
             assertEquals(expResult, result);
         }
     }
 
-    /**
-     * Test of getMainJar method, of class ParseJNLP.
-     */
     @Test
     public void testGetMainJar() throws ParserConfigurationException, IOException, SAXException {
 
@@ -186,9 +163,6 @@ public class ParseJNLPTest {
         }
     }
 
-    /**
-     * Test of getJars method, of class ParseJNLP.
-     */
     @Test
     public void testGetJars() throws ParserConfigurationException, IOException, SAXException {
 
@@ -202,9 +176,6 @@ public class ParseJNLPTest {
         }
     }
 
-    /**
-     * Test of getCodeBase method, of class ParseJNLP.
-     */
     @Test
     public void testGetCodeBase() throws ParserConfigurationException, IOException, SAXException {
 

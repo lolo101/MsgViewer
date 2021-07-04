@@ -1,26 +1,15 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package at.redeye.FrameWork.base.bindtypes;
 
-import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
 import at.redeye.SqlDBInterface.SqlDBIO.impl.DBDataType;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
 
-import org.junit.Ignore;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 
-/**
- *
- * @author martin
- */
 public class DBStringTest {
 
     static class TestCases
@@ -42,34 +31,16 @@ public class DBStringTest {
     private static final String NORMAL_STRING = "12345";
     private static final String LONG_STRING = "12345678901234567890";
 
-    public DBStringTest() {
-    }
-
     @BeforeClass
     public static void setUpClass() {
 
-        test_cases = new ArrayList();
+        test_cases = new ArrayList<>();
 
         test_cases.add( new TestCases( new DBString("name_only", MAX_LEN ), NORMAL_STRING, NORMAL_STRING ) );
         test_cases.add( new TestCases( new DBString("with title", "With Title", MAX_LEN ), LONG_STRING, LONG_STRING ) );
         test_cases.add( new TestCases( new DBString("empty", "empty With Title", MAX_LEN ), "", "" ) );
     }
 
-    @AfterClass
-    public static void tearDownClass() {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
-
-    /**
-     * Test of getDBType method, of class DBString.
-     */
     @Test
     public void testGetDBType() {
         System.out.println("getDBType");
@@ -83,9 +54,6 @@ public class DBStringTest {
         }
     }
 
-    /**
-     * Test of loadFromDB method, of class DBString.
-     */
     @Test
     public void testLoadFromDB() {
         System.out.println("loadFromDB");
@@ -99,9 +67,6 @@ public class DBStringTest {
         }
     }
 
-    /**
-     * Test of getValue method, of class DBString.
-     */
     @Test
     public void testGetValue() {
         System.out.println("getValue");
@@ -115,9 +80,6 @@ public class DBStringTest {
         }
     }
 
-    /**
-     * Test of toString method, of class DBString.
-     */
     @Test
     public void testToString() {
         System.out.println("toString");
@@ -131,9 +93,6 @@ public class DBStringTest {
         }
     }
 
-    /**
-     * Test of loadFromString method, of class DBString.
-     */
     @Test
     public void testLoadFromString() {
         System.out.println("loadFromString");
@@ -147,14 +106,11 @@ public class DBStringTest {
         }
     }
 
-    /**
-     * Test of acceptString method, of class DBString.
-     */
     @Test
     public void testAcceptString() {
         System.out.println("acceptString");
 
-        ArrayList<SimpleEntry<String,Boolean>> test_strings = new ArrayList();
+        ArrayList<SimpleEntry<String,Boolean>> test_strings = new ArrayList<>();
 
         test_strings.add(new SimpleEntry<>(NORMAL_STRING, true));
         test_strings.add(new SimpleEntry<>(LONG_STRING, false));
@@ -172,9 +128,6 @@ public class DBStringTest {
         }
     }
 
-    /**
-     * Test of getCopy method, of class DBString.
-     */
     @Test
     public void testGetCopy() {
         System.out.println("getCopy");
@@ -188,9 +141,6 @@ public class DBStringTest {
         }
     }
 
-    /**
-     * Test of loadFromCopy method, of class DBString.
-     */
     @Test
     public void testLoadFromCopy() {
         System.out.println("loadFromCopy");
@@ -205,9 +155,6 @@ public class DBStringTest {
         }
     }
 
-    /**
-     * Test of getMaxLen method, of class DBString.
-     */
     @Test
     public void testGetMaxLen() {
         System.out.println("getMaxLen");
@@ -220,9 +167,6 @@ public class DBStringTest {
         }
     }
 
-    /**
-     * Test of isEmpty method, of class DBString.
-     */
     @Test
     public void testIsEmpty() {
         System.out.println("isEmpty");
@@ -236,17 +180,15 @@ public class DBStringTest {
         }
     }
 
-    /**
-     * Test of isEmptyTrimmed method, of class DBString.
-     */
-    @Test @Ignore("Not implemented")
+    @Test
     public void testIsEmptyTrimmed() {
         System.out.println("isEmptyTrimmed");
-        DBString instance = null;
-        boolean expResult = false;
-        boolean result = instance.isEmptyTrimmed();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        for (TestCases test : test_cases)
+        {
+            DBString instance = test.instance;
+            boolean expResult = false;
+            boolean result = instance.isEmptyTrimmed();
+            assertEquals(expResult, result);
+        }
     }
 }
