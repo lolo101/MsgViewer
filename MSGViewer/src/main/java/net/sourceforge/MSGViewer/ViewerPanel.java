@@ -551,7 +551,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
                     sb.append("\"/> ");
                 }
 
-                if( ViewerHelper.is_mail_message(fatt.getFilename(), fatt.getMimeTag() ) ) {
+                if( ViewerHelper.is_mail_message(fatt.getFilename() ) ) {
                     if (!content.exists())
                     {
                         write(content, fatt.getData());

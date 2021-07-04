@@ -1,10 +1,14 @@
 package at.redeye.FrameWork.base.tablemanipulator.test;
 
-import at.redeye.FrameWork.base.*;
+import at.redeye.FrameWork.base.AutoMBox;
+import at.redeye.FrameWork.base.BaseDialog;
+import at.redeye.FrameWork.base.LocalRoot;
+import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.base.prm.bindtypes.DBConfig;
 import at.redeye.FrameWork.base.tablemanipulator.TableManipulator;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
 import java.util.Vector;
 
 public class RowHeaderTest extends BaseDialog {
@@ -16,6 +20,14 @@ public class RowHeaderTest extends BaseDialog {
         super(root,"Table RowHeader Test");
 
         initComponents();
+        for (UIManager.LookAndFeelInfo installedLookAndFeel : UIManager.getInstalledLookAndFeels()) {
+            String lookAndFeelName = installedLookAndFeel.getName();
+            JRadioButton button = new JRadioButton(lookAndFeelName);
+            button.setSelected(UIManager.getLookAndFeel().getName().equals(lookAndFeelName));
+            button.addActionListener(evt -> changeStyle(evt, installedLookAndFeel.getClassName()));
+            buttonGroupLaF.add(button);
+            jPanelLookAndFeels.add(button);
+        }
 
         DBConfig config = new DBConfig();
 
@@ -47,34 +59,25 @@ public class RowHeaderTest extends BaseDialog {
         tm.addAll(data);
 
         tm.autoResize();
-
-        if( StyleName.equals("system") )
-            jr_system.setSelected(true);
-        else if( StyleName.equals("metal") )
-            jr_metal.setSelected(true);
-        else if( StyleName.equals("motif") )
-            jr_motif.setSelected(true);
-        else
-            jr_nimbus.setSelected(true);
-
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
+        buttonGroupLaF = new javax.swing.ButtonGroup();
+        jPanelLookAndFeels = new javax.swing.JPanel();
+        javax.swing.JScrollPane jScrollPane1 = new javax.swing.JScrollPane();
         table = new javax.swing.JTable();
-        jr_system = new javax.swing.JRadioButton();
-        jr_motif = new javax.swing.JRadioButton();
-        jr_nimbus = new javax.swing.JRadioButton();
-        jr_metal = new javax.swing.JRadioButton();
-        jPanel1 = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        javax.swing.JPanel jPanel1 = new javax.swing.JPanel();
+        javax.swing.JButton jButton1 = new javax.swing.JButton();
+        javax.swing.JButton jButton2 = new javax.swing.JButton();
         jCShowRowHeader = new javax.swing.JCheckBox();
         jlTest = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+
+        jPanelLookAndFeels.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING));
+        getContentPane().add(jPanelLookAndFeels, java.awt.BorderLayout.PAGE_START);
 
         table.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -89,17 +92,7 @@ public class RowHeaderTest extends BaseDialog {
         ));
         jScrollPane1.setViewportView(table);
 
-        jr_system.setText("System");
-        jr_system.addActionListener(this::jr_systemActionPerformed);
-
-        jr_motif.setText("Motif");
-        jr_motif.addActionListener(this::jr_motifActionPerformed);
-
-        jr_nimbus.setText("Nimbus");
-        jr_nimbus.addActionListener(this::jr_nimbusActionPerformed);
-
-        jr_metal.setText("Metal");
-        jr_metal.addActionListener(this::jr_metalActionPerformed);
+        getContentPane().add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
         jButton1.setText("New");
         jButton1.addActionListener(this::jButton1ActionPerformed);
@@ -123,7 +116,7 @@ public class RowHeaderTest extends BaseDialog {
                 .addComponent(jButton1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 125, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jlTest, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jCShowRowHeader)
@@ -141,35 +134,7 @@ public class RowHeaderTest extends BaseDialog {
                 .addContainerGap())
         );
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jr_system)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jr_motif)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jr_nimbus)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jr_metal)
-                .addGap(255, 255, 255))
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 539, Short.MAX_VALUE)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jr_system)
-                    .addComponent(jr_motif)
-                    .addComponent(jr_nimbus)
-                    .addComponent(jr_metal))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
+        getContentPane().add(jPanel1, java.awt.BorderLayout.PAGE_END);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -218,51 +183,19 @@ public class RowHeaderTest extends BaseDialog {
 
     }//GEN-LAST:event_jCShowRowHeaderActionPerformed
 
-    private void jr_systemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jr_systemActionPerformed
+    private void changeStyle(ActionEvent evt, String className) {
+        AbstractButton button = (AbstractButton) evt.getSource();
+        button.setSelected(true);
+        changeStyle(className);
+    }
 
-        jr_motif.setSelected(false);
-        jr_nimbus.setSelected(false);
-        jr_metal.setSelected(false);
-
-        changeStyle("system");
-    }//GEN-LAST:event_jr_systemActionPerformed
-
-    private void jr_motifActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jr_motifActionPerformed
-
-        jr_system.setSelected(false);
-        jr_nimbus.setSelected(false);
-        jr_metal.setSelected(false);
-
-        changeStyle("motif");
-    }//GEN-LAST:event_jr_motifActionPerformed
-
-    private void jr_nimbusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jr_nimbusActionPerformed
-
-        jr_motif.setSelected(false);
-        jr_system.setSelected(false);
-        jr_metal.setSelected(false);
-
-        changeStyle("nimbus");
-    }//GEN-LAST:event_jr_nimbusActionPerformed
-
-    private void jr_metalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jr_metalActionPerformed
-
-        jr_motif.setSelected(false);
-        jr_nimbus.setSelected(false);
-        jr_system.setSelected(false);
-
-        changeStyle("metal");
-    }//GEN-LAST:event_jr_metalActionPerformed
-
-    void changeStyle( final String name )
+    final void changeStyle( final String className )
     {
-        StyleName = name;
-
         new AutoMBox(RowHeaderTest.class.getName())
         {
             @Override
             public void do_stuff() throws Exception {
-                UIManager.setLookAndFeel(BaseModuleLauncher.getLookAndFeelStrByName(name));
+                UIManager.setLookAndFeel(className);
                 root.closeAllWindowsNoAppExit();
                 run();
             }
@@ -270,7 +203,6 @@ public class RowHeaderTest extends BaseDialog {
     }
 
     private static Root main_root;
-    private static String StyleName = "metal";
 
     public static void main(String[] args) {
 
@@ -285,16 +217,10 @@ public class RowHeaderTest extends BaseDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
+    private javax.swing.ButtonGroup buttonGroupLaF;
     private javax.swing.JCheckBox jCShowRowHeader;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JPanel jPanelLookAndFeels;
     private javax.swing.JLabel jlTest;
-    private javax.swing.JRadioButton jr_metal;
-    private javax.swing.JRadioButton jr_motif;
-    private javax.swing.JRadioButton jr_nimbus;
-    private javax.swing.JRadioButton jr_system;
     private javax.swing.JTable table;
     // End of variables declaration//GEN-END:variables
 

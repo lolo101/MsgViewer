@@ -4,17 +4,17 @@ import at.redeye.FrameWork.base.FrameWorkConfigDefinitions;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.base.Setup;
 import at.redeye.FrameWork.utilities.DeleteDir;
-import at.redeye.FrameWork.utilities.StringUtils;
 import at.redeye.FrameWork.utilities.TempDir;
 import com.auxilii.msgparser.Message;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
 import com.auxilii.msgparser.attachment.MsgAttachment;
+import net.htmlparser.jericho.Attribute;
 import net.htmlparser.jericho.Attributes;
 import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.StartTag;
 import net.sourceforge.MSGViewer.rtfparser.ParseException;
-
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.poi.util.IOUtils;
 
@@ -25,12 +25,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static at.redeye.FrameWork.base.BaseDialog.logger;
 
 public class ViewerHelper {
 
-    private Root root;
+    private static final Pattern META_PATTERN = Pattern.compile("<meta\\s.*>", Pattern.CASE_INSENSITIVE);
+    private final Root root;
     private File tmp_dir;
     private boolean delete_tmp_dir = false;
 
@@ -57,11 +59,6 @@ public class ViewerHelper {
                 || file_name.toLowerCase().endsWith(".msg");
     }
 
-    static boolean is_mail_message( String file_name, String mime )
-    {
-        return is_mail_message( file_name );
-    }
-
     public String getOpenCommand()
     {
         if( Setup.is_win_system() )
@@ -70,64 +67,9 @@ public class ViewerHelper {
         return root.getSetup().getLocalConfig(FrameWorkConfigDefinitions.OpenCommand);
     }
 
-    static String prepareText( String s )
-    {
-        if( s == null )
-            return "";
-
-        StringBuilder sb = new StringBuilder();
-
-        s = s.replaceAll("<", "&lt;");
-        s = s.replaceAll(">", "&gt;");
-
-        int last_start = 0;
-
-        while( true )
-        {
-            int start = s.indexOf("http://", last_start);
-
-            if( start == -1 )
-            {
-                sb.append(s.substring(last_start));
-                break;
-            }
-
-            logger.info("last_start: " + last_start + " start: " + start + " length: " + s.length() );
-
-            sb.append(s, last_start, start);
-            last_start = start;
-
-            sb.append("<a href=\"");
-
-            int i;
-
-            for( i = start; i < s.length(); i++ )
-            {
-              if( s.indexOf("&gt;",i ) == i )
-                  break;
-
-              char c = s.charAt(i);
-
-              if( StringUtils.is_space(c) )
-              {
-                  break;
-              }
-              sb.append(c);
-            }
-
-            sb.append("\">");
-            sb.append(s, start, i-1);
-            sb.append("</a>");
-
-            last_start = i;
-        }
-
-        return sb.toString();
-    }
-
     static public String stripMetaTags(String html )
     {
-       html =  html.replaceAll("<[Mm][eE][Tt][aA]\\s.*>", "");
+       html = META_PATTERN.matcher(html).replaceAll("");
 
        StringBuilder body_text = new StringBuilder(html);
        Source source = new Source(html);
@@ -140,7 +82,7 @@ public class ViewerHelper {
            if( atts == null )
                continue;
 
-           net.htmlparser.jericho.Attribute att = atts.get("size");
+           Attribute att = atts.get("size");
 
            if( att != null )
            {
@@ -154,7 +96,7 @@ public class ViewerHelper {
            }
        }
 
-       System.out.println(body_text.toString());
+       System.out.println(body_text);
 
        return body_text.toString();
     }
@@ -232,7 +174,7 @@ public class ViewerHelper {
             throw new RuntimeException( "Cannot create tmp dir: " + tmp_dir );
         }
         return new File(tmp_dir,
-                org.apache.commons.lang3.StringUtils.isBlank(fatt.getFilename())
+                StringUtils.isBlank(fatt.getFilename())
                         ? fatt.getLongFilename()
                         : fatt.getFilename());
     }

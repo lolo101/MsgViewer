@@ -7,8 +7,6 @@ import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
 import com.auxilii.msgparser.attachment.MsgAttachment;
 import net.sourceforge.MSGViewer.HtmlFromRtf;
-import net.sourceforge.MSGViewer.ModuleLauncher;
-import net.sourceforge.MSGViewer.factory.MessageParser;
 import net.sourceforge.MSGViewer.factory.MessageSaver;
 import net.sourceforge.MSGViewer.factory.mbox.headers.DateHeader;
 
@@ -219,22 +217,6 @@ public class MBoxWriterViaJavaMail implements AutoCloseable
 
         tmp_dir = null;
     }
-
-     public static void main(String[] args)
-     {
-         ModuleLauncher.BaseConfigureLogging();
-
-         try {
-            Message msg = new MessageParser(new File( "/home/martin/NetBeansProjects/redeye/MSGViewer/test/data/Logminer.mbox")).parseMessage();
-
-            MBoxWriterViaJavaMail writer = new MBoxWriterViaJavaMail();
-
-            writer.write(msg, new FileOutputStream("/home/martin/test_out.mbox"));
-
-         } catch( Exception ex ) {
-             ex.printStackTrace();
-         }
-     }
 
      public String getExtension()
      {
