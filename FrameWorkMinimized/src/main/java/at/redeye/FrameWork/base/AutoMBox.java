@@ -5,17 +5,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
-import java.util.ArrayList;
 
 public class AutoMBox {
-    public interface ShowAdvancedException {
-        /**
-         * @return false, if the default exceptiondialog should be shown
-         */
-        boolean wantShowAdvancedException(Exception ex);
-
-        void showAdvancedException(Exception ex);
-    }
 
     @FunctionalInterface
     public interface Doable {
@@ -27,17 +18,15 @@ public class AutoMBox {
     protected final boolean do_mbox;
     private final Doable doable;
 
-    protected static ArrayList<ShowAdvancedException> show_exception_handlers = null;
-
-    public AutoMBox(String className, boolean do_mbox, Doable doable) {
-        logger = LogManager.getLogger(className);
+    public AutoMBox(String loggerName, boolean do_mbox, Doable doable) {
+        logger = LogManager.getLogger(loggerName);
         this.do_mbox = do_mbox;
         this.doable = doable;
         invoke();
     }
 
-    public AutoMBox(String className, Doable doable) {
-        this(className, true, doable);
+    public AutoMBox(String loggerName, Doable doable) {
+        this(loggerName, true, doable);
     }
 
     private void invoke() {
@@ -57,26 +46,13 @@ public class AutoMBox {
     }
 
     private static void showErrorDialog(Exception ex) {
-        boolean show_default_dialog = true;
+        Root root = Root.getLastRoot();
 
-        if (show_exception_handlers != null) {
-            for (ShowAdvancedException handler : show_exception_handlers) {
-                if (handler.wantShowAdvancedException(ex)) {
-                    show_default_dialog = false;
-                    handler.showAdvancedException(ex);
-                }
-            }
-        }
-
-        if (show_default_dialog) {
-            Root root = Root.getLastRoot();
-
-            JOptionPane.showMessageDialog(null,
-                    StringUtils.autoLineBreak(
-                            root.MlM("Es ist ein Fehler aufgetreten:") + " "
-                                    + ex.getLocalizedMessage()),
-                    root.MlM("Error"),
-                    JOptionPane.ERROR_MESSAGE);
-        }
+        JOptionPane.showMessageDialog(null,
+                StringUtils.autoLineBreak(
+                        root.MlM("Es ist ein Fehler aufgetreten:") + " "
+                                + ex.getLocalizedMessage()),
+                root.MlM("Error"),
+                JOptionPane.ERROR_MESSAGE);
     }
 }

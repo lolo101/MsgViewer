@@ -17,14 +17,14 @@
  */
 package com.auxilii.msgparser;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
 import org.apache.commons.validator.routines.EmailValidator;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
  * This class represents a recipient's entry of the parsed .msg file. It
  * provides informations like the email address and the display name.
- * 
+ *
  * @author thomas.misar
  * @author roman.kurmanowytsch
  */
@@ -32,7 +32,6 @@ public class RecipientEntry {
 
     private String email;
     private String smtp;
-    private String addressType;
     private String name;
     private RecipientType type;
 
@@ -43,9 +42,6 @@ public class RecipientEntry {
                 break;
             case PidTagDisplayName:
                 setName((String) property.getValue());
-                break;
-            case PidTagAddressType:
-                setAddressType((String) property.getValue());
                 break;
             case PidTagEmailAddress:
                 setEmail((String) property.getValue());
@@ -70,14 +66,6 @@ public class RecipientEntry {
 
     public void setSmtp(String smtp) {
         this.smtp = smtp;
-    }
-
-    public String getAddressType() {
-        return addressType;
-    }
-
-    public void setAddressType(String addressType) {
-        this.addressType = addressType;
     }
 
     public String getName() {

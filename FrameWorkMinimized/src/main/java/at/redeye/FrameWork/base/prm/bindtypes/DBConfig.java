@@ -1,29 +1,26 @@
 package at.redeye.FrameWork.base.prm.bindtypes;
 
-import at.redeye.FrameWork.base.bindtypes.*;
+import at.redeye.FrameWork.base.bindtypes.DBHistory;
+import at.redeye.FrameWork.base.bindtypes.DBString;
+import at.redeye.FrameWork.base.bindtypes.DBStrukt;
 import at.redeye.FrameWork.base.prm.PrmAttachInterface;
 import at.redeye.FrameWork.base.prm.PrmCustomChecksInterface;
 import at.redeye.FrameWork.base.prm.PrmDefaultChecksInterface;
 import at.redeye.FrameWork.base.prm.PrmListener;
 import at.redeye.FrameWork.base.prm.impl.PrmActionEvent;
+
 import java.util.Vector;
 
-
-/**
- *
- * @author martin
- */
 public class DBConfig extends DBStrukt implements PrmAttachInterface
 {
     public static String TABLENAME = "CONFIG";
 
-    private Vector <PrmListener> prmListeners = new Vector<>();
+    private final Vector <PrmListener> prmListeners = new Vector<>();
     private String oldValue = "";
     private String [] possibleValues = {};
 
     private PrmCustomChecksInterface customChecks = null;
     private PrmDefaultChecksInterface defaultChecks = null;
-
 
     public DBString  name  = new DBString("name", "Name", 100 );
     public DBString  value = new DBString( "value", "Wert", 100 );
@@ -48,7 +45,6 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface
         this.name.loadFromString(name);
         this.value.loadFromString(value);
         this.descr.loadFromString(descr);
-
     }
 
     public DBConfig( String name, String value )
@@ -71,7 +67,6 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface
         this.value.loadFromString(value);
         this.descr.loadFromString(descr);
         this.defaultChecks = checks;
-
     }
 
     public DBConfig( String name, String value, String descr, PrmDefaultChecksInterface checks, String [] possibleValues )
@@ -85,7 +80,6 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface
         this.descr.loadFromString(descr);
         this.defaultChecks = checks;
         this.possibleValues = possibleValues;
-
     }
 
     public DBConfig( String name, String value, PrmDefaultChecksInterface checks, String [] possibleValues )
@@ -113,14 +107,8 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface
         this.customChecks = specialChecks;
     }
 
-
     public boolean differs(DBConfig c_db) {
-        if( getConfigName().equals(c_db.getConfigName() ) == false )
-            return true;
-        if( getConfigValue().equals(c_db.getConfigValue()) == false )
-            return true;
-
-        return false;
+        return !(getConfigName().equals(c_db.getConfigName()) && getConfigValue().equals(c_db.getConfigValue()));
     }
 
     private void register()
@@ -190,7 +178,6 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface
             } else {
                 System.out.println("-> no custom check");
             }
-
         }
     }
 
@@ -222,7 +209,6 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface
         return defaultChecks;
     }
 
-
     public boolean hasChanged()
     {
         return changed;
@@ -237,5 +223,4 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface
     {
         changed = state;
     }
-
 }

@@ -19,6 +19,7 @@ import net.sourceforge.MSGViewer.factory.MessageParser;
 import net.sourceforge.MSGViewer.factory.MessageSaver;
 
 import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
@@ -35,13 +36,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static at.redeye.FrameWork.base.BaseDialog.logger;
 import static java.util.stream.Collectors.joining;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ViewerPanel extends javax.swing.JPanel implements Printable {
@@ -92,6 +93,11 @@ public class ViewerPanel extends javax.swing.JPanel implements Printable {
         if (pageTop >= fullHeight(bodyScale)) {
             return NO_SUCH_PAGE;
         }
+        printPage(graphics, pageFormat, pageTop, bodyScale);
+        return PAGE_EXISTS;
+    }
+
+    private void printPage(Graphics graphics, PageFormat pageFormat, int pageTop, double bodyScale) {
         Graphics2D g2d = (Graphics2D) graphics.create(
                 (int) pageFormat.getImageableX(),
                 (int) pageFormat.getImageableY(),
@@ -102,8 +108,7 @@ public class ViewerPanel extends javax.swing.JPanel implements Printable {
             printHeader(g2d, pageTop, headerHeight, (int) pageFormat.getImageableWidth());
         }
         printBody(g2d, pageTop, headerHeight, bodyScale);
-
-        return PAGE_EXISTS;
+        g2d.dispose();
     }
 
     private void printHeader(Graphics2D g2d, int pageTop, int headerHeight, int pageWidth) {
@@ -117,7 +122,6 @@ public class ViewerPanel extends javax.swing.JPanel implements Printable {
         g2d.translate(0, headerHeight - pageTop);
         g2d.scale(scale, scale);
         body.print(g2d);
-        g2d.dispose();
     }
 
     private double fullHeight(double bodyScale) {
@@ -407,7 +411,7 @@ public class ViewerPanel extends javax.swing.JPanel implements Printable {
 
         parent.setWaitCursor();
 
-        new AutoMBox(MainWin.class.getName(), () -> parse_int(file_name));
+        new AutoMBox(MainWin.class.getName(), this::doParse);
 
         parent.setNormalCursor();
     }
@@ -416,7 +420,7 @@ public class ViewerPanel extends javax.swing.JPanel implements Printable {
         message = null;
     }
 
-    void parse_int(final String file_name) throws Exception {
+    void doParse() throws Exception {
         cleanUp();
 
         wating_thread_pool_counter = 0;
@@ -427,21 +431,38 @@ public class ViewerPanel extends javax.swing.JPanel implements Printable {
             throw new FileNotFoundException(parent.MlM(String.format("File %s not found", file_name)));
 
         message = new MessageParser(file).parseMessage();
-
-        final StringBuilder sb = new StringBuilder();
-
-        sb.append("<html>");
-        sb.append("<body style=\"\">");
-
-        sb.append("<b>");
-        if (message.getSubject() != null)
-            sb.append(message.getSubject());
-        sb.append("</b>");
-        sb.append("<br/>");
-
         logger.info("Message From:" + message.getFromName() + "\n To:" + message.getToName() + "\n Email: " + message.getFromEmail());
 
-        printFrom(sb);
+        String text = headerHtml();
+        header.setContentType("text/html");
+
+        if (wating_thread_pool_counter > 0) {
+            updateBody(); // do something different now
+
+            new AutoMBox(file_name, () -> {
+                thread_pool.shutdown();
+                if (wating_thread_pool_counter > 0) {
+                    thread_pool.awaitTermination(1, TimeUnit.DAYS);
+                }
+            });
+
+            header.setText(text);
+            header.setCaretPosition(0);
+
+        } else {
+
+            header.setText(text);
+            header.setCaretPosition(0);
+
+            updateBody();
+        }
+    }
+
+    private String headerHtml() throws MimeTypeParseException, IOException {
+        final StringBuilder sb = new StringBuilder("<html><body style=\"\">");
+
+        sb.append(printSubject());
+        sb.append(printFrom());
 
         if (message.getDate() != null) {
             sb.append(parent.MlM("Date: "));
@@ -449,15 +470,13 @@ public class ViewerPanel extends javax.swing.JPanel implements Printable {
             sb.append("<br/>");
         }
 
-        printRecipients(sb, RecipientType.TO, "To: ");
-        printRecipients(sb, RecipientType.CC, "CC: ");
-        printRecipients(sb, RecipientType.BCC, "BCC: ");
-
-        List<Attachment> attachments = message.getAttachments();
+        sb.append(printRecipients(RecipientType.TO, "To: "));
+        sb.append(printRecipients(RecipientType.CC, "CC: "));
+        sb.append(printRecipients(RecipientType.BCC, "BCC: "));
 
         final int max_icon_size = Integer.parseInt(root.getSetup().getLocalConfig(AppConfigDefinitions.IconSize));
 
-        for (Attachment att : attachments) {
+        for (Attachment att : message.getAttachments()) {
             if (att instanceof FileAttachment) {
                 final FileAttachment fatt = (FileAttachment) att;
 
@@ -548,29 +567,7 @@ public class ViewerPanel extends javax.swing.JPanel implements Printable {
             }
         }
 
-        sb.append("</body></html>");
-        header.setContentType("text/html");
-
-        if (wating_thread_pool_counter > 0) {
-            updateBody(); // do something different now
-
-            new AutoMBox(file_name, () -> {
-                thread_pool.shutdown();
-                if (wating_thread_pool_counter > 0) {
-                    thread_pool.awaitTermination(1, TimeUnit.DAYS);
-                }
-            });
-
-            header.setText(sb.toString());
-            header.setCaretPosition(0);
-
-        } else {
-
-            header.setText(sb.toString());
-            header.setCaretPosition(0);
-
-            updateBody();
-        }
+        return sb.append("</body></html>").toString();
     }
 
     private void write(File content, byte[] data) {
@@ -587,57 +584,44 @@ public class ViewerPanel extends javax.swing.JPanel implements Printable {
         });
     }
 
-    private void printFrom(StringBuilder sb) {
-        sb.append(parent.MlM("From: "));
-        String messageFromName = message.getFromName();
-        String messageFromEmail = message.getFromEmail() != null && ViewerHelper.isValidEmail(message.getFromEmail())
-                ? message.getFromEmail()
-                : message.getFromSMTPAddress();
-
-        if (messageFromEmail == null && messageFromName == null) {
-            // add nothing
-        } else if (messageFromEmail == null) {
-            sb.append(parent.MlM("From: ")).append(messageFromName);
-        } else if (messageFromName == null) {
-            sb.append("<a href=\"mailto:");
-            sb.append(messageFromEmail);
-            sb.append("\">");
-            sb.append(messageFromEmail);
-        } else {
-            sb.append("<a href=\"mailto:");
-            sb.append(messageFromEmail);
-            sb.append("\">");
-            sb.append(messageFromName);
-        }
-
-        if (messageFromEmail != null && ViewerHelper.isValidEmail(messageFromEmail)) {
-            sb.append(" &lt;");
-            sb.append(messageFromEmail);
-            sb.append("&gt;");
-        }
-
-        sb.append("</a>");
-        sb.append("<br/>");
+    private String printSubject() {
+        StringBuilder sb = new StringBuilder("<b>");
+        if (message.getSubject() != null)
+            sb.append(message.getSubject());
+        return sb.append("</b><br/>").toString();
     }
 
-    private void printRecipients(StringBuilder sb, RecipientType to, String s) {
+    private String printFrom() {
+        StringBuilder sb = new StringBuilder(parent.MlM("From: "));
+        String messageFromName = message.getFromName();
+        String messageFromEmail = ViewerHelper.isValidEmail(message.getFromEmail())
+                ? message.getFromEmail()
+                : message.getFromSMTPAddress();
+        sb.append(mailTo(messageFromName, messageFromEmail));
+        return sb.append("<br/>").toString();
+    }
+
+    private String printRecipients(RecipientType to, String s) {
         String recipientsTo = message.getRecipients().stream()
                 .filter(r -> r.getType() == to)
                 .map(ViewerPanel::asMailto)
                 .collect(joining("; "));
-        if (isNotBlank(recipientsTo)) {
-            sb.append(parent.MlM(s));
-            sb.append(recipientsTo);
-            sb.append("<br/>");
+        if (isBlank(recipientsTo)) {
+            return "";
         }
+        return parent.MlM(s) + recipientsTo + "<br/>";
     }
 
     private static String asMailto(RecipientEntry recipient) {
         String name = recipient.getName();
         String mailTo = recipient.mailTo();
+        return mailTo(name, mailTo);
+    }
 
-        if (isNotBlank(mailTo)) {
-            return "<a href='mailto:" + mailTo + "'>" + (isNotBlank(name) ? name + " &lt;" + mailTo + "&gt;" : mailTo)
+    private static String mailTo(String name, String email) {
+        if (isNotBlank(email)) {
+            return "<a href='mailto:" + email + "'>"
+                    + (isNotBlank(name) ? name + " &lt;" + email + "&gt;" : email)
                     + "</a>";
         }
         return name;
