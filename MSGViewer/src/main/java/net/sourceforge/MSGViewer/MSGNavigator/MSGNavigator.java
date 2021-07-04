@@ -65,12 +65,7 @@ public class MSGNavigator extends BaseDialog {
 
         setting_show_size = StringUtils.isYes(root.getSetup().getLocalConfig(SETTING_SHOW_SIZE, "true"));
 
-        EventQueue.invokeLater(() -> new AutoMBox(MSGNavigator.class.getName()) {
-            @Override
-            public void do_stuff() throws Exception {
-                parse(file);
-            }
-        });
+        EventQueue.invokeLater(() -> new AutoMBox(MSGNavigator.class.getName(), () -> parse(file)));
     }
 
     void parse(File file) throws IOException {
@@ -232,7 +227,6 @@ public class MSGNavigator extends BaseDialog {
                 tree.setSelectionPath(path);
             }
 
-
             JPopupMenu popup = new NavActionPopup(this);
 
             popup.show(evt.getComponent(), evt.getX(), evt.getY());
@@ -240,32 +234,28 @@ public class MSGNavigator extends BaseDialog {
     }//GEN-LAST:event_treeMouseClicked
 
     public void deleteSelectedElement() {
-        new AutoMBox(this.getClass().getName()) {
+        new AutoMBox(this.getClass().getName(), () -> {
+            TreePath path = tree.getSelectionPath();
 
-            @Override
-            public void do_stuff() throws Exception {
-                TreePath path = tree.getSelectionPath();
-
-                if (path == null) {
-                    return;
-                }
-
-                TreeNodeContainer cont = (TreeNodeContainer) path.getLastPathComponent();
-
-                logger.info("deleting : " + cont.getEntry().getName());
-
-                TopLevelPropertyStream tops = new TopLevelPropertyStream(fs.getRoot());
-                tops.delete(cont.getEntry());
-
-                cont.removeFromParent();
-                tree.updateUI();
-
-                if (StringUtils.isYes(root.getSetup().getLocalConfig(SETTING_AUTOSAVE, "false"))) {
-                    save();
-                    reload();
-                }
+            if (path == null) {
+                return;
             }
-        };
+
+            TreeNodeContainer cont = (TreeNodeContainer) path.getLastPathComponent();
+
+            logger.info("deleting : " + cont.getEntry().getName());
+
+            TopLevelPropertyStream tops = new TopLevelPropertyStream(fs.getRoot());
+            tops.delete(cont.getEntry());
+
+            cont.removeFromParent();
+            tree.updateUI();
+
+            if (StringUtils.isYes(root.getSetup().getLocalConfig(SETTING_AUTOSAVE, "false"))) {
+                save();
+                reload();
+            }
+        });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

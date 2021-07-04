@@ -3,43 +3,30 @@ package net.sourceforge.MSGViewer.Plugins.msgparser;
 import at.redeye.FrameWork.base.AutoMBox;
 import at.redeye.FrameWork.widgets.helpwindow.HelpFileLoader;
 
-/**
- *
- * @author martin
- */
-public class Plugin implements at.redeye.FrameWork.Plugin.Plugin
-{
+public class Plugin implements at.redeye.FrameWork.Plugin.Plugin {
     public static final String NAME = "msgparser";
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return NAME;
     }
 
     @Override
-    public String getLicenceText()
-    {
+    public String getLicenceText() {
         final StringBuilder builder = new StringBuilder();
 
-        new AutoMBox( Plugin.class.getSimpleName() )
-        {
-            @Override
-            public void do_stuff() throws Exception {
-                HelpFileLoader helper = new HelpFileLoader();
+        new AutoMBox(Plugin.class.getSimpleName(), () -> {
+            HelpFileLoader helper = new HelpFileLoader();
 
-                String licence = helper.loadHelp("/net/sourceforge/MSGViewer/Plugins/msgparser", "GPL3");
-                builder.append(licence);
-            }
-        };
-
+            String licence = helper.loadHelp("/net/sourceforge/MSGViewer/Plugins/msgparser", "GPL3");
+            builder.append(licence);
+        });
 
         return builder.toString();
     }
 
     @Override
-    public void initPlugin(Object obj)
-    {
+    public void initPlugin(Object obj) {
 
     }
 
@@ -49,8 +36,7 @@ public class Plugin implements at.redeye.FrameWork.Plugin.Plugin
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return getName() + " " + getVersion();
     }
 
@@ -59,17 +45,12 @@ public class Plugin implements at.redeye.FrameWork.Plugin.Plugin
 
         final StringBuilder builder = new StringBuilder();
 
-        new AutoMBox( Plugin.class.getSimpleName() )
-        {
-            @Override
-            public void do_stuff() throws Exception {
-                HelpFileLoader helper = new HelpFileLoader();
+        new AutoMBox(Plugin.class.getSimpleName(), () -> {
+            HelpFileLoader helper = new HelpFileLoader();
 
-                String changelog = helper.loadHelp("/net/sourceforge/MSGViewer/Plugins/msgparser", "ChangeLog");
-                builder.append(changelog);
-            }
-        };
-
+            String changelog = helper.loadHelp("/net/sourceforge/MSGViewer/Plugins/msgparser", "ChangeLog");
+            builder.append(changelog);
+        });
 
         return builder.toString();
     }

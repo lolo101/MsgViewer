@@ -17,7 +17,7 @@ public class RowHeaderTest extends BaseDialog {
     TableManipulator tm;
 
     public RowHeaderTest(Root root) {
-        super(root,"Table RowHeader Test");
+        super(root, "Table RowHeader Test");
 
         initComponents();
         for (UIManager.LookAndFeelInfo installedLookAndFeel : UIManager.getInstalledLookAndFeels()) {
@@ -42,8 +42,7 @@ public class RowHeaderTest extends BaseDialog {
 
         Vector<DBConfig> data = new Vector<>();
 
-        for( i = 0 ; i < 19; i++ )
-        {
+        for (i = 0; i < 19; i++) {
             DBConfig c = new DBConfig();
 
             c.name.loadFromString(String.valueOf(i));
@@ -80,15 +79,15 @@ public class RowHeaderTest extends BaseDialog {
         getContentPane().add(jPanelLookAndFeels, java.awt.BorderLayout.PAGE_START);
 
         table.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
+                new Object[][]{
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null}
+                },
+                new String[]{
+                        "Title 1", "Title 2", "Title 3", "Title 4"
+                }
         ));
         jScrollPane1.setViewportView(table);
 
@@ -110,28 +109,28 @@ public class RowHeaderTest extends BaseDialog {
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jButton1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jlTest, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jCShowRowHeader)
-                .addContainerGap())
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jButton1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jlTest, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jCShowRowHeader)
+                                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jCShowRowHeader)
-                    .addComponent(jButton1)
-                    .addComponent(jButton2)
-                    .addComponent(jlTest))
-                .addContainerGap())
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jCShowRowHeader)
+                                        .addComponent(jButton1)
+                                        .addComponent(jButton2)
+                                        .addComponent(jlTest))
+                                .addContainerGap())
         );
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.PAGE_END);
@@ -141,16 +140,16 @@ public class RowHeaderTest extends BaseDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 
-            DBConfig c = new DBConfig();
+        DBConfig c = new DBConfig();
 
-            c.name.loadFromString(String.valueOf(i));
-            c.value.loadFromString("value " + i);
-            c.descr.loadFromString("foobar " + i);
-            c.hist.setAeHist("martin");
+        c.name.loadFromString(String.valueOf(i));
+        c.value.loadFromString("value " + i);
+        c.descr.loadFromString("foobar " + i);
+        c.hist.setAeHist("martin");
 
-            i++;
+        i++;
 
-            tm.add(c);
+        tm.add(c);
 
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -160,14 +159,13 @@ public class RowHeaderTest extends BaseDialog {
 
         System.out.println("removing row: " + row);
 
-        if( row != -1 )
-        {
+        if (row != -1) {
             tm.remove(row);
         } else {
             row = table.getRowCount() - 1;
 
-            if( row >= 0 )
-              tm.remove(row);
+            if (row >= 0)
+                tm.remove(row);
         }
 
     }//GEN-LAST:event_jButton2ActionPerformed
@@ -176,7 +174,7 @@ public class RowHeaderTest extends BaseDialog {
 
         tm.showRowHeader(jCShowRowHeader.isSelected());
 
-        if( jCShowRowHeader.isSelected() )
+        if (jCShowRowHeader.isSelected())
             jlTest.setText(MlM("enabled"));
         else
             jlTest.setText(MlM("disabled"));
@@ -189,17 +187,12 @@ public class RowHeaderTest extends BaseDialog {
         changeStyle(className);
     }
 
-    final void changeStyle( final String className )
-    {
-        new AutoMBox(RowHeaderTest.class.getName())
-        {
-            @Override
-            public void do_stuff() throws Exception {
-                UIManager.setLookAndFeel(className);
-                root.closeAllWindowsNoAppExit();
-                run();
-            }
-        };
+    final void changeStyle(final String className) {
+        new AutoMBox(RowHeaderTest.class.getName(), () -> {
+            UIManager.setLookAndFeel(className);
+            root.closeAllWindowsNoAppExit();
+            run();
+        });
     }
 
     private static Root main_root;
@@ -211,8 +204,7 @@ public class RowHeaderTest extends BaseDialog {
         run();
     }
 
-    private static void run()
-    {
+    private static void run() {
         new RowHeaderTest(main_root).setVisible(true);
     }
 

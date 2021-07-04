@@ -22,7 +22,6 @@ import javax.activation.MimeType;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 import javax.swing.text.EditorKit;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
@@ -45,7 +44,7 @@ import static at.redeye.FrameWork.base.BaseDialog.logger;
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener, Printable {
+public class ViewerPanel extends javax.swing.JPanel implements Printable {
 
     private String bodyText = null;
     private Message message;
@@ -61,30 +60,28 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
     public ViewerPanel() {
         initComponents();
 
-        header.addHyperlinkListener(this);
-        body.addHyperlinkListener(this);
+        header.addHyperlinkListener(this::hyperlinkUpdate);
+        body.addHyperlinkListener(this::hyperlinkUpdate);
 
         JCBfix.setEnabled(jRText.isSelected());
     }
 
-    public void setRoot( Root root, BaseDialogBase parent )
-    {
+    public void setRoot(Root root, BaseDialogBase parent) {
         this.parent = parent;
         this.root = root;
         helper = new ViewerHelper(root);
 
-        boolean rtfFormat = StringUtils.isYes(root.getSetup().getLocalConfig("RTFFormat", "yes") );
+        boolean rtfFormat = StringUtils.isYes(root.getSetup().getLocalConfig("RTFFormat", "yes"));
         jRRTF.setSelected(rtfFormat);
         jRText.setSelected(!rtfFormat);
 
-        JCBfix.setSelected(StringUtils.isYes(root.getSetup().getLocalConfig("FixedFont","no" ) ) );
+        JCBfix.setSelected(StringUtils.isYes(root.getSetup().getLocalConfig("FixedFont", "no")));
         JCBfix.setEnabled(jRText.isSelected());
 
-        jSplitPane.setDividerLocation(Integer.parseInt(root.getSetup().getLocalConfig("DividerLocation","150")));
+        jSplitPane.setDividerLocation(Integer.parseInt(root.getSetup().getLocalConfig("DividerLocation", "150")));
     }
 
-    public void setopenNewMailInterface( OpenNewMailInterface open_new_mail_handler )
-    {
+    public void setopenNewMailInterface(OpenNewMailInterface open_new_mail_handler) {
         this.open_new_mail_handler = open_new_mail_handler;
     }
 
@@ -95,11 +92,11 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
         if (pageTop >= fullHeight(bodyScale)) {
             return NO_SUCH_PAGE;
         }
-        Graphics2D g2d = (Graphics2D)graphics.create(
-                (int)pageFormat.getImageableX(),
-                (int)pageFormat.getImageableY(),
-                (int)pageFormat.getImageableWidth(),
-                (int)pageFormat.getImageableHeight());
+        Graphics2D g2d = (Graphics2D) graphics.create(
+                (int) pageFormat.getImageableX(),
+                (int) pageFormat.getImageableY(),
+                (int) pageFormat.getImageableWidth(),
+                (int) pageFormat.getImageableHeight());
         int headerHeight = header.getHeight();
         if (pageTop < headerHeight) {
             printHeader(g2d, pageTop, headerHeight, (int) pageFormat.getImageableWidth());
@@ -111,7 +108,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
     private void printHeader(Graphics2D g2d, int pageTop, int headerHeight, int pageWidth) {
         int lineY = headerHeight - pageTop - 1;
-        g2d.translate(0, - pageTop);
+        g2d.translate(0, -pageTop);
         header.print(g2d);
         g2d.drawLine(0, lineY, pageWidth, lineY);
     }
@@ -171,45 +168,45 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
         javax.swing.GroupLayout buttonsPanelLayout = new javax.swing.GroupLayout(buttonsPanel);
         buttonsPanel.setLayout(buttonsPanelLayout);
         buttonsPanelLayout.setHorizontalGroup(
-            buttonsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(buttonsPanelLayout.createSequentialGroup()
-                .addComponent(jRRTF)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jRText)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(JCBfix)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSFontSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(fontSizeLabel)
-                .addGap(0, 95, Short.MAX_VALUE))
+                buttonsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(buttonsPanelLayout.createSequentialGroup()
+                                .addComponent(jRRTF)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jRText)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(JCBfix)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jSFontSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(fontSizeLabel)
+                                .addGap(0, 95, Short.MAX_VALUE))
         );
         buttonsPanelLayout.setVerticalGroup(
-            buttonsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(buttonsPanelLayout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addGroup(buttonsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, buttonsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jRRTF)
-                        .addComponent(jRText)
-                        .addComponent(JCBfix))
-                    .addComponent(jSFontSize, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(fontSizeLabel, javax.swing.GroupLayout.Alignment.TRAILING)))
+                buttonsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(buttonsPanelLayout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addGroup(buttonsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, buttonsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                .addComponent(jRRTF)
+                                                .addComponent(jRText)
+                                                .addComponent(JCBfix))
+                                        .addComponent(jSFontSize, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(fontSizeLabel, javax.swing.GroupLayout.Alignment.TRAILING)))
         );
 
         javax.swing.GroupLayout MainPanelLayout = new javax.swing.GroupLayout(MainPanel);
         MainPanel.setLayout(MainPanelLayout);
         MainPanelLayout.setHorizontalGroup(
-            MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(buttonsPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(bodyScrollPane, javax.swing.GroupLayout.Alignment.TRAILING)
+                MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(buttonsPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(bodyScrollPane, javax.swing.GroupLayout.Alignment.TRAILING)
         );
         MainPanelLayout.setVerticalGroup(
-            MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(MainPanelLayout.createSequentialGroup()
-                .addComponent(bodyScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(buttonsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(MainPanelLayout.createSequentialGroup()
+                                .addComponent(bodyScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(buttonsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         jSplitPane.setRightComponent(MainPanel);
@@ -217,12 +214,12 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jSplitPane)
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jSplitPane, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -253,9 +250,8 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
         } else {
 
-            if( bodyText != null )
-            {
-                bodyText = bodyText.replaceAll("(\\\\fs)([0-9]+)", "$1" + ((jSFontSize.getValue())*2));
+            if (bodyText != null) {
+                bodyText = bodyText.replaceAll("(\\\\fs)([0-9]+)", "$1" + ((jSFontSize.getValue()) * 2));
                 System.out.println(bodyText);
                 body.setText(bodyText);
             }
@@ -272,63 +268,48 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
     private void jRTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRTextActionPerformed
 
-         jRRTF.setSelected(!jRText.isSelected());
-         JCBfix.setEnabled(jRText.isSelected());
-         updateBody();
+        jRRTF.setSelected(!jRText.isSelected());
+        JCBfix.setEnabled(jRText.isSelected());
+        updateBody();
     }//GEN-LAST:event_jRTextActionPerformed
 
     private void JCBfixActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JCBfixActionPerformed
         updateBody();
     }//GEN-LAST:event_JCBfixActionPerformed
 
-    private void updateBody()
-    {
-        if( message == null )
+    private void updateBody() {
+        if (message == null)
             return;
 
-        if( jRRTF.isSelected() &&  message.getBodyRTF() != null &&  !message.getBodyRTF().isEmpty() )
-        {
-            if( message.getBodyRTF().contains("\\fromhtml") )
-            {
-                AutoMBox am = new AutoMBox(MainWin.class.getName()) {
+        if (jRRTF.isSelected() && message.getBodyRTF() != null && !message.getBodyRTF().isEmpty()) {
+            if (message.getBodyRTF().contains("\\fromhtml")) {
+                AutoMBox am = new AutoMBox(MainWin.class.getName(), () -> {
+                    logger.info("extracting HTML data from RTF Code");
 
-                    @Override
-                    public void do_stuff() throws Exception {
-                        logger.info("extracting HTML data from RTF Code");
-
-                        if( logger.isTraceEnabled() )
-                        {
-                            logger.trace("\n" + StringUtils.addLineNumbers(message.getBodyRTF()));
-                        }
-
-                        body.setContentType("text/html");
-                        bodyText = helper.extractHTMLFromRTF(message.getBodyRTF(),message);
-
-                        logger.trace(bodyText);
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("\n" + StringUtils.addLineNumbers(message.getBodyRTF()));
                     }
-                };
 
-                if( am.isFailed() )
-                {
+                    body.setContentType("text/html");
+                    bodyText = helper.extractHTMLFromRTF(message.getBodyRTF(), message);
+
+                    logger.trace(bodyText);
+                });
+
+                if (am.isFailed()) {
                     body.setContentType("text/rtf");
                     bodyText = message.getBodyRTF();
                 }
-            }
-            else
-            {
+            } else {
                 body.setContentType("text/rtf");
                 bodyText = message.getBodyRTF();
             }
-        }
-        else if( message.getBodyHtml() != null )
-        {
+        } else if (message.getBodyHtml() != null) {
             PrepareImages prep_images = new PrepareImages(helper, message);
 
             body.setContentType("text/html");
             bodyText = prep_images.prepareImages(new StringBuilder(ViewerHelper.stripMetaTags(message.getBodyHtml())));
-        }
-        else
-        {
+        } else {
             body.setContentType("text/plain");
             bodyText = message.getBodyText();
         }
@@ -337,35 +318,27 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
         body.setCaretPosition(0);
     }
 
-    @Override
-    public void hyperlinkUpdate( final HyperlinkEvent e )
-    {
-        new AutoMBox(MainWin.class.getName()) {
+    private void hyperlinkUpdate(final HyperlinkEvent e) {
+        new AutoMBox(MainWin.class.getName(), () -> {
 
-            @Override
-            public void do_stuff() throws Exception {
-
-                if (message == null) {
-                    return;
-                }
-
-                if (!e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
-                    return;
-                }
-
-                openUrl(e.getURL());
+            if (message == null) {
+                return;
             }
-        };
+
+            if (!e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
+                return;
+            }
+
+            openUrl(e.getURL());
+        });
     }
 
-    public void openUrl(URL url) throws IOException
-    {
+    public void openUrl(URL url) throws IOException {
         logger.info(url);
 
         final String protocol = url.getProtocol();
 
-        if( !protocol.equals("file") )
-        {
+        if (!protocol.equals("file")) {
             if (Setup.is_win_system()) {
                 logger.info("opening: " + url);
 
@@ -389,23 +362,21 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
             return;
         }
 
-        File content = helper.extractUrl(url,message);
+        File content = helper.extractUrl(url, message);
 
-        if( content == null )
-        {
+        if (content == null) {
             // maybe the url points to a local directory
             content = new File(url.getFile());
         }
 
-        if( ViewerHelper.is_mail_message(content.toString() ) ) {
+        if (ViewerHelper.is_mail_message(content.toString())) {
 
-            if( open_new_mail_handler != null )
-            {
-                open_new_mail_handler.openMail( root,content.toString() );
+            if (open_new_mail_handler != null) {
+                open_new_mail_handler.openMail(root, content.toString());
             }
         } else {
 
-            if (Setup.is_win_system() && root.getPlugin("ShellExec") != null ) {
+            if (Setup.is_win_system() && root.getPlugin("ShellExec") != null) {
                 logger.info("opening: " + content.getPath());
 
                 ShellExec shell = new ShellExec();
@@ -428,22 +399,15 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
     }
 
-    public void parse(final String file_name)
-    {
-        if( file_name == null )
+    public void parse(final String file_name) {
+        if (file_name == null)
             return;
 
         this.file_name = file_name;
 
         parent.setWaitCursor();
 
-        new AutoMBox(MainWin.class.getName()) {
-
-                @Override
-                public void do_stuff() throws Exception {
-                    parse_int( file_name );
-                }
-            };
+        new AutoMBox(MainWin.class.getName(), () -> parse_int(file_name));
 
         parent.setNormalCursor();
     }
@@ -452,16 +416,15 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
         message = null;
     }
 
-    void parse_int(final String file_name) throws Exception
-    {
+    void parse_int(final String file_name) throws Exception {
         cleanUp();
 
         wating_thread_pool_counter = 0;
 
         File file = new File(file_name);
 
-        if( !file.exists() )
-            throw new FileNotFoundException( parent.MlM( String.format("File %s not found",file_name)) );
+        if (!file.exists())
+            throw new FileNotFoundException(parent.MlM(String.format("File %s not found", file_name)));
 
         message = new MessageParser(file).parseMessage();
 
@@ -471,7 +434,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
         sb.append("<body style=\"\">");
 
         sb.append("<b>");
-        if( message.getSubject() != null )
+        if (message.getSubject() != null)
             sb.append(message.getSubject());
         sb.append("</b>");
         sb.append("<br/>");
@@ -480,8 +443,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
         printFrom(sb);
 
-        if( message.getDate() != null )
-        {
+        if (message.getDate() != null) {
             sb.append(parent.MlM("Date: "));
             sb.append(DateFormat.getDateTimeInstance().format(message.getDate()));
             sb.append("<br/>");
@@ -495,10 +457,8 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
         final int max_icon_size = Integer.parseInt(root.getSetup().getLocalConfig(AppConfigDefinitions.IconSize));
 
-        for( Attachment att : attachments )
-        {
-            if( att instanceof FileAttachment)
-            {
+        for (Attachment att : attachments) {
+            if (att instanceof FileAttachment) {
                 final FileAttachment fatt = (FileAttachment) att;
 
                 File content = helper.getTempFile(fatt);
@@ -511,10 +471,9 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
                 logger.info("<a href=\"" + content.toURI() + "\"> " + mime_type);
 
-                if( mime_type != null
+                if (mime_type != null
                         && ViewerHelper.is_image_mime_type(new MimeType(mime_type))
-                        && fatt.getSize() < 1024*1024*2 )
-                {
+                        && fatt.getSize() < 1024 * 1024 * 2) {
                     File contentIcon = new File(content.getAbsolutePath() + "-small.jpg");
                     if (!content.exists()) {
 
@@ -525,11 +484,11 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
                         thread_pool.execute(() -> {
                             try {
                                 ImageIcon icon = ImageUtils.loadScaledImageIcon(fatt.getData(),
-                                                            fatt.toString(),
-                                                            max_icon_size, max_icon_size);
+                                        fatt.toString(),
+                                        max_icon_size, max_icon_size);
 
-                                BufferedImage bi = new BufferedImage(icon.getIconWidth(),icon.getIconHeight(),
-                                                        BufferedImage.TYPE_INT_RGB);
+                                BufferedImage bi = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(),
+                                        BufferedImage.TYPE_INT_RGB);
 
                                 Graphics2D g2 = bi.createGraphics();
                                 g2.drawImage(icon.getImage(), 0, 0, null);
@@ -537,8 +496,8 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
                                 ImageIO.write(bi, "jpg", contentIcon);
 
-                            } catch( IOException ex ) {
-                                logger.error(ex,ex);
+                            } catch (IOException ex) {
+                                logger.error(ex, ex);
                             }
 
                             wating_thread_pool_counter--;
@@ -551,9 +510,8 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
                     sb.append("\"/> ");
                 }
 
-                if( ViewerHelper.is_mail_message(fatt.getFilename() ) ) {
-                    if (!content.exists())
-                    {
+                if (ViewerHelper.is_mail_message(fatt.getFilename())) {
+                    if (!content.exists()) {
                         write(content, fatt.getData());
                     }
 
@@ -565,19 +523,14 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
                 sb.append(fatt);
                 sb.append("</a> ");
 
-            } else if( att instanceof MsgAttachment) {
+            } else if (att instanceof MsgAttachment) {
 
                 MsgAttachment msgAtt = (MsgAttachment) att;
                 final Message msg = msgAtt.getMessage();
 
                 File sub_file = helper.getTempFile(msgAtt);
 
-                thread_pool.execute(() -> new AutoMBox(file_name) {
-                    @Override
-                    public void do_stuff() throws Exception {
-                        new MessageSaver(msg).saveMessage(sub_file);
-                    }
-                });
+                thread_pool.execute(() -> new AutoMBox(file_name, () -> new MessageSaver(msg).saveMessage(sub_file)));
 
                 sb.append("<a href=\"");
                 sb.append(sub_file.toURI());
@@ -591,28 +544,22 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
                 sb.append("</a> &nbsp; ");
             } else {
-                logger.error("unknown Attachment: " + att + " " + att.getClass().getName() );
+                logger.error("unknown Attachment: " + att + " " + att.getClass().getName());
             }
         }
 
         sb.append("</body></html>");
         header.setContentType("text/html");
 
-        if( wating_thread_pool_counter > 0 )
-        {
+        if (wating_thread_pool_counter > 0) {
             updateBody(); // do something different now
 
-            new AutoMBox(file_name) {
-
-                @Override
-                public void do_stuff() throws Exception {
-                    thread_pool.shutdown();
-
-                    if( wating_thread_pool_counter > 0 ) {
-                        thread_pool.awaitTermination(1, TimeUnit.DAYS);
-                    }
+            new AutoMBox(file_name, () -> {
+                thread_pool.shutdown();
+                if (wating_thread_pool_counter > 0) {
+                    thread_pool.awaitTermination(1, TimeUnit.DAYS);
                 }
-            };
+            });
 
             header.setText(sb.toString());
             header.setCaretPosition(0);
@@ -632,8 +579,8 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
         thread_pool.execute(() -> {
             try (FileOutputStream fout = new FileOutputStream(content)) {
                 fout.write(data);
-            } catch( IOException ex ) {
-                logger.error(ex,ex);
+            } catch (IOException ex) {
+                logger.error(ex, ex);
             }
 
             wating_thread_pool_counter--;
@@ -696,9 +643,8 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
         return name;
     }
 
-    public void dispose()
-    {
-        root.getSetup().setLocalConfig("RTFFormat",jRRTF.isSelected() ? "yes" : "no");
+    public void dispose() {
+        root.getSetup().setLocalConfig("RTFFormat", jRRTF.isSelected() ? "yes" : "no");
         root.getSetup().setLocalConfig("FixedFont", JCBfix.isSelected() ? "yes" : "no");
         root.getSetup().setLocalConfig("DividerLocation", String.valueOf(jSplitPane.getDividerLocation()));
 
@@ -716,15 +662,14 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
     // End of variables declaration//GEN-END:variables
 
     public Message getMessage() {
-       return message;
+        return message;
     }
 
     public void exportFile(File export_file) throws Exception {
         new MessageSaver(message).saveMessage(export_file);
     }
 
-    public String getFileName()
-    {
+    public String getFileName() {
         return file_name;
     }
 
