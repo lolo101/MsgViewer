@@ -1,19 +1,11 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package at.redeye.FrameWork.base;
 
 import at.redeye.FrameWork.base.prm.PrmDefaultChecksInterface;
-import at.redeye.FrameWork.base.prm.impl.LocalConfigDefinitions;
-import at.redeye.FrameWork.base.prm.impl.GlobalConfigDefinitions;
 import at.redeye.FrameWork.base.prm.bindtypes.DBConfig;
+import at.redeye.FrameWork.base.prm.impl.GlobalConfigDefinitions;
+import at.redeye.FrameWork.base.prm.impl.LocalConfigDefinitions;
 import at.redeye.FrameWork.base.prm.impl.PrmDefaultCheckSuite;
 
-/**
- *
- * @author martin
- */
 public class FrameWorkConfigDefinitions {
 
     public static DBConfig HelpParamColorEven = new DBConfig("HelpParamColorEven", "#fefeaa", "Hilfehintergundfarbe für Parameter gerade Zeilen.");
@@ -77,10 +69,6 @@ public class FrameWorkConfigDefinitions {
 
         add(AllowAutoLogin);
 
-    }
-
-    static void add(String name, String value, String descr) {
-        GlobalConfigDefinitions.add(new DBConfig(name, value, descr));
     }
 
     static void add(DBConfig c) {

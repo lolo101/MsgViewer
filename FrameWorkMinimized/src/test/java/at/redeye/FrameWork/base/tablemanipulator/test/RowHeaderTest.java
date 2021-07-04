@@ -1,14 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
- * TableTest.java
- *
- * Created on 15.05.2010, 09:33:53
- */
-
 package at.redeye.FrameWork.base.tablemanipulator.test;
 
 import at.redeye.FrameWork.base.*;
@@ -18,13 +7,8 @@ import at.redeye.FrameWork.base.tablemanipulator.TableManipulator;
 import javax.swing.*;
 import java.util.Vector;
 
-/**
- *
- * @author martin
- */
 public class RowHeaderTest extends BaseDialog {
 
-    /** Creates new form TableTest */
     int i;
     TableManipulator tm;
 
@@ -285,9 +269,6 @@ public class RowHeaderTest extends BaseDialog {
         };
     }
 
-    /**
-    * @param args the command line RowHeaderTest
-    */
     private static Root main_root;
     private static String StyleName = "metal";
 

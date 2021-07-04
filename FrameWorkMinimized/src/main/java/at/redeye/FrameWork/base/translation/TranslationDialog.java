@@ -21,9 +21,10 @@ import at.redeye.FrameWork.widgets.helpwindow.HelpWin;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.*;
 
@@ -125,66 +126,49 @@ public class TranslationDialog extends BaseDialog {
                 final NoticeIfChangedTextField editField = new NoticeIfChangedTextField();
                 right_cols.add(editField);
 
-                copy.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        editField.setText(tf.getText());
-                    }
-                });
+                copy.addActionListener(e -> editField.setText(tf.getText()));
 
                 if( wizard != null )
                 {
-                    wizard.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            editField.setText(root.MlM(tf.getText()));
-                        }
-                    });
+                    wizard.addActionListener(e -> editField.setText(root.MlM(tf.getText())));
                 }
 
                 editField.setColumns(40);
 
                 final JFrame base = this;
 
-                edit.addActionListener(new ActionListener() {
+                edit.addActionListener(e -> {
 
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
+                    final MultiLineInputDialog dialog = new MultiLineInputDialog(base, root);
 
-                        final MultiLineInputDialog dialog = new MultiLineInputDialog(base, root);
+                    final MultiLineInput mli = dialog.getMli();
+                    mli.setSaveActionListener(() -> {
+                        editField.setText(mli.getText());
+                        dialog.dispose();
+                    });
 
-                        final MultiLineInput mli = dialog.getMli();
-                        mli.setSaveActionListener(new Runnable() {
-                            public void run()
-                            {
-                                editField.setText(mli.getText());
-                                dialog.dispose();
-                            }
-                        });
+                    mli.setCloseActionListener(dialog::dispose);
 
-                        mli.setCloseActionListener(dialog::dispose);
+                    mli.setText(tf.getText());
 
-                        mli.setText(tf.getText());
+                    String editedText =  editField.getText().trim();
+                    if( !editedText.isEmpty() )
+                        mli.setTransText(editedText);
 
-                        String editedText =  editField.getText().trim();
-                        if( !editedText.isEmpty() )
-                            mli.setTransText(editedText);
+                    // Adjust dialogs placement on screen
+                    Dimension dialog_dim = dialog.getPreferredSize();
 
-                        // Adjust dialogs placement on screen
-                        Dimension dialog_dim = dialog.getPreferredSize();
+                    Rectangle rect = base.getBounds();
+                    rect.x += rect.width / 2;
+                    rect.y += rect.height / 2;
+                    rect.x -= dialog_dim.height / 2;
+                    rect.y -= dialog_dim.width / 2;
+                    rect.height = dialog_dim.height;
+                    rect.width = dialog_dim.width;
 
-                        Rectangle rect = base.getBounds();
-                        rect.x += rect.width / 2;
-                        rect.y += rect.height / 2;
-                        rect.x -= dialog_dim.height / 2;
-                        rect.y -= dialog_dim.width / 2;
-                        rect.height = dialog_dim.height;
-                        rect.width = dialog_dim.width;
-
-                        dialog.setBounds(rect);
-                        dialog.setVisible(true);
-                        dialog.toFront();
-                    }
+                    dialog.setBounds(rect);
+                    dialog.setVisible(true);
+                    dialog.toFront();
                 });
 
 
@@ -269,12 +253,7 @@ public class TranslationDialog extends BaseDialog {
 
         adjustScrollingSpeed(jScrollPane1);
 
-        registerHelpWin(new Runnable() {
-
-            public void run() {
-                invokeDialogUnique(new HelpWin(root, "/at/redeye/FrameWork/base/translation/resources/Help", "TranslationDialog"));
-            }
-        });
+        registerHelpWin(() -> invokeDialogUnique(new HelpWin(root, "/at/redeye/FrameWork/base/translation/resources/Help", "TranslationDialog")));
     }
 
     private String getTitle(String name )
@@ -337,23 +316,23 @@ public class TranslationDialog extends BaseDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jBClose = new javax.swing.JButton();
-        jBSave = new javax.swing.JButton();
+        javax.swing.JButton jBClose = new javax.swing.JButton();
+        javax.swing.JButton jBSave = new javax.swing.JButton();
         jLTitle = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         panel = new javax.swing.JPanel();
-        jPanel1 = new javax.swing.JPanel();
-        language = new javax.swing.JComboBox();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        country = new javax.swing.JComboBox();
-        jLabel3 = new javax.swing.JLabel();
+        javax.swing.JPanel jPanel1 = new javax.swing.JPanel();
+        language = new javax.swing.JComboBox<>();
+        javax.swing.JLabel jLabel1 = new javax.swing.JLabel();
+        javax.swing.JLabel jLabel2 = new javax.swing.JLabel();
+        country = new javax.swing.JComboBox<>();
+        javax.swing.JLabel jLabel3 = new javax.swing.JLabel();
         locale_string = new javax.swing.JTextField();
-        jLabel4 = new javax.swing.JLabel();
+        javax.swing.JLabel jLabel4 = new javax.swing.JLabel();
         colsLeft = new javax.swing.JSpinner();
-        jLabel5 = new javax.swing.JLabel();
+        javax.swing.JLabel jLabel5 = new javax.swing.JLabel();
         colsRight = new javax.swing.JSpinner();
-        jBHelp = new javax.swing.JButton();
+        javax.swing.JButton jBHelp = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -382,14 +361,14 @@ public class TranslationDialog extends BaseDialog {
 
         jScrollPane1.setViewportView(panel);
 
-        language.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        language.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         language.addActionListener(this::languageActionPerformed);
 
         jLabel1.setText("Sprache:");
 
         jLabel2.setText("Ländervariante:");
 
-        country.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        country.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         country.addActionListener(this::countryActionPerformed);
 
         jLabel3.setText("Lokalisierungskürzel:");
@@ -461,14 +440,13 @@ public class TranslationDialog extends BaseDialog {
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jBSave)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 714, Short.MAX_VALUE)
-                        .addComponent(jBClose))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 974, Short.MAX_VALUE)
-                            .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addComponent(jBSave)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 714, Short.MAX_VALUE)
+                                .addComponent(jBClose))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 974, Short.MAX_VALUE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                 .addComponent(jLTitle, javax.swing.GroupLayout.DEFAULT_SIZE, 930, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jBHelp, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)))))
@@ -563,13 +541,9 @@ public class TranslationDialog extends BaseDialog {
         {
             if (prev_lang_index != -1)
             {
-                java.awt.EventQueue.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        force_undo_language = true;
-                        language.setSelectedIndex(prev_lang_index);
-                    }
+                java.awt.EventQueue.invokeLater(() -> {
+                    force_undo_language = true;
+                    language.setSelectedIndex(prev_lang_index);
                 });
             }
         }
@@ -587,14 +561,9 @@ public class TranslationDialog extends BaseDialog {
         {
             if( prev_country_index != -1 )
             {
-                java.awt.EventQueue.invokeLater( new Runnable(){
-
-                @Override
-                public void run()
-                {
+                java.awt.EventQueue.invokeLater(() -> {
                     force_undo_country = true;
                     country.setSelectedIndex(prev_country_index);
-                }
                 });
             }
         }
@@ -625,19 +594,10 @@ public class TranslationDialog extends BaseDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JSpinner colsLeft;
     private javax.swing.JSpinner colsRight;
-    private javax.swing.JComboBox country;
-    private javax.swing.JButton jBClose;
-    private javax.swing.JButton jBHelp;
-    private javax.swing.JButton jBSave;
+    private javax.swing.JComboBox<String> country;
     private javax.swing.JLabel jLTitle;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JComboBox language;
+    private javax.swing.JComboBox<String> language;
     private javax.swing.JTextField locale_string;
     private javax.swing.JPanel panel;
     // End of variables declaration//GEN-END:variables
@@ -677,7 +637,7 @@ public class TranslationDialog extends BaseDialog {
         return dir;
     }
 
-    private void loadTranslationsFor(String ClassName, String lang) throws FileNotFoundException, IOException
+    private void loadTranslationsFor(String ClassName, String lang) throws IOException
     {
          String dir = getTranslationsDir(root);
 
