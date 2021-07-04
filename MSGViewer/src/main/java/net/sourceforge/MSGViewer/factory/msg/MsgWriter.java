@@ -4,7 +4,7 @@ import com.auxilii.msgparser.Message;
 import net.sourceforge.MSGViewer.ModuleLauncher;
 import net.sourceforge.MSGViewer.factory.MessageParser;
 import org.apache.poi.poifs.filesystem.DirectoryNode;
-import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,7 +19,7 @@ public class MsgWriter {
     }
 
     public void write(OutputStream out) throws IOException {
-        NPOIFSFileSystem fs = new NPOIFSFileSystem();
+        POIFSFileSystem fs = new POIFSFileSystem();
         DirectoryNode root = fs.getRoot();
 
         MsgContainer cont = new MsgContainer(msg);
