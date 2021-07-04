@@ -1,8 +1,8 @@
 package at.redeye.FrameWork.utilities;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ParseJNLPTest {
 
@@ -119,7 +119,7 @@ public class ParseJNLPTest {
 
     static List<TestFile> test_cases = new ArrayList<>();
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws Exception {
 
         test_cases.add(new TestSFTPUpload());
@@ -130,7 +130,7 @@ public class ParseJNLPTest {
         }
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() {
         for( TestFile test : test_cases ) {
             test.cleanUp();
