@@ -36,6 +36,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -43,7 +44,6 @@ import java.util.concurrent.TimeUnit;
 import static at.redeye.FrameWork.base.BaseDialog.logger;
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ViewerPanel extends javax.swing.JPanel implements Printable {
 
@@ -323,17 +323,10 @@ public class ViewerPanel extends javax.swing.JPanel implements Printable {
     }
 
     private void hyperlinkUpdate(final HyperlinkEvent e) {
-        new AutoMBox(MainWin.class.getName(), () -> {
-
-            if (message == null) {
-                return;
+        new AutoMBox(ViewerPanel.class.getName(), () -> {
+            if (message != null && e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
+                openUrl(e.getURL());
             }
-
-            if (!e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
-                return;
-            }
-
-            openUrl(e.getURL());
         });
     }
 
@@ -416,10 +409,6 @@ public class ViewerPanel extends javax.swing.JPanel implements Printable {
         parent.setNormalCursor();
     }
 
-    void cleanUp() {
-        message = null;
-    }
-
     void doParse() throws Exception {
         cleanUp();
 
@@ -458,116 +447,155 @@ public class ViewerPanel extends javax.swing.JPanel implements Printable {
         }
     }
 
+    void cleanUp() {
+        message = null;
+    }
+
     private String headerHtml() throws MimeTypeParseException, IOException {
-        final StringBuilder sb = new StringBuilder("<html><body style=\"\">");
+        final StringBuilder sb = new StringBuilder("<html><body>");
 
         sb.append(printSubject());
         sb.append(printFrom());
-
-        if (message.getDate() != null) {
-            sb.append(parent.MlM("Date: "));
-            sb.append(DateFormat.getDateTimeInstance().format(message.getDate()));
-            sb.append("<br/>");
-        }
+        sb.append(printDate());
 
         sb.append(printRecipients(RecipientType.TO, "To: "));
         sb.append(printRecipients(RecipientType.CC, "CC: "));
         sb.append(printRecipients(RecipientType.BCC, "BCC: "));
 
-        final int max_icon_size = Integer.parseInt(root.getSetup().getLocalConfig(AppConfigDefinitions.IconSize));
-
         for (Attachment att : message.getAttachments()) {
-            if (att instanceof FileAttachment) {
-                final FileAttachment fatt = (FileAttachment) att;
-
-                File content = helper.getTempFile(fatt);
-
-                sb.append("<a href=\"");
-                sb.append(content.toURI());
-                sb.append("\">");
-
-                String mime_type = fatt.getMimeTag();
-
-                logger.info("<a href=\"" + content.toURI() + "\"> " + mime_type);
-
-                if (mime_type != null
-                        && ViewerHelper.is_image_mime_type(new MimeType(mime_type))
-                        && fatt.getSize() < 1024 * 1024 * 2) {
-                    File contentIcon = new File(content.getAbsolutePath() + "-small.jpg");
-                    if (!content.exists()) {
-
-                        write(content, fatt.getData());
-
-                        wating_thread_pool_counter++;
-
-                        thread_pool.execute(() -> {
-                            try {
-                                ImageIcon icon = ImageUtils.loadScaledImageIcon(fatt.getData(),
-                                        fatt.toString(),
-                                        max_icon_size, max_icon_size);
-
-                                BufferedImage bi = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(),
-                                        BufferedImage.TYPE_INT_RGB);
-
-                                Graphics2D g2 = bi.createGraphics();
-                                g2.drawImage(icon.getImage(), 0, 0, null);
-                                g2.dispose();
-
-                                ImageIO.write(bi, "jpg", contentIcon);
-
-                            } catch (IOException ex) {
-                                logger.error(ex, ex);
-                            }
-
-                            wating_thread_pool_counter--;
-                        });
-                    }
-
-                    System.out.println(contentIcon);
-                    sb.append("<img border=0 src=\"");
-                    sb.append(contentIcon.toURI());
-                    sb.append("\"/> ");
-                }
-
-                if (ViewerHelper.is_mail_message(fatt.getFilename())) {
-                    if (!content.exists()) {
-                        write(content, fatt.getData());
-                    }
-
-                    sb.append("<img border=0 align=\"baseline\" src=\"");
-                    sb.append(helper.getMailIconFile().toURI());
-                    sb.append("\"/>");
-                }
-
-                sb.append(fatt);
-                sb.append("</a> ");
-
-            } else if (att instanceof MsgAttachment) {
-
-                MsgAttachment msgAtt = (MsgAttachment) att;
-                final Message msg = msgAtt.getMessage();
-
-                File sub_file = helper.getTempFile(msgAtt);
-
-                thread_pool.execute(() -> new AutoMBox(file_name, () -> new MessageSaver(msg).saveMessage(sub_file)));
-
-                sb.append("<a href=\"");
-                sb.append(sub_file.toURI());
-                sb.append("\">");
-
-                sb.append("<img border=0 align=\"baseline\" src=\"");
-                sb.append(helper.getMailIconFile().toURI());
-                sb.append("\"/>");
-
-                sb.append(msg.getSubject());
-
-                sb.append("</a> &nbsp; ");
-            } else {
-                logger.error("unknown Attachment: " + att + " " + att.getClass().getName());
-            }
+            sb.append(printAttachment(att));
         }
 
         return sb.append("</body></html>").toString();
+    }
+
+    private String printSubject() {
+        String subject = message.getSubject();
+        return "<b>" + (subject == null ? "" : subject) + "</b><br/>";
+    }
+
+    private String printFrom() {
+        String messageFromName = message.getFromName();
+        String messageFromEmail = ViewerHelper.isValidEmail(message.getFromEmail())
+                ? message.getFromEmail()
+                : message.getFromSMTPAddress();
+        return parent.MlM("From: ") + mailTo(messageFromName, messageFromEmail) + "<br/>";
+    }
+
+    private String printDate() {
+        Date date = message.getDate();
+        return date == null
+                ? ""
+                : parent.MlM("Date: ") + DateFormat.getDateTimeInstance().format(date) + "<br/>";
+    }
+
+    private String printRecipients(RecipientType to, String s) {
+        String recipientsTo = message.getRecipients().stream()
+                .filter(r -> r.getType() == to)
+                .map(ViewerPanel::asMailto)
+                .collect(joining("; "));
+        return isBlank(recipientsTo) ? "" : parent.MlM(s) + recipientsTo + "<br/>";
+    }
+
+    private String printAttachment(Attachment att) throws MimeTypeParseException, IOException {
+        if (att instanceof FileAttachment) {
+            return printFileAttachment((FileAttachment) att);
+        }
+        if (att instanceof MsgAttachment) {
+            return printMsgAttachment((MsgAttachment) att);
+        }
+        logger.error("unknown Attachment: " + att + " " + att.getClass().getName());
+        return "";
+    }
+
+    private String printFileAttachment(FileAttachment att) throws MimeTypeParseException, IOException {
+        File content = helper.getTempFile(att);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("<a href=\"");
+        sb.append(content.toURI());
+        sb.append("\">");
+
+        String mime_type = att.getMimeTag();
+
+        logger.info("<a href=\"" + content.toURI() + "\"> " + mime_type);
+
+        if (mime_type != null
+                && ViewerHelper.is_image_mime_type(new MimeType(mime_type))
+                && att.getSize() < 1024 * 1024 * 2) {
+            File contentIcon = new File(content.getAbsolutePath() + "-small.jpg");
+            if (!content.exists()) {
+
+                write(content, att.getData());
+
+                wating_thread_pool_counter++;
+
+                thread_pool.execute(() -> {
+                    try {
+                        final int max_icon_size = Integer.parseInt(root.getSetup().getLocalConfig(AppConfigDefinitions.IconSize));
+                        ImageIcon icon = ImageUtils.loadScaledImageIcon(att.getData(),
+                                att.toString(),
+                                max_icon_size, max_icon_size);
+
+                        BufferedImage bi = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(),
+                                BufferedImage.TYPE_INT_RGB);
+
+                        Graphics2D g2 = bi.createGraphics();
+                        g2.drawImage(icon.getImage(), 0, 0, null);
+                        g2.dispose();
+
+                        ImageIO.write(bi, "jpg", contentIcon);
+
+                    } catch (IOException ex) {
+                        logger.error(ex, ex);
+                    }
+
+                    wating_thread_pool_counter--;
+                });
+            }
+
+            System.out.println(contentIcon);
+            sb.append("<img border=0 src=\"");
+            sb.append(contentIcon.toURI());
+            sb.append("\"/> ");
+        }
+
+        if (ViewerHelper.is_mail_message(att.getFilename())) {
+            if (!content.exists()) {
+                write(content, att.getData());
+            }
+
+            sb.append(helper.printMailIconHtml());
+        }
+
+        sb.append(att);
+        sb.append("</a> ");
+        return sb.toString();
+    }
+
+    private String printMsgAttachment(MsgAttachment att) throws IOException {
+        final Message msg = att.getMessage();
+
+        File sub_file = helper.getTempFile(att);
+
+        thread_pool.execute(() -> new AutoMBox(file_name, () -> new MessageSaver(msg).saveMessage(sub_file)));
+
+        return "<a href=\"" + sub_file.toURI() + "\">"
+                + helper.printMailIconHtml()
+                + msg.getSubject()
+                + "</a>&nbsp;";
+    }
+
+    private static String asMailto(RecipientEntry recipient) {
+        String name = recipient.getName();
+        String mailTo = recipient.mailTo();
+        return mailTo(name, mailTo);
+    }
+
+    private static String mailTo(String name, String email) {
+        return isBlank(email)
+                ? name
+                : "<a href='mailto:" + email + "'>" + (isBlank(name) ? email : name + " &lt;" + email + "&gt;") + "</a>";
     }
 
     private void write(File content, byte[] data) {
@@ -582,49 +610,6 @@ public class ViewerPanel extends javax.swing.JPanel implements Printable {
 
             wating_thread_pool_counter--;
         });
-    }
-
-    private String printSubject() {
-        StringBuilder sb = new StringBuilder("<b>");
-        if (message.getSubject() != null)
-            sb.append(message.getSubject());
-        return sb.append("</b><br/>").toString();
-    }
-
-    private String printFrom() {
-        StringBuilder sb = new StringBuilder(parent.MlM("From: "));
-        String messageFromName = message.getFromName();
-        String messageFromEmail = ViewerHelper.isValidEmail(message.getFromEmail())
-                ? message.getFromEmail()
-                : message.getFromSMTPAddress();
-        sb.append(mailTo(messageFromName, messageFromEmail));
-        return sb.append("<br/>").toString();
-    }
-
-    private String printRecipients(RecipientType to, String s) {
-        String recipientsTo = message.getRecipients().stream()
-                .filter(r -> r.getType() == to)
-                .map(ViewerPanel::asMailto)
-                .collect(joining("; "));
-        if (isBlank(recipientsTo)) {
-            return "";
-        }
-        return parent.MlM(s) + recipientsTo + "<br/>";
-    }
-
-    private static String asMailto(RecipientEntry recipient) {
-        String name = recipient.getName();
-        String mailTo = recipient.mailTo();
-        return mailTo(name, mailTo);
-    }
-
-    private static String mailTo(String name, String email) {
-        if (isNotBlank(email)) {
-            return "<a href='mailto:" + email + "'>"
-                    + (isNotBlank(name) ? name + " &lt;" + email + "&gt;" : email)
-                    + "</a>";
-        }
-        return name;
     }
 
     public void dispose() {
