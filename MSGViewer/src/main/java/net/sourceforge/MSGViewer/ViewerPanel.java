@@ -285,6 +285,15 @@ public class ViewerPanel extends javax.swing.JPanel implements Printable {
         if (message == null)
             return;
 
+        bodyText();
+
+        logger.trace(bodyText);
+
+        body.setText(bodyText);
+        body.setCaretPosition(0);
+    }
+
+    private void bodyText() {
         if (jRRTF.isSelected() && message.getBodyRTF() != null && !message.getBodyRTF().isEmpty()) {
             if (message.getBodyRTF().contains("\\fromhtml")) {
                 AutoMBox am = new AutoMBox(MainWin.class.getName(), () -> {
@@ -296,8 +305,6 @@ public class ViewerPanel extends javax.swing.JPanel implements Printable {
 
                     body.setContentType("text/html");
                     bodyText = helper.extractHTMLFromRTF(message.getBodyRTF(), message);
-
-                    logger.trace(bodyText);
                 });
 
                 if (am.isFailed()) {
@@ -317,9 +324,6 @@ public class ViewerPanel extends javax.swing.JPanel implements Printable {
             body.setContentType("text/plain");
             bodyText = message.getBodyText();
         }
-
-        body.setText(bodyText);
-        body.setCaretPosition(0);
     }
 
     private void hyperlinkUpdate(final HyperlinkEvent e) {
@@ -369,7 +373,7 @@ public class ViewerPanel extends javax.swing.JPanel implements Printable {
         if (ViewerHelper.is_mail_message(content.toString())) {
 
             if (open_new_mail_handler != null) {
-                open_new_mail_handler.openMail(root, content.toString());
+                open_new_mail_handler.openMail(content.toString());
             }
         } else {
 
@@ -409,7 +413,7 @@ public class ViewerPanel extends javax.swing.JPanel implements Printable {
         parent.setNormalCursor();
     }
 
-    void doParse() throws Exception {
+    private void doParse() throws Exception {
         cleanUp();
 
         wating_thread_pool_counter = 0;

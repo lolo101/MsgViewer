@@ -14,7 +14,7 @@ public class AutoMBox {
     }
 
     protected Logger logger;
-    protected boolean failed = true;
+    protected boolean failed;
     protected final boolean do_mbox;
     private final Doable doable;
 
@@ -32,8 +32,8 @@ public class AutoMBox {
     private void invoke() {
         try {
             doable.do_stuff();
-            failed = false;
         } catch (Exception ex) {
+            failed = true;
             logger.error("Exception: " + ex + "\n" + ex.getLocalizedMessage(), ex);
             if (do_mbox) {
                 showErrorDialog(ex);

@@ -16,7 +16,7 @@ import java.io.File;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
-public class SingleWin extends BaseDialog implements MainDialog, OpenNewMailInterface, LoadMessageInterface {
+public class SingleWin extends BaseDialog implements MainDialog, LoadMessageInterface {
 
     private static String last_path = null;
     private String dialog_id;
@@ -28,7 +28,7 @@ public class SingleWin extends BaseDialog implements MainDialog, OpenNewMailInte
         last_path = root.getSetup().getLocalConfig("LastPath", "");
 
         viewerPanel.setRoot(root, this);
-        viewerPanel.setopenNewMailInterface(this);
+        viewerPanel.setopenNewMailInterface(this::openMail);
 
         if (file_name == null) {
             viewerPanel.getHeaderPane().setText(MlM("Drag a msg file into this window"));
@@ -277,8 +277,7 @@ public class SingleWin extends BaseDialog implements MainDialog, OpenNewMailInte
         }
     }
 
-    @Override
-    public void openMail(Root root, String file) {
+    private void openMail(String file) {
         SingleWin win = new SingleWin(root, file);
 
         if (!menubar.isVisible()) {

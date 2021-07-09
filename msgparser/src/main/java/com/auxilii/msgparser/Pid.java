@@ -1,5 +1,7 @@
 package com.auxilii.msgparser;
 
+import java.util.Arrays;
+
 public enum Pid {
     PidTagGuidStream(0x0002),
     PidTagEntryStream(0x0003),
@@ -88,6 +90,7 @@ public enum Pid {
     PidTagAttachMethod(0x3705),
     PidTagAttachLongFilename(0x3707),
     PidTagAttachRendering(0x3709),
+    PidTagAttachTag(0x370a),
     PidTagRenderingPosition(0x370b),
     PidTagAttachMimeTag(0x370e),
     PidTagAttachContentId(0x3712),
@@ -146,11 +149,9 @@ public enum Pid {
     }
 
     public static Pid from(int id) {
-        for (Pid value : Pid.values()) {
-            if (value.id == id) {
-                return value;
-            }
-        }
-        return Unknown;
+        return Arrays.stream(Pid.values())
+                .filter(value -> value.id == id)
+                .findFirst()
+                .orElse(Unknown);
     }
 }

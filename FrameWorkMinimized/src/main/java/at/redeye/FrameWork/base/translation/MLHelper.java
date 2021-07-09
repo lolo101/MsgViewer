@@ -1,26 +1,13 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.base.translation;
 
 import at.redeye.FrameWork.base.AutoLogger;
 import at.redeye.FrameWork.base.Root;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+
+import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
-/**
- *
- * @author martin
- */
 public class MLHelper
 {
     Root root;
@@ -39,7 +26,7 @@ public class MLHelper
         autoLoadCurrentLocale();
     }
 
-    boolean loadPropsFile( String lang ) throws FileNotFoundException, IOException
+    boolean loadPropsFile( String lang ) throws IOException
     {
         boolean loaded_something = false;
 
@@ -90,10 +77,6 @@ public class MLHelper
     public boolean loadTrans(String trans) {
         try {
             return loadPropsFile(trans);
-
-        } catch (FileNotFoundException ex) {
-            return false;
-
         } catch (IOException ex) {
             return false;
         }
@@ -101,11 +84,6 @@ public class MLHelper
 
     public void autoLoadCurrentLocale()
     {
-        /*
-        if( current_lang != null && locale.equals(current_lang) )
-            return;
-        */
-
         if (loadTrans(locale)) {
             return;
         }
@@ -156,11 +134,8 @@ public class MLHelper
             {
                 try {
                     FileInputStream in = new FileInputStream( file );
-                    if( in != null )
-                    {
-                        missing_props.load(in);
-                        in.close();
-                    }
+                    missing_props.load(in);
+                    in.close();
                 } catch( IOException ex ) {
 
                 }
@@ -189,36 +164,6 @@ public class MLHelper
 
     }
 
-    /**
-     * automatically loads a translation file for the given object.
-     * as implementation language root.getBaseLanguage() is used
-     * and as target language the current language is used.
-     * @param object
-     */
-    public void autoLoadFile4Class(Object object)
-    {
-        autoLoadFile4ClassName(object.getClass().getName());
-    }
-
-    /**
-     * automatically loads a translation file for the given object.
-     * as implementation language root.getBaseLanguage() is used
-     * and as target language the current language is used.
-     * @param object
-     */
-    public void autoLoadFile4ClassName(String name)
-    {
-        if( already_loaded( name, current_lang, root.getBaseLanguage() ) )
-           return;
-
-        Properties p = MLUtil.autoLoadFile4ClassName(root, name, current_lang, root.getBaseLanguage());
-
-        if( p != null )
-        {
-            MLUtil.addAllProps(props, p);
-        }
-    }
-
     private boolean already_loaded( String name, String locale, String impl_language )
     {
         String key = name + locale + impl_language;
@@ -237,7 +182,7 @@ public class MLHelper
 
     /**
      * tries locating and loading a translation class for a specific language
-     * @param object for which a translation is required
+     * @param name for which a translation is required
      * @param locale language that is requested eg: "de_AT", or "de"
      * @param impl_language naitive languague shoudl be like "de"
      */

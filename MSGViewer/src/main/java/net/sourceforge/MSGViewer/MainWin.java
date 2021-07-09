@@ -17,7 +17,7 @@ import java.io.File;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
-public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterface, LoadMessageInterface {
+public class MainWin extends BaseDialog implements MainDialog, LoadMessageInterface {
     private String dialog_id;
     private final ViewerHelper helper;
     private final PrinterJob printerJob = PrinterJob.getPrinterJob();
@@ -35,7 +35,7 @@ public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterf
         initComponents();
 
         viewerPanel.setRoot(root, this);
-        viewerPanel.setopenNewMailInterface(this);
+        viewerPanel.setopenNewMailInterface(this::openMail);
 
         last_path = root.getSetup().getLocalConfig("LastPath", "");
 
@@ -282,8 +282,7 @@ public class MainWin extends BaseDialog implements MainDialog, OpenNewMailInterf
     private net.sourceforge.MSGViewer.ViewerPanel viewerPanel;
     // End of variables declaration//GEN-END:variables
 
-    @Override
-    public void openMail(Root root, String file_name) {
+    private void openMail(String file_name) {
         MainWin win = new MainWin(root, file_name);
 
         if (!menubar.isVisible())
