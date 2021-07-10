@@ -18,8 +18,8 @@ import java.util.Locale;
  */
 public abstract class Root {
 
-    String app_name;
-    String app_title;
+    protected final String app_name;
+    private final String app_title;
 
     /**
      * language most of the aplication is programmed in
@@ -57,12 +57,6 @@ public abstract class Root {
     String display_language;
 
     static Root static_root;
-
-    public Root( String app_name )
-    {
-        this.app_name = app_name;
-        static_root = this;
-    }
 
     public Root( String app_name, String app_title )
     {

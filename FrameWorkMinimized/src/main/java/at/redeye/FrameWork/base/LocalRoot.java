@@ -17,60 +17,48 @@ import java.util.Vector;
 
 public class LocalRoot extends Root {
 
-    protected LocalSetup setup;
-    protected DBConnection db_connection;
-    protected Vector<BaseDialogBase> dialogs = new Vector<>();
-    protected boolean appExitAllowed = true;
     private static final Logger logger = LogManager.getLogger(LocalRoot.class);
+    private final LocalSetup setup;
+    private final DLLCache dll_cache;
+    private final Vector<BaseDialogBase> dialogs = new Vector<>();
+    protected DBConnection db_connection;
+    protected boolean appExitAllowed = true;
     DelayedProxyLoader loader_proxy;
     AutoProxyHandler proxy_handler;
-    DLLCache dll_cache;
     ArrayList<Plugin> plugins;
     Holidays holidays;
     MLHelper ml_helper;
 
     public class DelayedProxyLoader extends Thread {
-        Root root;
-
-        DelayedProxyLoader(Root root) {
-            this.root = root;
-
+        DelayedProxyLoader() {
             this.setName(DelayedProxyLoader.class.getCanonicalName());
         }
 
         @Override
         public void run() {
             long start = System.currentTimeMillis();
-            proxy_handler = new AutoProxyHandler(root);
+            proxy_handler = new AutoProxyHandler(LocalRoot.this);
 
             logger.trace(" proxy laoding: " + (System.currentTimeMillis() - start));
         }
     }
 
     public LocalRoot(String app_name) {
-        super(app_name);
-
-        init(true);
+        this(app_name, app_name, true);
     }
 
     public LocalRoot(String app_name, String title) {
-        super(app_name, title);
-
-        init(true);
+        this(app_name, title, true);
     }
 
     public LocalRoot(String app_name, String title, boolean enable_proxy_loading) {
         super(app_name, title);
 
-        init(enable_proxy_loading);
-    }
-
-    private void init(boolean enable_proxy_loading) {
         dll_cache = new DLLCache(this);
-        setup = new LocalSetup(this, app_name);
+        setup = new LocalSetup(this, this.app_name);
 
         if (enable_proxy_loading) {
-            loader_proxy = new DelayedProxyLoader(this);
+            loader_proxy = new DelayedProxyLoader();
             loader_proxy.start();
         }
     }
