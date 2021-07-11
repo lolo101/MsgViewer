@@ -3,6 +3,7 @@ package at.redeye.FrameWork.base;
 import at.redeye.FrameWork.base.bindtypes.DBDateTime;
 import at.redeye.FrameWork.base.bindtypes.DBFlagInteger;
 import at.redeye.FrameWork.base.bindtypes.DBValue;
+import at.redeye.FrameWork.base.tablemanipulator.TableManipulator;
 import at.redeye.FrameWork.base.transaction.Transaction;
 import at.redeye.FrameWork.widgets.datetime.IDateTimeComponent;
 import org.apache.logging.log4j.LogManager;
@@ -120,6 +121,19 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
     }
 
     /**
+     * Checks, if data within the table have been change, asks the user what
+     * sould be done (save it, don't save it, or cancel current operation
+     *
+     * @param tm TableManipulator object
+     * @return 1 when the data should by saved <br/>
+     * 0 on saving should be done <br/>
+     * -1 cancel current operation <br/>
+     */
+    public int checkSave(TableManipulator tm) {
+        return helper.checkSave(tm);
+    }
+
+    /**
      * to be overrided by subdialogs
      *
      * @return true if the dialog can be closed
@@ -134,8 +148,7 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
         helper.setEdited();
     }
 
-    @Override
-    public boolean isEdited() {
+    protected boolean isEdited() {
         return helper.isEdited();
     }
 

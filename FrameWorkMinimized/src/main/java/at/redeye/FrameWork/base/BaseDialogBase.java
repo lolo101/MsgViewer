@@ -76,8 +76,6 @@ public interface BaseDialogBase
 
     void setEdited();
 
-    boolean isEdited();
-
     void setEdited(boolean val);
 
     /**

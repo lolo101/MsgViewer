@@ -1,5 +1,6 @@
 package net.sourceforge.MSGViewer;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import javax.swing.*;
@@ -16,6 +17,7 @@ import static org.mockito.Mockito.*;
 class EditorDropTargetTest {
 
     @Test
+    @Disabled("Does not work in headless environment : need to decouple logic from view")
     void drop_multiple_messages() {
         LoadMessageInterface main_win = mock(LoadMessageInterface.class);
         EditorDropTarget sut = new EditorDropTarget(main_win, new JEditorPane());
