@@ -16,7 +16,7 @@ import java.io.File;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
-public class SingleWin extends BaseDialog implements MainDialog, LoadMessageInterface {
+public class SingleWin extends BaseDialog implements MainDialog {
 
     private static String last_path = null;
     private String dialog_id;
@@ -45,8 +45,8 @@ public class SingleWin extends BaseDialog implements MainDialog, LoadMessageInte
                 jMNavActionPerformed(null);
         });
 
-        new EditorDropTarget(this, viewerPanel.getHeaderPane());
-        new EditorDropTarget(this, viewerPanel.getBodyPane());
+        new EditorDropTarget(this::loadMessage, viewerPanel.getHeaderPane());
+        new EditorDropTarget(this::loadMessage, viewerPanel.getBodyPane());
     }
 
     @Override
@@ -253,8 +253,7 @@ public class SingleWin extends BaseDialog implements MainDialog, LoadMessageInte
     }//GEN-LAST:event_jMNavActionPerformed
 
 
-    @Override
-    public void loadMessage(String file_name) {
+    private void loadMessage(String file_name) {
         logger.info("filename: " + file_name);
 
         if (file_name.startsWith("file://")) {

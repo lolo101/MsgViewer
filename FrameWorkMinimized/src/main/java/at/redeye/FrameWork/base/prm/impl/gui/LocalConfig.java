@@ -1,9 +1,9 @@
 package at.redeye.FrameWork.base.prm.impl.gui;
 
 import at.redeye.FrameWork.base.BaseDialog;
-import at.redeye.FrameWork.base.CanSaveInterface;
 import at.redeye.FrameWork.base.DefaultCanClose;
 import at.redeye.FrameWork.base.Root;
+import at.redeye.FrameWork.base.Saveable;
 import at.redeye.FrameWork.base.bindtypes.DBStrukt;
 import at.redeye.FrameWork.base.prm.PrmCustomChecksInterface;
 import at.redeye.FrameWork.base.prm.PrmDefaultChecksInterface;
@@ -22,7 +22,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
 
-public class LocalConfig extends BaseDialog implements CanSaveInterface, PrmListener {
+public class LocalConfig extends BaseDialog implements Saveable, PrmListener {
 
     private static final long serialVersionUID = 1L;
     Vector<DBStrukt> values = new Vector<>();

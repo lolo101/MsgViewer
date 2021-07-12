@@ -423,9 +423,9 @@ public class BaseDialogBaseHelper implements BindVarInterface {
                         JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
         switch (n) {
-            case 0:
+            case JOptionPane.YES_OPTION:
                 return 1;
-            case 1:
+            case JOptionPane.NO_OPTION:
                 return 0;
             default:
                 return -1;

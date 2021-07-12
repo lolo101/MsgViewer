@@ -20,7 +20,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
 
-public class GlobalConfig extends BaseDialog implements CanSaveInterface,
+public class GlobalConfig extends BaseDialog implements Saveable,
         PrmListener {
 
     private static final long serialVersionUID = 1L;

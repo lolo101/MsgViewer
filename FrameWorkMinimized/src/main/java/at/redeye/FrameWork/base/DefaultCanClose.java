@@ -4,7 +4,7 @@ import at.redeye.FrameWork.base.tablemanipulator.TableManipulator;
 
 public class DefaultCanClose {
 
-    public static boolean DefaultCanCloseWithTable(CanSaveInterface iface, TableManipulator tm )
+    public static boolean DefaultCanCloseWithTable(Saveable iface, TableManipulator tm )
     {
         int ret = iface.checkSave(tm);
 

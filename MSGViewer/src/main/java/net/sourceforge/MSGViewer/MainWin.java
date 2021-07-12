@@ -17,7 +17,7 @@ import java.io.File;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
-public class MainWin extends BaseDialog implements MainDialog, LoadMessageInterface {
+public class MainWin extends BaseDialog implements MainDialog {
     private String dialog_id;
     private final ViewerHelper helper;
     private final PrinterJob printerJob = PrinterJob.getPrinterJob();
@@ -48,8 +48,8 @@ public class MainWin extends BaseDialog implements MainDialog, LoadMessageInterf
             });
         }
 
-        new EditorDropTarget(this, viewerPanel.getHeaderPane());
-        new EditorDropTarget(this, viewerPanel.getBodyPane());
+        new EditorDropTarget(this::loadMessage, viewerPanel.getHeaderPane());
+        new EditorDropTarget(this::loadMessage, viewerPanel.getBodyPane());
 
         registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_V, 0), () -> jMDetailActionPerformed(null));
 
@@ -291,8 +291,7 @@ public class MainWin extends BaseDialog implements MainDialog, LoadMessageInterf
         invokeDialog(win);
     }
 
-    @Override
-    public void loadMessage(String file_name) {
+    private void loadMessage(String file_name) {
         logger.info("filename: " + file_name);
 
         if (file_name.startsWith("file://")) {

@@ -62,11 +62,6 @@ public class ViewerPanel extends JPanel implements Printable {
 
     public ViewerPanel() {
         initComponents();
-
-        header.addHyperlinkListener(this::hyperlinkUpdate);
-        body.addHyperlinkListener(this::hyperlinkUpdate);
-
-        JCBfix.setEnabled(jRText.isSelected());
     }
 
     public void setRoot(Root root, BaseDialogBase parent) {
@@ -151,11 +146,13 @@ public class ViewerPanel extends JPanel implements Printable {
         jSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
         header.setEditable(false);
+        header.addHyperlinkListener(this::headerHyperlinkUpdate);
         headerScrollPane.setViewportView(header);
 
         jSplitPane.setTopComponent(headerScrollPane);
 
         body.setEditable(false);
+        body.addHyperlinkListener(this::bodyHyperlinkUpdate);
         bodyScrollPane.setViewportView(body);
 
         jRRTF.setText("RTF");
@@ -165,6 +162,7 @@ public class ViewerPanel extends JPanel implements Printable {
         jRText.addActionListener(this::jRTextActionPerformed);
 
         JCBfix.setText("Fixed Font");
+        JCBfix.setEnabled(jRText.isSelected());
         JCBfix.addActionListener(this::JCBfixActionPerformed);
 
         jSFontSize.addChangeListener(this::jSFontSizeStateChanged);
@@ -174,45 +172,45 @@ public class ViewerPanel extends JPanel implements Printable {
         javax.swing.GroupLayout buttonsPanelLayout = new javax.swing.GroupLayout(buttonsPanel);
         buttonsPanel.setLayout(buttonsPanelLayout);
         buttonsPanelLayout.setHorizontalGroup(
-            buttonsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(buttonsPanelLayout.createSequentialGroup()
-                .addComponent(jRRTF)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jRText)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(JCBfix)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSFontSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(fontSizeLabel)
-                .addGap(0, 95, Short.MAX_VALUE))
+                buttonsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(buttonsPanelLayout.createSequentialGroup()
+                                .addComponent(jRRTF)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jRText)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(JCBfix)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jSFontSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(fontSizeLabel)
+                                .addGap(0, 95, Short.MAX_VALUE))
         );
         buttonsPanelLayout.setVerticalGroup(
-            buttonsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(buttonsPanelLayout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addGroup(buttonsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, buttonsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jRRTF)
-                        .addComponent(jRText)
-                        .addComponent(JCBfix))
-                    .addComponent(jSFontSize, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(fontSizeLabel, javax.swing.GroupLayout.Alignment.TRAILING)))
+                buttonsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(buttonsPanelLayout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addGroup(buttonsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, buttonsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                .addComponent(jRRTF)
+                                                .addComponent(jRText)
+                                                .addComponent(JCBfix))
+                                        .addComponent(jSFontSize, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(fontSizeLabel, javax.swing.GroupLayout.Alignment.TRAILING)))
         );
 
         javax.swing.GroupLayout MainPanelLayout = new javax.swing.GroupLayout(MainPanel);
         MainPanel.setLayout(MainPanelLayout);
         MainPanelLayout.setHorizontalGroup(
-            MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(buttonsPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(bodyScrollPane, javax.swing.GroupLayout.Alignment.TRAILING)
+                MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(buttonsPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(bodyScrollPane, javax.swing.GroupLayout.Alignment.TRAILING)
         );
         MainPanelLayout.setVerticalGroup(
-            MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(MainPanelLayout.createSequentialGroup()
-                .addComponent(bodyScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(buttonsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(MainPanelLayout.createSequentialGroup()
+                                .addComponent(bodyScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(buttonsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         jSplitPane.setRightComponent(MainPanel);
@@ -220,12 +218,12 @@ public class ViewerPanel extends JPanel implements Printable {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jSplitPane)
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jSplitPane, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -282,6 +280,14 @@ public class ViewerPanel extends JPanel implements Printable {
     private void JCBfixActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JCBfixActionPerformed
         updateBody();
     }//GEN-LAST:event_JCBfixActionPerformed
+
+    private void bodyHyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {//GEN-FIRST:event_bodyHyperlinkUpdate
+        hyperlinkUpdate(evt);
+    }//GEN-LAST:event_bodyHyperlinkUpdate
+
+    private void headerHyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {//GEN-FIRST:event_headerHyperlinkUpdate
+        hyperlinkUpdate(evt);
+    }//GEN-LAST:event_headerHyperlinkUpdate
 
     private void updateBody() {
         if (message == null)
@@ -342,26 +348,7 @@ public class ViewerPanel extends JPanel implements Printable {
         final String protocol = url.getProtocol();
 
         if (!protocol.equals("file")) {
-            if (Setup.is_win_system()) {
-                logger.info("opening: " + url);
-
-                ShellExec shell = new ShellExec();
-                int ret = shell.execute(url.toString());
-                logger.debug("shell exec returned: " + ret);
-            } else {
-
-                String open_command = helper.getOpenCommand();
-
-                String command = open_command + " \"" + url + "\"";
-                logger.info(command);
-
-                String[] command_array = new String[2];
-
-                command_array[0] = open_command;
-                command_array[1] = url.toString();
-
-                Process p = Runtime.getRuntime().exec(command_array);
-            }
+            open(url.toString());
             return;
         }
 
@@ -378,28 +365,30 @@ public class ViewerPanel extends JPanel implements Printable {
                 open_new_mail_handler.openMail(content.toString());
             }
         } else {
-
-            if (Setup.is_win_system() && root.getPlugin("ShellExec") != null) {
-                logger.info("opening: " + content.getPath());
-
-                ShellExec shell = new ShellExec();
-                int ret = shell.execute(content.getPath());
-                logger.debug("shell exec returned: " + ret);
-            } else {
-                String open_command = helper.getOpenCommand();
-
-                String command = open_command + " \"" + content.getPath() + "\"";
-                logger.info(command);
-
-                String[] command_array = new String[2];
-
-                command_array[0] = open_command;
-                command_array[1] = content.getPath();
-
-                Process p = Runtime.getRuntime().exec(command_array);
-            }
+            open(content.getPath());
         }
 
+    }
+
+    private void open(String path) throws IOException {
+        if (Setup.is_win_system() && root.getPlugin("ShellExec") != null) {
+            logger.info("opening: " + path);
+
+            ShellExec shell = new ShellExec();
+            int ret = shell.execute(path);
+            logger.debug("shell exec returned: " + ret);
+        } else {
+            String open_command = helper.getOpenCommand();
+
+            logger.info(open_command + " \"" + path + "\"");
+
+            String[] command_array = new String[2];
+
+            command_array[0] = open_command;
+            command_array[1] = path;
+
+            Runtime.getRuntime().exec(command_array);
+        }
     }
 
     public void parse(final String file_name) {
@@ -458,26 +447,23 @@ public class ViewerPanel extends JPanel implements Printable {
     }
 
     private String headerHtml() throws MimeTypeParseException, IOException {
-        final StringBuilder sb = new StringBuilder("<html><body>");
+        return "<html><body>" + "<b>" + printSubject() + "</b><br/>"
+                + printLine("From: ", printFrom())
+                + printLine("Date: ", printDate())
+                + printLine("To: ", printRecipients(RecipientType.TO))
+                + printLine("CC: ", printRecipients(RecipientType.CC))
+                + printLine("BCC: ", printRecipients(RecipientType.BCC))
+                + printAttachments()
+                + "</body></html>";
+    }
 
-        sb.append(printSubject());
-        sb.append(printFrom());
-        sb.append(printDate());
-
-        sb.append(printRecipients(RecipientType.TO, "To: "));
-        sb.append(printRecipients(RecipientType.CC, "CC: "));
-        sb.append(printRecipients(RecipientType.BCC, "BCC: "));
-
-        for (Attachment att : message.getAttachments()) {
-            sb.append(printAttachment(att));
-        }
-
-        return sb.append("</body></html>").toString();
+    private String printLine(String label, String value) {
+        return isBlank(value) ? "" : parent.MlM(label) + value + "<br/>";
     }
 
     private String printSubject() {
         String subject = message.getSubject();
-        return "<b>" + (subject == null ? "" : subject) + "</b><br/>";
+        return subject == null ? "" : subject;
     }
 
     private String printFrom() {
@@ -485,22 +471,28 @@ public class ViewerPanel extends JPanel implements Printable {
         String messageFromEmail = ViewerHelper.isValidEmail(message.getFromEmail())
                 ? message.getFromEmail()
                 : message.getFromSMTPAddress();
-        return parent.MlM("From: ") + mailTo(messageFromName, messageFromEmail) + "<br/>";
+        return mailTo(messageFromName, messageFromEmail);
     }
 
     private String printDate() {
         Date date = message.getDate();
-        return date == null
-                ? ""
-                : parent.MlM("Date: ") + DateFormat.getDateTimeInstance().format(date) + "<br/>";
+        return date == null ? "" : DateFormat.getDateTimeInstance().format(date);
     }
 
-    private String printRecipients(RecipientType to, String s) {
+    private String printRecipients(RecipientType to) {
         String recipientsTo = message.getRecipients().stream()
                 .filter(r -> r.getType() == to)
                 .map(ViewerPanel::asMailto)
                 .collect(joining("; "));
-        return isBlank(recipientsTo) ? "" : parent.MlM(s) + recipientsTo + "<br/>";
+        return isBlank(recipientsTo) ? "" : recipientsTo;
+    }
+
+    private String printAttachments() throws MimeTypeParseException, IOException {
+        StringBuilder sb = new StringBuilder();
+        for (Attachment att : message.getAttachments()) {
+            sb.append(printAttachment(att));
+        }
+        return sb.toString();
     }
 
     private String printAttachment(Attachment att) throws MimeTypeParseException, IOException {
@@ -586,10 +578,7 @@ public class ViewerPanel extends JPanel implements Printable {
 
         thread_pool.execute(() -> new AutoMBox(file_name, () -> new MessageSaver(msg).saveMessage(sub_file)));
 
-        return "<a href=\"" + sub_file.toURI() + "\">"
-                + helper.printMailIconHtml()
-                + msg.getSubject()
-                + "</a>&nbsp;";
+        return "<a href=\"" + sub_file.toURI() + "\">" + helper.printMailIconHtml() + msg.getSubject() + "</a>&nbsp;";
     }
 
     private static String asMailto(RecipientEntry recipient) {
