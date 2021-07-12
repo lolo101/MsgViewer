@@ -39,11 +39,7 @@ public class testRTF2HTML extends BaseModuleLauncher
 
                 System.out.println(content);
 
-                new AutoLogger(testRTF2HTML.class.getName()) {
-
-                    @Override
-                    public void do_stuff() throws Exception {
-
+                new AutoLogger(testRTF2HTML.class.getName(), () -> {
                         RTFParser parser = new RTFParser(new FileInputStream(file));
 
                         String message = null;
@@ -64,10 +60,10 @@ public class testRTF2HTML extends BaseModuleLauncher
                             {
                                 if( group.isNotEmptyText() )
                                 {
-                                    String content = group.getTextContent();
+                                    String textContent = group.getTextContent();
 
-                                    System.out.print(content);
-                                    sb.append(content);
+                                    System.out.print(textContent);
+                                    sb.append(textContent);
                                 }
                             }
 
@@ -124,12 +120,8 @@ public class testRTF2HTML extends BaseModuleLauncher
                                         col = 40;
                                     }
 
-                                    StringBuilder sb = new StringBuilder();
-
-                                    sb.append(" ".repeat(Math.max(0, col - 1)));
-                                    sb.append("^");
-
-                                    logger.error("\n\n" + ll + "\n" + sb.toString());
+                                    String sb = " ".repeat(Math.max(0, col - 1)) + "^";
+                                    logger.error("\n\n" + ll + "\n" + sb);
                                 }
                             }
                         }
@@ -142,9 +134,7 @@ public class testRTF2HTML extends BaseModuleLauncher
                                 throw exc;
                             }
                         }
-
-                    }
-                };
+                });
 
             }
         }

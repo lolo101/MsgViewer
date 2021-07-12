@@ -27,14 +27,12 @@ public class EncryptedDBPasswd {
     public static String encryptDBPassword(final String DBPasswd, final String password) {
         final StringBuffer buf = new StringBuffer();
 
-        AutoLogger al = new AutoLogger(EncryptedDBPasswd.class.getName()) {
-            public void do_stuff() throws Exception {
-                DesEncrypt cipher = new DesEncrypt(password);
-                String str = cipher.encrypt(DBPasswd);
+        AutoLogger al = new AutoLogger(EncryptedDBPasswd.class.getName(), () -> {
+            DesEncrypt cipher = new DesEncrypt(password);
+            String str = cipher.encrypt(DBPasswd);
 
-                buf.append(str);
-            }
-        };
+            buf.append(str);
+        });
 
         if (al.isFailed())
             return null;

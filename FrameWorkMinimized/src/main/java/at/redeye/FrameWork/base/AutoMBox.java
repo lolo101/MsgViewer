@@ -8,30 +8,23 @@ import javax.swing.*;
 
 public class AutoMBox {
 
-    @FunctionalInterface
-    public interface Doable {
-        void do_stuff() throws Exception;
-    }
-
     protected Logger logger;
     protected boolean failed;
     protected final boolean do_mbox;
-    private final Doable doable;
 
-    public AutoMBox(String loggerName, boolean do_mbox, Doable doable) {
+    public AutoMBox(String loggerName, boolean do_mbox, Invokable invokable) {
         logger = LogManager.getLogger(loggerName);
         this.do_mbox = do_mbox;
-        this.doable = doable;
-        invoke();
+        invoke(invokable);
     }
 
-    public AutoMBox(String loggerName, Doable doable) {
-        this(loggerName, true, doable);
+    public AutoMBox(String loggerName, Invokable invokable) {
+        this(loggerName, true, invokable);
     }
 
-    private void invoke() {
+    private void invoke(Invokable invokable) {
         try {
-            doable.do_stuff();
+            invokable.invoke();
         } catch (Exception ex) {
             failed = true;
             logger.error("Exception: " + ex + "\n" + ex.getLocalizedMessage(), ex);

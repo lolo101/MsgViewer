@@ -30,17 +30,15 @@ public abstract class BaseModuleLauncher {
         BaseConfigureLogging();
     }
 
-    public String getStartupParam(String shortname, String longname,
-                                  String envname) {
+    public String getStartupParam(String name) {
+        return getStartupParam(name, name, name, null);
+    }
+
+    public String getStartupParam(String shortname, String longname, String envname) {
         return getStartupParam(shortname, longname, envname, null);
     }
 
-    public String getStartupParam(String name) {
-        return getStartupParam(name, name, name);
-    }
-
-    public String getStartupParam(String shortname, String longname,
-                                  String envname, String default_value) {
+    public String getStartupParam(String shortname, String longname, String envname, String default_value) {
 
         shortname = "-" + shortname;
         longname = "-" + longname;
@@ -88,15 +86,10 @@ public abstract class BaseModuleLauncher {
                 final File jnlp_file = new File(arg);
 
                 if (jnlp_file.exists()) {
-                    new AutoLogger(BaseModuleLauncher.class.getName()) {
-
-                        @Override
-                        public void do_stuff() throws Exception {
+                    new AutoLogger(BaseModuleLauncher.class.getName(), () -> {
                             ParseJNLP parser = new ParseJNLP(jnlp_file);
-
                             jnlp_properties = parser.getProperties();
-                        }
-                    };
+                    });
                 }
             }
         }

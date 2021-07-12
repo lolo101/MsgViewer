@@ -51,11 +51,8 @@ public class LocalSetup extends Setup {
     }
 
     private boolean checkGlobal() {
-        if (global_config == null) {
-            return loadGlobalProps();
-        }
+        return global_config != null || loadGlobalProps();
 
-        return true;
     }
 
     public void loadProps() {
@@ -157,40 +154,31 @@ public class LocalSetup extends Setup {
         if (conn == null)
             return false;
 
-        AutoLogger al = new AutoLogger("LocalSetup") {
+        AutoLogger al = new AutoLogger("LocalSetup", () -> {
+            Transaction trans = conn.getNewTransaction();
 
-            @Override
-            public void do_stuff() {
-                result = Boolean.FALSE;
+            Set<String> keys = global_config.keySet();
 
-                Transaction trans = conn.getNewTransaction();
-
-                Set<String> keys = global_config.keySet();
-
-                for (String key : keys) {
-                    DBConfig c = global_config.get(key);
-                    if (c.hasChanged()) {
-                        PrmActionEvent event = new PrmActionEvent();
-                        event.setParameterName(c.name);
-                        event.setOldPrmValue(c.getOldValue());
-                        event.setNewPrmValue(c.value);
-                        event.setPossibleVals(c.getPossibleValues());
-                        DefaultInsertOrUpdater.insertOrUpdateValuesWithPrimKey(
-                                trans, c);
-                        c.updateListeners(event);
-                        c.setChanged(false);
-                    }
+            for (String key : keys) {
+                DBConfig c = global_config.get(key);
+                if (c.hasChanged()) {
+                    PrmActionEvent event = new PrmActionEvent();
+                    event.setParameterName(c.name);
+                    event.setOldPrmValue(c.getOldValue());
+                    event.setNewPrmValue(c.value);
+                    event.setPossibleVals(c.getPossibleValues());
+                    DefaultInsertOrUpdater.insertOrUpdateValuesWithPrimKey(
+                            trans, c);
+                    c.updateListeners(event);
+                    c.setChanged(false);
                 }
-
-                trans.commit();
-                conn.closeTransaction(trans);
-
-                result = Boolean.TRUE;
             }
 
-        };
+            trans.commit();
+            conn.closeTransaction(trans);
+        });
 
-        return (Boolean) al.result;
+        return !al.isFailed();
     }
 
     @Override
@@ -289,10 +277,7 @@ public class LocalSetup extends Setup {
 
     @Override
     public DBConfig getConfig(String key) {
-        if (!checkGlobal()) {
-            return null;
-        }
-        return (global_config.get(key));
+        return checkGlobal() ? global_config.get(key) : null;
     }
 
     @Override
