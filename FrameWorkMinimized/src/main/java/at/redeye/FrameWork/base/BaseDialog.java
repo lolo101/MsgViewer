@@ -18,14 +18,13 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
 
     private static final long serialVersionUID = 1L;
 
-    public BaseDialogBaseHelper helper;
+    public final BaseDialogBaseHelper helper;
     JRootPane myrootPane;
     public static Logger logger = LogManager.getLogger(BaseDialog.class);
-    public Root root;
+    public final Root root;
 
     public BaseDialog(Root root, String title) {
-        this.root = root;
-        helper = new BaseDialogBaseHelper(this, root, title, myrootPane, false);
+        this(root, title, false);
     }
 
     public BaseDialog(Root root, String title, boolean do_not_inform_root) {
@@ -62,7 +61,7 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
     }
 
     /**
-     * Registers a listener for a F1, ESC, or somthing global keypressed Event
+     * Registers a listener for a F1, ESC, or something global keypressed Event
      *
      * @param to_listen_Key Keyboard Key
      * @param runnable      Method to call

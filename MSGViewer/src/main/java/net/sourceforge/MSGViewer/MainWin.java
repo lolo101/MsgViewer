@@ -14,15 +14,14 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.print.PrinterJob;
 import java.io.File;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 
 public class MainWin extends BaseDialog implements MainDialog {
-    private String dialog_id;
+    private static String last_path;
+
     private final ViewerHelper helper;
     private final PrinterJob printerJob = PrinterJob.getPrinterJob();
 
-    private static String last_path = null;
+    private String dialog_id;
 
     /**
      * Creates new form MainWin
@@ -47,9 +46,6 @@ public class MainWin extends BaseDialog implements MainDialog {
                 viewerPanel.parse(file_name);
             });
         }
-
-        new EditorDropTarget(this::loadMessage, viewerPanel.getHeaderPane());
-        new EditorDropTarget(this::loadMessage, viewerPanel.getBodyPane());
 
         registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_V, 0), () -> jMDetailActionPerformed(null));
 
@@ -265,7 +261,7 @@ public class MainWin extends BaseDialog implements MainDialog {
         final File[] files = fc.getSelectedFiles();
 
         for (File file : files) {
-            loadMessage(file.getPath());
+            openMail(file.getPath());
         }
 
     }//GEN-LAST:event_jMOpenFileActionPerformed
@@ -289,29 +285,6 @@ public class MainWin extends BaseDialog implements MainDialog {
             win.hideMenuBar();
 
         invokeDialog(win);
-    }
-
-    private void loadMessage(String file_name) {
-        logger.info("filename: " + file_name);
-
-        if (file_name.startsWith("file://")) {
-            file_name = URLDecoder.decode(file_name, StandardCharsets.UTF_8);
-            file_name = file_name.substring(7);
-
-        }
-
-        jMNav.setEnabled(file_name.toLowerCase().endsWith(".msg"));
-
-        if (viewerPanel.getMessage() == null) {
-            viewerPanel.parse(file_name);
-        } else {
-            MainWin win = new MainWin(root, file_name);
-
-            if (!menubar.isVisible())
-                win.hideMenuBar();
-
-            invokeMainDialog(win);
-        }
     }
 
     @Override

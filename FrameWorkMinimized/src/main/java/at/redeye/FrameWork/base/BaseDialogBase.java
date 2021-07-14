@@ -42,7 +42,7 @@ public interface BaseDialogBase
     void setPreferredSize(Dimension dimension);
 
     /**
-     * Registers a listener for a F1, ESC, or somthing global keypressed Event
+     * Registers a listener for a F1, ESC, or something global keypressed Event
      * @param keyStroke Keyboard Key
      * @param runnable      Method to call
      */

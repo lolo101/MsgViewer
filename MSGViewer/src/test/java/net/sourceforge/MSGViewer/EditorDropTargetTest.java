@@ -3,7 +3,6 @@ package net.sourceforge.MSGViewer;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
@@ -19,8 +18,8 @@ class EditorDropTargetTest {
     @Test
     @Disabled("Does not work in headless environment : need to decouple logic from view")
     void drop_multiple_messages() {
-        LoadMessageInterface main_win = mock(LoadMessageInterface.class);
-        EditorDropTarget sut = new EditorDropTarget(main_win, new JEditorPane());
+        MessageView main_win = mock(MessageView.class);
+        EditorDropTarget sut = new EditorDropTarget(main_win);
 
         DropTargetDragEvent dragEvent = givenFileListDragEvent();
         sut.dragEnter(dragEvent);
@@ -28,8 +27,8 @@ class EditorDropTargetTest {
         DropTargetDropEvent dropEvent = givenFileListDropEvent();
         sut.drop(dropEvent);
 
-        verify(main_win).loadMessage("a");
-        verify(main_win).loadMessage("b");
+        verify(main_win).view("a");
+        verify(main_win).view("b");
     }
 
     private static DropTargetDropEvent givenFileListDropEvent() {

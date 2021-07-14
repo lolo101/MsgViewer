@@ -4,7 +4,7 @@ import at.redeye.FrameWork.utilities.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.swing.*;
+import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -18,23 +18,13 @@ import java.util.List;
 
 public class EditorDropTarget implements DropTargetListener {
     private static final Logger logger = LogManager.getLogger(EditorDropTarget.class);
-    private final LoadMessageInterface main_win;
-    private final JEditorPane pane;
-    private final Color feedbackColor;
-    private final Color backgroundColor;
-    private boolean acceptableType;
+    private final MessageView messageView;
+    private Color backgroundColor;
+    private boolean draggingContent;
     private boolean draggingFile;
 
-    public EditorDropTarget(LoadMessageInterface main_win, JEditorPane pane) {
-        this.pane = pane;
-        this.main_win = main_win;
-
-        backgroundColor = pane.getBackground();
-        feedbackColor = backgroundColor.darker();
-
-        // Create the DropTarget and register
-        // it with the JEditorPane.
-        new DropTarget(pane, DnDConstants.ACTION_COPY_OR_MOVE, this, true, null);
+    public EditorDropTarget(MessageView messageView) {
+        this.messageView = messageView;
     }
 
     @Override
@@ -46,50 +36,33 @@ public class EditorDropTarget implements DropTargetListener {
         // whether it is appropriate.
         checkTransferType(dtde);
 
-        // Accept or reject the drag.
-        boolean acceptedDrag = acceptOrRejectDrag(dtde);
-
-        // Do drag-under feedback
-        dragUnderFeedback(dtde, acceptedDrag);
+        if (acceptsDrag(dtde))
+            dragEnter((JTextComponent) dtde.getDropTargetContext().getComponent());
     }
 
     @Override
     public void dragOver(DropTargetDragEvent dtde) {
-
-
         logger.debug("dragOver");
-        // Accept or reject the drag
-        boolean acceptedDrag = acceptOrRejectDrag(dtde);
-
-        // Do drag-under feedback
-        dragUnderFeedback(dtde, acceptedDrag);
+        if (acceptsDrag(dtde))
+            dragOver((JTextComponent) dtde.getDropTargetContext().getComponent(), dtde.getLocation());
     }
 
     @Override
     public void dropActionChanged(DropTargetDragEvent dtde) {
-
-        logger.debug("dropActionChanged");
-
-        // Accept or reject the drag
-        boolean acceptedDrag = acceptOrRejectDrag(dtde);
-
-        // Do drag-under feedback
-        dragUnderFeedback(dtde, acceptedDrag);
+        acceptsDrag(dtde);
     }
 
     @Override
     public void dragExit(DropTargetEvent dte) {
-
         logger.debug("dragExit");
-        // Do drag-under feedback
-        dragUnderFeedback(null, false);
+        dragExit((JTextComponent) dte.getDropTargetContext().getComponent());
     }
 
     @Override
     public void drop(DropTargetDropEvent dtde) {
 
         logger.debug("drop");
-        dragUnderFeedback(null, false);
+        dragExit((JTextComponent) dtde.getDropTargetContext().getComponent());
 
         // Check the drop action
         if ((dtde.getDropAction() & DnDConstants.ACTION_COPY_OR_MOVE) != 0) {
@@ -118,74 +91,52 @@ public class EditorDropTarget implements DropTargetListener {
         }
 
     }
-    // Internal methods start here
 
-    private boolean acceptOrRejectDrag(DropTargetDragEvent dtde) {
-        int dropAction = dtde.getDropAction();
+    private boolean acceptsDrag(DropTargetDragEvent dtde) {
         int sourceActions = dtde.getSourceActions();
-        boolean acceptedDrag = false;
-
-        logger.info("\tSource actions are "
-                + sourceActions + ", drop action is "
-                + dropAction);
-
-        // Reject if the object being transferred
-        // or the operations available are not acceptable.
-        if (!acceptableType || (sourceActions & DnDConstants.ACTION_COPY_OR_MOVE) == 0) {
-            logger.info("Drop target rejecting drag");
-            dtde.rejectDrag();
-        } else if ((dropAction & DnDConstants.ACTION_COPY_OR_MOVE) == 0) {
-            // Not offering copy or move - suggest a copy
-            logger.info("Drop target offering COPY");
-            dtde.acceptDrag(DnDConstants.ACTION_COPY);
-            acceptedDrag = true;
+        boolean acceptedDrag = (draggingFile || draggingContent)
+                && (sourceActions & DnDConstants.ACTION_COPY_OR_MOVE) != 0;
+        if (acceptedDrag) {
+            dtde.acceptDrag(DnDConstants.ACTION_MOVE);
         } else {
-            // Offering an acceptable operation: accept
-            logger.info("Drop target accepting drag");
-            dtde.acceptDrag(dropAction);
-            acceptedDrag = true;
+            dtde.rejectDrag();
         }
-
         return acceptedDrag;
     }
 
-    private void dragUnderFeedback(DropTargetDragEvent dtde,
-                                     boolean acceptedDrag) {
-        boolean receptive = dtde != null && acceptedDrag;
+    private void dragEnter(JTextComponent component) {
         if (draggingFile) {
-            // When dragging a file, change the background color
-            Color newColor = receptive ? feedbackColor : backgroundColor;
-            if (!newColor.equals(pane.getBackground())) {
-                pane.setBackground(newColor);
-                pane.repaint();
-            }
+            backgroundColor = component.getBackground();
+            Color feedbackColor = backgroundColor.darker();
+            component.setBackground(feedbackColor);
+            component.repaint();
         } else {
-            if (receptive) {
-                // Dragging text - move the insertion cursor
-                Point location = dtde.getLocation();
-                pane.getCaret().setVisible(true);
-                pane.setCaretPosition(pane.viewToModel2D(location));
-            } else {
-                pane.getCaret().setVisible(false);
-            }
+            component.getCaret().setVisible(true);
+        }
+    }
+
+    private void dragOver(JTextComponent pane, Point location) {
+        if (draggingContent) {
+            pane.setCaretPosition(pane.viewToModel2D(location));
+        }
+    }
+
+    private void dragExit(JTextComponent component) {
+        if (draggingFile) {
+            component.setBackground(backgroundColor);
+            component.repaint();
+        } else {
+            component.getCaret().setVisible(false);
         }
     }
 
     private void checkTransferType(DropTargetDragEvent dtde) {
-        // Accept a list of files, or data content that
-        // amounts to plain text or a Unicode text string
-        acceptableType = false;
-        draggingFile = false;
-        if (dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-            acceptableType = true;
-            draggingFile = true;
-        } else if (dtde.isDataFlavorSupported(DataFlavor.plainTextFlavor)
-                || dtde.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-            acceptableType = true;
-        }
+        draggingFile = dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor);
+        draggingContent = dtde.isDataFlavorSupported(DataFlavor.plainTextFlavor)
+                || dtde.isDataFlavorSupported(DataFlavor.stringFlavor);
 
-        logger.info("File type acceptable - " + acceptableType);
         logger.info("Dragging a file - " + draggingFile);
+        logger.info("Dragging content - " + draggingContent);
     }
 
     // This method handles a drop for a list of files
@@ -195,7 +146,7 @@ public class EditorDropTarget implements DropTargetListener {
                 .getTransferData(DataFlavor.javaFileListFlavor);
         fileList.forEach(transferFile -> {
             logger.info("Opening file " + transferFile);
-            main_win.loadMessage(transferFile.getPath());
+            messageView.view(transferFile.getPath());
         });
 
         return true;
@@ -203,7 +154,7 @@ public class EditorDropTarget implements DropTargetListener {
 
     // This method handles a drop with data content
     private boolean dropContent(Transferable transferable,
-                                  DropTargetDropEvent dtde) {
+                                DropTargetDropEvent dtde) {
 
         try {
             // Check for a match with the current content type
@@ -261,7 +212,7 @@ public class EditorDropTarget implements DropTargetListener {
                 String[] files_to_open = insertData.split("\n");
 
                 for (String file_to_open : files_to_open)
-                    main_win.loadMessage(file_to_open);
+                    messageView.view(file_to_open);
 
                 return true;
             }

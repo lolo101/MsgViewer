@@ -1,19 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.sourceforge.MSGViewer;
 
+import at.redeye.FrameWork.base.BaseModuleLauncher;
+import net.sourceforge.MSGViewer.CLIHelp.CLIGroupHeader;
 import net.sourceforge.MSGViewer.CLIHelp.CLIHelp;
 import net.sourceforge.MSGViewer.CLIHelp.CLIOption;
-import net.sourceforge.MSGViewer.CLIHelp.CLIGroupHeader;
-import at.redeye.FrameWork.base.BaseModuleLauncher;
 
-/**
- *
- * @author martin
- */
 public class CLIHelpMSGViewer extends CLIHelp
 {
     public static final String CLI_MAINWIN = "-mainwin";
@@ -50,7 +41,7 @@ public class CLIHelpMSGViewer extends CLIHelp
 
         add( new CLIOption( CLI_HIDEMENUBAR, "Hide menubar.",
                                              "In this mode MSGViewer can only show messages. There is no file save as," +
-                                             " or somthing like this avaliable. This mode is use by internet kiosks." ));
+                                             " or something like this avaliable. This mode is use by internet kiosks." ));
     }
 
 }

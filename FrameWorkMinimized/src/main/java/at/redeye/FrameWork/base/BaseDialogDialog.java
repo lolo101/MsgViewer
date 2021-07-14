@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package at.redeye.FrameWork.base;
 
 import at.redeye.FrameWork.base.bindtypes.DBDateTime;
@@ -16,10 +12,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Collection;
 
-/**
- *
- * @author martin
- */
 public class BaseDialogDialog extends javax.swing.JDialog implements
 		BindVarInterface, BaseDialogBase {
 
@@ -63,7 +55,7 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	}
 
 	/**
-	 * Registers a listener for a F1, ESC, or somthing global keypressed Event
+	 * Registers a listener for a F1, ESC, or something global keypressed Event
 	 *
 	 * @param to_listen_Key
 	 *            Keyboard Key

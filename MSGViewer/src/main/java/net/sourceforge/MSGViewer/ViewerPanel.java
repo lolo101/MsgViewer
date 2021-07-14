@@ -27,6 +27,8 @@ import javax.swing.text.EditorKit;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 import java.awt.*;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
 import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
@@ -35,6 +37,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
@@ -49,19 +53,21 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 public class ViewerPanel extends JPanel implements Printable {
 
     private static final Pattern RTF_FONT_SIZE_PATTERN = Pattern.compile("(\\\\fs)([0-9]+)");
-    private String bodyText = null;
+    private String bodyText;
     private Message message;
-    private ViewerHelper helper = null;
-    private Root root = null;
+    private ViewerHelper helper;
+    private Root root;
     private String file_name;
-    private OpenNewMailInterface open_new_mail_handler = null;
-    private BaseDialogBase parent = null;
+    private OpenNewMailInterface open_new_mail_handler;
+    private BaseDialogBase parent;
 
     private final ExecutorService thread_pool = Executors.newCachedThreadPool();
     private int wating_thread_pool_counter = 0;
 
     public ViewerPanel() {
         initComponents();
+        new DropTarget(header, DnDConstants.ACTION_COPY_OR_MOVE, new EditorDropTarget(this::view), true, null);
+        new DropTarget(body, DnDConstants.ACTION_COPY_OR_MOVE, new EditorDropTarget(this::view), true, null);
     }
 
     public void setRoot(Root root, BaseDialogBase parent) {
@@ -81,6 +87,21 @@ public class ViewerPanel extends JPanel implements Printable {
 
     public void setopenNewMailInterface(OpenNewMailInterface open_new_mail_handler) {
         this.open_new_mail_handler = open_new_mail_handler;
+    }
+
+    private void view(String file_name) {
+        logger.info("filename: " + file_name);
+
+        if (file_name.startsWith("file://")) {
+            file_name = URLDecoder.decode(file_name, StandardCharsets.UTF_8);
+            file_name = file_name.substring(7);
+        }
+
+        if (message == null) {
+            parse(file_name);
+        } else {
+            open_new_mail_handler.openMail(file_name);
+        }
     }
 
     @Override
@@ -405,8 +426,6 @@ public class ViewerPanel extends JPanel implements Printable {
     }
 
     private void doParse() throws Exception {
-        cleanUp();
-
         wating_thread_pool_counter = 0;
 
         File file = new File(file_name);
@@ -440,10 +459,6 @@ public class ViewerPanel extends JPanel implements Printable {
 
             updateBody();
         }
-    }
-
-    void cleanUp() {
-        message = null;
     }
 
     private String headerHtml() throws MimeTypeParseException, IOException {

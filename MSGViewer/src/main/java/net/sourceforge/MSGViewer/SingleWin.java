@@ -13,8 +13,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 
 public class SingleWin extends BaseDialog implements MainDialog {
 
@@ -44,9 +42,6 @@ public class SingleWin extends BaseDialog implements MainDialog {
             if (jMNav.isEnabled())
                 jMNavActionPerformed(null);
         });
-
-        new EditorDropTarget(this::loadMessage, viewerPanel.getHeaderPane());
-        new EditorDropTarget(this::loadMessage, viewerPanel.getBodyPane());
     }
 
     @Override
@@ -181,7 +176,7 @@ public class SingleWin extends BaseDialog implements MainDialog {
         final File[] files = fc.getSelectedFiles();
         for (File file : files) {
             last_path = file.getPath();
-            loadMessage(file.getPath());
+            openMail(file.getPath());
         }
     }//GEN-LAST:event_jFileOpenActionPerformed
 
@@ -251,30 +246,6 @@ public class SingleWin extends BaseDialog implements MainDialog {
         invokeDialogUnique(new MSGNavigator(root, new File(viewerPanel.getFileName())));
 
     }//GEN-LAST:event_jMNavActionPerformed
-
-
-    private void loadMessage(String file_name) {
-        logger.info("filename: " + file_name);
-
-        if (file_name.startsWith("file://")) {
-            file_name = URLDecoder.decode(file_name, StandardCharsets.UTF_8);
-            file_name = file_name.substring(7);
-
-        }
-
-        jMNav.setEnabled(file_name.toLowerCase().endsWith(".msg"));
-
-        if (viewerPanel.getMessage() == null) {
-            viewerPanel.parse(file_name);
-        } else {
-            SingleWin win = new SingleWin(root, file_name);
-
-            if (!menubar.isVisible())
-                win.hideMenuBar();
-
-            invokeMainDialog(win);
-        }
-    }
 
     private void openMail(String file) {
         SingleWin win = new SingleWin(root, file);
