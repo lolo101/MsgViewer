@@ -139,20 +139,18 @@ public class ViewerHelper {
     }
 
     public File getTempFile(FileAttachment fatt) {
-        if (!tmp_dir.isDirectory() && !tmp_dir.mkdirs()) {
-            throw new RuntimeException("Cannot create tmp dir: " + tmp_dir);
-        }
-        return new File(tmp_dir,
-                StringUtils.isBlank(fatt.getFilename())
-                        ? fatt.getLongFilename()
-                        : fatt.getFilename());
+        return getTempFile(StringUtils.isBlank(fatt.getFilename()) ? fatt.getLongFilename() : fatt.getFilename());
     }
 
     public File getTempFile(MsgAttachment matt) {
+        return getTempFile(matt.getMessage().hashCode() + ".msg");
+    }
+
+    private File getTempFile(String fileName) {
         if (!tmp_dir.isDirectory() && !tmp_dir.mkdirs()) {
             throw new RuntimeException("Cannot create tmp dir: " + tmp_dir);
         }
-        return new File(tmp_dir, matt.getMessage().hashCode() + ".msg");
+        return new File(tmp_dir, fileName);
     }
 
     public static boolean isValidEmail(String email) {

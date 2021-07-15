@@ -23,9 +23,6 @@ public class MainWin extends BaseDialog implements MainDialog {
 
     private String dialog_id;
 
-    /**
-     * Creates new form MainWin
-     */
     public MainWin(Root root, final String file_name) {
         super(root, file_name != null ? (root.MlM(root.getAppTitle()) + ": " + file_name) : root.getAppTitle());
 
@@ -101,6 +98,8 @@ public class MainWin extends BaseDialog implements MainDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(400, 400));
 
+        viewerPanel.addPropertyChangeListener(this::viewerPanelPropertyChange);
+
         jMenuProgram.setText("Program");
 
         jMOpenFile.setText("File Open ...");
@@ -156,16 +155,16 @@ public class MainWin extends BaseDialog implements MainDialog {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(viewerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGap(0, 0, 0))
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(viewerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(0, 0, 0))
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(viewerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGap(0, 0, 0))
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(viewerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(0, 0, 0))
         );
 
         pack();
@@ -271,6 +270,13 @@ public class MainWin extends BaseDialog implements MainDialog {
             new AutoMBox(this.getClass().getName(), printerJob::print);
         }
     }//GEN-LAST:event_jMPrintActionPerformed
+
+    private void viewerPanelPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_viewerPanelPropertyChange
+        if (evt.getPropertyName().equals(ViewerPanel.FILE_NAME_PROPERTY)) {
+            String file_name = (String) evt.getNewValue();
+            jMNav.setEnabled(file_name.toLowerCase().endsWith(".msg"));
+        }
+    }//GEN-LAST:event_viewerPanelPropertyChange
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem jMNav;

@@ -52,6 +52,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public class ViewerPanel extends JPanel implements Printable {
 
+    public static final String FILE_NAME_PROPERTY = "file_name";
     private static final Pattern RTF_FONT_SIZE_PATTERN = Pattern.compile("(\\\\fs)([0-9]+)");
     private String bodyText;
     private Message message;
@@ -99,6 +100,7 @@ public class ViewerPanel extends JPanel implements Printable {
 
         if (message == null) {
             parse(file_name);
+            firePropertyChange(FILE_NAME_PROPERTY, null, file_name);
         } else {
             open_new_mail_handler.openMail(file_name);
         }
@@ -541,9 +543,7 @@ public class ViewerPanel extends JPanel implements Printable {
 
                 write(content, att.getData());
 
-                wating_thread_pool_counter++;
-
-                thread_pool.execute(() -> {
+                async(() -> {
                     try {
                         final int max_icon_size = Integer.parseInt(root.getSetup().getLocalConfig(AppConfigDefinitions.IconSize));
                         ImageIcon icon = ImageUtils.loadScaledImageIcon(att.getData(),
@@ -562,8 +562,6 @@ public class ViewerPanel extends JPanel implements Printable {
                     } catch (IOException ex) {
                         logger.error(ex, ex);
                     }
-
-                    wating_thread_pool_counter--;
                 });
             }
 
@@ -591,7 +589,7 @@ public class ViewerPanel extends JPanel implements Printable {
 
         File sub_file = helper.getTempFile(att);
 
-        thread_pool.execute(() -> new AutoMBox(file_name, () -> new MessageSaver(msg).saveMessage(sub_file)));
+        async(() -> new AutoMBox(file_name, () -> new MessageSaver(msg).saveMessage(sub_file)));
 
         return "<a href=\"" + sub_file.toURI() + "\">" + helper.printMailIconHtml() + msg.getSubject() + "</a>&nbsp;";
     }
@@ -609,16 +607,12 @@ public class ViewerPanel extends JPanel implements Printable {
     }
 
     private void write(File content, byte[] data) {
-        wating_thread_pool_counter++;
-
-        thread_pool.execute(() -> {
+        async(() -> {
             try (FileOutputStream fout = new FileOutputStream(content)) {
                 fout.write(data);
             } catch (IOException ex) {
                 logger.error(ex, ex);
             }
-
-            wating_thread_pool_counter--;
         });
     }
 
@@ -658,5 +652,13 @@ public class ViewerPanel extends JPanel implements Printable {
 
     public JEditorPane getBodyPane() {
         return body;
+    }
+
+    private void async(Runnable runnable) {
+        wating_thread_pool_counter++;
+        thread_pool.execute(() -> {
+            runnable.run();
+            wating_thread_pool_counter--;
+        });
     }
 }

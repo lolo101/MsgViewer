@@ -81,6 +81,8 @@ public class SingleWin extends BaseDialog implements MainDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
+        viewerPanel.addPropertyChangeListener(this::viewerPanelPropertyChange);
+
         jMFileOpen.setText("Program");
 
         jFileOpen.setText("File Open ...");
@@ -132,16 +134,16 @@ public class SingleWin extends BaseDialog implements MainDialog {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(viewerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGap(0, 0, 0))
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(viewerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(0, 0, 0))
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(viewerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGap(0, 0, 0))
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(viewerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(0, 0, 0))
         );
 
         pack();
@@ -246,6 +248,13 @@ public class SingleWin extends BaseDialog implements MainDialog {
         invokeDialogUnique(new MSGNavigator(root, new File(viewerPanel.getFileName())));
 
     }//GEN-LAST:event_jMNavActionPerformed
+
+    private void viewerPanelPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_viewerPanelPropertyChange
+        if (evt.getPropertyName().equals(ViewerPanel.FILE_NAME_PROPERTY)) {
+            String file_name = (String) evt.getNewValue();
+            jMNav.setEnabled(file_name.toLowerCase().endsWith(".msg"));
+        }
+    }//GEN-LAST:event_viewerPanelPropertyChange
 
     private void openMail(String file) {
         SingleWin win = new SingleWin(root, file);

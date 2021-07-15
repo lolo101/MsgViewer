@@ -180,6 +180,9 @@
   </Layout>
   <SubComponents>
     <Component class="net.sourceforge.MSGViewer.ViewerPanel" name="viewerPanel">
+      <Events>
+        <EventHandler event="propertyChange" listener="java.beans.PropertyChangeListener" parameters="java.beans.PropertyChangeEvent" handler="viewerPanelPropertyChange"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>
