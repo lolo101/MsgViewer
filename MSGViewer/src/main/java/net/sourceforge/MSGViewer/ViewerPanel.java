@@ -50,7 +50,7 @@ import static at.redeye.FrameWork.base.BaseDialog.logger;
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-public class ViewerPanel extends JPanel implements Printable {
+public class ViewerPanel extends JPanel implements Printable, MessageView {
 
     public static final String FILE_NAME_PROPERTY = "file_name";
     private static final Pattern RTF_FONT_SIZE_PATTERN = Pattern.compile("(\\\\fs)([0-9]+)");
@@ -67,8 +67,8 @@ public class ViewerPanel extends JPanel implements Printable {
 
     public ViewerPanel() {
         initComponents();
-        new DropTarget(header, DnDConstants.ACTION_COPY_OR_MOVE, new EditorDropTarget(this::view), true, null);
-        new DropTarget(body, DnDConstants.ACTION_COPY_OR_MOVE, new EditorDropTarget(this::view), true, null);
+        new DropTarget(header, DnDConstants.ACTION_COPY_OR_MOVE, new EditorDropTarget(this), true, null);
+        new DropTarget(body, DnDConstants.ACTION_COPY_OR_MOVE, new EditorDropTarget(this), true, null);
     }
 
     public void setRoot(Root root, BaseDialogBase parent) {
@@ -90,7 +90,7 @@ public class ViewerPanel extends JPanel implements Printable {
         this.open_new_mail_handler = open_new_mail_handler;
     }
 
-    private void view(String file_name) {
+    public void view(String file_name) {
         logger.info("filename: " + file_name);
 
         if (file_name.startsWith("file://")) {

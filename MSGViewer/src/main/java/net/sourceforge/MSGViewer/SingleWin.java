@@ -178,7 +178,7 @@ public class SingleWin extends BaseDialog implements MainDialog {
         final File[] files = fc.getSelectedFiles();
         for (File file : files) {
             last_path = file.getPath();
-            openMail(file.getPath());
+            viewerPanel.view(file.getPath());
         }
     }//GEN-LAST:event_jFileOpenActionPerformed
 

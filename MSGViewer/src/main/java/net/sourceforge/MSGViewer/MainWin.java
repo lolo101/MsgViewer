@@ -260,7 +260,7 @@ public class MainWin extends BaseDialog implements MainDialog {
         final File[] files = fc.getSelectedFiles();
 
         for (File file : files) {
-            openMail(file.getPath());
+            viewerPanel.view(file.getPath());
         }
 
     }//GEN-LAST:event_jMOpenFileActionPerformed
