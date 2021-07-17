@@ -2,7 +2,6 @@ package net.sourceforge.MSGViewer;
 
 import at.redeye.FrameWork.Plugin.AboutPlugins;
 import at.redeye.FrameWork.base.AutoMBox;
-import at.redeye.FrameWork.base.BaseDialog;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.base.prm.impl.gui.LocalConfig;
 import net.sourceforge.MSGViewer.MSGNavigator.MSGNavigator;
@@ -10,21 +9,19 @@ import net.sourceforge.MSGViewer.MSGNavigator.MSGNavigator;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.print.PrinterJob;
 import java.io.File;
+import java.util.Arrays;
 
-public class MainWin extends BaseDialog implements MainDialog {
+public class MainWin extends BaseWin {
     private static String last_path;
 
     private final ViewerHelper helper;
     private final PrinterJob printerJob = PrinterJob.getPrinterJob();
 
-    private String dialog_id;
-
-    public MainWin(Root root, final String file_name) {
-        super(root, file_name != null ? (root.MlM(root.getAppTitle()) + ": " + file_name) : root.getAppTitle());
+    public MainWin(Root root) {
+        super(root);
 
         helper = new ViewerHelper(root);
 
@@ -35,34 +32,15 @@ public class MainWin extends BaseDialog implements MainDialog {
 
         last_path = root.getSetup().getLocalConfig("LastPath", "");
 
-        if (file_name == null) {
-            viewerPanel.getHeaderPane().setText(MlM("Drag a msg file into this window"));
-        } else {
-            EventQueue.invokeLater(() -> {
-                jMNav.setEnabled(file_name.toLowerCase().endsWith(".msg"));
-                viewerPanel.parse(file_name);
-            });
-        }
-
-        registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_V, 0), () -> jMDetailActionPerformed(null));
+        registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_V, 0), () -> {
+            if (jMDetail.isEnabled())
+                jMDetailActionPerformed(null);
+        });
 
         registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_N, 0), () -> {
             if (jMNav.isEnabled())
                 jMNavActionPerformed(null);
         });
-    }
-
-    @Override
-    public String getUniqueDialogIdentifier(Object requester) {
-        /*
-         * This way the title of the dialog won't change the id, of the dialog.
-         * The id of the dialog is used for saveing with height and position of
-         * the dialog
-         */
-        if (dialog_id == null)
-            dialog_id = super.getUniqueDialogIdentifier(requester);
-
-        return dialog_id;
     }
 
     @Override
@@ -73,6 +51,11 @@ public class MainWin extends BaseDialog implements MainDialog {
         helper.dispose();
 
         super.close();
+    }
+
+    @Override
+    public void openFile(File file) {
+        viewerPanel.view(file.getPath());
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -88,7 +71,7 @@ public class MainWin extends BaseDialog implements MainDialog {
         javax.swing.JMenuItem jMSettings = new javax.swing.JMenuItem();
         javax.swing.JMenuItem jMQuit = new javax.swing.JMenuItem();
         javax.swing.JMenu jMenuInfo = new javax.swing.JMenu();
-        javax.swing.JMenuItem jMDetail = new javax.swing.JMenuItem();
+        jMDetail = new javax.swing.JMenuItem();
         jMNav = new javax.swing.JMenuItem();
         javax.swing.JPopupMenu.Separator jSeparator1 = new javax.swing.JPopupMenu.Separator();
         javax.swing.JMenuItem jMAbout = new javax.swing.JMenuItem();
@@ -127,6 +110,7 @@ public class MainWin extends BaseDialog implements MainDialog {
         jMenuInfo.setText("Info");
 
         jMDetail.setText("Details");
+        jMDetail.setEnabled(false);
         jMDetail.addActionListener(this::jMDetailActionPerformed);
         jMenuInfo.add(jMDetail);
 
@@ -155,16 +139,16 @@ public class MainWin extends BaseDialog implements MainDialog {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(viewerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(0, 0, 0))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(viewerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(0, 0, 0))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(viewerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(0, 0, 0))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(viewerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(0, 0, 0))
         );
 
         pack();
@@ -186,8 +170,7 @@ public class MainWin extends BaseDialog implements MainDialog {
 
     private void jMDetailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMDetailActionPerformed
 
-        if (viewerPanel.getMessage() != null)
-            invokeDialogUnique(new Internals(root, viewerPanel.getMessage()));
+        invokeDialogUnique(new Internals(root, viewerPanel.getMessage()));
 
     }//GEN-LAST:event_jMDetailActionPerformed
 
@@ -257,12 +240,7 @@ public class MainWin extends BaseDialog implements MainDialog {
         if (retval != 0) {
             return;
         }
-        final File[] files = fc.getSelectedFiles();
-
-        for (File file : files) {
-            viewerPanel.view(file.getPath());
-        }
-
+        Arrays.stream(fc.getSelectedFiles()).forEach(this::openFile);
     }//GEN-LAST:event_jMOpenFileActionPerformed
 
     private void jMPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMPrintActionPerformed
@@ -272,20 +250,24 @@ public class MainWin extends BaseDialog implements MainDialog {
     }//GEN-LAST:event_jMPrintActionPerformed
 
     private void viewerPanelPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_viewerPanelPropertyChange
-        if (evt.getPropertyName().equals(ViewerPanel.FILE_NAME_PROPERTY)) {
+        if (ViewerPanel.FILE_NAME_PROPERTY.equals(evt.getPropertyName())) {
             String file_name = (String) evt.getNewValue();
+            setTitle(root.MlM(root.getAppTitle()) + ": " + file_name);
+            jMDetail.setEnabled(true);
             jMNav.setEnabled(file_name.toLowerCase().endsWith(".msg"));
         }
     }//GEN-LAST:event_viewerPanelPropertyChange
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem jMDetail;
     private javax.swing.JMenuItem jMNav;
     private javax.swing.JMenuBar menubar;
     private net.sourceforge.MSGViewer.ViewerPanel viewerPanel;
     // End of variables declaration//GEN-END:variables
 
     private void openMail(String file_name) {
-        MainWin win = new MainWin(root, file_name);
+        MainWin win = new MainWin(root);
+        win.viewerPanel.view(file_name);
 
         if (!menubar.isVisible())
             win.hideMenuBar();

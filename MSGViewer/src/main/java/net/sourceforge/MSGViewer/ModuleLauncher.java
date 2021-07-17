@@ -7,12 +7,12 @@ import at.redeye.FrameWork.base.Setup;
 import at.redeye.FrameWork.widgets.StartupWindow;
 import org.apache.logging.log4j.Level;
 
+import java.io.File;
 import java.util.Arrays;
 
 public class ModuleLauncher extends BaseModuleLauncher {
-    private MainDialog mainwin;
 
-    public ModuleLauncher(String[] args) {
+    private ModuleLauncher(String[] args) {
         super(args);
 
         BaseConfigureLogging(Level.ERROR);
@@ -21,6 +21,10 @@ public class ModuleLauncher extends BaseModuleLauncher {
         root.setBaseLanguage("en");
         root.setDefaultLanguage("en");
         root.setLanguageTranslationResourcePath("/net/sourceforge/MSGViewer/resources/translations");
+    }
+
+    public static void main(String[] args) {
+        new ModuleLauncher(args).invoke();
     }
 
     public void invoke() {
@@ -95,37 +99,18 @@ public class ModuleLauncher extends BaseModuleLauncher {
 
         configureLogging();
 
-        for (String arg : args) {
-            if (arg.toLowerCase().endsWith(".msg") ||
-                    arg.toLowerCase().endsWith(".mbox") ||
-                    arg.toLowerCase().endsWith(".eml")) {
-
-                MainDialog win = getStartupFlag(CLIHelpMSGViewer.CLI_MAINWIN)
-                        ? new MainWin(root, arg)
-                        : new SingleWin(root, arg);
-
-                if (mainwin == null) {
-                    mainwin = win;
-                } else {
-                    if (getStartupFlag(CLIHelpMSGViewer.CLI_HIDEMENUBAR)) {
-                        win.hideMenuBar();
-                    }
-                    win.setVisible(true);
-                }
-            }
-        }
-
-        if (mainwin == null) {
-            if (getStartupFlag(CLIHelpMSGViewer.CLI_MAINWIN)) {
-                mainwin = new MainWin(root, null);
-            } else {
-                mainwin = new SingleWin(root, null);
-            }
-        }
+        BaseWin mainwin = getStartupFlag(CLIHelpMSGViewer.CLI_MAINWIN)
+                ? new MainWin(root)
+                : new SingleWin(root);
 
         if (getStartupFlag(CLIHelpMSGViewer.CLI_HIDEMENUBAR)) {
             mainwin.hideMenuBar();
         }
+
+        Arrays.stream(args)
+                .filter(ModuleLauncher::isMessagePath)
+                .map(File::new)
+                .forEach(mainwin::openFile);
 
         closeSplash();
         mainwin.setVisible(true);
@@ -148,7 +133,9 @@ public class ModuleLauncher extends BaseModuleLauncher {
         return Arrays.stream(args).anyMatch(string::equalsIgnoreCase);
     }
 
-    public static void main(String[] args) {
-        new ModuleLauncher(args).invoke();
+    private static boolean isMessagePath(String arg) {
+        return arg.toLowerCase().endsWith(".msg") ||
+                arg.toLowerCase().endsWith(".mbox") ||
+                arg.toLowerCase().endsWith(".eml");
     }
 }

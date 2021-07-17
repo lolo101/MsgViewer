@@ -129,7 +129,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 
         Point mouse_point = MouseInfo.getPointerInfo().getLocation();
 
-        if (x < mouse_point.x && x + w > mouse_point.x) {
+        if (x < mouse_point.x && mouse_point.x < x + w) {
             // alter Wert is super, den lassen wir so
         } else if (Math.abs(x + w - mouse_point.x) < w) {
             // alter Wert is super, den lassen wir so

@@ -2,7 +2,6 @@ package net.sourceforge.MSGViewer;
 
 import at.redeye.FrameWork.Plugin.AboutPlugins;
 import at.redeye.FrameWork.base.AutoMBox;
-import at.redeye.FrameWork.base.BaseDialog;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.base.prm.impl.gui.LocalConfig;
 import net.sourceforge.MSGViewer.MSGNavigator.MSGNavigator;
@@ -10,17 +9,16 @@ import net.sourceforge.MSGViewer.MSGNavigator.MSGNavigator;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.Arrays;
 
-public class SingleWin extends BaseDialog implements MainDialog {
+public class SingleWin extends BaseWin {
 
     private static String last_path = null;
-    private String dialog_id;
 
-    public SingleWin(Root root, final String file_name) {
-        super(root, file_name != null ? (root.MlM(root.getAppTitle()) + ": " + file_name) : root.getAppTitle());
+    public SingleWin(Root root) {
+        super(root);
         initComponents();
 
         last_path = root.getSetup().getLocalConfig("LastPath", "");
@@ -28,28 +26,15 @@ public class SingleWin extends BaseDialog implements MainDialog {
         viewerPanel.setRoot(root, this);
         viewerPanel.setopenNewMailInterface(this::openMail);
 
-        if (file_name == null) {
-            viewerPanel.getHeaderPane().setText(MlM("Drag a msg file into this window"));
-        } else {
-            EventQueue.invokeLater(() -> {
-                jMNav.setEnabled(file_name.toLowerCase().endsWith(".msg"));
-                viewerPanel.parse(file_name);
-            });
-        }
-
+        registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_V, 0), () -> {
+            if (jMDetail.isEnabled())
+                jMDetailActionPerformed(null);
+        });
 
         registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_N, 0), () -> {
             if (jMNav.isEnabled())
                 jMNavActionPerformed(null);
         });
-    }
-
-    @Override
-    public String getUniqueDialogIdentifier(Object requester) {
-        if (dialog_id == null)
-            dialog_id = super.getUniqueDialogIdentifier(requester);
-
-        return dialog_id;
     }
 
     @Override
@@ -59,6 +44,12 @@ public class SingleWin extends BaseDialog implements MainDialog {
 
 
         super.close();
+    }
+
+    @Override
+    public void openFile(File file) {
+        last_path = file.getPath();
+        viewerPanel.view(file.getPath());
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -72,7 +63,7 @@ public class SingleWin extends BaseDialog implements MainDialog {
         javax.swing.JMenuItem jMOptions = new javax.swing.JMenuItem();
         javax.swing.JMenuItem jMQuit = new javax.swing.JMenuItem();
         javax.swing.JMenu jMInfo = new javax.swing.JMenu();
-        javax.swing.JMenuItem jMDetail = new javax.swing.JMenuItem();
+        jMDetail = new javax.swing.JMenuItem();
         jMNav = new javax.swing.JMenuItem();
         javax.swing.JPopupMenu.Separator jSeparator1 = new javax.swing.JPopupMenu.Separator();
         javax.swing.JMenuItem jMAbout = new javax.swing.JMenuItem();
@@ -106,6 +97,7 @@ public class SingleWin extends BaseDialog implements MainDialog {
         jMInfo.setText("Info");
 
         jMDetail.setText("Details");
+        jMDetail.setEnabled(false);
         jMDetail.addActionListener(this::jMDetailActionPerformed);
         jMInfo.add(jMDetail);
 
@@ -134,16 +126,16 @@ public class SingleWin extends BaseDialog implements MainDialog {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(viewerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(0, 0, 0))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(viewerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(0, 0, 0))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(viewerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(0, 0, 0))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(viewerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(0, 0, 0))
         );
 
         pack();
@@ -175,11 +167,7 @@ public class SingleWin extends BaseDialog implements MainDialog {
         if (retval != 0) {
             return;
         }
-        final File[] files = fc.getSelectedFiles();
-        for (File file : files) {
-            last_path = file.getPath();
-            viewerPanel.view(file.getPath());
-        }
+        Arrays.stream(fc.getSelectedFiles()).forEach(this::openFile);
     }//GEN-LAST:event_jFileOpenActionPerformed
 
     private void jMFileSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMFileSaveActionPerformed
@@ -238,8 +226,7 @@ public class SingleWin extends BaseDialog implements MainDialog {
 
     private void jMDetailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMDetailActionPerformed
 
-        if (viewerPanel.getMessage() != null)
-            invokeDialogUnique(new Internals(root, viewerPanel.getMessage()));
+        invokeDialogUnique(new Internals(root, viewerPanel.getMessage()));
 
     }//GEN-LAST:event_jMDetailActionPerformed
 
@@ -250,14 +237,17 @@ public class SingleWin extends BaseDialog implements MainDialog {
     }//GEN-LAST:event_jMNavActionPerformed
 
     private void viewerPanelPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_viewerPanelPropertyChange
-        if (evt.getPropertyName().equals(ViewerPanel.FILE_NAME_PROPERTY)) {
+        if (ViewerPanel.FILE_NAME_PROPERTY.equals(evt.getPropertyName())) {
             String file_name = (String) evt.getNewValue();
+            setTitle(root.MlM(root.getAppTitle()) + ": " + file_name);
+            jMDetail.setEnabled(true);
             jMNav.setEnabled(file_name.toLowerCase().endsWith(".msg"));
         }
     }//GEN-LAST:event_viewerPanelPropertyChange
 
-    private void openMail(String file) {
-        SingleWin win = new SingleWin(root, file);
+    private void openMail(String file_name) {
+        SingleWin win = new SingleWin(root);
+        win.viewerPanel.view(file_name);
 
         if (!menubar.isVisible()) {
             win.hideMenuBar();
@@ -272,6 +262,7 @@ public class SingleWin extends BaseDialog implements MainDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem jMDetail;
     private javax.swing.JMenuItem jMNav;
     private javax.swing.JMenuBar menubar;
     private net.sourceforge.MSGViewer.ViewerPanel viewerPanel;

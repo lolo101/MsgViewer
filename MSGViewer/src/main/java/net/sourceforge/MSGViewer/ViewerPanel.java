@@ -84,6 +84,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         JCBfix.setEnabled(jRText.isSelected());
 
         jSplitPane.setDividerLocation(Integer.parseInt(root.getSetup().getLocalConfig("DividerLocation", "150")));
+        header.setText(parent.MlM("Drag a msg file into this window"));
     }
 
     public void setopenNewMailInterface(OpenNewMailInterface open_new_mail_handler) {
@@ -644,10 +645,6 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
 
     public String getFileName() {
         return file_name;
-    }
-
-    public JEditorPane getHeaderPane() {
-        return header;
     }
 
     public JEditorPane getBodyPane() {
