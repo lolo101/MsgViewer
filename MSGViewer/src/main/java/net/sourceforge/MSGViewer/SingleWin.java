@@ -7,48 +7,29 @@ import at.redeye.FrameWork.base.prm.impl.gui.LocalConfig;
 import net.sourceforge.MSGViewer.MSGNavigator.MSGNavigator;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.util.Arrays;
 
 public class SingleWin extends BaseWin {
-
-    private static String last_path = null;
 
     public SingleWin(Root root) {
         super(root);
         initComponents();
 
-        last_path = root.getSetup().getLocalConfig("LastPath", "");
-
         viewerPanel.setRoot(root, this);
         viewerPanel.setopenNewMailInterface(this::openMail);
 
         registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_V, 0), () -> {
-            if (jMDetail.isEnabled())
-                jMDetailActionPerformed(null);
+            if (jMDetail.isEnabled()) jMDetailActionPerformed(null);
         });
 
         registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_N, 0), () -> {
-            if (jMNav.isEnabled())
-                jMNavActionPerformed(null);
+            if (jMNav.isEnabled()) jMNavActionPerformed(null);
         });
-    }
-
-    @Override
-    public void close() {
-        if (last_path != null)
-            root.getSetup().setLocalConfig("LastPath", last_path);
-
-
-        super.close();
     }
 
     @Override
     public void openFile(File file) {
-        last_path = file.getPath();
         viewerPanel.view(file.getPath());
     }
 
@@ -152,58 +133,13 @@ public class SingleWin extends BaseWin {
     }//GEN-LAST:event_jMOptionsActionPerformed
 
     private void jFileOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFileOpenActionPerformed
-
-        JFileChooser fc = new JFileChooser();
-
-        fc.setAcceptAllFileFilterUsed(false);
-        fc.setFileFilter(new MSGFileFilter(root));
-        fc.setMultiSelectionEnabled(true);
-
-        logger.info("last path: " + last_path);
-        if (last_path != null) {
-            fc.setCurrentDirectory(new File(last_path));
-        }
-        int retval = fc.showOpenDialog(this);
-        if (retval != 0) {
-            return;
-        }
-        Arrays.stream(fc.getSelectedFiles()).forEach(this::openFile);
+        filesRepository.chooseFilesToOpen().forEach(this::openFile);
     }//GEN-LAST:event_jFileOpenActionPerformed
 
     private void jMFileSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMFileSaveActionPerformed
-
-        final JFileChooser fc = new JFileChooser();
-        fc.setAcceptAllFileFilterUsed(false);
-        final FileFilter msg_filter = new FileNameExtensionFilter(MlM("Outlook *.msg File"), "msg");
-        final FileFilter mbox_filter = new FileNameExtensionFilter(MlM("Unix *.mbox File"), "mbox");
-        final FileFilter eml_filter = new FileNameExtensionFilter(MlM("Thunderbird *.eml File"), "eml");
-        fc.addChoosableFileFilter(msg_filter);
-        fc.addChoosableFileFilter(mbox_filter);
-        fc.addChoosableFileFilter(eml_filter);
-        fc.setMultiSelectionEnabled(false);
-        if (last_path != null) {
-            fc.setCurrentDirectory(new File(last_path));
-        }
-        int retval = fc.showSaveDialog(this);
-        if (retval != JFileChooser.APPROVE_OPTION) {
-            return;
-        }
-        final File file = fc.getSelectedFile();
-        new AutoMBox(this.getClass().getName(), () -> {
-            File export_file = file;
-            last_path = file.getPath();
-            if (!file.getName().toLowerCase().endsWith(".msg") && !file.getName().toLowerCase().endsWith(".eml") && !file.getName().toLowerCase().endsWith(".mbox")) {
-                if (fc.getFileFilter() == msg_filter) {
-                    export_file = new File(file.getAbsolutePath() + ".msg");
-                } else if (fc.getFileFilter() == eml_filter) {
-                    export_file = new File(file.getAbsolutePath() + ".eml");
-                } else {
-                    export_file = new File(file.getAbsolutePath() + ".mbox");
-                }
-            }
-            viewerPanel.exportFile(export_file);
-        });
-
+        filesRepository.chooseFilesToSave().ifPresent(file ->
+                new AutoMBox(this.getClass().getName(), () -> viewerPanel.exportFile(file))
+        );
     }//GEN-LAST:event_jMFileSaveActionPerformed
 
     private void jMAboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMAboutActionPerformed

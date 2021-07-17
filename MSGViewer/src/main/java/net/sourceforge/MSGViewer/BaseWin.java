@@ -7,9 +7,11 @@ import java.io.File;
 
 public abstract class BaseWin extends BaseDialog implements MainDialog {
     private String dialog_id;
+    protected final FilesRepository filesRepository;
 
     public BaseWin(Root root) {
         super(root, root.MlM(root.getAppTitle()));
+        filesRepository = new FilesRepository(this);
     }
 
     @Override

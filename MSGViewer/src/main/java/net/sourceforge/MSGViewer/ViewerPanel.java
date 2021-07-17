@@ -1,7 +1,7 @@
 package net.sourceforge.MSGViewer;
 
 import at.redeye.FrameWork.base.AutoMBox;
-import at.redeye.FrameWork.base.BaseDialogBase;
+import at.redeye.FrameWork.base.BaseDialog;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.base.Setup;
 import at.redeye.FrameWork.base.imagestorage.ImageUtils;
@@ -60,7 +60,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
     private Root root;
     private String file_name;
     private OpenNewMailInterface open_new_mail_handler;
-    private BaseDialogBase parent;
+    private BaseDialog parent;
 
     private final ExecutorService thread_pool = Executors.newCachedThreadPool();
     private int wating_thread_pool_counter = 0;
@@ -71,7 +71,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         new DropTarget(body, DnDConstants.ACTION_COPY_OR_MOVE, new EditorDropTarget(this), true, null);
     }
 
-    public void setRoot(Root root, BaseDialogBase parent) {
+    public void setRoot(Root root, BaseDialog parent) {
         this.parent = parent;
         this.root = root;
         helper = new ViewerHelper(root);
@@ -640,6 +640,12 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
     }
 
     public void exportFile(File export_file) throws Exception {
+        if (message == null) {
+            JOptionPane.showMessageDialog(parent,
+                    root.MlM("No message to save"),
+                    root.MlM("Error"),
+                    JOptionPane.ERROR_MESSAGE);
+        }
         new MessageSaver(message).saveMessage(export_file);
     }
 

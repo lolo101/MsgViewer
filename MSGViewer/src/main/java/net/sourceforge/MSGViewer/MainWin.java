@@ -7,50 +7,27 @@ import at.redeye.FrameWork.base.prm.impl.gui.LocalConfig;
 import net.sourceforge.MSGViewer.MSGNavigator.MSGNavigator;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.event.KeyEvent;
 import java.awt.print.PrinterJob;
 import java.io.File;
-import java.util.Arrays;
 
 public class MainWin extends BaseWin {
-    private static String last_path;
-
-    private final ViewerHelper helper;
     private final PrinterJob printerJob = PrinterJob.getPrinterJob();
 
     public MainWin(Root root) {
         super(root);
-
-        helper = new ViewerHelper(root);
-
         initComponents();
 
         viewerPanel.setRoot(root, this);
         viewerPanel.setopenNewMailInterface(this::openMail);
 
-        last_path = root.getSetup().getLocalConfig("LastPath", "");
-
         registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_V, 0), () -> {
-            if (jMDetail.isEnabled())
-                jMDetailActionPerformed(null);
+            if (jMDetail.isEnabled()) jMDetailActionPerformed(null);
         });
 
         registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_N, 0), () -> {
-            if (jMNav.isEnabled())
-                jMNavActionPerformed(null);
+            if (jMNav.isEnabled()) jMNavActionPerformed(null);
         });
-    }
-
-    @Override
-    public void close() {
-        root.getSetup().setLocalConfig("LastPath", last_path);
-
-        viewerPanel.dispose();
-        helper.dispose();
-
-        super.close();
     }
 
     @Override
@@ -193,54 +170,13 @@ public class MainWin extends BaseWin {
     }//GEN-LAST:event_jMSettingsActionPerformed
 
     private void jMSaveAsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMSaveAsActionPerformed
-
-        final JFileChooser fc = new JFileChooser();
-        fc.setAcceptAllFileFilterUsed(false);
-        final FileFilter msg_filter = new FileNameExtensionFilter(MlM("Outlook *.msg File"), "msg");
-        final FileFilter mbox_filter = new FileNameExtensionFilter(MlM("Unix *.mbox File"), "mbox");
-        final FileFilter eml_filter = new FileNameExtensionFilter(MlM("Thunderbird *.eml File"), "eml");
-        fc.addChoosableFileFilter(msg_filter);
-        fc.addChoosableFileFilter(mbox_filter);
-        fc.addChoosableFileFilter(eml_filter);
-        fc.setMultiSelectionEnabled(false);
-        if (last_path != null) {
-            fc.setCurrentDirectory(new File(last_path));
-        }
-        int retval = fc.showSaveDialog(this);
-        if (retval != JFileChooser.APPROVE_OPTION) {
-            return;
-        }
-        final File file = fc.getSelectedFile();
-        new AutoMBox(this.getClass().getName(), () -> {
-            File export_file = file;
-            if (!file.getName().toLowerCase().endsWith(".msg") && !file.getName().toLowerCase().endsWith(".eml") && !file.getName().toLowerCase().endsWith(".mbox")) {
-                if (fc.getFileFilter() == msg_filter) {
-                    export_file = new File(file.getAbsolutePath() + ".msg");
-                } else if (fc.getFileFilter() == eml_filter) {
-                    export_file = new File(file.getAbsolutePath() + ".eml");
-                } else {
-                    export_file = new File(file.getAbsolutePath() + ".mbox");
-                }
-            }
-            viewerPanel.exportFile(export_file);
-        });
+        filesRepository.chooseFilesToSave().ifPresent(file ->
+                new AutoMBox(this.getClass().getName(), () -> viewerPanel.exportFile(file))
+        );
     }//GEN-LAST:event_jMSaveAsActionPerformed
 
     private void jMOpenFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMOpenFileActionPerformed
-
-        JFileChooser fc = new JFileChooser();
-        fc.setAcceptAllFileFilterUsed(false);
-        fc.setFileFilter(new MSGFileFilter(root));
-        fc.setMultiSelectionEnabled(true);
-        logger.info("last path: " + last_path);
-        if (last_path != null) {
-            fc.setCurrentDirectory(new File(last_path));
-        }
-        int retval = fc.showOpenDialog(this);
-        if (retval != 0) {
-            return;
-        }
-        Arrays.stream(fc.getSelectedFiles()).forEach(this::openFile);
+        filesRepository.chooseFilesToOpen().forEach(this::openFile);
     }//GEN-LAST:event_jMOpenFileActionPerformed
 
     private void jMPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMPrintActionPerformed
