@@ -421,4 +421,8 @@ public class StringUtils {
 
 		return sb.toString();
 	}
+
+    public static String limitLength(String data, int max) {
+        return data.length() > max ? data.substring(0, max) + "…" : data;
+    }
 }

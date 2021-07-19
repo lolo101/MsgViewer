@@ -3,6 +3,7 @@ package net.sourceforge.MSGViewer.MSGNavigator;
 import at.redeye.FrameWork.base.BaseDialog;
 import at.redeye.FrameWork.base.Root;
 import com.auxilii.msgparser.Pid;
+import com.auxilii.msgparser.Ptyp;
 import net.sourceforge.MSGViewer.MSGNavigator.MSGNavigator.TreeNodeContainer;
 import net.sourceforge.MSGViewer.factory.msg.lib.ByteConvert;
 import net.sourceforge.MSGViewer.factory.msg.lib.MSTimeConvert;
@@ -41,15 +42,15 @@ public class ShowNode extends BaseDialog {
             {
                 show_properties_entry(cont);
             }
-            else if( name.equals("__substg1.0_00020102") )
+            else if( name.equals(Ptyp.SUBSTORAGE_PREFIX + "00020102") )
             {
                 show_guid_stream(cont);
             }
-            else if( name.equals("__substg1.0_00030102") )
+            else if( name.equals(Ptyp.SUBSTORAGE_PREFIX + "00030102") )
             {
                 show_entry_stream(cont);
             }
-            else if( name.equals("__substg1.0_00040102") )
+            else if( name.equals(Ptyp.SUBSTORAGE_PREFIX + "00040102") )
             {
                 show_string_stream(cont);
             }

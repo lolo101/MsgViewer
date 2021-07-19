@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
@@ -15,16 +16,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class MSTimeConvertTest {
     @Test
     public void testMsEpochOffset() {
-        LocalDateTime dt = LocalDateTime.of(1601, 1, 1, 0, 0, 0, 0);
+        LocalDateTime dt = LocalDateTime.of(1601, Month.JANUARY, 1, 0, 0, 0, 0);
 
         long millis = 0;
-        boolean first = true;
+        boolean next = false;
 
         while (dt.getYear() < 1970) {
-            if (!first)
+            if (next)
                 millis += dt.minus(1, ChronoUnit.MILLIS).get(ChronoField.MILLI_OF_DAY) + 1;
 
-            first = false;
+            next = true;
 
             dt = dt.plusDays(1);
         }

@@ -135,7 +135,7 @@ public class MsgParser {
      *  not be parsed/read.
      */
     protected static void parseAttachment(DirectoryEntry dir, Message msg) throws IOException {
-        if (dir.hasEntry("__substg1.0_3701000D")) {
+        if (dir.hasEntry(Ptyp.SUBSTORAGE_PREFIX + "3701000D")) {
             parseEmbeddedMessage(dir, msg);
         } else {
             ParseFileAttachment(dir, msg);
@@ -143,7 +143,7 @@ public class MsgParser {
     }
 
     private static void parseEmbeddedMessage(DirectoryEntry dir, Message msg) throws IOException {
-        DirectoryEntry entry = (DirectoryEntry) dir.getEntry("__substg1.0_3701000D");
+        DirectoryEntry entry = (DirectoryEntry) dir.getEntry(Ptyp.SUBSTORAGE_PREFIX + "3701000D");
         Message attachmentMsg = new Message();
         MsgAttachment msgAttachment = new MsgAttachment();
         msgAttachment.setMessage(attachmentMsg);

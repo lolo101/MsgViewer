@@ -1,6 +1,7 @@
 package net.sourceforge.MSGViewer.factory.msg;
 
 import com.auxilii.msgparser.Message;
+import com.auxilii.msgparser.Ptyp;
 import com.auxilii.msgparser.RecipientEntry;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
@@ -253,7 +254,7 @@ public class MsgContainer {
 
         createPropertyStreamEntry(bytes, att_dir);
 
-        DirectoryEntry msg_dir = att_dir.createDirectory("__substg1.0_3701000D");
+        DirectoryEntry msg_dir = att_dir.createDirectory(Ptyp.SUBSTORAGE_PREFIX + "3701000D");
         writeMessage(attachment.getMessage(), msg_dir);
     }
 
