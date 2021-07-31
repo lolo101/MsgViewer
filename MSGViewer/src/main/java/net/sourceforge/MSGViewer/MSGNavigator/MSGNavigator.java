@@ -133,10 +133,10 @@ public class MSGNavigator extends BaseDialog {
     }
 
     private static MutableTreeNode parseProperties(DocumentEntry de) throws IOException {
-        PropertyParser pp = new PropertyParser(de);
         TreeNodeContainer node = new TreeNodeContainer(de,
                 "<html><body><b>" + de.getName() + "</b></body></html>",
                 new DocumentInputStream(de).readAllBytes());
+        PropertyParser pp = new PropertyParser(de);
         for (String tag : pp.getPropertyTags()) {
             TreeNodeContainer pnode = new TreeNodeContainer(de,
                     "<html><body><pre style=\"font-family: monospace; fonz-size:8px\">" + tag + "</pre></body></html>",
