@@ -23,7 +23,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
  * This class represents a recipient's entry of the parsed .msg file. It
- * provides informations like the email address and the display name.
+ * provides information like the email address and the display name.
  *
  * @author thomas.misar
  * @author roman.kurmanowytsch
@@ -88,7 +88,8 @@ public class RecipientEntry {
         EmailValidator emailValidator = EmailValidator.getInstance();
         if (isNotBlank(email) && emailValidator.isValid(email)) {
             return email;
-        } else if (isNotBlank(smtp)) {
+        }
+        if (isNotBlank(smtp)) {
             return smtp;
         }
         return "";

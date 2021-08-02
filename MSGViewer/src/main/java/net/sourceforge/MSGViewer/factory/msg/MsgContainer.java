@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.auxilii.msgparser.Pid.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 public class MsgContainer {
@@ -67,35 +68,37 @@ public class MsgContainer {
             addProperty(new PropPtypTime(PidTagClientSubmitTime, msg.getDate().getTime()));
         }
 
-        if (msg.getFromName() != null && !msg.getFromName().isEmpty()) {
-            addVarEntry(new StringUTF16SubstgEntry(PidTagSenderName, msg.getFromName()));
-        }
-
-        if (msg.getFromEmail() != null && !msg.getFromEmail().isEmpty()) {
-            addVarEntry(new StringUTF16SubstgEntry(PidTagSenderEmailAddress, msg.getFromEmail()));
-        }
-
-        if (msg.getToEmail() != null) {
-            addVarEntry(new StringUTF16SubstgEntry(PidTagEmailAddress, msg.getToEmail()));
-        }
-
-        if (msg.getToName() != null) {
-            addVarEntry(new StringUTF16SubstgEntry(PidTagDisplayName, msg.getToName()));
-        }
-
-        if (msg.getMessageId() != null && !msg.getMessageId().isEmpty()) {
+        if (isNotBlank(msg.getMessageId())) {
             addVarEntry(new StringUTF16SubstgEntry(PidTagInternetMessageId, msg.getMessageId()));
         }
 
-        if (msg.getDisplayTo() != null && !msg.getDisplayTo().isEmpty()) {
+        if (isNotBlank(msg.getFromName())) {
+            addVarEntry(new StringUTF16SubstgEntry(PidTagSenderName, msg.getFromName()));
+            addVarEntry(new StringUTF16SubstgEntry(PidTagSentRepresentingName, msg.getFromName()));
+        }
+
+        if (isNotBlank(msg.getFromEmail())) {
+            addVarEntry(new StringUTF16SubstgEntry(PidTagSenderEmailAddress, msg.getFromEmail()));
+            addVarEntry(new StringUTF16SubstgEntry(PidTagSentRepresentingEmailAddress, msg.getFromEmail()));
+        }
+
+        if (isNotBlank(msg.getToName())) {
+            addVarEntry(new StringUTF16SubstgEntry(PidTagDisplayName, msg.getToName()));
+        }
+
+        if (isNotBlank(msg.getToEmail())) {
+            addVarEntry(new StringUTF16SubstgEntry(PidTagEmailAddress, msg.getToEmail()));
+        }
+
+        if (isNotBlank(msg.getDisplayTo())) {
             addVarEntry(new StringUTF16SubstgEntry(PidTagDisplayTo, msg.getDisplayTo()));
         }
 
-        if (msg.getDisplayCc() != null && !msg.getDisplayCc().isEmpty()) {
+        if (isNotBlank(msg.getDisplayCc())) {
             addVarEntry(new StringUTF16SubstgEntry(PidTagDisplayCc, msg.getDisplayCc()));
         }
 
-        if (msg.getDisplayBcc() != null && !msg.getDisplayBcc().isEmpty()) {
+        if (isNotBlank(msg.getDisplayBcc())) {
             addVarEntry(new StringUTF16SubstgEntry(PidTagDisplayBcc, msg.getDisplayBcc()));
         }
 
