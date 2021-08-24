@@ -3,8 +3,8 @@ package net.sourceforge.MSGViewer.factory.mbox.headers;
 import com.auxilii.msgparser.Message;
 import com.auxilii.msgparser.RecipientType;
 
-public class FromEmailHeader extends EmailHeader {
-    public FromEmailHeader() {
+public class FromHeader extends RecipientHeader {
+    public FromHeader() {
         super(RecipientType.FROM);
     }
 

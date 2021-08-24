@@ -11,18 +11,17 @@ import javax.mail.*;
 import javax.mail.Message.RecipientType;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeUtility;
 import java.io.*;
 import java.util.Enumeration;
-import javax.mail.internet.MimeUtility;
 
-public class JavaMailParser
-{
+public class JavaMailParser {
     private static final Logger LOGGER = LogManager.getLogger(JavaMailParser.class);
 
-    private static final EmailHeader FROM_PARSER = new FromEmailHeader();
-    private static final EmailHeader TO_PARSER =  new ToEmailHeader();
-    private static final EmailHeader CC_PARSER =  new CcEmailHeader();
-    private static final EmailHeader BCC_PARSER =  new BccEmailHeader();
+    private static final RecipientHeader FROM_PARSER = new FromHeader();
+    private static final RecipientHeader TO_PARSER = new ToHeader();
+    private static final RecipientHeader CC_PARSER = new CcHeader();
+    private static final RecipientHeader BCC_PARSER = new BccHeader();
     private static final DateHeader DATE_PARSER = new DateHeader();
     private final File file;
 
@@ -30,8 +29,7 @@ public class JavaMailParser
         this.file = file;
     }
 
-    public Message parse() throws Exception
-    {
+    public Message parse() throws Exception {
         javax.mail.Message jmsg = parseJMessage();
 
         Message msg = new Message();

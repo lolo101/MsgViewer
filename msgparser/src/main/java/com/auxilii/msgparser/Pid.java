@@ -9,6 +9,7 @@ public enum Pid {
 
     // 0x0001-0x0BFF Message object envelope property; reserved
     PidTagMessageClass(0x001a),
+    PidTagSensitivity(0x0036),
     PidTagSubject(0x0037),
     PidTagClientSubmitTime(0x0039),
     PidTagSentRepresentingSearchKey(0x003b),

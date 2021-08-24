@@ -20,7 +20,6 @@ package com.auxilii.msgparser;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
 import com.auxilii.msgparser.attachment.MsgAttachment;
-
 import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,7 +29,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.poi.util.StringUtil.getFromUnicodeLE;
 
 /**
@@ -227,21 +228,21 @@ public class Message {
 
     private StringBuilder headerString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("From: ").append(this.createMailString(this.fromEmail, this.fromName)).append("\n");
+        sb.append("From: ").append(Message.createMailString(this.fromEmail, this.fromName)).append("\n");
         if (toEmail != null || toName != null) {
             sb.append("To: ");
-            sb.append(this.createMailString(toEmail, toName)).append("\n");
+            sb.append(Message.createMailString(toEmail, toName)).append("\n");
         }
         if (!ccEmail.isEmpty()) {
             sb.append("Cc: ");
             for (int i = 0; i < ccEmail.size(); ++i) {
-                sb.append(this.createMailString(ccEmail.get(i), ccName.get(i))).append("\n");
+                sb.append(Message.createMailString(ccEmail.get(i), ccName.get(i))).append("\n");
             }
         }
         if (!bccEmail.isEmpty()) {
             sb.append("Bcc: ");
             for (int i = 0; i < bccEmail.size(); ++i) {
-                sb.append(this.createMailString(bccEmail.get(i), bccName.get(i))).append("\n");
+                sb.append(Message.createMailString(bccEmail.get(i), bccName.get(i))).append("\n");
             }
         }
         if (this.date != null) {
@@ -262,14 +263,14 @@ public class Message {
      * @param name The name part of the address.
      * @return A combination of the name and address.
      */
-    public String createMailString(String mail, String name) {
-        if (mail == null && name == null) {
+    public static String createMailString(String mail, String name) {
+        if (isBlank(mail) && isBlank(name)) {
             return null;
         }
-        if (name == null) {
+        if (isBlank(name)) {
             return mail;
         }
-        if (mail == null) {
+        if (isBlank(mail)) {
             return name;
         }
         if (mail.equalsIgnoreCase(name)) {
@@ -357,7 +358,7 @@ public class Message {
     }
 
     public String getDisplayTo() {
-        return displayTo;
+        return displayTo != null ? displayTo : display(RecipientType.TO);
     }
 
     private void setDisplayTo(String displayTo) {
@@ -365,7 +366,7 @@ public class Message {
     }
 
     public String getDisplayCc() {
-        return displayCc;
+        return displayCc != null ? displayCc : display(RecipientType.CC);
     }
 
     private void setDisplayCc(String displayCc) {
@@ -373,7 +374,7 @@ public class Message {
     }
 
     public String getDisplayBcc() {
-        return displayBcc;
+        return displayBcc != null ? displayBcc : display(RecipientType.BCC);
     }
 
     private void setDisplayBcc(String displayBcc) {
@@ -571,6 +572,13 @@ public class Message {
 
     public Object getProperty(String name) {
         return this.properties.get(name);
+    }
+
+    private String display(RecipientType type) {
+        return this.recipients.stream()
+                .filter(recipientEntry -> recipientEntry.getType() == type)
+                .map(recipientEntry -> createMailString(recipientEntry.mailTo(), recipientEntry.getName()))
+                .collect(Collectors.joining(";"));
     }
 
     private String decompressRTF() {

@@ -9,15 +9,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toList;
-
-public abstract class EmailHeader extends HeaderParser {
-    private static final Logger LOGGER = LogManager.getLogger(EmailHeader.class);
+public abstract class RecipientHeader extends HeaderParser {
+    private static final Logger LOGGER = LogManager.getLogger(RecipientHeader.class);
     private final RecipientType type;
 
-    EmailHeader(RecipientType type) {
+    RecipientHeader(RecipientType type) {
         super(type.toString());
         this.type = type;
     }
@@ -28,12 +26,11 @@ public abstract class EmailHeader extends HeaderParser {
         splitAttendees(line).forEach(msg::addRecipient);
     }
 
-    protected List<RecipientEntry> splitAttendees(String text) {
+    protected Stream<RecipientEntry> splitAttendees(String text) {
         return Arrays.stream(text.split(","))
-                .map(EmailHeader::mailAddressFrom)
+                .map(RecipientHeader::mailAddressFrom)
                 .filter(addr -> addr.getEmail().contains("@"))
-                .map(this::toRecipientEntry)
-                .collect(toList());
+                .map(this::toRecipientEntry);
     }
 
     private static MailAddress mailAddressFrom(String part) {
