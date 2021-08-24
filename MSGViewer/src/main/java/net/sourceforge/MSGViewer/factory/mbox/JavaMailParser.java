@@ -3,16 +3,16 @@ package net.sourceforge.MSGViewer.factory.mbox;
 import at.redeye.FrameWork.utilities.StringUtils;
 import com.auxilii.msgparser.Message;
 import com.auxilii.msgparser.attachment.FileAttachment;
+import jakarta.mail.*;
+import jakarta.mail.Message.RecipientType;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimePart;
+import jakarta.mail.internet.MimeUtility;
 import net.sourceforge.MSGViewer.factory.FileExtension;
 import net.sourceforge.MSGViewer.factory.mbox.headers.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.mail.*;
-import javax.mail.Message.RecipientType;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimePart;
-import javax.mail.internet.MimeUtility;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,7 +40,7 @@ public class JavaMailParser {
     }
 
     public Message parse() throws Exception {
-        javax.mail.Message jmsg = parseJMessage();
+        jakarta.mail.Message jmsg = parseJMessage();
 
         Message msg = new Message();
 
@@ -61,7 +61,7 @@ public class JavaMailParser {
         return msg;
     }
 
-    private javax.mail.Message parseJMessage() throws MessagingException, IOException {
+    private jakarta.mail.Message parseJMessage() throws MessagingException, IOException {
         try (InputStream stream = Files.newInputStream(file)) {
             Session session = Session.getInstance(System.getProperties());
             return new MimeMessage(session, stream);

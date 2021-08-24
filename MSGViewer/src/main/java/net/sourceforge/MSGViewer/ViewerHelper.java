@@ -6,11 +6,11 @@ import at.redeye.FrameWork.base.Setup;
 import com.auxilii.msgparser.Message;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
+import jakarta.activation.MimeType;
 import net.htmlparser.jericho.*;
 import net.sourceforge.MSGViewer.rtfparser.ParseException;
 import org.apache.commons.validator.routines.EmailValidator;
 
-import javax.activation.MimeType;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;

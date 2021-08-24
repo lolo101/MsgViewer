@@ -13,13 +13,13 @@ import com.auxilii.msgparser.RecipientType;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
 import com.auxilii.msgparser.attachment.MsgAttachment;
+import jakarta.activation.MimeType;
+import jakarta.activation.MimeTypeParseException;
 import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.StartTag;
 import net.sourceforge.MSGViewer.factory.MessageParser;
 import net.sourceforge.MSGViewer.factory.MessageSaver;
 
-import javax.activation.MimeType;
-import javax.activation.MimeTypeParseException;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
