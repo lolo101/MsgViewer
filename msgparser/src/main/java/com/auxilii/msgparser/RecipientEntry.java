@@ -108,8 +108,9 @@ public class RecipientEntry {
         if (sb.length() > 0) {
             sb.append(" ");
         }
-        if ((this.email != null) && (this.email.length() > 0)) {
-            sb.append("<").append(this.email).append(">");
+        String mailTo = mailTo();
+        if (isNotBlank(mailTo)) {
+            sb.append("<").append(mailTo).append(">");
         }
         return sb.toString();
     }

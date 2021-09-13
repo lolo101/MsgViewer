@@ -539,37 +539,13 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         if (mime_type != null
                 && ViewerHelper.is_image_mime_type(new MimeType(mime_type))
                 && att.getSize() < 1024 * 1024 * 2) {
-            File contentIcon = new File(content.getAbsolutePath() + "-small.jpg");
+            File thumbnailFile = new File(content.getAbsolutePath() + "-small.jpg");
             if (!content.exists()) {
-
                 write(content, att.getData());
-
-                async(() -> {
-                    try {
-                        final int max_icon_size = Integer.parseInt(root.getSetup().getLocalConfig(AppConfigDefinitions.IconSize));
-                        ImageIcon icon = ImageUtils.loadScaledImageIcon(att.getData(),
-                                att.toString(),
-                                max_icon_size, max_icon_size);
-
-                        BufferedImage bi = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(),
-                                BufferedImage.TYPE_INT_RGB);
-
-                        Graphics2D g2 = bi.createGraphics();
-                        g2.drawImage(icon.getImage(), 0, 0, null);
-                        g2.dispose();
-
-                        ImageIO.write(bi, "jpg", contentIcon);
-
-                    } catch (IOException ex) {
-                        logger.error(ex, ex);
-                    }
-                });
+                async(() -> printThumbnail(att, thumbnailFile));
             }
 
-            System.out.println(contentIcon);
-            sb.append("<img border=0 src=\"");
-            sb.append(contentIcon.toURI());
-            sb.append("\"/> ");
+            sb.append("<img border=0 src=\"").append(thumbnailFile.toURI()).append("\"/> ");
         }
 
         if (ViewerHelper.is_mail_message(att.getFilename())) {
@@ -593,6 +569,21 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         async(() -> new AutoMBox(file_name, () -> new MessageSaver(msg).saveMessage(sub_file)));
 
         return "<a href=\"" + sub_file.toURI() + "\">" + helper.printMailIconHtml() + msg.getSubject() + "</a>&nbsp;";
+    }
+
+    private void printThumbnail(FileAttachment att, File thumbnailFile) {
+        try {
+            final int max_icon_size = Integer.parseInt(root.getSetup().getLocalConfig(AppConfigDefinitions.IconSize));
+            ImageIcon icon = ImageUtils.loadScaledImageIcon(att.getData(), att.toString(), max_icon_size, max_icon_size);
+            BufferedImage bi = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_RGB);
+            Graphics2D g2 = bi.createGraphics();
+            g2.drawImage(icon.getImage(), 0, 0, null);
+            g2.dispose();
+
+            ImageIO.write(bi, "jpg", thumbnailFile);
+        } catch (IOException ex) {
+            logger.error(ex, ex);
+        }
     }
 
     private static String asMailto(RecipientEntry recipient) {
