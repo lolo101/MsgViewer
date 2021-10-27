@@ -5,7 +5,10 @@ import net.sourceforge.MSGViewer.factory.mbox.EMLWriterViaJavaMail;
 import net.sourceforge.MSGViewer.factory.mbox.MBoxWriterViaJavaMail;
 import net.sourceforge.MSGViewer.factory.msg.MsgWriter;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 public class MessageSaver {
 
@@ -16,15 +19,9 @@ public class MessageSaver {
     }
 
     public void saveMessage(File file) throws Exception {
-        int idx = file.getName().lastIndexOf('.');
+        FileExtension extension = new FileExtension(file);
 
-        if (idx < 0) {
-            throw new FileNotFoundException("Cannot identify file type");
-        }
-
-        String suffix = file.getName().substring(idx + 1).toLowerCase();
-
-        switch (suffix) {
+        switch (extension.toString()) {
             case "msg":
                 saveMsgFile(file);
                 break;
@@ -35,7 +32,7 @@ public class MessageSaver {
                 saveEMLFile(file);
                 break;
             default:
-                throw new Exception("Extension '" + suffix + "' not supported");
+                throw new Exception("Extension '" + extension + "' not supported");
         }
     }
 

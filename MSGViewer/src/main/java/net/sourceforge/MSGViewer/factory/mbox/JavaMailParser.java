@@ -3,6 +3,7 @@ package net.sourceforge.MSGViewer.factory.mbox;
 import at.redeye.FrameWork.utilities.StringUtils;
 import com.auxilii.msgparser.Message;
 import com.auxilii.msgparser.attachment.FileAttachment;
+import net.sourceforge.MSGViewer.factory.FileExtension;
 import net.sourceforge.MSGViewer.factory.mbox.headers.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -104,7 +105,7 @@ public class JavaMailParser {
                 String filename = MimeUtility.decodeText(part.getFileName());
                 att.setMimeTag(getMime(part.getContentType()));
                 att.setFilename(filename);
-                att.setExtension(filename.substring(filename.lastIndexOf('.') + 1));
+                att.setExtension(new FileExtension(filename).toString());
 
                 String cid = mpart.getContentID();
                 if( cid != null ) {

@@ -5,7 +5,6 @@ import com.auxilii.msgparser.MsgParser;
 import net.sourceforge.MSGViewer.factory.mbox.JavaMailParser;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class MessageParser {
@@ -17,22 +16,16 @@ public class MessageParser {
     }
 
     public Message parseMessage() throws Exception {
-        int idx = file.getName().lastIndexOf('.');
+        FileExtension extention = new FileExtension(file);
 
-        if (idx < 0) {
-            throw new FileNotFoundException("Cannot identify file type");
-        }
-
-        String suffix = file.getName().substring(idx + 1).toLowerCase();
-
-        switch (suffix) {
+        switch (extention.toString()) {
             case "msg":
                 return parseMsgFile();
             case "mbox":
             case "eml":
                 return parseJavaMailFile();
             default:
-                throw new Exception("Extension '" + suffix + "' not supported");
+                throw new Exception("Extension '" + extention + "' not supported");
         }
     }
 
