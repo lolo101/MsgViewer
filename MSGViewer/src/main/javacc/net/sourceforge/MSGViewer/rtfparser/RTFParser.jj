@@ -17,7 +17,7 @@ import java.util.List;
 public class RTFParser {
 
     RTFGroup current_group = null;
-    List<RTFGroup> groups = new ArrayList();
+    List<RTFGroup> groups = new ArrayList<>();
     String characterSet = "";
 
     public List<RTFGroup> getGroups()
@@ -89,10 +89,10 @@ void group() : {}
       | brace_open()
       | brace_close()
       | esc_special_char()
-      | ( <C_BACKSLASH> ) { current_group.addTextContent("\\"); }
-      | ( <C_NONBREAKING_HYPHEN> ) { current_group.addTextContent("_"); }
-      | ( <C_OPTIONAL_HYPHEN> ) { current_group.addTextContent("-"); }
-      | ( <C_NONBREAKING_SPACE> ) { current_group.addTextContent("&nbsp;"); }
+      | <C_BACKSLASH> { current_group.addTextContent("\\"); }
+      | <C_NONBREAKING_HYPHEN> { current_group.addTextContent("_"); }
+      | <C_OPTIONAL_HYPHEN> { current_group.addTextContent("-"); }
+      | <C_NONBREAKING_SPACE> { current_group.addTextContent("&nbsp;"); }
       | group()
     )*
     group_end()
