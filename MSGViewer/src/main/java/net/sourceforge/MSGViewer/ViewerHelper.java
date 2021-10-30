@@ -139,7 +139,7 @@ public class ViewerHelper {
     }
 
     public File getTempFile(FileAttachment fatt) {
-        return getTempFile(StringUtils.isBlank(fatt.getFilename()) ? fatt.getLongFilename() : fatt.getFilename());
+        return getTempFile(StringUtils.isBlank(fatt.getLongFilename()) ? fatt.getFilename() : fatt.getLongFilename());
     }
 
     public File getTempFile(MsgAttachment matt) {

@@ -21,6 +21,7 @@ public enum Pid {
     PidTagReceivedRepresentingEntryId(0x0043),
     PidTagReceivedRepresentingName(0x0044),
     PidTagOriginalAuthorName(0x004d),
+    PidTagReplyRecipientEntries(0x004f),
     PidTagReplyRecipientNames(0x0050),
     PidTagReceivedBySearchKey(0x0051),
     PidTagReceivedRepresentingSearchKey(0x0052),
