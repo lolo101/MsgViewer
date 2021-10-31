@@ -65,6 +65,7 @@ public class Message {
      * The name part of the From: mail address
      */
     private String fromName = null;
+    private String fromAddressType;
 
     private String toEmail;
     private String toName;
@@ -117,7 +118,7 @@ public class Message {
     /**
      * Contains all properties that are not covered by the special properties.
      */
-    private final Map<String, Object> properties = new HashMap<>();
+    private final Map<Pid, Object> properties = new HashMap<>();
     /**
      * A list containing all recipients for this message (which can be set in the
      * 'to:', 'cc:' and 'bcc:' field, respectively).
@@ -156,6 +157,9 @@ public class Message {
             case PidTagSentRepresentingName:
                 this.setFromName((String) property.getValue());
                 break;
+            case PidTagSenderAddressType:
+                this.setFromAddressType((String) property.getValue());
+                break;
             case PidTagReceivedByEmailAddress:
                 this.addToEmail((String) property.getValue());
                 break;
@@ -190,7 +194,7 @@ public class Message {
         }
 
         // save all properties (incl. those identified above)
-        this.properties.put(property.getPid().toString(), property.getValue());
+        this.properties.put(property.getPid(), property.getValue());
     }
 
     /**
@@ -341,6 +345,14 @@ public class Message {
 
     public void setFromSMTPAddress(String fromSMTPAddress) {
         this.fromSMTPAddress = fromSMTPAddress;
+    }
+
+    public String getFromAddressType() {
+        return this.fromAddressType;
+    }
+
+    public void setFromAddressType(String fromAddressType) {
+        this.fromAddressType = fromAddressType;
     }
 
     /**
@@ -566,11 +578,7 @@ public class Message {
         this.date = date;
     }
 
-    public Set<String> getProperties() {
-        return this.properties.keySet();
-    }
-
-    public Object getProperty(String name) {
+    public Object getProperty(Pid name) {
         return this.properties.get(name);
     }
 

@@ -82,6 +82,9 @@ public class MsgContainer {
             addVarEntry(new StringUTF16SubstgEntry(PidTagSentRepresentingEmailAddress, msg.getFromEmail()));
         }
 
+        addVarEntry(new StringUTF16SubstgEntry(PidTagSenderAddressType, msg.getFromAddressType()));
+        addVarEntry(new StringUTF16SubstgEntry(PidTagSentRepresentingAddressType, msg.getFromAddressType()));
+
         if (isNotBlank(msg.getToName())) {
             addVarEntry(new StringUTF16SubstgEntry(PidTagDisplayName, msg.getToName()));
         }

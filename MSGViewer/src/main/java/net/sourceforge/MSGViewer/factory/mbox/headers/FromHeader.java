@@ -12,7 +12,9 @@ public class FromHeader extends RecipientHeader {
     public void parse(Message msg, String line) {
         splitAttendees(line).forEach(entry -> {
             msg.setFromEmail(entry.getEmail());
+            msg.setFromSMTPAddress(entry.getEmail());
             msg.setFromName(entry.getName());
+            msg.setFromAddressType("SMTP");
         });
     }
 }

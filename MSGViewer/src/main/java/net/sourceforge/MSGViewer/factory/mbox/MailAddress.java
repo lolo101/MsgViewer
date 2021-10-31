@@ -1,14 +1,5 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package net.sourceforge.MSGViewer.factory.mbox;
 
-/**
- *
- * @author martin
- */
 public class MailAddress
 {
     private final String displayName;
@@ -44,15 +35,15 @@ public class MailAddress
     {
         if( o == null )
             return false;
-        
+
         if( o == this )
             return true;
-        
+
         if( o.getClass() == this.getClass() ) {
             MailAddress addr = (MailAddress)o;
             return addr.email.equals(email) && addr.displayName.equals(displayName);
         }
-        
+
         return false;
     }
 

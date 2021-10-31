@@ -38,7 +38,7 @@ public abstract class RecipientHeader extends HeaderParser {
         int end = part.indexOf('>');
 
         if (start < 0 || end < 0) {
-            return new MailAddress(null, part);
+            return new MailAddress(part, part);
         }
         String displayName = StringUtils.strip(part.substring(0, start).trim(), "\"");
         String email = part.substring(start + 1, end);
