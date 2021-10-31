@@ -29,6 +29,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -45,6 +47,7 @@ import static org.apache.poi.util.StringUtil.getFromUnicodeLE;
  */
 public class Message {
     private static final Logger LOGGER = LogManager.getLogger(Message.class);
+    public static final Pattern PREFIX_PATTERN = Pattern.compile("^[^:\\s\\d]{1,3}:\\s+");
 
     /**
      * The message class as defined in the .msg file.
@@ -77,6 +80,8 @@ public class Message {
      * The mail's subject.
      */
     private String subject = null;
+    private String subjectPrefix;
+    private String topic;
     /**
      * The normalized body text.
      */
@@ -433,6 +438,16 @@ public class Message {
      */
     public void setSubject(String subject) {
         this.subject = nullOrTrim(subject);
+        this.subjectPrefix = findSubjectPrefix();
+        this.topic = subject.substring(subjectPrefix.length());
+    }
+
+    public String getSubjectPrefix() {
+        return subjectPrefix.isEmpty() ? "" : subjectPrefix.trim() + " ";
+    }
+
+    public String getTopic() {
+        return topic;
     }
 
     /**
@@ -580,6 +595,11 @@ public class Message {
 
     public Object getProperty(Pid name) {
         return this.properties.get(name);
+    }
+
+    private String findSubjectPrefix() {
+        Matcher matcher = PREFIX_PATTERN.matcher(subject);
+        return matcher.find() ? matcher.group() : "";
     }
 
     private String display(RecipientType type) {

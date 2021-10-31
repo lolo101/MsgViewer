@@ -38,6 +38,9 @@ public class MsgContainer {
     MsgContainer(Message msg) {
         if (msg.getSubject() != null) {
             addVarEntry(new SubjectEntry(msg.getSubject()));
+            addVarEntry(new StringUTF16SubstgEntry(PidTagNormalizedSubject, msg.getTopic()));
+            addVarEntry(new StringUTF16SubstgEntry(PidTagConversationTopic, msg.getTopic()));
+            addVarEntry(new StringUTF16SubstgEntry(PidTagSubjectPrefix, msg.getSubjectPrefix()));
         }
 
         addVarEntry(new MessageClassEntry());
