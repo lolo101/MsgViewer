@@ -351,7 +351,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
             PrepareImages prep_images = new PrepareImages(helper, message);
 
             body.setContentType("text/html");
-            bodyText = prep_images.prepareImages(new StringBuilder(ViewerHelper.stripMetaTags(message.getBodyHtml())));
+            bodyText = prep_images.prepareImages(ViewerHelper.stripMetaTags(message.getBodyHtml()));
         } else {
             body.setContentType("text/plain");
             bodyText = message.getBodyText();

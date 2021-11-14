@@ -109,7 +109,7 @@ public class ViewerHelper {
 
         PrepareImages prep_images = new PrepareImages(this, message);
 
-        return prep_images.prepareImages(new StringBuilder(html));
+        return prep_images.prepareImages(html);
     }
 
     public File extractUrl(URL url, Message message) throws IOException {
@@ -168,7 +168,7 @@ public class ViewerHelper {
         if (!file.exists()) {
             try (InputStream stream = ViewerHelper.class.getResourceAsStream("/icons/rg1024_yellow_mail.png");
                  FileOutputStream writer = new FileOutputStream(file)) {
-                writer.write(IOUtils.toByteArray(stream));
+                IOUtils.copy(stream, writer);
             }
         }
 

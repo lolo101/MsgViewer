@@ -327,7 +327,7 @@ public class Message {
      * @param bodyText the bodyText to set
      */
     public void setBodyText(String bodyText) {
-        this.bodyText = nullOrTrim(bodyText);
+        this.bodyText = trimNonNull(bodyText);
     }
 
     /**
@@ -341,7 +341,7 @@ public class Message {
      * @param fromEmail the fromEmail to set
      */
     public void setFromEmail(String fromEmail) {
-        this.fromEmail = nullOrTrim(fromEmail);
+        this.fromEmail = trimNonNull(fromEmail);
     }
 
     public String getFromSMTPAddress() {
@@ -371,7 +371,7 @@ public class Message {
      * @param fromName the fromName to set
      */
     public void setFromName(String fromName) {
-        this.fromName = nullOrTrim(fromName);
+        this.fromName = trimNonNull(fromName);
     }
 
     public String getDisplayTo() {
@@ -437,9 +437,9 @@ public class Message {
      * @param subject the subject to set
      */
     public void setSubject(String subject) {
-        this.subject = nullOrTrim(subject);
+        this.subject = trimNonNull(subject);
         this.subjectPrefix = findSubjectPrefix();
-        this.topic = subject.substring(subjectPrefix.length());
+        this.topic = this.subject.substring(subjectPrefix.length());
     }
 
     public String getSubjectPrefix() {
@@ -461,7 +461,7 @@ public class Message {
      * @param toEmail the toEmail to set
      */
     private void addToEmail(String toEmail) {
-        this.toEmail = nullOrTrim(toEmail);
+        this.toEmail = trimNonNull(toEmail);
     }
 
     /**
@@ -475,7 +475,7 @@ public class Message {
      * @param toName the toName to set
      */
     private void addToName(String toName) {
-        this.toName = nullOrTrim(toName);
+        this.toName = trimNonNull(toName);
     }
 
     public List<String> getCcEmail() {
@@ -483,7 +483,7 @@ public class Message {
     }
 
     public void addCcEmail(String ccEmail) {
-        this.ccEmail.add(nullOrTrim(ccEmail));
+        this.ccEmail.add(trimNonNull(ccEmail));
     }
 
     public List<String> getCcName() {
@@ -491,7 +491,7 @@ public class Message {
     }
 
     public void addCcName(String ccName) {
-        this.ccName.add(nullOrTrim(ccName));
+        this.ccName.add(trimNonNull(ccName));
     }
 
     public List<String> getBccEmail() {
@@ -499,7 +499,7 @@ public class Message {
     }
 
     public void addBccEmail(String bccEmail) {
-        this.bccEmail.add(nullOrTrim(bccEmail));
+        this.bccEmail.add(trimNonNull(bccEmail));
     }
 
     public List<String> getBccName() {
@@ -507,7 +507,7 @@ public class Message {
     }
 
     public void addBccName(String bccName) {
-        this.bccName.add(nullOrTrim(bccName));
+        this.bccName.add(trimNonNull(bccName));
     }
 
     public byte[] getCompressedRTF() {
@@ -619,7 +619,7 @@ public class Message {
         }
     }
 
-    private static String nullOrTrim(String subject1) {
-        return subject1 == null ? null : subject1.trim();
+    private static String trimNonNull(String subject1) {
+        return subject1 == null ? "" : subject1.trim();
     }
 }
