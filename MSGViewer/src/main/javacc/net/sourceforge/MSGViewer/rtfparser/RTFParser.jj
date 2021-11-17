@@ -16,7 +16,7 @@ import java.util.List;
 
 public class RTFParser {
 
-    RTFGroup current_group = null;
+    RTFGroup current_group;
     List<RTFGroup> groups = new ArrayList<>();
     String characterSet = "";
 
@@ -58,24 +58,26 @@ SKIP : { " " | "\n" | "\r" | "\r\n" }
 <DEFAULT> TOKEN :
 {
    < C_ESC : "\\" >
- | < C_BRACE_OPEN : "\\" "{" >
- | < C_BRACE_CLOSE : "\\" "}" >
+ | < C_BRACE_OPEN : "\\{" >
+ | < C_BRACE_CLOSE : "\\}" >
  | < C_NONBREAKING_SPACE : "\\~" >
  | < C_OPTIONAL_HYPHEN : "\\-" >
  | < C_NONBREAKING_HYPHEN : "\\_" >
  | < C_GROUP_START : "{" >
  | < C_GROUP_END : "}" >
  | < C_BACKSLASH : "\\\\" >
- | < C_ESC_STRING : ("\\" "'" ( ["A"-"Z","a"-"z","0"-"9"] ){2})+ >
+ | < C_ESC_STRING : ("\\'" ( ["A"-"Z","a"-"z","0"-"9"] ){2})+ >
  | < C_CODEPAGE : "\\ansicpg" ( [ "0"-"9"] ) + >
+ | < C_UNICODE : "\\u" ("-")? (["0"-"9"]){1,5} >
+ | < UNICODE_PLACEHOLDER : "?" >
  | < C_COMMAND : "\\" ( ["A"-"Z","a"-"z","0"-"9"] )+ >
- | < C_SKIP_NEXT : "\\" "*" >
- | < STRING: (~["\\","\n","}","{"])+>
+ | < C_DESTINATION_GROUP : "\\*" >
+ | < STRING: (~["\\","\n","}","{", " "]) (~["\\","\n","}","{"])* >
 }
 
 void parse() : {}
 {
-    group() ( group() )* <EOF>
+    ( group() )+ <EOF>
 }
 
 void group() : {}
@@ -83,16 +85,17 @@ void group() : {}
     group_start()
     (
         set_codepage()
-      | command()
-      | string_sequence()
-      | <C_SKIP_NEXT>
+      | <C_DESTINATION_GROUP>
       | brace_open()
       | brace_close()
       | esc_special_char()
+      | unicode_char()
       | <C_BACKSLASH> { current_group.addTextContent("\\"); }
-      | <C_NONBREAKING_HYPHEN> { current_group.addTextContent("_"); }
+      | <C_NONBREAKING_HYPHEN> { current_group.addTextContent("&shy;"); }
       | <C_OPTIONAL_HYPHEN> { current_group.addTextContent("-"); }
       | <C_NONBREAKING_SPACE> { current_group.addTextContent("&nbsp;"); }
+      | command()
+      | string_sequence()
       | group()
     )*
     group_end()
@@ -100,7 +103,7 @@ void group() : {}
 
 void esc_special_char() :
 {
-    Token esc_str = null;
+    Token esc_str;
 }
 {
     esc_str = <C_ESC_STRING>
@@ -109,9 +112,21 @@ void esc_special_char() :
     }
 }
 
+void unicode_char() :
+{
+    Token code;
+}
+{
+    code = <C_UNICODE>
+    {
+        current_group.addTextContent(String.format("&#x%04X;", (short)Integer.parseInt(code.image.substring(2))));
+    }
+    <UNICODE_PLACEHOLDER>
+}
+
 void set_codepage() :
 {
-    Token codepage = null;
+    Token codepage;
 }
 {
     codepage = <C_CODEPAGE>
@@ -122,7 +137,7 @@ void set_codepage() :
 
 void brace_open() :
 {
-    Token brace = null;
+    Token brace;
 }
 {
     brace = <C_BRACE_OPEN>
@@ -133,7 +148,7 @@ void brace_open() :
 
 void brace_close() :
 {
-    Token brace = null;
+    Token brace;
 }
 {
     brace = <C_BRACE_CLOSE>
@@ -144,7 +159,7 @@ void brace_close() :
 
 void string_sequence() :
 {
-    Token string = null;
+    Token string;
 }
 {
     string = <STRING>
@@ -155,7 +170,7 @@ void string_sequence() :
 
 void command() :
 {
-    Token command = null;
+    Token command;
 }
 {
     command = <C_COMMAND>
