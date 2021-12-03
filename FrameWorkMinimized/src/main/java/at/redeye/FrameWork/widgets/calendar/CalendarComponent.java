@@ -338,9 +338,9 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
             InfoRenderer renderer = days.get(i).getInfoRenderer();
 
             if( renderer != null )
-                renderer.setDay(cal.plusDays(count-1));
+                renderer.setDay(cal.plusDays(count- 1L));
 
-            days.get(i).setWeekDay(cal.plusDays(count-1).getDayOfWeek().getValue());
+            days.get(i).setWeekDay(cal.plusDays(count- 1L).getDayOfWeek().getValue());
         }
 
         // Samstage hervorheben
@@ -361,7 +361,7 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
             InfoRenderer renderer = days.get(i).getInfoRenderer();
 
             if( renderer != null )
-                renderer.setDay(cal.plusDays(maxDays + count - 1));
+                renderer.setDay(cal.plusDays(maxDays + count - 1L ));
         }
 
         LocalDate cal2 = LocalDate.of(Year,Month,1);
@@ -380,7 +380,7 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
             InfoRenderer renderer = days.get(i).getInfoRenderer();
 
             if( renderer != null )
-                renderer.setDay(cal3.plusDays(count - 1));
+                renderer.setDay(cal3.plusDays(count - 1L ));
         }
 
         jLTitle.setText( MonthNames.getFullMonthName(month)+ " " + cal.getYear());
