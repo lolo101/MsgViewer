@@ -106,12 +106,9 @@ public class MavenWrapperDownloader {
             });
         }
         URL website = new URL(urlString);
-        ReadableByteChannel rbc;
-        rbc = Channels.newChannel(website.openStream());
-        try (FileOutputStream fos = new FileOutputStream(destination)) {
+        try (FileOutputStream fos = new FileOutputStream(destination); 
+			ReadableByteChannel rbc = Channels.newChannel(website.openStream())) {
             fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-            fos.close();
-            rbc.close();
         }
     }
 
