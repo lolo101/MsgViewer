@@ -14,40 +14,45 @@ public class RTFGroup
     void addCommand( String command )
     {
 
-        if( command.equals("\\par") )
+        if (command.equals("\\par"))
             addTextContent("\n");
-        else if( command.equals("\\tab"))
+        else if (command.equals("\\tab"))
             addTextContent("\t");
-        else
-        {
+        else {
             commands.add(command);
             last_command = command;
         }
     }
 
-    public void addEscapedChar( String characterSet, String hexa )
-    {
+    public void addEscapedChar(String characterSet, String hexa) {
         addTextContent(ConvertCharset.convertCharacter(characterSet, hexa));
     }
 
-    public void addTextContent( String text )
-    {
-        if( last_command.startsWith("\\html") )
+    public void addUnicodeChar(String code) {
+        String codepoint = code.substring(2);
+        char ch = (char) Integer.parseInt(codepoint);
+        addCharacterContent(ch);
+    }
+
+    public void addTextContent(String text) {
+        if (last_command.startsWith("\\html"))
             text_content.append(text);
     }
 
-    public boolean isEmpty()
-    {
+    public void addCharacterContent(char character) {
+        if (last_command.startsWith("\\html"))
+            text_content.append(character);
+    }
+
+    public boolean isEmpty() {
         return text_content.length() == 0 && commands.isEmpty();
     }
 
-    public String getTextContent()
-    {
+    public String getTextContent() {
         return text_content.toString();
     }
 
-    public List<String> getCommands()
-    {
+    public List<String> getCommands() {
         return commands;
     }
 

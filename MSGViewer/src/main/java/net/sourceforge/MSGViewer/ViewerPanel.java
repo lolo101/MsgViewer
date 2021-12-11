@@ -87,7 +87,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         header.setText(parent.MlM("Drag a msg file into this window"));
     }
 
-    public void setopenNewMailInterface(OpenNewMailInterface open_new_mail_handler) {
+    public void setOpenNewMailInterface(OpenNewMailInterface open_new_mail_handler) {
         this.open_new_mail_handler = open_new_mail_handler;
     }
 
@@ -431,37 +431,32 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
     private void doParse() throws Exception {
         wating_thread_pool_counter = 0;
 
-        File file = new File(file_name);
-
-        if (!file.exists())
-            throw new FileNotFoundException(parent.MlM(String.format("File %s not found", file_name)));
-
-        message = new MessageParser(file).parseMessage();
-        logger.info("Message From:" + message.getFromName() + "\n To:" + message.getToName() + "\n Email: " + message.getFromEmail());
-
-        String text = headerHtml();
-        header.setContentType("text/html");
+        parseMessage();
+        updateHeader();
+        updateBody();
 
         if (wating_thread_pool_counter > 0) {
-            updateBody(); // do something different now
-
             new AutoMBox(file_name, () -> {
                 thread_pool.shutdown();
                 if (wating_thread_pool_counter > 0) {
                     thread_pool.awaitTermination(1, TimeUnit.DAYS);
                 }
             });
-
-            header.setText(text);
-            header.setCaretPosition(0);
-
-        } else {
-
-            header.setText(text);
-            header.setCaretPosition(0);
-
-            updateBody();
         }
+    }
+
+    private void parseMessage() throws Exception {
+        File file = new File(file_name);
+        if (!file.exists())
+            throw new FileNotFoundException(parent.MlM(String.format("File %s not found", file_name)));
+        message = new MessageParser(file).parseMessage();
+        logger.info("Message From:" + message.getFromName() + "\n To:" + message.getToName() + "\n Email: " + message.getFromEmail());
+    }
+
+    private void updateHeader() throws MimeTypeParseException, IOException {
+        header.setContentType("text/html");
+        header.setText(headerHtml());
+        header.setCaretPosition(0);
     }
 
     private String headerHtml() throws MimeTypeParseException, IOException {

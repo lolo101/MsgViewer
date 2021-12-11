@@ -119,8 +119,8 @@ void unicode_char() :
 {
     code = <C_UNICODE>
     {
-        current_group.addTextContent(String.format("&#x%04X;", (short)Integer.parseInt(code.image.substring(2))));
-    }
+    current_group.addUnicodeChar(code.image);
+}
     <UNICODE_PLACEHOLDER>
 }
 

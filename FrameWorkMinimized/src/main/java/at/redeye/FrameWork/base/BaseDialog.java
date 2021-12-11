@@ -67,8 +67,8 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
      * @param runnable      Method to call
      */
     @Override
-    public void registerActionKeyListener(KeyStroke to_listen_Key,
-                                          Runnable runnable) {
+    public final void registerActionKeyListener(KeyStroke to_listen_Key,
+                                                Runnable runnable) {
         helper.registerActionKeyListener(to_listen_Key, runnable);
     }
 

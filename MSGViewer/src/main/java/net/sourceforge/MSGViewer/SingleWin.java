@@ -17,7 +17,7 @@ public class SingleWin extends BaseWin {
         initComponents();
 
         viewerPanel.setRoot(root, this);
-        viewerPanel.setopenNewMailInterface(this::openMail);
+        viewerPanel.setOpenNewMailInterface(this::openMail);
 
         registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_V, 0), () -> {
             if (jMDetail.isEnabled()) jMDetailActionPerformed(null);
