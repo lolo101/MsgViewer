@@ -8,9 +8,6 @@ import at.redeye.FrameWork.utilities.ReadFile;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
-import java.util.List;
-
-import static java.util.stream.Collectors.joining;
 
 public class testRTF2HTML extends BaseModuleLauncher {
     public testRTF2HTML(String[] args) {
@@ -51,18 +48,14 @@ public class testRTF2HTML extends BaseModuleLauncher {
                             parser.parse();
                             logger.info("done parsing " + file);
 
-                            List<RTFGroup> groups = parser.getGroups();
-
-                            String textContent = groups.stream()
-                                    .map(RTFGroup::getTextContent)
-                                    .collect(joining());
-                            System.out.print(textContent);
+                            String htmlContent = parser.getHTML();
+                            System.out.print(htmlContent);
 
                             String file_name = getStartupParam("writehtml");
 
                             if (file_name != null) {
                                 try (FileWriter fout = new FileWriter(file_name)) {
-                                    fout.write(textContent);
+                                    fout.write(htmlContent);
                                 }
                             }
 

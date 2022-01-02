@@ -12,36 +12,30 @@ options {
 PARSER_BEGIN(RTFParser)
 package net.sourceforge.MSGViewer.rtfparser;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class RTFParser {
 
-    RTFGroup current_group;
-    List<RTFGroup> groups = new ArrayList<>();
-    Charset characterSet;
-
-    public List<RTFGroup> getGroups()
-    {
-        return groups;
-    }
+    private final Deque<RTFGroup> groups = new LinkedList<>();
+    private final StringBuilder htmlContent = new StringBuilder();
+    private RTFGroup current_group;
+    private Charset characterSet;
 
     public String getHTML()
     {
-        StringBuilder sb = new StringBuilder();
-
-        for( RTFGroup group : groups )
-        {
-            sb.append(group.getTextContent());
-        }
-
-        return sb.toString();
+        return htmlContent.toString();
     }
 
-    public void addGroup()
+    public void pushGroup()
     {
-        current_group = new RTFGroup(characterSet);
-        groups.add(current_group);
+        current_group = new RTFGroup(characterSet, htmlContent);
+        groups.push(current_group);
+    }
+
+    public void popGroup()
+    {
+        groups.pop();
+        current_group = groups.peek();
     }
 }
 PARSER_END(RTFParser)
@@ -82,7 +76,7 @@ void parse() : {}
 
 void group() : {}
 {
-    <GROUP_START> { addGroup(); }
+    <GROUP_START> { pushGroup(); }
     ( set_codepage()
     | destinationGroup()
     | <C_BRACE_OPEN> { current_group.addTextContent( "{" ); }
@@ -106,7 +100,7 @@ void group() : {}
     | string_sequence()
     | group()
     )*
-    <GROUP_END>
+    <GROUP_END> { popGroup(); }
 }
 
 void destinationGroup() : {

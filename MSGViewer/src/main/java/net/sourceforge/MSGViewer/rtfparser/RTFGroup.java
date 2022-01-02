@@ -4,13 +4,14 @@ import java.nio.charset.Charset;
 
 public class RTFGroup {
 
-    private final StringBuilder text_content = new StringBuilder();
+    private final StringBuilder htmlContent;
     private final Charset characterSet;
     private String destination = "";
     private String command = "";
 
-    public RTFGroup(Charset characterSet) {
+    public RTFGroup(Charset characterSet, StringBuilder htmlContent) {
         this.characterSet = characterSet;
+        this.htmlContent = htmlContent;
     }
 
     public void handleCommand(String command) {
@@ -22,7 +23,7 @@ public class RTFGroup {
     }
 
     public String getTextContent() {
-        return text_content.toString();
+        return htmlContent.toString();
     }
 
     public void addEscapedChar(String escapedChar) {
@@ -39,11 +40,11 @@ public class RTFGroup {
 
     public void addTextContent(String text) {
         if (destination.startsWith("\\htmltag") || command.equals("\\htmlrtf0"))
-            text_content.append(text);
+            htmlContent.append(text);
     }
 
     private void addCharacterContent(char character) {
         if (destination.startsWith("\\htmltag") || command.equals("\\htmlrtf0"))
-            text_content.append(character);
+            htmlContent.append(character);
     }
 }
