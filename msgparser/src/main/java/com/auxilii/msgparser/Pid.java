@@ -67,6 +67,7 @@ public enum Pid {
     // 0x1000-0x2FFF Message content property; reserved
     PidTagBody(0x1000),
     PidTagRtfCompressed(0x1009),
+    PidTagBodyHtml(0x1013),
     PidTagInternetMessageId(0x1035),
     PidTagOriginalMessageId(0x1046),
 

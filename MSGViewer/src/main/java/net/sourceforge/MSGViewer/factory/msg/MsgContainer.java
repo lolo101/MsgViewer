@@ -49,6 +49,10 @@ public class MsgContainer {
             addVarEntry(new BodyTextEntry(msg.getBodyText()));
         }
 
+        if (isNotEmpty(msg.getBodyHtml())) {
+            addVarEntry(new BodyHtmlEntry(msg.getBodyHtml()));
+        }
+
         if (msg.getCompressedRTF() != null) {
             addVarEntry(new CompressedRTFEntry(msg.getCompressedRTF()));
         }

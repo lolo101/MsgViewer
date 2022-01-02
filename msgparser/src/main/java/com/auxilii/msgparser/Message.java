@@ -183,6 +183,9 @@ public class Message {
             case PidTagBody:
                 this.setBodyText((String) property.getValue());
                 break;
+            case PidTagBodyHtml:
+                this.setBodyHtml((String) property.getValue());
+                break;
             case PidTagRtfCompressed:
                 this.setCompressedRTF((byte[]) property.getValue());
                 break;
