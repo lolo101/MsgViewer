@@ -8,11 +8,11 @@ import org.apache.poi.poifs.filesystem.DirectoryEntry;
 import java.io.IOException;
 import java.io.InputStream;
 
-public abstract class SubstGEntry {
+public abstract class SubStorageEntry {
     protected final Ptyp type;
     protected final Pid tag;
 
-    public SubstGEntry(Pid tag, Ptyp type) {
+    public SubStorageEntry(Pid tag, Ptyp type) {
         this.tag = tag;
         this.type = type;
     }

@@ -30,7 +30,7 @@ public class MsgContainer {
     public static final String NAMED_PROPERTY = "__nameid_version1.0";
 
     private final List<PropType> properties = new ArrayList<>();
-    private final List<SubstGEntry> substg_streams = new ArrayList<>();
+    private final List<SubStorageEntry> substg_streams = new ArrayList<>();
 
     private final List<RecipientEntry> recipients = new ArrayList<>();
     private final List<Attachment> attachments = new ArrayList<>();
@@ -146,7 +146,7 @@ public class MsgContainer {
             prop.writePropertiesEntry(bytes);
         }
 
-        for (SubstGEntry entry : substg_streams) {
+        for (SubStorageEntry entry : substg_streams) {
             entry.createEntry(root);
         }
 
@@ -166,7 +166,7 @@ public class MsgContainer {
         properties.add(prop);
     }
 
-    private void addVarEntry(SubstGEntry entry) {
+    private void addVarEntry(SubStorageEntry entry) {
         addProperty(entry.getPropType());
         substg_streams.add(entry);
     }
@@ -208,20 +208,20 @@ public class MsgContainer {
     private static void writeRecipientEntry(DirectoryEntry root, RecipientEntry rec, int id) throws IOException {
         DirectoryEntry rec_dir = root.createDirectory(String.format("__recip_version1.0_#%08X", id));
 
-        List<? extends SubstGEntry> entries = Arrays.asList(
+        List<? extends SubStorageEntry> entries = Arrays.asList(
                 new StringUTF16SubstgEntry(PidTagDisplayName, rec.getName()),
                 new StringUTF16SubstgEntry(PidTagAddressType, "SMTP"),
                 new StringUTF16SubstgEntry(PidTagEmailAddress, rec.getEmail())
         );
 
-        for (SubstGEntry entry : entries) {
+        for (SubStorageEntry entry : entries) {
             entry.createEntry(rec_dir);
         }
 
         List<PropType> props = new ArrayList<>();
         props.add(new PropPtypInteger32(PidTagRowid, id));
         props.add(new PropPtypInteger32(PidTagRecipientType, rec.getType().getValue()));
-        for (SubstGEntry entry : entries) {
+        for (SubStorageEntry entry : entries) {
             props.add(entry.getPropType());
         }
 
@@ -241,7 +241,7 @@ public class MsgContainer {
     }
 
     private static void writeFileAttachment(FileAttachment attachment, DirectoryEntry att_dir) throws IOException {
-        List<? extends SubstGEntry> entries = Arrays.asList(
+        List<? extends SubStorageEntry> entries = Arrays.asList(
                 new BinaryEntry(PidTagAttachDataBinary, attachment.getData()),
                 new StringUTF16SubstgEntry(PidTagAttachExtension, attachment.getExtension()),
                 new StringUTF16SubstgEntry(PidTagAttachFilename, attachment.getFilename()),
@@ -249,12 +249,12 @@ public class MsgContainer {
                 new StringUTF16SubstgEntry(PidTagAttachMimeTag, attachment.getMimeTag())
         );
 
-        for (SubstGEntry entry : entries) {
+        for (SubStorageEntry entry : entries) {
             entry.createEntry(att_dir);
         }
 
         List<PropType> props = entries.stream()
-                .map(SubstGEntry::getPropType)
+                .map(SubStorageEntry::getPropType)
                 .collect(Collectors.toList());
 
         ByteBuffer bytes = createPropertiesEntryContent(props);

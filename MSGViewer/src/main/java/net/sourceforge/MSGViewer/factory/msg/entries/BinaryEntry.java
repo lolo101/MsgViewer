@@ -9,7 +9,7 @@ import java.io.InputStream;
 
 import static com.auxilii.msgparser.Ptyp.PtypBinary;
 
-public class BinaryEntry extends SubstGEntry {
+public class BinaryEntry extends SubStorageEntry {
 
     private final byte[] value;
 

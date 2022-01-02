@@ -13,7 +13,7 @@ import static com.auxilii.msgparser.Ptyp.PtypString;
 /**
  * @author martin
  */
-public class StringUTF16SubstgEntry extends SubstGEntry {
+public class StringUTF16SubstgEntry extends SubStorageEntry {
     private final String value;
 
     public StringUTF16SubstgEntry(Pid tag, String value) {
