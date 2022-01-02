@@ -72,14 +72,13 @@ public class PrepareImages {
 
     private URI getImgsrc(String src) {
         URI imgsrc = URI.create(src);
-        if (!imgsrc.isAbsolute()) {
-            FileAttachment fatt = attachmentByLocation.remove(imgsrc.getPath());
-            return fileRepository.getTempFile(fatt).toURI();
-        }
-        if (imgsrc.getScheme().equals("cid")) {
-            FileAttachment fatt = attachmentById.remove(imgsrc.getSchemeSpecificPart());
-            return fileRepository.getTempFile(fatt).toURI();
-        }
-        return imgsrc;
+        FileAttachment fatt = getFileAttachment(imgsrc);
+        return fatt == null ? imgsrc : fileRepository.getTempFile(fatt).toURI();
+    }
+
+    private FileAttachment getFileAttachment(URI imgsrc) {
+        if ("cid".equals(imgsrc.getScheme())) return attachmentById.remove(imgsrc.getSchemeSpecificPart());
+        if (!imgsrc.isAbsolute()) return attachmentByLocation.remove(imgsrc.getPath());
+        return null;
     }
 }
