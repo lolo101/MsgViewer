@@ -72,7 +72,7 @@ public class MsgParser {
 
     private static void parseMsg(DirectoryEntry dir, Message msg) throws IOException {
         DocumentEntry propertyEntry = (DocumentEntry) dir.getEntry(PROPERTIES_ENTRY);
-        try ( DocumentInputStream propertyStream = new DocumentInputStream(propertyEntry)) {
+        try (DocumentInputStream propertyStream = new DocumentInputStream(propertyEntry)) {
             propertyStream.skip(8);
             int nextRecipientId = propertyStream.readInt();
             int nextAttachmentId = propertyStream.readInt();
@@ -104,12 +104,12 @@ public class MsgParser {
      * @param dir The current node in the .msg file.
      * @param msg The resulting {@link Message} object.
      * @throws IOException Thrown if the .msg file could not
-     *  be parsed.
+     *                     be parsed.
      */
     protected static void parseRecipient(DirectoryEntry dir, Message msg) throws IOException {
         RecipientEntry recipient = new RecipientEntry();
         DocumentEntry propertyEntry = (DocumentEntry) dir.getEntry(PROPERTIES_ENTRY);
-        try ( DocumentInputStream propertyStream = new DocumentInputStream(propertyEntry)) {
+        try (DocumentInputStream propertyStream = new DocumentInputStream(propertyEntry)) {
             propertyStream.skip(8);
             while (propertyStream.available() > 0) {
                 recipient.setProperty(new Property(propertyStream, dir));
@@ -127,12 +127,12 @@ public class MsgParser {
      * as a {@link MsgAttachment} object instead.
      *
      * @param dir The directory entry containing the attachment
-     *  document entry and some other document entries
-     *  describing the attachment (name, extension, mime type, ...)
+     *            document entry and some other document entries
+     *            describing the attachment (name, extension, mime type, ...)
      * @param msg The {@link Message} object that this
-     *  attachment should be added to.
+     *            attachment should be added to.
      * @throws IOException Thrown if the attachment could
-     *  not be parsed/read.
+     *                     not be parsed/read.
      */
     protected static void parseAttachment(DirectoryEntry dir, Message msg) throws IOException {
         if (dir.hasEntry(Ptyp.SUBSTORAGE_PREFIX + "3701000D")) {
@@ -154,16 +154,21 @@ public class MsgParser {
     }
 
     private static void ParseFileAttachment(DirectoryEntry dir, Message msg) throws IOException {
-        FileAttachment fileAttachment = new FileAttachment();
         DocumentEntry propertyEntry = (DocumentEntry) dir.getEntry(PROPERTIES_ENTRY);
-        try ( DocumentInputStream propertyStream = new DocumentInputStream(propertyEntry)) {
+        try (DocumentInputStream propertyStream = new DocumentInputStream(propertyEntry)) {
             propertyStream.skip(8);
-            while (propertyStream.available() > 0) {
-                Property property = new Property(propertyStream, dir);
-                fileAttachment.setProperty(property);
-            }
+            FileAttachment fileAttachment = createAttachmentWithProperties(dir, propertyStream);
+            msg.addAttachment(fileAttachment);
         }
 
-        msg.addAttachment(fileAttachment);
+    }
+
+    private static FileAttachment createAttachmentWithProperties(DirectoryEntry dir, DocumentInputStream propertyStream) throws IOException {
+        FileAttachment fileAttachment = new FileAttachment();
+        while (propertyStream.available() > 0) {
+            Property property = new Property(propertyStream, dir);
+            fileAttachment.setProperty(property);
+        }
+        return fileAttachment;
     }
 }
