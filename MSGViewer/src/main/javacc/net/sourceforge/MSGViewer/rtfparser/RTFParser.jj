@@ -11,6 +11,7 @@ options {
 
 PARSER_BEGIN(RTFParser)
 package net.sourceforge.MSGViewer.rtfparser;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +19,7 @@ public class RTFParser {
 
     RTFGroup current_group;
     List<RTFGroup> groups = new ArrayList<>();
-    String characterSet = "";
+    Charset characterSet;
 
     public List<RTFGroup> getGroups()
     {
@@ -31,48 +32,47 @@ public class RTFParser {
 
         for( RTFGroup group : groups )
         {
-            if( group.isNotEmptyText() )
-            {
-                String content = group.getTextContent();
-                sb.append(content);
-            }
+            sb.append(group.getTextContent());
         }
 
         return sb.toString();
     }
 
-    String codePage2Iso( String codepage )
+    public void addGroup()
     {
-        if( codepage.equals( "1252" ) )
-            return "iso-8859-1";
-
-        return codepage;
+        current_group = new RTFGroup(characterSet);
+        groups.add(current_group);
     }
-
 }
 PARSER_END(RTFParser)
 
-SKIP : { " " | "\n" | "\r" | "\r\n" }
+SKIP : { " " | "\r" | "\n" | "\r\n" }
 
 
 <DEFAULT> TOKEN :
-{
-   < C_ESC : "\\" >
- | < C_BRACE_OPEN : "\\{" >
- | < C_BRACE_CLOSE : "\\}" >
- | < C_NONBREAKING_SPACE : "\\~" >
- | < C_OPTIONAL_HYPHEN : "\\-" >
- | < C_NONBREAKING_HYPHEN : "\\_" >
- | < C_GROUP_START : "{" >
- | < C_GROUP_END : "}" >
- | < C_BACKSLASH : "\\\\" >
- | < C_ESC_STRING : ("\\'" ( ["A"-"Z","a"-"z","0"-"9"] ){2})+ >
- | < C_CODEPAGE : "\\ansicpg" ( [ "0"-"9"] ) + >
- | < C_UNICODE : "\\u" ("-")? (["0"-"9"]){1,5} >
- | < UNICODE_PLACEHOLDER : "?" >
- | < C_COMMAND : "\\" ( ["A"-"Z","a"-"z","0"-"9"] )+ >
- | < C_DESTINATION_GROUP : "\\*" >
- | < STRING: (~["\\","\n","}","{", " "]) (~["\\","\n","}","{"])* >
+{ < GROUP_START : "{" >
+| < GROUP_END : "}" >
+| < C_CODEPAGE : "\\ansicpg" ( [ "0"-"9"] ) + >
+| < C_BRACE_OPEN : "\\{" >
+| < C_BRACE_CLOSE : "\\}" >
+| < C_NONBREAKING_SPACE : "\\~" >
+| < C_OPTIONAL_HYPHEN : "\\-" >
+| < C_NONBREAKING_HYPHEN : "\\_" >
+| < C_BACKSLASH : "\\\\" >
+| < C_PARAGRAPH : "\\par" >
+| < C_TABULATION : "\\tab" >
+| < C_LEFT_QUOTE : "\\lquote" >
+| < C_RIGHT_QUOTE : "\\rquote" >
+| < C_LEFT_DOUBLE_QUOTE : "\\ldblquote" >
+| < C_RIGHT_DOUBLE_QUOTE : "\\rdblquote" >
+| < C_BULLET : "\\bullet" >
+| < C_EN_DASH : "\\endash" >
+| < C_EM_DASH : "\\emdash" >
+| < C_ESC_STRING : "\\'" ( ["A"-"Z","a"-"z","0"-"9"] ){2} >
+| < C_UNICODE : "\\u" ("-")? (["0"-"9"]){1,5} >
+| < C_COMMAND : "\\" ( ["A"-"Z","a"-"z", "-", "0"-"9"] )+ >
+| < C_DESTINATION_GROUP : "\\*" >
+| < STRING: (~["\\", "\r", "\n", "}", "{", " "]) (~["\\", "\r", "\n", "}", "{"])* >
 }
 
 void parse() : {}
@@ -82,33 +82,52 @@ void parse() : {}
 
 void group() : {}
 {
-    group_start()
-    (
-        set_codepage()
-      | <C_DESTINATION_GROUP>
-      | brace_open()
-      | brace_close()
-      | esc_special_char()
-      | unicode_char()
-      | <C_BACKSLASH> { current_group.addTextContent("\\"); }
-      | <C_NONBREAKING_HYPHEN> { current_group.addTextContent("&shy;"); }
-      | <C_OPTIONAL_HYPHEN> { current_group.addTextContent("-"); }
-      | <C_NONBREAKING_SPACE> { current_group.addTextContent("&nbsp;"); }
-      | command()
-      | string_sequence()
-      | group()
+    <GROUP_START> { addGroup(); }
+    ( set_codepage()
+    | destinationGroup()
+    | <C_BRACE_OPEN> { current_group.addTextContent( "{" ); }
+    | <C_BRACE_CLOSE> { current_group.addTextContent( "}" ); }
+    | <C_OPTIONAL_HYPHEN> { current_group.addTextContent("-"); }
+    | <C_PARAGRAPH> { current_group.addTextContent("\n"); }
+    | <C_TABULATION> { current_group.addTextContent("\t"); }
+    | <C_BACKSLASH> { current_group.addTextContent("\\"); }
+    | <C_LEFT_QUOTE> { current_group.addTextContent("&lsquo;"); }
+    | <C_RIGHT_QUOTE> { current_group.addTextContent("&rsquo;"); }
+    | <C_LEFT_DOUBLE_QUOTE> { current_group.addTextContent("&ldquo;"); }
+    | <C_RIGHT_DOUBLE_QUOTE> { current_group.addTextContent("&rdquo;"); }
+    | <C_BULLET> { current_group.addTextContent("&bull;"); }
+    | <C_EN_DASH> { current_group.addTextContent("&ndash;"); }
+    | <C_EM_DASH> { current_group.addTextContent("&mdash;"); }
+    | <C_NONBREAKING_SPACE> { current_group.addTextContent("&nbsp;"); }
+    | <C_NONBREAKING_HYPHEN> { current_group.addTextContent("&shy;"); }
+    | escaped_char()
+    | unicode_char()
+    | command()
+    | string_sequence()
+    | group()
     )*
-    group_end()
+    <GROUP_END>
 }
 
-void esc_special_char() :
-{
-    Token esc_str;
+void destinationGroup() : {
+ Token destination;
 }
 {
-    esc_str = <C_ESC_STRING>
+    <C_DESTINATION_GROUP>
+    destination = <C_COMMAND>
     {
-        current_group.addEscapedChar( characterSet, esc_str.image );
+        current_group.destination( destination.image );
+    }
+}
+
+void escaped_char() :
+{
+    Token escaped;
+}
+{
+    escaped = <C_ESC_STRING>
+    {
+        current_group.addEscapedChar( escaped.image );
     }
 }
 
@@ -118,10 +137,10 @@ void unicode_char() :
 }
 {
     code = <C_UNICODE>
+    <STRING>
     {
-    current_group.addUnicodeChar(code.image);
-}
-    <UNICODE_PLACEHOLDER>
+        current_group.addUnicodeChar( code.image );
+    }
 }
 
 void set_codepage() :
@@ -131,29 +150,7 @@ void set_codepage() :
 {
     codepage = <C_CODEPAGE>
     {
-        characterSet = codepage.image.substring(8);
-    }
-}
-
-void brace_open() :
-{
-    Token brace;
-}
-{
-    brace = <C_BRACE_OPEN>
-    {
-        current_group.addTextContent( "{" );
-    }
-}
-
-void brace_close() :
-{
-    Token brace;
-}
-{
-    brace = <C_BRACE_CLOSE>
-    {
-        current_group.addTextContent( "}" );
+        characterSet = Charset.forName("CP" + codepage.image.substring(8));
     }
 }
 
@@ -164,7 +161,7 @@ void string_sequence() :
 {
     string = <STRING>
     {
-       current_group.addTextContent(string.image);
+       current_group.addTextContent( string.image );
     }
 }
 
@@ -175,20 +172,6 @@ void command() :
 {
     command = <C_COMMAND>
     {
-        current_group.addCommand(command.image);
+        current_group.handleCommand( command.image );
     }
-}
-
-void group_start() : {}
-{
-    <C_GROUP_START>
-    {
-        current_group = new RTFGroup();
-        groups.add( current_group );
-    }
-}
-
-void group_end() : {}
-{
-    <C_GROUP_END>
 }

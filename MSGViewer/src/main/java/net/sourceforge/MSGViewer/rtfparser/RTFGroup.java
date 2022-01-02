@@ -1,31 +1,34 @@
 package net.sourceforge.MSGViewer.rtfparser;
 
-import org.apache.commons.lang3.StringUtils;
+import java.nio.charset.Charset;
 
-import java.util.ArrayList;
-import java.util.List;
+public class RTFGroup {
 
-public class RTFGroup
-{
     private final StringBuilder text_content = new StringBuilder();
-    private final List<String> commands = new ArrayList<>();
-    private String last_command = "";
+    private final Charset characterSet;
+    private String destination = "";
+    private String command = "";
 
-    void addCommand( String command )
-    {
-
-        if (command.equals("\\par"))
-            addTextContent("\n");
-        else if (command.equals("\\tab"))
-            addTextContent("\t");
-        else {
-            commands.add(command);
-            last_command = command;
-        }
+    public RTFGroup(Charset characterSet) {
+        this.characterSet = characterSet;
     }
 
-    public void addEscapedChar(String characterSet, String hexa) {
-        addTextContent(ConvertCharset.convertCharacter(characterSet, hexa));
+    public void handleCommand(String command) {
+        this.command = command;
+    }
+
+    public void destination(String destination) {
+        this.destination = destination;
+    }
+
+    public String getTextContent() {
+        return text_content.toString();
+    }
+
+    public void addEscapedChar(String escapedChar) {
+        int hexa = Integer.parseInt(escapedChar.substring(2), 16);
+        byte[] bytes = {(byte) hexa};
+        addTextContent(new String(bytes, characterSet));
     }
 
     public void addUnicodeChar(String code) {
@@ -35,30 +38,12 @@ public class RTFGroup
     }
 
     public void addTextContent(String text) {
-        if (last_command.startsWith("\\html"))
+        if (destination.startsWith("\\htmltag") || command.equals("\\htmlrtf0"))
             text_content.append(text);
     }
 
-    public void addCharacterContent(char character) {
-        if (last_command.startsWith("\\html"))
+    private void addCharacterContent(char character) {
+        if (destination.startsWith("\\htmltag") || command.equals("\\htmlrtf0"))
             text_content.append(character);
     }
-
-    public boolean isEmpty() {
-        return text_content.length() == 0 && commands.isEmpty();
-    }
-
-    public String getTextContent() {
-        return text_content.toString();
-    }
-
-    public List<String> getCommands() {
-        return commands;
-    }
-
-    boolean isNotEmptyText() {
-
-       return !StringUtils.isEmpty(text_content);
-    }
-
 }

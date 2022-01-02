@@ -10,13 +10,13 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.util.List;
 
-public class testRTF2HTML extends BaseModuleLauncher
-{
-    public testRTF2HTML(String[] args)
-    {
+import static java.util.stream.Collectors.joining;
+
+public class testRTF2HTML extends BaseModuleLauncher {
+    public testRTF2HTML(String[] args) {
         super(args);
 
-        root = new LocalRoot( "MSGViewer", "MSGViewer");
+        root = new LocalRoot("MSGViewer", "MSGViewer");
 
         configureLogging();
     }
@@ -43,37 +43,27 @@ public class testRTF2HTML extends BaseModuleLauncher
                         RTFParser parser = new RTFParser(new FileInputStream(file));
 
                         String message = null;
-
                         Exception exc = null;
                         Error err = null;
 
                         try {
-
-                            StringBuilder sb = new StringBuilder();
 
                             parser.parse();
                             logger.info("done parsing " + file);
 
                             List<RTFGroup> groups = parser.getGroups();
 
-                            for( RTFGroup group : groups )
-                            {
-                                if( group.isNotEmptyText() )
-                                {
-                                    String textContent = group.getTextContent();
-
-                                    System.out.print(textContent);
-                                    sb.append(textContent);
-                                }
-                            }
+                            String textContent = groups.stream()
+                                    .map(RTFGroup::getTextContent)
+                                    .collect(joining());
+                            System.out.print(textContent);
 
                             String file_name = getStartupParam("writehtml");
 
-                            if( file_name != null )
-                            {
-								try (FileWriter fout = new FileWriter(file_name)) {
-									fout.write(sb.toString());
-								}
+                            if (file_name != null) {
+                                try (FileWriter fout = new FileWriter(file_name)) {
+                                    fout.write(textContent);
+                                }
                             }
 
                         } catch ( Error ex ) {
