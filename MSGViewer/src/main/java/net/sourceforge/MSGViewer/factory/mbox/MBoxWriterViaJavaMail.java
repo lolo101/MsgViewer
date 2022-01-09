@@ -28,148 +28,130 @@ import java.util.Date;
 
 import static java.util.Objects.requireNonNullElse;
 
-public class MBoxWriterViaJavaMail implements AutoCloseable
-{
-     private final Session session = Session.getInstance(System.getProperties());
-     private File tmp_dir;
+public class MBoxWriterViaJavaMail implements AutoCloseable {
+    private final Session session = Session.getInstance(System.getProperties());
+    private File tmp_dir;
 
-     public void write(Message msg, OutputStream out ) throws Exception
-     {
-         javax.mail.Message jmsg = new MimeMessage(session);
+    public void write(Message msg, OutputStream out) throws Exception {
+        javax.mail.Message jmsg = new MimeMessage(session);
 
-         writeMBoxHeader(msg, out);
+        writeMBoxHeader(msg, out);
 
-         MimeMultipart mp = new MimeMultipart();
+        MimeMultipart mp = new MimeMultipart();
 
-         MimeBodyPart mp_text_alternate = new MimeBodyPart();
-         MimeMultipart mp_alternate = new MimeMultipart("alternative");
+        MimeMultipart mp_alternate = new MimeMultipart("alternative");
 
-         String rtf = msg.getBodyRTF();
+        String rtf = msg.getBodyRTF();
 
-         if( rtf != null && !rtf.isEmpty() )
-         {
-             MimeBodyPart html_text = new MimeBodyPart();
+        if (rtf != null && !rtf.isEmpty()) {
+            MimeBodyPart html_text = new MimeBodyPart();
 
-             String html = rtf;
+            String html = rtf;
 
-             if( rtf.contains("\\fromhtml") )
-             {
-                HtmlFromRtf rtf2html= new HtmlFromRtf(rtf);
+            if (rtf.contains("\\fromhtml")) {
+                HtmlFromRtf rtf2html = new HtmlFromRtf(rtf);
 
                 html = rtf2html.getHTML();
-             }
-             html_text.setDataHandler(new DataHandler(new ByteArrayDataSource(html, "text/html")));
+            }
+            html_text.setDataHandler(new DataHandler(new ByteArrayDataSource(html, "text/html")));
 
-             mp_alternate.addBodyPart(html_text);
-         }
-         {
-             MimeBodyPart plain_text = new MimeBodyPart();
-             String plain_text_string = msg.getBodyText();
+            mp_alternate.addBodyPart(html_text);
+        }
+        {
+            MimeBodyPart plain_text = new MimeBodyPart();
+            String plain_text_string = msg.getBodyText();
 
-             plain_text.setText(requireNonNullElse(plain_text_string, ""));
+            plain_text.setText(requireNonNullElse(plain_text_string, ""));
 
-             mp_alternate.addBodyPart(plain_text);
+            mp_alternate.addBodyPart(plain_text);
 
-             mp_text_alternate.setContent(mp_alternate);
-             MimeBodyPart part = new MimeBodyPart();
-             part.setContent(mp_alternate);
+            MimeBodyPart part = new MimeBodyPart();
+            part.setContent(mp_alternate);
 
-             mp.addBodyPart(part);
+            mp.addBodyPart(part);
 
-         }
+        }
 
-         for( Attachment att : msg.getAttachments() )
-         {
-             if( att instanceof FileAttachment )
-             {
+        for (Attachment att : msg.getAttachments()) {
+            MimeBodyPart part = new MimeBodyPart();
+            part.setDisposition(BodyPart.ATTACHMENT);
+            if (att instanceof FileAttachment) {
                 FileAttachment fatt = (FileAttachment) att;
-                MimeBodyPart part = new MimeBodyPart();
-                part.setDisposition(BodyPart.ATTACHMENT);
-
-                part.attachFile(dumpAttachment(fatt));
                 part.setFileName(MimeUtility.encodeText(fatt.getDisplayName(), "UTF-8", null));
-
-                mp.addBodyPart(part);
-             } else if( att instanceof MsgAttachment ) {
-
+                part.attachFile(dumpAttachment(fatt));
+            } else if (att instanceof MsgAttachment) {
                 MsgAttachment msgAtt = (MsgAttachment) att;
+                part.attachFile(dumpAttachment(msgAtt));
+            }
+            mp.addBodyPart(part);
+        }
 
-                Message message = msgAtt.getMessage();
+        addHeaders(msg, jmsg);
 
-                String message_file_name = message.getSubject();
-                if( message_file_name == null || message_file_name.isEmpty() ) {
-                    message_file_name = String.valueOf(message.hashCode());
-                }
-                message_file_name = message_file_name.replace("/", " ");
+        jmsg.setContent(mp);
 
-                File subMessage = new File(getTmpDir() + "/" + message_file_name + "." + getExtension());
-                new MessageSaver(message).saveMessage(subMessage);
+        jmsg.writeTo(out);
 
-                MimeBodyPart part = new MimeBodyPart();
-                part.setDisposition(BodyPart.ATTACHMENT);
-
-                part.attachFile(subMessage);
-
-                mp.addBodyPart(part);
-             }
-         }
-
-         addHeaders(msg, jmsg);
-
-         jmsg.setContent(mp);
-
-         jmsg.writeTo(out);
-
-         close();
-     }
-
-     private File getTmpDir()
-     {
-         if (tmp_dir == null) {
-             try {
-                 tmp_dir = TempDir.getTempDir(null, null);
-             } catch (IOException ex) {
-                 tmp_dir = new File(System.getProperty("java.io.tmpdir") + "/" + this.getClass().getSimpleName());
-             }
-         }
-
-         return tmp_dir;
-     }
-
-     private File dumpAttachment( FileAttachment fatt ) throws IOException
-     {
-         File content = new File(getTmpDir(), fatt.getFilename());
-
-         try (FileOutputStream fout = new FileOutputStream(content)) {
-             fout.write(fatt.getData());
-         }
-
-         return content;
-     }
-
-    private static void writeMBoxHeader(Message msg, OutputStream out) throws IOException
-    {
-       StringBuilder sb = new StringBuilder();
-
-       sb.append("From ");
-       sb.append(msg.getFromEmail());
-       sb.append(" ");
-
-       Date date = msg.getDate();
-
-       if( date == null ) {
-           date = new Date(0);
-       }
-
-       sb.append(DateHeader.date_format.format(date));
-       sb.append("\r\n");
-
-       out.write(sb.toString().getBytes(StandardCharsets.US_ASCII));
+        close();
     }
 
-    static void addHeaders(Message msg, javax.mail.Message jmsg) throws MessagingException
-    {
-        if( msg.getHeaders() == null ) {
+    private File getTmpDir() {
+        if (tmp_dir == null) {
+            try {
+                tmp_dir = TempDir.getTempDir(null, null);
+            } catch (IOException ex) {
+                tmp_dir = new File(System.getProperty("java.io.tmpdir"), this.getClass().getSimpleName());
+            }
+        }
+
+        return tmp_dir;
+    }
+
+    private File dumpAttachment(FileAttachment fatt) throws IOException {
+        File content = new File(getTmpDir(), fatt.getFilename());
+
+        try (FileOutputStream fout = new FileOutputStream(content)) {
+            fout.write(fatt.getData());
+        }
+
+        return content;
+    }
+
+    private File dumpAttachment(MsgAttachment msgAtt) throws Exception {
+        Message message = msgAtt.getMessage();
+
+        String message_file_name = message.getSubject();
+        if (message_file_name == null || message_file_name.isEmpty()) {
+            message_file_name = String.valueOf(message.hashCode());
+        }
+        message_file_name = message_file_name.replace("/", " ");
+
+        File subMessage = new File(getTmpDir(), message_file_name + "." + getExtension());
+        new MessageSaver(message).saveMessage(subMessage);
+        return subMessage;
+    }
+
+    private static void writeMBoxHeader(Message msg, OutputStream out) throws IOException {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("From ");
+        sb.append(msg.getFromEmail());
+        sb.append(" ");
+
+        Date date = msg.getDate();
+
+        if (date == null) {
+            date = new Date(0);
+        }
+
+        sb.append(DateHeader.date_format.format(date));
+        sb.append("\r\n");
+
+        out.write(sb.toString().getBytes(StandardCharsets.US_ASCII));
+    }
+
+    static void addHeaders(Message msg, javax.mail.Message jmsg) throws MessagingException {
+        if (msg.getHeaders() == null) {
             return;
         }
 
@@ -177,11 +159,10 @@ public class MBoxWriterViaJavaMail implements AutoCloseable
 
         StringBuilder sb = new StringBuilder();
 
-        for( String hl : headers)
-        {
+        for (String hl : headers) {
             String header_line = hl.trim();
 
-            if( header_line.startsWith(" ") ) {
+            if (header_line.startsWith(" ")) {
                 sb.append("\n");
                 sb.append(header_line);
             } else {
@@ -191,14 +172,13 @@ public class MBoxWriterViaJavaMail implements AutoCloseable
 
                 int idx = h.indexOf(':');
 
-                if( idx > 0 ) {
-                    String name = h.substring(0,idx);
-                    String value =  h.substring(idx+1);
+                if (idx > 0) {
+                    String name = h.substring(0, idx);
+                    String value = h.substring(idx + 1);
 
-                    if( name.startsWith("From ") )
-                    {
-                         sb.setLength(0);
-                         continue;
+                    if (name.startsWith("From ")) {
+                        sb.setLength(0);
+                        continue;
                     }
                     jmsg.addHeader(name, value);
                 }
@@ -209,17 +189,15 @@ public class MBoxWriterViaJavaMail implements AutoCloseable
     }
 
     @Override
-    public void close()
-    {
-        if( tmp_dir != null ) {
+    public void close() {
+        if (tmp_dir != null) {
             DeleteDir.deleteDirectory(tmp_dir);
         }
 
         tmp_dir = null;
     }
 
-     public String getExtension()
-     {
-         return "mbox";
-     }
+    public String getExtension() {
+        return "mbox";
+    }
 }

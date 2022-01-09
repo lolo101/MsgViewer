@@ -44,7 +44,7 @@ public class ViewerHelper {
             tmp_dir = TempDir.getTempDir(null, null);
             delete_tmp_dir = true;
         } catch (IOException ex) {
-            tmp_dir = new File(System.getProperty("java.io.tmpdir") + "/" + root.getAppName());
+            tmp_dir = new File(System.getProperty("java.io.tmpdir"), root.getAppName());
         }
     }
 
