@@ -41,7 +41,7 @@ public class ViewerHelper {
         this.root = root;
 
         try {
-            tmp_dir = TempDir.getTempDir(null, null);
+            tmp_dir = TempDir.getTempDir();
             delete_tmp_dir = true;
         } catch (IOException ex) {
             tmp_dir = new File(System.getProperty("java.io.tmpdir"), root.getAppName());

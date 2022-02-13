@@ -111,7 +111,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
             }
         });
 
-        String id = parent.getUniqueDialogIdentifier("SetToLastXYPos");
+        String id = parent.getUniqueDialogIdentifier();
 
         int x = Integer.parseInt(root.getSetup().getLocalConfig(
                 id.concat(Setup.WindowX), String.valueOf(default_pos_x += 30)));
@@ -482,8 +482,8 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 
         cancelAutoRefreshTimer();
 
-        String id_xy = parent.getUniqueDialogIdentifier("SaveLastXYPos");
-        String id_wh = parent.getUniqueDialogIdentifier("SaveWidthHeight");
+        String id_xy = parent.getUniqueDialogIdentifier();
+        String id_wh = parent.getUniqueDialogIdentifier();
 
         logger.info("store size to: " + parent.getWidth() + "x"
                 + parent.getHeight());

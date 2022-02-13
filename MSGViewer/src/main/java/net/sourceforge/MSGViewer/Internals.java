@@ -47,13 +47,13 @@ public class Internals extends BaseDialog {
 
 
     @Override
-    public String getUniqueDialogIdentifier(Object requester) {
+    public String getUniqueDialogIdentifier() {
         /*
          * dadurch können wir später den Titel ändern, ohne das sich dadurch
          * die Dialog ID verändert.
          */
         if (dialog_id == null)
-            dialog_id = super.getUniqueDialogIdentifier(requester);
+            dialog_id = super.getUniqueDialogIdentifier();
 
         return dialog_id;
     }

@@ -1,30 +1,21 @@
-  /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.base.tablemanipulator;
 
-  import at.redeye.FrameWork.base.*;
-  import at.redeye.FrameWork.base.bindtypes.DBEnum;
-  import at.redeye.FrameWork.base.bindtypes.DBEnumAsInteger;
-  import at.redeye.FrameWork.base.bindtypes.DBStrukt;
-  import at.redeye.FrameWork.base.bindtypes.DBValue;
-  import at.redeye.FrameWork.utilities.StringUtils;
-  import org.apache.logging.log4j.LogManager;
-  import org.apache.logging.log4j.Logger;
+import at.redeye.FrameWork.base.*;
+import at.redeye.FrameWork.base.bindtypes.DBEnum;
+import at.redeye.FrameWork.base.bindtypes.DBEnumAsInteger;
+import at.redeye.FrameWork.base.bindtypes.DBStrukt;
+import at.redeye.FrameWork.base.bindtypes.DBValue;
+import at.redeye.FrameWork.utilities.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-  import javax.swing.*;
-  import javax.swing.table.*;
-  import java.awt.*;
-  import java.util.List;
-  import java.util.*;
-  import java.util.Map.Entry;
+import javax.swing.*;
+import javax.swing.table.*;
+import java.awt.*;
+import java.util.List;
+import java.util.*;
+import java.util.Map.Entry;
 
-/**
- *
- * @author martin
- */
 public class TableManipulator {
 
     private DBStrukt binddesc = null;
@@ -801,7 +792,7 @@ public class TableManipulator {
         if( base == null )
             return null;
 
-        return base.getUniqueDialogIdentifier(this);
+        return base.getUniqueDialogIdentifier();
     }
 
     public void saveTableHeaderSize()

@@ -16,9 +16,6 @@ public interface BaseDialogBase
     String getTitle();
 
     /**
-     * @param requester The calling object (can be used to implement different behavoir for eg
-     *        saving size of window and table. Can be null
-     *
      * @return a Dialog identifier for saving some data, eg:
      * width an height of the dialog.
      * The default behavior is retuning the dialog title.
@@ -27,7 +24,7 @@ public interface BaseDialogBase
      * each one has a different title.
      */
 
-    String getUniqueDialogIdentifier(Object requester);
+    String getUniqueDialogIdentifier();
 
     void addWindowListener(WindowListener windowListener);
 

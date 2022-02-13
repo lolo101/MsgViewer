@@ -98,7 +98,7 @@ public class MBoxWriterViaJavaMail implements AutoCloseable {
     private File getTmpDir() {
         if (tmp_dir == null) {
             try {
-                tmp_dir = TempDir.getTempDir(null, null);
+                tmp_dir = TempDir.getTempDir();
             } catch (IOException ex) {
                 tmp_dir = new File(System.getProperty("java.io.tmpdir"), this.getClass().getSimpleName());
             }

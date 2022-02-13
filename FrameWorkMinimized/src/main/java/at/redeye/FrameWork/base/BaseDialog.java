@@ -281,8 +281,6 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
     }
 
     /**
-     * @param requester The calling object (can be used to implement different
-     *                  behavoir for eg saving size of window and table. Can be null
      * @return a Dialog identifier for saving some data, eg: width an height of
      * the dialog. The default behavior is retuning the dialog title.
      * This function should be overloaded if some instances of dialogs
@@ -291,7 +289,7 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
      */
 
     @Override
-    public String getUniqueDialogIdentifier(Object requester) {
+    public String getUniqueDialogIdentifier() {
         return this.getClass().getName() + "/" + getTitle();
     }
 

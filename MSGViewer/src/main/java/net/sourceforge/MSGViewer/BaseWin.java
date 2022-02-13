@@ -15,9 +15,9 @@ public abstract class BaseWin extends BaseDialog implements MainDialog {
     }
 
     @Override
-    public String getUniqueDialogIdentifier(Object requester) {
+    public String getUniqueDialogIdentifier() {
         if (dialog_id == null)
-            dialog_id = super.getUniqueDialogIdentifier(requester);
+            dialog_id = super.getUniqueDialogIdentifier();
 
         return dialog_id;
     }
