@@ -1,5 +1,7 @@
 package com.auxilii.msgparser;
 
+import java.util.Arrays;
+
 public enum Pid {
     PidTagGuidStream(0x0002),
     PidTagEntryStream(0x0003),
@@ -7,6 +9,7 @@ public enum Pid {
 
     // 0x0001-0x0BFF Message object envelope property; reserved
     PidTagMessageClass(0x001a),
+    PidTagSensitivity(0x0036),
     PidTagSubject(0x0037),
     PidTagClientSubmitTime(0x0039),
     PidTagSentRepresentingSearchKey(0x003b),
@@ -18,6 +21,7 @@ public enum Pid {
     PidTagReceivedRepresentingEntryId(0x0043),
     PidTagReceivedRepresentingName(0x0044),
     PidTagOriginalAuthorName(0x004d),
+    PidTagReplyRecipientEntries(0x004f),
     PidTagReplyRecipientNames(0x0050),
     PidTagReceivedBySearchKey(0x0051),
     PidTagReceivedRepresentingSearchKey(0x0052),
@@ -63,6 +67,7 @@ public enum Pid {
     // 0x1000-0x2FFF Message content property; reserved
     PidTagBody(0x1000),
     PidTagRtfCompressed(0x1009),
+    PidTagBodyHtml(0x1013),
     PidTagInternetMessageId(0x1035),
     PidTagOriginalMessageId(0x1046),
 
@@ -88,6 +93,7 @@ public enum Pid {
     PidTagAttachMethod(0x3705),
     PidTagAttachLongFilename(0x3707),
     PidTagAttachRendering(0x3709),
+    PidTagAttachTag(0x370a),
     PidTagRenderingPosition(0x370b),
     PidTagAttachMimeTag(0x370e),
     PidTagAttachContentId(0x3712),
@@ -146,11 +152,9 @@ public enum Pid {
     }
 
     public static Pid from(int id) {
-        for (Pid value : Pid.values()) {
-            if (value.id == id) {
-                return value;
-            }
-        }
-        return Unknown;
+        return Arrays.stream(Pid.values())
+                .filter(value -> value.id == id)
+                .findFirst()
+                .orElse(Unknown);
     }
 }

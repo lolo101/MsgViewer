@@ -4,16 +4,18 @@ import at.redeye.FrameWork.base.FrameWorkConfigDefinitions;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.base.Setup;
 import at.redeye.FrameWork.utilities.DeleteDir;
-import at.redeye.FrameWork.utilities.StringUtils;
 import at.redeye.FrameWork.utilities.TempDir;
 import com.auxilii.msgparser.Message;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
 import com.auxilii.msgparser.attachment.MsgAttachment;
+import net.htmlparser.jericho.Attribute;
 import net.htmlparser.jericho.Attributes;
 import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.StartTag;
 import net.sourceforge.MSGViewer.rtfparser.ParseException;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.poi.util.IOUtils;
 
 import javax.activation.MimeType;
@@ -21,151 +23,84 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static at.redeye.FrameWork.base.BaseDialog.logger;
 
 public class ViewerHelper {
 
-    private Root root;
+    private static final Pattern META_PATTERN = Pattern.compile("<meta\\s.*>", Pattern.CASE_INSENSITIVE);
+    private final Root root;
     private File tmp_dir;
     private boolean delete_tmp_dir = false;
 
-    public ViewerHelper( Root root )
-    {
+    public ViewerHelper(Root root) {
         this.root = root;
 
         try {
-           tmp_dir = TempDir.getTempDir(null, null);
-           delete_tmp_dir = true;
+            tmp_dir = TempDir.getTempDir(null, null);
+            delete_tmp_dir = true;
         } catch (IOException ex) {
-           tmp_dir = new File(System.getProperty("java.io.tmpdir") + "/" + root.getAppName());
+            tmp_dir = new File(System.getProperty("java.io.tmpdir"), root.getAppName());
         }
     }
 
-   static boolean is_image_mime_type( MimeType mime )
-    {
-        return  mime.getPrimaryType().equalsIgnoreCase("image");
+    static boolean is_image_mime_type(MimeType mime) {
+        return mime.getPrimaryType().equalsIgnoreCase("image");
     }
 
-    static boolean is_mail_message( String file_name )
-    {
+    static boolean is_mail_message(String file_name) {
         return file_name.toLowerCase().endsWith(".mbox")
                 || file_name.toLowerCase().endsWith(".msg");
     }
 
-    static boolean is_mail_message( String file_name, String mime )
-    {
-        return is_mail_message( file_name );
-    }
-
-    public String getOpenCommand()
-    {
-        if( Setup.is_win_system() )
+    public String getOpenCommand() {
+        if (Setup.is_win_system())
             return "explorer";
 
         return root.getSetup().getLocalConfig(FrameWorkConfigDefinitions.OpenCommand);
     }
 
-    static String prepareText( String s )
-    {
-        if( s == null )
-            return "";
+    static public String stripMetaTags(String html) {
+        html = META_PATTERN.matcher(html).replaceAll("");
 
-        StringBuilder sb = new StringBuilder();
+        StringBuilder body_text = new StringBuilder(html);
+        Source source = new Source(html);
+        source.fullSequentialParse();
 
-        s = s.replaceAll("<", "&lt;");
-        s = s.replaceAll(">", "&gt;");
-
-        int last_start = 0;
-
-        while( true )
-        {
-            int start = s.indexOf("http://", last_start);
-
-            if( start == -1 )
-            {
-                sb.append(s.substring(last_start));
-                break;
-            }
-
-            logger.info("last_start: " + last_start + " start: " + start + " length: " + s.length() );
-
-            sb.append(s, last_start, start);
-            last_start = start;
-
-            sb.append("<a href=\"");
-
-            int i;
-
-            for( i = start; i < s.length(); i++ )
-            {
-              if( s.indexOf("&gt;",i ) == i )
-                  break;
-
-              char c = s.charAt(i);
-
-              if( StringUtils.is_space(c) )
-              {
-                  break;
-              }
-              sb.append(c);
-            }
-
-            sb.append("\">");
-            sb.append(s, start, i-1);
-            sb.append("</a>");
-
-            last_start = i;
-        }
-
-        return sb.toString();
-    }
-
-    static public String stripMetaTags(String html )
-    {
-       html =  html.replaceAll("<[Mm][eE][Tt][aA]\\s.*>", "");
-
-       StringBuilder body_text = new StringBuilder(html);
-       Source source = new Source(html);
-       source.fullSequentialParse();
-
-       for( StartTag tag : source.getAllStartTags("font") )
-       {
+        for (StartTag tag : source.getAllStartTags("font")) {
             // remove size="x"
             Attributes atts = tag.getAttributes();
-           if( atts == null )
-               continue;
+            if (atts == null)
+                continue;
 
-           net.htmlparser.jericho.Attribute att = atts.get("size");
+            Attribute att = atts.get("size");
 
-           if( att != null )
-           {
-               int start = att.getBegin();
-               int end = att.getEnd();
+            if (att != null) {
+                int start = att.getBegin();
+                int end = att.getEnd();
 
-               for( int i = start; i < end+1; i++ )
-               {
-                body_text.setCharAt(i, ' ');
-               }
-           }
-       }
+                for (int i = start; i < end + 1; i++) {
+                    body_text.setCharAt(i, ' ');
+                }
+            }
+        }
 
-       System.out.println(body_text.toString());
+        System.out.println(body_text);
 
-       return body_text.toString();
+        return body_text.toString();
     }
 
 
-    public void dispose()
-    {
-         if( delete_tmp_dir && tmp_dir.exists() )
+    public void dispose() {
+        if (delete_tmp_dir && tmp_dir.exists())
             DeleteDir.deleteDirectory(tmp_dir);
     }
 
-    public String extractHTMLFromRTF(String bodyText, Message message ) throws ParseException
-    {
+    public String extractHTMLFromRTF(String bodyText, Message message) throws ParseException {
         HtmlFromRtf rtf2html = new HtmlFromRtf(bodyText);
 
         String html = rtf2html.getHTML();
@@ -174,42 +109,22 @@ public class ViewerHelper {
 
         PrepareImages prep_images = new PrepareImages(this, message);
 
-        return prep_images.prepareImages(new StringBuilder(html));
+        return prep_images.prepareImages(html);
     }
 
-    public File getMailIconFile() throws IOException
-    {
-        File file = new File(tmp_dir, "mail.png");
-
-        if( file.exists() )
-            return file;
-
-        try (InputStream stream = ViewerHelper.class.getResourceAsStream("/icons/rg1024_yellow_mail.png");
-                FileOutputStream writer = new FileOutputStream(file)) {
-            writer.write(IOUtils.toByteArray(stream));
-        }
-
-        return file;
-    }
-
-    public File extractUrl(URL url, Message message ) throws IOException
-    {
+    public File extractUrl(URL url, Message message) throws IOException {
         List<Attachment> attachments = message.getAttachments();
 
-        for( Attachment att : attachments )
-        {
-            if( att instanceof FileAttachment)
-            {
+        for (Attachment att : attachments) {
+            if (att instanceof FileAttachment) {
                 FileAttachment fatt = (FileAttachment) att;
 
                 File content = getTempFile(fatt);
 
-                if( content.toURI().toURL().equals(url) )
-                {
+                if (content.toURI().toURL().equals(url)) {
                     logger.info("opening " + fatt);
 
-                    if( !content.exists() )
-                    {
+                    if (!content.exists()) {
                         try (FileOutputStream fout = new FileOutputStream(content)) {
                             fout.write(fatt.getData());
                         }
@@ -223,25 +138,40 @@ public class ViewerHelper {
         return null;
     }
 
-    public File getTempFile(FileAttachment fatt)
-    {
-        if( !tmp_dir.isDirectory() && !tmp_dir.mkdirs() )
-        {
-            throw new RuntimeException( "Cannot create tmp dir: " + tmp_dir );
-        }
-        return new File(tmp_dir,
-                org.apache.commons.lang3.StringUtils.isBlank(fatt.getFilename())
-                        ? fatt.getLongFilename()
-                        : fatt.getFilename());
+    public File getTempFile(FileAttachment fatt) {
+        return getTempFile(StringUtils.isBlank(fatt.getLongFilename()) ? fatt.getFilename() : fatt.getLongFilename());
     }
 
-    public File getTempFile(MsgAttachment matt)
-    {
-        if( !tmp_dir.isDirectory() && !tmp_dir.mkdirs() )
-        {
-            throw new RuntimeException( "Cannot create tmp dir: " + tmp_dir );
-        }
-        return new File(tmp_dir, matt.getMessage().hashCode() + ".msg");
+    public File getTempFile(MsgAttachment matt) {
+        return getTempFile(matt.getMessage().hashCode() + ".msg");
     }
 
+    private File getTempFile(String fileName) {
+        if (!tmp_dir.isDirectory() && !tmp_dir.mkdirs()) {
+            throw new RuntimeException("Cannot create tmp dir: " + tmp_dir);
+        }
+        return new File(tmp_dir, fileName);
+    }
+
+    public static boolean isValidEmail(String email) {
+        EmailValidator emailValidator = EmailValidator.getInstance();
+        return emailValidator.isValid(email);
+    }
+
+    public String printMailIconHtml() throws IOException {
+        return "<img border=0 align=\"baseline\" src=\"" + getMailIconFile() + "\"/>";
+    }
+
+    private URI getMailIconFile() throws IOException {
+        File file = new File(tmp_dir, "mail.png");
+
+        if (!file.exists()) {
+            try (InputStream stream = ViewerHelper.class.getResourceAsStream("/icons/rg1024_yellow_mail.png");
+                 FileOutputStream writer = new FileOutputStream(file)) {
+                IOUtils.copy(stream, writer);
+            }
+        }
+
+        return file.toURI();
+    }
 }

@@ -3,6 +3,7 @@ package net.sourceforge.MSGViewer.MSGNavigator;
 import at.redeye.FrameWork.base.BaseDialog;
 import at.redeye.FrameWork.base.Root;
 import com.auxilii.msgparser.Pid;
+import com.auxilii.msgparser.Ptyp;
 import net.sourceforge.MSGViewer.MSGNavigator.MSGNavigator.TreeNodeContainer;
 import net.sourceforge.MSGViewer.factory.msg.lib.ByteConvert;
 import net.sourceforge.MSGViewer.factory.msg.lib.MSTimeConvert;
@@ -13,6 +14,7 @@ import org.apache.poi.hmef.CompressedRTF;
 import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.regex.Pattern;
 
@@ -20,45 +22,36 @@ public class ShowNode extends BaseDialog {
 
     private static final long serialVersionUID = 3130592579862038804L;
     private static final Pattern NAMED_PROPERTY_SUBSTORAGE = Pattern.compile("__substg1\\.0_[0-9]{4}0102");
+    private static final int PROPATTR_MANDATORY = 0x00000001;
+    private static final int PROPATTR_READABLE = 0x00000002;
+    private static final int PROPATTR_WRITABLE = 0x00000004;
 
-    private int max_descr_lenght = 20;
+    private final int max_descr_lenght;
 
-    public ShowNode(Root root, TreeNodeContainer cont)
-    {
-        super( root, root.MlM("Navigate:") + " " + cont.getEntry().getName());
+    public ShowNode(Root root, TreeNodeContainer cont) {
+        super(root, root.MlM("Navigate:") + " " + cont.getEntry().getName());
         initComponents();
 
-        for( Pid descr : Pid.values() ) {
-            if( descr.toString().length() > max_descr_lenght ) {
-                max_descr_lenght = descr.toString().length();
-            }
-        }
+        int actual_pid_max_length = Arrays.stream(Pid.values())
+                .mapToInt(pid -> pid.toString().length())
+                .max()
+                .orElse(0);
+        max_descr_lenght = Math.max(20, actual_pid_max_length);
 
-        if( cont.getEntry().isDocumentEntry() )
-        {
+        if (cont.getEntry().isDocumentEntry()) {
             String name = cont.getEntry().getName();
-            if( name.equals("__properties_version1.0") )
-            {
+            if (name.equals("__properties_version1.0")) {
                 show_properties_entry(cont);
-            }
-            else if( name.equals("__substg1.0_00020102") )
-            {
+            } else if (name.equals(Ptyp.SUBSTORAGE_PREFIX + "00020102")) {
                 show_guid_stream(cont);
-            }
-            else if( name.equals("__substg1.0_00030102") )
-            {
+            } else if (name.equals(Ptyp.SUBSTORAGE_PREFIX + "00030102")) {
                 show_entry_stream(cont);
-            }
-            else if( name.equals("__substg1.0_00040102") )
-            {
+            } else if (name.equals(Ptyp.SUBSTORAGE_PREFIX + "00040102")) {
                 show_string_stream(cont);
-            }
-            else if( NAMED_PROPERTY_SUBSTORAGE.matcher(name).matches() &&
-                   cont.getEntry().getParent().getName().equals("__nameid_version1.0") )
-            {
+            } else if (NAMED_PROPERTY_SUBSTORAGE.matcher(name).matches() &&
+                    cont.getEntry().getParent().getName().equals("__nameid_version1.0")) {
                 show_nameid_stream(cont);
-            }
-            else {
+            } else {
                 show_data(cont);
             }
         }
@@ -82,12 +75,12 @@ public class ShowNode extends BaseDialog {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 438, Short.MAX_VALUE)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 438, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
         );
 
         pack();
@@ -96,20 +89,19 @@ public class ShowNode extends BaseDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
 
     private javax.swing.JTextArea jTHex;
-    // End of variables declaration//GEN-END:variables
-    private void show_properties_entry(TreeNodeContainer cont)
-    {
 
-        StringBuilder sb = new StringBuilder();
+    // End of variables declaration//GEN-END:variables
+    private void show_properties_entry(TreeNodeContainer cont) {
         byte[] bytes = (byte[]) cont.getData();
 
+        StringBuilder sb = new StringBuilder();
         sb.append("__properties_version1.0\n");
         sb.append("HEADER\n");
         sb.append("\tRESERVED 8 bytes (should by zero)\n\t\t");
 
         int offset = 0;
 
-        for( int i = 0; i < 8; i++, offset++) {
+        for (int i = 0; i < 8; i++, offset++) {
             sb.append(formatByte(bytes[offset]));
         }
 
@@ -148,62 +140,37 @@ public class ShowNode extends BaseDialog {
 
         sb.append("\n");
 
-        for( ; offset < bytes.length; offset += 16) {
+        for (; offset < bytes.length; offset += 16) {
             sb.append("\n");
-            dumpPropertyEntry( sb, bytes, offset );
+            sb.append(dumpPropertyEntry(bytes, offset));
         }
 
         jTHex.setText(sb.toString());
     }
 
-    private String formatByte( byte b )
-    {
+    private static String formatByte(byte b) {
         return b == 0 ? "__ " : String.format("%02X ", b);
     }
 
-    private String formatByte0( byte b )
-    {
-        return String.format("%02X ", b);
-    }
-
-    private String formatByte0S( byte b )
-    {
+    private static String formatByte0S(byte b) {
         return String.format("%02X", b);
     }
 
-    private void dumpPropertyEntry(StringBuilder sb, byte[] bytes, int offset)
-    {
+    private String dumpPropertyEntry(byte[] bytes, int offset) {
+        StringBuilder sb = new StringBuilder();
         sb.append("TAG: ");
 
         StringBuilder tagname = new StringBuilder();
 
         // property tag
-        for( int i = offset + 3; i >= offset; i-- ) {
+        for (int i = offset + 3; i >= offset; i--) {
             sb.append(formatByte0S(bytes[i]));
             tagname.append(formatByte0S(bytes[i]));
         }
 
         offset += 4;
 
-        sb.append(" FLAGS: ");
-
-        if( (bytes[offset] & 0x0001) > 0 ) {
-            sb.append("M");
-        } else {
-            sb.append("_");
-        }
-
-        if( (bytes[offset] & 0x0002) > 0 ) {
-            sb.append("R");
-        } else {
-            sb.append("_");
-        }
-
-        if( (bytes[offset] & 0x0004) > 0 ) {
-            sb.append("W");
-        } else {
-            sb.append("_");
-        }
+        sb.append(printFlags(bytes[offset]));
 
         offset += 4;
 
@@ -211,69 +178,82 @@ public class ShowNode extends BaseDialog {
 
         int value_start_offset = offset;
 
-        for( int i = 0; i < 8; i++, offset++ ) {
-            sb.append(formatByte0(bytes[offset]));
-        }
+        sb.append(formatBytesSpaced(bytes, offset, 8));
 
         sb.append(" ");
 
         String lTagname = tagname.toString().toLowerCase();
-        Pid descr = Pid.from(Integer.parseInt(lTagname.substring(0,4), 16));
-        sb.append(StringUtils.rightPad(descr.toString(),max_descr_lenght));
+        Pid descr = Pid.from(Integer.parseInt(lTagname.substring(0, 4), 16));
+        sb.append(StringUtils.rightPad(descr.toString(), max_descr_lenght));
 
-        String tagtype = lTagname.substring(4);
+        Ptyp tagtype = Ptyp.from(Integer.parseInt(lTagname.substring(4), 16));
 
         switch (tagtype) {
-            case "001f":
-                {
-                    StringBuilder res = new StringBuilder();
-                    for( int i = value_start_offset + 3; i >= value_start_offset; i-- ) {
-                        res.append(formatByte0S(bytes[i]));
-                    }
-                    int length = Integer.valueOf(res.toString(), 16);
-                    sb.append(" PtypString length: ");
-                    sb.append(length - 2);
-                    break;
+            case PtypString: {
+                StringBuilder res = new StringBuilder();
+                for (int i = value_start_offset + 3; i >= value_start_offset; i--) {
+                    res.append(formatByte0S(bytes[i]));
                 }
-            case "0102":
-                {
-                    StringBuilder res = new StringBuilder();
-                    for( int i = value_start_offset + 3; i >= value_start_offset; i-- ) {
-                        res.append(formatByte0S(bytes[i]));
-                    }
-                    int length = Integer.valueOf(res.toString(), 16);
-                    sb.append(" PtypBinary length: ");
-                    sb.append(length);
-                    break;
+                int length = Integer.valueOf(res.toString(), 16);
+                sb.append(" PtypString length: ");
+                sb.append(length - 2);
+                break;
+            }
+            case PtypBinary: {
+                StringBuilder res = new StringBuilder();
+                for (int i = value_start_offset + 3; i >= value_start_offset; i--) {
+                    res.append(formatByte0S(bytes[i]));
                 }
-            case "0040":
+                int length = Integer.valueOf(res.toString(), 16);
+                sb.append(" PtypBinary length: ");
+                sb.append(length);
+                break;
+            }
+            case PtypTime:
                 sb.append(" PtypTime");
-                long val = ByteConvert.convertByteArrayToLong(bytes,value_start_offset);
+                long val = ByteConvert.convertByteArrayToLong(bytes, value_start_offset);
                 sb.append(" ");
                 sb.append(val);
                 sb.append(": ");
-                sb.append(new Date(MSTimeConvert.PtypeTime2Millis(val)).toString());
+                sb.append(new Date(MSTimeConvert.PtypeTime2Millis(val)));
                 break;
-            case "000b":
+            case PtypBoolean:
                 sb.append(" boolean");
                 break;
-            case "0003":
-                {
-                    StringBuilder res = new StringBuilder();
-                    for( int i = value_start_offset + 3; i >= value_start_offset; i-- ) {
-                        res.append(formatByte0S(bytes[i]));
-                    }
-                    int length = Integer.valueOf(res.toString(), 16);
-                    sb.append(" PtypInteger32 value: ");
-                    sb.append(length);
-                    break;
+            case PtypInteger32: {
+                StringBuilder res = new StringBuilder();
+                for (int i = value_start_offset + 3; i >= value_start_offset; i--) {
+                    res.append(formatByte0S(bytes[i]));
                 }
+                int length = Integer.valueOf(res.toString(), 16);
+                sb.append(" PtypInteger32 value: ");
+                sb.append(length);
+                break;
+            }
         }
+        return sb.toString();
+    }
+
+    private static String printFlags(int b) {
+        boolean mandatory = (b & PROPATTR_MANDATORY) != 0;
+        boolean readable = (b & PROPATTR_READABLE) != 0;
+        boolean writable = (b & PROPATTR_WRITABLE) != 0;
+        return " FLAGS: "
+                + (mandatory ? "_" : "M")
+                + (readable ? "_" : "R")
+                + (writable ? "_" : "W");
+    }
+
+    private static String formatBytesSpaced(byte[] bytes, int offset, int length) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            sb.append(String.format("%02X ", bytes[offset + i]));
+        }
+        return sb.toString();
     }
 
 
-    private void show_string_stream(TreeNodeContainer cont)
-    {
+    private void show_string_stream(TreeNodeContainer cont) {
         StringBuilder sb = new StringBuilder();
         byte[] bytes = (byte[]) cont.getData();
 
@@ -334,12 +314,12 @@ public class ShowNode extends BaseDialog {
         sb.append(cont.getEntry().getName());
         sb.append("\n\n");
 
-        int count=0;
+        int count = 0;
 
         for (int offset = 0; offset < bytes.length; offset += 16, count++) {
 
             sb.append("INDEX: ");
-            sb.append(String.format("% 2d",count+3));
+            sb.append(String.format("% 2d", count + 3));
 
             sb.append(" {");
 
@@ -389,9 +369,8 @@ public class ShowNode extends BaseDialog {
         jTHex.setText(sb.toString());
     }
 
-    private String getPropertySetById( String id )
-    {
-        switch(id) {
+    private static String getPropertySetById(String id) {
+        switch (id) {
             case "00020386-0000-0000-C000-000000000046":
                 return "PS_INTERNET_HEADERS";
             case "00020329-0000-0000-C000-000000000046":
@@ -427,8 +406,7 @@ public class ShowNode extends BaseDialog {
         }
     }
 
-    private void show_entry_stream(TreeNodeContainer cont)
-    {
+    private void show_entry_stream(TreeNodeContainer cont) {
         StringBuilder sb = new StringBuilder();
         byte[] bytes = (byte[]) cont.getData();
 
@@ -470,7 +448,7 @@ public class ShowNode extends BaseDialog {
 
         for (int offset = 0; offset < bytes.length; offset += 8) {
 
-            sb.append( "NAME/CRC-32: ");
+            sb.append("NAME/CRC-32: ");
 
             int voffset = offset;
             for (int i = voffset + 3; i >= voffset; i--) {
@@ -488,22 +466,19 @@ public class ShowNode extends BaseDialog {
     private void show_data(TreeNodeContainer cont) {
         Object data = cont.getData();
 
-        if( data instanceof String )
-        {
-            jTHex.setText((String)data);
-        }
-        else if( data instanceof byte[] )
-        {
+        if (data instanceof String) {
+            jTHex.setText((String) data);
+        } else if (data instanceof byte[]) {
             StringBuilder sb = new StringBuilder();
             byte[] bytes = (byte[]) data;
 
-            for( int i = 0; i < bytes.length; i++ ) {
+            for (int i = 0; i < bytes.length; i++) {
 
-                if( i > 0 && i % 20 == 0 ) {
+                if (i > 0 && i % 20 == 0) {
                     sb.append("\n");
                 }
 
-                if( bytes[i] == 0 ) {
+                if (bytes[i] == 0) {
                     sb.append("__");
                 } else {
                     sb.append(String.format("%02X", bytes[i]));
@@ -511,8 +486,8 @@ public class ShowNode extends BaseDialog {
 
                 sb.append(" ");
 
-                if( bytes[i] > 30 && bytes[i] < 127 ) {
-                    sb.append(String.format("%c", (char)bytes[i]));
+                if (bytes[i] > 30 && bytes[i] < 127) {
+                    sb.append(String.format("%c", (char) bytes[i]));
                 } else {
                     sb.append(" ");
                 }
@@ -522,14 +497,14 @@ public class ShowNode extends BaseDialog {
 
             sb.append("\n\nASCII only\n");
 
-            for( int i = 0; i < bytes.length; i++ ) {
+            for (int i = 0; i < bytes.length; i++) {
 
-                if( i > 0 && i % 20 == 0 ) {
+                if (i > 0 && i % 20 == 0) {
                     sb.append("\n");
                 }
 
-                if( bytes[i] > 30 && bytes[i] < 127 ) {
-                    sb.append(String.format("%c", (char)bytes[i]));
+                if (bytes[i] > 30 && bytes[i] < 127) {
+                    sb.append(String.format("%c", (char) bytes[i]));
                 }
 
             }
@@ -538,7 +513,7 @@ public class ShowNode extends BaseDialog {
                 byte[] decBytes = new CompressedRTF().decompress(new ByteArrayInputStream(bytes));
                 sb.append("\n\ndecompressed TNEF\n\n");
                 sb.append(new String(decBytes));
-            } catch( Exception ex ) {
+            } catch (Exception ex) {
                 logger.error("failed decompressing", ex);
             }
 
@@ -549,7 +524,7 @@ public class ShowNode extends BaseDialog {
         }
     }
 
-    private void appendGuid(int voffset, byte[] bytes, StringBuilder sb) throws NumberFormatException {
+    private static void appendGuid(int voffset, byte[] bytes, StringBuilder sb) throws NumberFormatException {
         StringBuilder s_guid = new StringBuilder();
 
         // 15 Bytes GUID
@@ -567,13 +542,13 @@ public class ShowNode extends BaseDialog {
 
         sb.append(" GUID: ");
 
-        long guid = Long.valueOf(s_guid.toString(),16);
+        long guid = Long.valueOf(s_guid.toString(), 16);
 
         boolean is_string = (guid & 0x01) > 0;
 
         guid >>= 1;
 
-        sb.append(String.format("%04X",guid));
+        sb.append(String.format("%04X", guid));
         sb.append(" ");
         sb.append(is_string ? "STRING " : "NUM ");
         sb.append("\n");

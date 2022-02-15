@@ -5,6 +5,7 @@ import at.redeye.FrameWork.base.BaseDialog;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.utilities.StringUtils;
 import com.auxilii.msgparser.FieldInformation;
+import com.auxilii.msgparser.Ptyp;
 import org.apache.poi.poifs.filesystem.*;
 
 import javax.swing.*;
@@ -15,14 +16,12 @@ import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 
 public class MSGNavigator extends BaseDialog {
 
     public static final String SETTING_SHOW_SIZE = "MSG_NAVIGATOR_SHOW_SIZE";
     public static final String SETTING_AUTOSAVE = "MSG_SETTING_AUTOSAVE";
     public static final String PROPERTIES_ENTRY = "__properties_version1.0";
-    public static final String SUBSTORAGE_PREFIX = "__substg1.0_";
 
     private POIFSFileSystem fs;
     private final File file;
@@ -65,12 +64,7 @@ public class MSGNavigator extends BaseDialog {
 
         setting_show_size = StringUtils.isYes(root.getSetup().getLocalConfig(SETTING_SHOW_SIZE, "true"));
 
-        EventQueue.invokeLater(() -> new AutoMBox(MSGNavigator.class.getName()) {
-            @Override
-            public void do_stuff() throws Exception {
-                parse(file);
-            }
-        });
+        EventQueue.invokeLater(() -> new AutoMBox(MSGNavigator.class.getName(), () -> parse(file)));
     }
 
     void parse(File file) throws IOException {
@@ -97,7 +91,7 @@ public class MSGNavigator extends BaseDialog {
             return parseDirectory((DirectoryEntry) entry);
         }
         DocumentEntry de = (DocumentEntry) entry;
-        if (de.getName().startsWith(SUBSTORAGE_PREFIX)) {
+        if (de.getName().startsWith(Ptyp.SUBSTORAGE_PREFIX)) {
             return parseSubStrorage(de);
         }
         if (de.getName().equals(PROPERTIES_ENTRY)) {
@@ -115,43 +109,34 @@ public class MSGNavigator extends BaseDialog {
     }
 
     private MutableTreeNode parseSubStrorage(DocumentEntry de) throws IOException {
-        try (DocumentInputStream dstream = new DocumentInputStream(de)) {
-            FieldInformation info = analyzeSubStorage(de);
-
-            StringBuilder sb = new StringBuilder()
-                    .append("<html><body>")
-                    .append(de.getName())
-                    .append("&nbsp;&nbsp;&nbsp;")
-                    .append("<code style=\"color: green\">")
-                    .append(info.getId())
-                    .append("</code> ");
-
-            if (setting_show_size) {
-                sb.append(" ").append(de.getSize()).append("b ");
-            }
-
-            Object data = getData(dstream, info);
-            if (data instanceof String) {
-                String s = (String) data;
-                if (s.length() > 100) {
-                    s = s.substring(0, 100) + "...";
-                }
-
-                sb.append("     <i>").append(s).append("</i>");
-            }
-            if (data instanceof byte[]) {
-                sb.append("     <i style=\"color: dd5555\">byte array</i>");
-            }
-            sb.append("</body></html>");
-            return new TreeNodeContainer(de, sb.toString(), data);
+        FieldInformation info = new FieldInformation(de);
+        StringBuilder sb = new StringBuilder()
+                .append("<html><body>")
+                .append(de.getName())
+                .append("&nbsp;&nbsp;&nbsp;")
+                .append("<code style=\"color: green\">")
+                .append(info.getId())
+                .append("</code> ");
+        if (setting_show_size) {
+            sb.append(" ").append(de.getSize()).append("b ");
         }
+
+        Object data = info.getData();
+        if (data instanceof String) {
+            sb.append("     <i>").append(StringUtils.limitLength((String) data, 100)).append("</i>");
+        }
+        if (data instanceof byte[]) {
+            sb.append("     <i style=\"color: dd5555\">byte array</i>");
+        }
+        sb.append("</body></html>");
+        return new TreeNodeContainer(de, sb.toString(), data);
     }
 
     private static MutableTreeNode parseProperties(DocumentEntry de) throws IOException {
-        PropertyParser pp = new PropertyParser(de);
         TreeNodeContainer node = new TreeNodeContainer(de,
                 "<html><body><b>" + de.getName() + "</b></body></html>",
                 new DocumentInputStream(de).readAllBytes());
+        PropertyParser pp = new PropertyParser(de);
         for (String tag : pp.getPropertyTags()) {
             TreeNodeContainer pnode = new TreeNodeContainer(de,
                     "<html><body><pre style=\"font-family: monospace; fonz-size:8px\">" + tag + "</pre></body></html>",
@@ -159,30 +144,6 @@ public class MSGNavigator extends BaseDialog {
             node.add(pnode);
         }
         return node;
-    }
-
-    public static FieldInformation analyzeSubStorage(DocumentEntry de) {
-        String name = de.getName();
-        String val = name.substring(SUBSTORAGE_PREFIX.length()).toLowerCase();
-        String tag = val.substring(0, 4);
-        String type = val.substring(4, 8);
-        return new FieldInformation(tag, type);
-    }
-
-    private static Object getData(DocumentInputStream dstream, FieldInformation info) throws IOException {
-        switch (info.getType()) {
-            case PtypString8:
-            case PtypMultipleString8:
-                return new String(dstream.readAllBytes(), StandardCharsets.ISO_8859_1);
-            case PtypString:
-            case PtypMultipleString:
-                return new String(dstream.readAllBytes(), StandardCharsets.UTF_16LE);
-            case PtypBinary:
-            case PtypMultipleBinary:
-                return dstream.readAllBytes();
-        }
-        logger.warn("Unsupported field type " + info.getType());
-        return null;
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -232,7 +193,6 @@ public class MSGNavigator extends BaseDialog {
                 tree.setSelectionPath(path);
             }
 
-
             JPopupMenu popup = new NavActionPopup(this);
 
             popup.show(evt.getComponent(), evt.getX(), evt.getY());
@@ -240,32 +200,28 @@ public class MSGNavigator extends BaseDialog {
     }//GEN-LAST:event_treeMouseClicked
 
     public void deleteSelectedElement() {
-        new AutoMBox(this.getClass().getName()) {
+        new AutoMBox(this.getClass().getName(), () -> {
+            TreePath path = tree.getSelectionPath();
 
-            @Override
-            public void do_stuff() throws Exception {
-                TreePath path = tree.getSelectionPath();
-
-                if (path == null) {
-                    return;
-                }
-
-                TreeNodeContainer cont = (TreeNodeContainer) path.getLastPathComponent();
-
-                logger.info("deleting : " + cont.getEntry().getName());
-
-                TopLevelPropertyStream tops = new TopLevelPropertyStream(fs.getRoot());
-                tops.delete(cont.getEntry());
-
-                cont.removeFromParent();
-                tree.updateUI();
-
-                if (StringUtils.isYes(root.getSetup().getLocalConfig(SETTING_AUTOSAVE, "false"))) {
-                    save();
-                    reload();
-                }
+            if (path == null) {
+                return;
             }
-        };
+
+            TreeNodeContainer cont = (TreeNodeContainer) path.getLastPathComponent();
+
+            logger.info("deleting : " + cont.getEntry().getName());
+
+            TopLevelPropertyStream tops = new TopLevelPropertyStream(fs.getRoot());
+            tops.delete(cont.getEntry());
+
+            cont.removeFromParent();
+            tree.updateUI();
+
+            if (StringUtils.isYes(root.getSetup().getLocalConfig(SETTING_AUTOSAVE, "false"))) {
+                save();
+                reload();
+            }
+        });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

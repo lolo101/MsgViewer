@@ -8,14 +8,11 @@ import org.apache.poi.poifs.filesystem.DirectoryEntry;
 import java.io.IOException;
 import java.io.InputStream;
 
-/**
- * @author martin
- */
-public abstract class SubstGEntry {
+public abstract class SubStorageEntry {
     protected final Ptyp type;
     protected final Pid tag;
 
-    public SubstGEntry(Pid tag, Ptyp type) {
+    public SubStorageEntry(Pid tag, Ptyp type) {
         this.tag = tag;
         this.type = type;
     }
@@ -32,7 +29,7 @@ public abstract class SubstGEntry {
 
     public final void createEntry(DirectoryEntry dir) throws IOException {
         InputStream stream = createEntryContent();
-        dir.createDocument(String.format("__substg1.0_%04X%04X", tag.id, type.id), stream);
+        dir.createDocument(String.format(Ptyp.SUBSTORAGE_PREFIX + "%04X%04X", tag.id, type.id), stream);
     }
 
     protected abstract InputStream createEntryContent() throws IOException;

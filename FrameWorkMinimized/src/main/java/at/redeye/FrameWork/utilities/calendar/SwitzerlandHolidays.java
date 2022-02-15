@@ -1,19 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.utilities.calendar;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Vector;
-import org.joda.time.LocalDate;
 
-
-/**
- *
- * @author Administrator
- */
 public class SwitzerlandHolidays extends BaseHolidays implements Holidays {
 
     public static String myCountryCode = "CH";
@@ -30,10 +20,6 @@ public class SwitzerlandHolidays extends BaseHolidays implements Holidays {
 
         // siehe http://de.wikipedia.org/wiki/Feiertage_in_der_Schweiz
         Vector<HolidayInfo> res = new Vector<>();
-
-        Easterformular easter_formular = new Easterformular(year);
-
-        int day = easter_formular.easterday();
 
         LocalDate easter = getEaster(year);
 

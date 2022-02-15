@@ -1,7 +1,7 @@
 package net.sourceforge.MSGViewer;
 
 import at.redeye.FrameWork.base.AutoMBox;
-import at.redeye.FrameWork.base.BaseDialogBase;
+import at.redeye.FrameWork.base.BaseDialog;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.base.Setup;
 import at.redeye.FrameWork.base.imagestorage.ImageUtils;
@@ -15,79 +15,138 @@ import com.auxilii.msgparser.attachment.FileAttachment;
 import com.auxilii.msgparser.attachment.MsgAttachment;
 import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.StartTag;
-import net.sourceforge.MSGViewer.factory.MessageParserFactory;
+import net.sourceforge.MSGViewer.factory.MessageParser;
+import net.sourceforge.MSGViewer.factory.MessageSaver;
 
 import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 import javax.swing.text.EditorKit;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 import java.awt.*;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
 import java.awt.image.BufferedImage;
+import java.awt.print.PageFormat;
+import java.awt.print.Printable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
-import java.util.List;
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+import java.util.regex.Pattern;
 
 import static at.redeye.FrameWork.base.BaseDialog.logger;
 import static java.util.stream.Collectors.joining;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
-public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener {
+public class ViewerPanel extends JPanel implements Printable, MessageView {
 
-    private String bodyText = null;
+    public static final String FILE_NAME_PROPERTY = "file_name";
+    private static final Pattern RTF_FONT_SIZE_PATTERN = Pattern.compile("(\\\\fs)([0-9]+)");
+    private String bodyText;
     private Message message;
-    private ViewerHelper helper = null;
-    private Root root = null;
+    private ViewerHelper helper;
+    private Root root;
     private String file_name;
-    private OpenNewMailInterface open_new_mail_handler = null;
-    private BaseDialogBase parent = null;
-    private final MessageParserFactory parser_factory = new MessageParserFactory();
+    private OpenNewMailInterface open_new_mail_handler;
+    private BaseDialog parent;
 
     private final ExecutorService thread_pool = Executors.newCachedThreadPool();
     private int wating_thread_pool_counter = 0;
 
-    /**
-     * Creates new form ViewerPanel
-     */
     public ViewerPanel() {
         initComponents();
-
-        header.addHyperlinkListener(this);
-        body.addHyperlinkListener(this);
-
-        JCBfix.setEnabled(jRText.isSelected());
+        new DropTarget(header, DnDConstants.ACTION_COPY_OR_MOVE, new EditorDropTarget(this), true, null);
+        new DropTarget(body, DnDConstants.ACTION_COPY_OR_MOVE, new EditorDropTarget(this), true, null);
     }
 
-    public void setRoot( Root root, BaseDialogBase parent )
-    {
+    public void setRoot(Root root, BaseDialog parent) {
         this.parent = parent;
         this.root = root;
         helper = new ViewerHelper(root);
 
-        boolean rtfFormat = StringUtils.isYes(root.getSetup().getLocalConfig("RTFFormat", "yes") );
+        boolean rtfFormat = StringUtils.isYes(root.getSetup().getLocalConfig("RTFFormat", "yes"));
         jRRTF.setSelected(rtfFormat);
         jRText.setSelected(!rtfFormat);
 
-        JCBfix.setSelected(StringUtils.isYes(root.getSetup().getLocalConfig("FixedFont","no" ) ) );
+        JCBfix.setSelected(StringUtils.isYes(root.getSetup().getLocalConfig("FixedFont", "no")));
         JCBfix.setEnabled(jRText.isSelected());
 
-        jSplitPane.setDividerLocation(Integer.parseInt(root.getSetup().getLocalConfig("DividerLocation","150")));
+        jSplitPane.setDividerLocation(Integer.parseInt(root.getSetup().getLocalConfig("DividerLocation", "150")));
+        header.setText(parent.MlM("Drag a msg file into this window"));
     }
 
-    public void setopenNewMailInterface( OpenNewMailInterface open_new_mail_handler )
-    {
+    public void setOpenNewMailInterface(OpenNewMailInterface open_new_mail_handler) {
         this.open_new_mail_handler = open_new_mail_handler;
+    }
+
+    public void view(String file_name) {
+        logger.info("filename: " + file_name);
+
+        if (file_name.startsWith("file://")) {
+            file_name = URLDecoder.decode(file_name, StandardCharsets.UTF_8);
+            file_name = file_name.substring(7);
+        }
+
+        if (message == null) {
+            parse(file_name);
+            firePropertyChange(FILE_NAME_PROPERTY, null, file_name);
+        } else {
+            open_new_mail_handler.openMail(file_name);
+        }
+    }
+
+    @Override
+    public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) {
+        int pageTop = (int) (pageFormat.getImageableHeight() * pageIndex);
+        double bodyScale = pageFormat.getImageableWidth() / body.getWidth();
+        if (pageTop >= fullHeight(bodyScale)) {
+            return NO_SUCH_PAGE;
+        }
+        printPage(graphics, pageFormat, pageTop, bodyScale);
+        return PAGE_EXISTS;
+    }
+
+    private void printPage(Graphics graphics, PageFormat pageFormat, int pageTop, double bodyScale) {
+        Graphics2D g2d = (Graphics2D) graphics.create(
+                (int) pageFormat.getImageableX(),
+                (int) pageFormat.getImageableY(),
+                (int) pageFormat.getImageableWidth(),
+                (int) pageFormat.getImageableHeight());
+        int headerHeight = header.getHeight();
+        if (pageTop < headerHeight) {
+            printHeader(g2d, pageTop, headerHeight, (int) pageFormat.getImageableWidth());
+        }
+        printBody(g2d, pageTop, headerHeight, bodyScale);
+        g2d.dispose();
+    }
+
+    private void printHeader(Graphics2D g2d, int pageTop, int headerHeight, int pageWidth) {
+        int lineY = headerHeight - pageTop - 1;
+        g2d.translate(0, -pageTop);
+        header.print(g2d);
+        g2d.drawLine(0, lineY, pageWidth, lineY);
+    }
+
+    private void printBody(Graphics2D g2d, int pageTop, int headerHeight, double scale) {
+        g2d.translate(0, headerHeight - pageTop);
+        g2d.scale(scale, scale);
+        body.print(g2d);
+    }
+
+    private double fullHeight(double bodyScale) {
+        return header.getHeight() + body.getHeight() * bodyScale;
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -96,9 +155,11 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
         jSplitPane = new javax.swing.JSplitPane();
         javax.swing.JScrollPane headerScrollPane = new javax.swing.JScrollPane();
         header = new javax.swing.JEditorPane();
+        header.addPropertyChangeListener("paintingForPrint", new PrintListener());
         javax.swing.JPanel MainPanel = new javax.swing.JPanel();
         javax.swing.JScrollPane bodyScrollPane = new javax.swing.JScrollPane();
         body = new javax.swing.JEditorPane();
+        body.addPropertyChangeListener("paintingForPrint", new PrintListener());
         javax.swing.JPanel buttonsPanel = new javax.swing.JPanel();
         jRRTF = new javax.swing.JRadioButton();
         jRText = new javax.swing.JRadioButton();
@@ -109,11 +170,13 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
         jSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
         header.setEditable(false);
+        header.addHyperlinkListener(this::headerHyperlinkUpdate);
         headerScrollPane.setViewportView(header);
 
         jSplitPane.setTopComponent(headerScrollPane);
 
         body.setEditable(false);
+        body.addHyperlinkListener(this::bodyHyperlinkUpdate);
         bodyScrollPane.setViewportView(body);
 
         jRRTF.setText("RTF");
@@ -123,6 +186,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
         jRText.addActionListener(this::jRTextActionPerformed);
 
         JCBfix.setText("Fixed Font");
+        JCBfix.setEnabled(jRText.isSelected());
         JCBfix.addActionListener(this::JCBfixActionPerformed);
 
         jSFontSize.addChangeListener(this::jSFontSizeStateChanged);
@@ -132,45 +196,45 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
         javax.swing.GroupLayout buttonsPanelLayout = new javax.swing.GroupLayout(buttonsPanel);
         buttonsPanel.setLayout(buttonsPanelLayout);
         buttonsPanelLayout.setHorizontalGroup(
-            buttonsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(buttonsPanelLayout.createSequentialGroup()
-                .addComponent(jRRTF)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jRText)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(JCBfix)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSFontSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(fontSizeLabel)
-                .addGap(0, 95, Short.MAX_VALUE))
+                buttonsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(buttonsPanelLayout.createSequentialGroup()
+                                .addComponent(jRRTF)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jRText)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(JCBfix)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jSFontSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(fontSizeLabel)
+                                .addGap(0, 95, Short.MAX_VALUE))
         );
         buttonsPanelLayout.setVerticalGroup(
-            buttonsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(buttonsPanelLayout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addGroup(buttonsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, buttonsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jRRTF)
-                        .addComponent(jRText)
-                        .addComponent(JCBfix))
-                    .addComponent(jSFontSize, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(fontSizeLabel, javax.swing.GroupLayout.Alignment.TRAILING)))
+                buttonsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(buttonsPanelLayout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addGroup(buttonsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, buttonsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                .addComponent(jRRTF)
+                                                .addComponent(jRText)
+                                                .addComponent(JCBfix))
+                                        .addComponent(jSFontSize, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(fontSizeLabel, javax.swing.GroupLayout.Alignment.TRAILING)))
         );
 
         javax.swing.GroupLayout MainPanelLayout = new javax.swing.GroupLayout(MainPanel);
         MainPanel.setLayout(MainPanelLayout);
         MainPanelLayout.setHorizontalGroup(
-            MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(buttonsPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(bodyScrollPane, javax.swing.GroupLayout.Alignment.TRAILING)
+                MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(buttonsPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(bodyScrollPane, javax.swing.GroupLayout.Alignment.TRAILING)
         );
         MainPanelLayout.setVerticalGroup(
-            MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(MainPanelLayout.createSequentialGroup()
-                .addComponent(bodyScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(buttonsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(MainPanelLayout.createSequentialGroup()
+                                .addComponent(bodyScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(buttonsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         jSplitPane.setRightComponent(MainPanel);
@@ -178,12 +242,12 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jSplitPane)
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jSplitPane, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -202,7 +266,7 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
             String tags = source.getAllStartTags().stream()
                     .map(StartTag::getName)
                     .map(t -> t + rule)
-                    .collect(Collectors.joining());
+                    .collect(joining());
 
             HTMLEditorKit html_editor = (HTMLEditorKit) editor;
             StyleSheet sheet = html_editor.getStyleSheet();
@@ -214,9 +278,8 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
         } else {
 
-            if( bodyText != null )
-            {
-                bodyText = bodyText.replaceAll("(\\\\fs)([0-9]+)", "$1" + ((jSFontSize.getValue())*2));
+            if (bodyText != null) {
+                bodyText = RTF_FONT_SIZE_PATTERN.matcher(bodyText).replaceAll("$1" + ((jSFontSize.getValue()) * 2));
                 System.out.println(bodyText);
                 body.setText(bodyText);
             }
@@ -233,431 +296,315 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
 
     private void jRTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRTextActionPerformed
 
-         jRRTF.setSelected(!jRText.isSelected());
-         JCBfix.setEnabled(jRText.isSelected());
-         updateBody();
+        jRRTF.setSelected(!jRText.isSelected());
+        JCBfix.setEnabled(jRText.isSelected());
+        updateBody();
     }//GEN-LAST:event_jRTextActionPerformed
 
     private void JCBfixActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JCBfixActionPerformed
-
         updateBody();
     }//GEN-LAST:event_JCBfixActionPerformed
 
-   private void updateBody()
-    {
-        if( message == null )
+    private void bodyHyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {//GEN-FIRST:event_bodyHyperlinkUpdate
+        hyperlinkUpdate(evt);
+    }//GEN-LAST:event_bodyHyperlinkUpdate
+
+    private void headerHyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {//GEN-FIRST:event_headerHyperlinkUpdate
+        hyperlinkUpdate(evt);
+    }//GEN-LAST:event_headerHyperlinkUpdate
+
+    private void updateBody() {
+        if (message == null)
             return;
 
-        if( jRRTF.isSelected() &&  message.getBodyRTF() != null &&  !message.getBodyRTF().isEmpty() )
-        {
-            if( message.getBodyRTF().contains("\\fromhtml") )
-            {
-                AutoMBox am = new AutoMBox(MainWin.class.getName()) {
+        bodyText();
 
-                    @Override
-                    public void do_stuff() throws Exception {
-                        logger.info("extracting HTML data from RTF Code");
-
-                        if( logger.isTraceEnabled() )
-                        {
-                            logger.trace("\n" + StringUtils.addLineNumbers(message.getBodyRTF()));
-                        }
-
-                        body.setContentType("text/html");
-                        bodyText = helper.extractHTMLFromRTF(message.getBodyRTF(),message);
-
-                        logger.trace(bodyText);
-                    }
-                };
-
-                if( am.isFailed() )
-                {
-                    body.setContentType("text/rtf");
-                    bodyText = message.getBodyRTF();
-                }
-            }
-            else
-            {
-                body.setContentType("text/rtf");
-                bodyText = message.getBodyRTF();
-            }
-        }
-        else if( message.getBodyHtml() != null )
-        {
-            PrepareImages prep_images = new PrepareImages(helper, message);
-
-            body.setContentType("text/html");
-            bodyText = prep_images.prepareImages(new StringBuilder(ViewerHelper.stripMetaTags(message.getBodyHtml())));
-        }
-        else
-        {
-            body.setContentType("text/plain");
-            bodyText = message.getBodyText();
-        }
+        logger.trace(bodyText);
 
         body.setText(bodyText);
         body.setCaretPosition(0);
     }
 
-    @Override
-    public void hyperlinkUpdate( final HyperlinkEvent e )
-    {
-        new AutoMBox(MainWin.class.getName()) {
+    private void bodyText() {
+        if (jRRTF.isSelected() && message.getBodyRTF() != null && !message.getBodyRTF().isEmpty()) {
+            if (message.getBodyRTF().contains("\\fromhtml")) {
+                AutoMBox am = new AutoMBox(MainWin.class.getName(), () -> {
+                    logger.info("extracting HTML data from RTF Code");
 
-            @Override
-            public void do_stuff() throws Exception {
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("\n" + StringUtils.addLineNumbers(message.getBodyRTF()));
+                    }
 
-                if (message == null) {
-                    return;
+                    body.setContentType("text/html");
+                    bodyText = helper.extractHTMLFromRTF(message.getBodyRTF(), message);
+                });
+
+                if (am.isFailed()) {
+                    body.setContentType("text/rtf");
+                    bodyText = message.getBodyRTF();
                 }
-
-                if (!e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
-                    return;
-                }
-
-                openUrl(e.getURL());
+            } else {
+                body.setContentType("text/rtf");
+                bodyText = message.getBodyRTF();
             }
-        };
+        } else if (message.getBodyHtml() != null) {
+            PrepareImages prep_images = new PrepareImages(helper, message);
+
+            body.setContentType("text/html");
+            bodyText = prep_images.prepareImages(ViewerHelper.stripMetaTags(message.getBodyHtml()));
+        } else {
+            body.setContentType("text/plain");
+            bodyText = message.getBodyText();
+        }
     }
 
-    public void openUrl(URL url) throws IOException
-    {
+    private void hyperlinkUpdate(final HyperlinkEvent e) {
+        new AutoMBox(ViewerPanel.class.getName(), () -> {
+            if (message != null && e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
+                openUrl(e.getURL());
+            }
+        });
+    }
+
+    public void openUrl(URL url) throws IOException {
         logger.info(url);
 
         final String protocol = url.getProtocol();
 
-        if( !protocol.equals("file") )
-        {
-            if (Setup.is_win_system()) {
-                logger.info("opening: " + url);
-
-                ShellExec shell = new ShellExec();
-                int ret = shell.execute(url.toString());
-                logger.debug("shell exec returned: " + ret);
-            } else {
-
-                String open_command = helper.getOpenCommand();
-
-                String command = open_command + " \"" + url + "\"";
-                logger.info(command);
-
-                String[] command_array = new String[2];
-
-                command_array[0] = open_command;
-                command_array[1] = url.toString();
-
-                Process p = Runtime.getRuntime().exec(command_array);
-            }
+        if (!protocol.equals("file")) {
+            open(url.toString());
             return;
         }
 
-        File content = helper.extractUrl(url,message);
+        File content = helper.extractUrl(url, message);
 
-        if( content == null )
-        {
+        if (content == null) {
             // maybe the url points to a local directory
             content = new File(url.getFile());
         }
 
-        if( ViewerHelper.is_mail_message(content.toString() ) ) {
+        if (ViewerHelper.is_mail_message(content.toString())) {
 
-            if( open_new_mail_handler != null )
-            {
-                open_new_mail_handler.openMail( root,content.toString() );
+            if (open_new_mail_handler != null) {
+                open_new_mail_handler.openMail(content.toString());
             }
         } else {
-
-            if (Setup.is_win_system() && root.getPlugin("ShellExec") != null ) {
-                logger.info("opening: " + content.getPath());
-
-                ShellExec shell = new ShellExec();
-                int ret = shell.execute(content.getPath());
-                logger.debug("shell exec returned: " + ret);
-            } else {
-                String open_command = helper.getOpenCommand();
-
-                String command = open_command + " \"" + content.getPath() + "\"";
-                logger.info(command);
-
-                String[] command_array = new String[2];
-
-                command_array[0] = open_command;
-                command_array[1] = content.getPath();
-
-                Process p = Runtime.getRuntime().exec(command_array);
-            }
+            open(content.getPath());
         }
 
     }
 
+    private void open(String path) throws IOException {
+        if (Setup.is_win_system() && root.getPlugin("ShellExec") != null) {
+            logger.info("opening: " + path);
 
-    public void parse(final String file_name)
-    {
-        if( file_name == null )
+            ShellExec shell = new ShellExec();
+            int ret = shell.execute(path);
+            logger.debug("shell exec returned: " + ret);
+        } else {
+            String open_command = helper.getOpenCommand();
+
+            logger.info(open_command + " \"" + path + "\"");
+
+            String[] command_array = new String[2];
+
+            command_array[0] = open_command;
+            command_array[1] = path;
+
+            Runtime.getRuntime().exec(command_array);
+        }
+    }
+
+    public void parse(final String file_name) {
+        if (file_name == null)
             return;
 
         this.file_name = file_name;
 
         parent.setWaitCursor();
 
-        new AutoMBox(MainWin.class.getName()) {
-
-                @Override
-                public void do_stuff() throws Exception {
-                    parse_int( file_name );
-                }
-            };
+        new AutoMBox(MainWin.class.getName(), this::doParse);
 
         parent.setNormalCursor();
     }
 
-    void cleanUp() {
-        message = null;
-    }
-
-    void parse_int(final String file_name) throws Exception
-    {
-        cleanUp();
-
+    private void doParse() throws Exception {
         wating_thread_pool_counter = 0;
 
+        parseMessage();
+        updateHeader();
+        updateBody();
+
+        if (wating_thread_pool_counter > 0) {
+            new AutoMBox(file_name, () -> {
+                thread_pool.shutdown();
+                if (wating_thread_pool_counter > 0) {
+                    thread_pool.awaitTermination(1, TimeUnit.DAYS);
+                }
+            });
+        }
+    }
+
+    private void parseMessage() throws Exception {
         File file = new File(file_name);
-
-        if( !file.exists() )
-            throw new FileNotFoundException( parent.MlM( String.format("File %s not found",file_name)) );
-
-        message = parser_factory.parseMessage(file);
-
-        final StringBuilder sb = new StringBuilder();
-
-        sb.append("<html>");
-        sb.append("<body style=\"\">");
-
-        sb.append("<b>");
-        if( message.getSubject() != null )
-            sb.append(message.getSubject());
-        sb.append("</b>");
-        sb.append("<br/>");
-
+        if (!file.exists())
+            throw new FileNotFoundException(parent.MlM(String.format("File %s not found", file_name)));
+        message = new MessageParser(file).parseMessage();
         logger.info("Message From:" + message.getFromName() + "\n To:" + message.getToName() + "\n Email: " + message.getFromEmail());
+    }
 
-        printFrom(sb);
-
-        if( message.getDate() != null )
-        {
-            sb.append(parent.MlM("Date: "));
-            sb.append(DateFormat.getDateTimeInstance().format(message.getDate()));
-            sb.append("<br/>");
-        }
-
-        printRecipients(sb, RecipientType.TO, "To: ");
-        printRecipients(sb, RecipientType.CC, "CC: ");
-        printRecipients(sb, RecipientType.BCC, "BCC: ");
-
-        List<Attachment> attachments = message.getAttachments();
-
-        final int max_icon_size = Integer.parseInt(root.getSetup().getLocalConfig(AppConfigDefinitions.IconSize));
-
-        for( Attachment att : attachments )
-        {
-            if( att instanceof FileAttachment)
-            {
-                final FileAttachment fatt = (FileAttachment) att;
-
-                File content = helper.getTempFile(fatt);
-
-                sb.append("<a href=\"");
-                sb.append(content.toURI());
-                sb.append("\">");
-
-                String mime_type = fatt.getMimeTag();
-
-                logger.info("<a href=\"" + content.toURI() + "\"> " + mime_type);
-
-                if( mime_type != null
-                        && ViewerHelper.is_image_mime_type(new MimeType(mime_type))
-                        && fatt.getSize() < 1024*1024*2 )
-                {
-                    File contentIcon = new File(content.getAbsolutePath() + "-small.jpg");
-                    if (!content.exists()) {
-
-                        write(content, fatt.getData());
-
-                        wating_thread_pool_counter++;
-
-                        thread_pool.execute(() -> {
-                            try {
-                                ImageIcon icon = ImageUtils.loadScaledImageIcon(fatt.getData(),
-                                                            fatt.toString(),
-                                                            max_icon_size, max_icon_size);
-
-                                BufferedImage bi = new BufferedImage(icon.getIconWidth(),icon.getIconHeight(),
-                                                        BufferedImage.TYPE_INT_RGB);
-
-                                Graphics2D g2 = bi.createGraphics();
-                                g2.drawImage(icon.getImage(), 0, 0, null);
-                                g2.dispose();
-
-                                ImageIO.write(bi, "jpg", contentIcon);
-
-                            } catch( IOException ex ) {
-                                logger.error(ex,ex);
-                            }
-
-                            wating_thread_pool_counter--;
-                        });
-                    }
-
-                    System.out.println(contentIcon);
-                    sb.append("<img border=0 src=\"");
-                    sb.append(contentIcon.toURI());
-                    sb.append("\"/> ");
-                }
-
-                if( ViewerHelper.is_mail_message(fatt.getFilename(), fatt.getMimeTag() ) ) {
-                    if (!content.exists())
-                    {
-                        write(content, fatt.getData());
-                    }
-
-                    sb.append("<img border=0 align=\"baseline\" src=\"");
-                    sb.append(helper.getMailIconFile().toURI());
-                    sb.append("\"/>");
-                }
-
-                sb.append(fatt);
-                sb.append("</a> ");
-
-            } else if( att instanceof MsgAttachment) {
-
-                MsgAttachment msgAtt = (MsgAttachment) att;
-                final Message msg = msgAtt.getMessage();
-
-                File sub_file = helper.getTempFile(msgAtt);
-
-                thread_pool.execute(() -> new AutoMBox(file_name) {
-                    @Override
-                    public void do_stuff() throws Exception {
-
-                        MessageParserFactory factory = new MessageParserFactory();
-                        factory.saveMessage(msg, sub_file);
-
-                    }
-                });
-
-                sb.append("<a href=\"");
-                sb.append(sub_file.toURI());
-                sb.append("\">");
-
-                sb.append("<img border=0 align=\"baseline\" src=\"");
-                sb.append(helper.getMailIconFile().toURI());
-                sb.append("\"/>");
-
-                sb.append(msg.getSubject());
-
-                sb.append("</a> &nbsp; ");
-            } else {
-                logger.error("unknown Attachment: " + att + " " + att.getClass().getName() );
-            }
-        }
-
-        sb.append("</body></html>");
+    private void updateHeader() throws MimeTypeParseException, IOException {
         header.setContentType("text/html");
-
-        if( wating_thread_pool_counter > 0 )
-        {
-            updateBody(); // do something different now
-
-            new AutoMBox(file_name) {
-
-                @Override
-                public void do_stuff() throws Exception {
-                    thread_pool.shutdown();
-
-                    if( wating_thread_pool_counter > 0 ) {
-                        thread_pool.awaitTermination(1, TimeUnit.DAYS);
-                    }
-                }
-            };
-
-            header.setText(sb.toString());
-            header.setCaretPosition(0);
-
-        } else {
-
-            header.setText(sb.toString());
-            header.setCaretPosition(0);
-
-            updateBody();
-        }
+        header.setText(headerHtml());
+        header.setCaretPosition(0);
     }
 
-    private void write(File content, byte[] data) {
-        wating_thread_pool_counter++;
-
-        thread_pool.execute(() -> {
-            try (FileOutputStream fout = new FileOutputStream(content)) {
-                fout.write(data);
-            } catch( IOException ex ) {
-                logger.error(ex,ex);
-            }
-
-            wating_thread_pool_counter--;
-        });
+    private String headerHtml() throws MimeTypeParseException, IOException {
+        return "<html><body>" + "<b>" + printSubject() + "</b><br/>"
+                + printLine("From: ", printFrom())
+                + printLine("Date: ", printDate())
+                + printLine("To: ", printRecipients(RecipientType.TO))
+                + printLine("CC: ", printRecipients(RecipientType.CC))
+                + printLine("BCC: ", printRecipients(RecipientType.BCC))
+                + printAttachments()
+                + "</body></html>";
     }
 
-    private void printFrom(StringBuilder sb) {
-        sb.append(parent.MlM("From: "));
-        if (message.getFromEmail() == null && message.getFromName() == null) {
-        } else if (message.getFromEmail() == null) {
-            sb.append(parent.MlM("From: ")).append(message.getFromName());
-        } else if (message.getFromName() == null) {
-            sb.append("<a href=\"mailto:");
-            sb.append(message.getFromEmail());
-            sb.append("\">");
-            sb.append(message.getFromEmail());
-        } else {
-            sb.append("<a href=\"mailto:");
-            sb.append(message.getFromEmail());
-            sb.append("\">");
-            sb.append(message.getFromName());
-        }
-
-        if( message.getFromEmail() != null && message.getFromEmail().contains("@") )
-        {
-            sb.append(" &lt;");
-            sb.append(message.getFromEmail());
-            sb.append("&gt;");
-        }
-
-        sb.append("</a>");
-        sb.append("<br/>");
+    private String printLine(String label, String value) {
+        return isBlank(value) ? "" : parent.MlM(label) + value + "<br/>";
     }
 
-    private void printRecipients(StringBuilder sb, RecipientType to, String s) {
+    private String printSubject() {
+        String subject = message.getSubject();
+        return subject == null ? "" : subject;
+    }
+
+    private String printFrom() {
+        String messageFromName = message.getFromName();
+        String messageFromEmail = ViewerHelper.isValidEmail(message.getFromEmail())
+                ? message.getFromEmail()
+                : message.getFromSMTPAddress();
+        return mailTo(messageFromName, messageFromEmail);
+    }
+
+    private String printDate() {
+        Date date = message.getDate();
+        return date == null ? "" : DateFormat.getDateTimeInstance().format(date);
+    }
+
+    private String printRecipients(RecipientType to) {
         String recipientsTo = message.getRecipients().stream()
                 .filter(r -> r.getType() == to)
                 .map(ViewerPanel::asMailto)
                 .collect(joining("; "));
-        if (isNotBlank(recipientsTo)) {
-            sb.append(parent.MlM(s));
-            sb.append(recipientsTo);
-            sb.append("<br/>");
+        return isBlank(recipientsTo) ? "" : recipientsTo;
+    }
+
+    private String printAttachments() throws MimeTypeParseException, IOException {
+        StringBuilder sb = new StringBuilder();
+        for (Attachment att : message.getAttachments()) {
+            sb.append(printAttachment(att));
+        }
+        return sb.toString();
+    }
+
+    private String printAttachment(Attachment att) throws MimeTypeParseException, IOException {
+        if (att instanceof FileAttachment) {
+            return printFileAttachment((FileAttachment) att);
+        }
+        if (att instanceof MsgAttachment) {
+            return printMsgAttachment((MsgAttachment) att);
+        }
+        logger.error("unknown Attachment: " + att + " " + att.getClass().getName());
+        return "";
+    }
+
+    private String printFileAttachment(FileAttachment att) throws MimeTypeParseException, IOException {
+        File content = helper.getTempFile(att);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("<a href=\"");
+        sb.append(content.toURI());
+        sb.append("\">");
+
+        String mime_type = att.getMimeTag();
+
+        logger.info("<a href=\"" + content.toURI() + "\"> " + mime_type);
+
+        if (mime_type != null
+                && ViewerHelper.is_image_mime_type(new MimeType(mime_type))
+                && att.getSize() < 1024 * 1024 * 2) {
+            File thumbnailFile = new File(content.getAbsolutePath() + "-small.jpg");
+            if (!content.exists()) {
+                write(content, att.getData());
+                async(() -> printThumbnail(att, thumbnailFile));
+            }
+
+            sb.append("<img border=0 src=\"").append(thumbnailFile.toURI()).append("\"/> ");
+        }
+
+        if (ViewerHelper.is_mail_message(att.getFilename())) {
+            if (!content.exists()) {
+                write(content, att.getData());
+            }
+
+            sb.append(helper.printMailIconHtml());
+        }
+
+        sb.append(att);
+        sb.append("</a> ");
+        return sb.toString();
+    }
+
+    private String printMsgAttachment(MsgAttachment att) throws IOException {
+        final Message msg = att.getMessage();
+
+        File sub_file = helper.getTempFile(att);
+
+        async(() -> new AutoMBox(file_name, () -> new MessageSaver(msg).saveMessage(sub_file)));
+
+        return "<a href=\"" + sub_file.toURI() + "\">" + helper.printMailIconHtml() + msg.getSubject() + "</a>&nbsp;";
+    }
+
+    private void printThumbnail(FileAttachment att, File thumbnailFile) {
+        try {
+            final int max_icon_size = Integer.parseInt(root.getSetup().getLocalConfig(AppConfigDefinitions.IconSize));
+            ImageIcon icon = ImageUtils.loadScaledImageIcon(att.getData(), att.toString(), max_icon_size, max_icon_size);
+            BufferedImage bi = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_RGB);
+            Graphics2D g2 = bi.createGraphics();
+            g2.drawImage(icon.getImage(), 0, 0, null);
+            g2.dispose();
+
+            ImageIO.write(bi, "jpg", thumbnailFile);
+        } catch (IOException ex) {
+            logger.error(ex, ex);
         }
     }
 
     private static String asMailto(RecipientEntry recipient) {
         String name = recipient.getName();
-        String email = recipient.getEmail();
-        if (isNotBlank(email)) {
-            return "<a href='mailto:" + email + "'>" + (isNotBlank(name) ? name + " &lt;" + email + "&gt;" : email) + "</a>";
-        }
-        return name;
+        String mailTo = recipient.mailTo();
+        return mailTo(name, mailTo);
     }
 
-    public void dispose()
-    {
-        root.getSetup().setLocalConfig("RTFFormat",jRRTF.isSelected() ? "yes" : "no");
+    private static String mailTo(String name, String email) {
+        return isBlank(email)
+                ? name
+                : "<a href='mailto:" + email + "'>" + (isBlank(name) ? email : name + " &lt;" + email + "&gt;") + "</a>";
+    }
+
+    private void write(File content, byte[] data) {
+        async(() -> {
+            try (FileOutputStream fout = new FileOutputStream(content)) {
+                fout.write(data);
+            } catch (IOException ex) {
+                logger.error(ex, ex);
+            }
+        });
+    }
+
+    public void dispose() {
+        root.getSetup().setLocalConfig("RTFFormat", jRRTF.isSelected() ? "yes" : "no");
         root.getSetup().setLocalConfig("FixedFont", JCBfix.isSelected() ? "yes" : "no");
         root.getSetup().setLocalConfig("DividerLocation", String.valueOf(jSplitPane.getDividerLocation()));
 
@@ -675,23 +622,32 @@ public class ViewerPanel extends javax.swing.JPanel implements HyperlinkListener
     // End of variables declaration//GEN-END:variables
 
     public Message getMessage() {
-       return message;
+        return message;
     }
 
     public void exportFile(File export_file) throws Exception {
-        parser_factory.saveMessage(message, export_file);
+        if (message == null) {
+            JOptionPane.showMessageDialog(parent,
+                    root.MlM("No message to save"),
+                    root.MlM("Error"),
+                    JOptionPane.ERROR_MESSAGE);
+        }
+        new MessageSaver(message).saveMessage(export_file);
     }
 
-    public String getFileName()
-    {
+    public String getFileName() {
         return file_name;
-    }
-
-    public JEditorPane getHeaderPane() {
-        return header;
     }
 
     public JEditorPane getBodyPane() {
         return body;
+    }
+
+    private void async(Runnable runnable) {
+        wating_thread_pool_counter++;
+        thread_pool.execute(() -> {
+            runnable.run();
+            wating_thread_pool_counter--;
+        });
     }
 }

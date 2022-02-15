@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.base;
 
 import at.redeye.FrameWork.base.bindtypes.DBStrukt;
@@ -13,312 +8,289 @@ import at.redeye.FrameWork.base.prm.impl.PrmActionEvent;
 import at.redeye.FrameWork.base.transaction.Transaction;
 
 import java.io.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 
-/**
- *
- * @author martin
- */
 public class LocalSetup extends Setup {
 
-	String config_file;
-	String app_name;
-	Properties props;
-	Root root;
-	HashMap<String, DBConfig> global_config = null;
-	boolean initial_run = false;
-
-	public LocalSetup(Root root, String app_name) {
-		this.app_name = app_name;
-		this.root = root;
-
-		String config_name = app_name + ".properties";
+    String config_file;
+    String app_name;
+    Properties props;
+    Root root;
+    HashMap<String, DBConfig> global_config = null;
+    boolean initial_run = false;
+
+    public LocalSetup(Root root, String app_name) {
+        this.app_name = app_name;
+        this.root = root;
 
-		config_file = getHiddenUserHomeFileName(config_name);
-
-		String new_location = getAppConfigFile(app_name, config_name);
+        String config_name = app_name + ".properties";
 
-		File file = new File(new_location);
+        config_file = getHiddenUserHomeFileName(config_name);
 
-		if (file.exists()) {
-			config_file = new_location;
-			check();
-		} else {
-			check();
-			config_file = new_location;
-			saveConfig();
-		}
-	}
+        String new_location = getAppConfigFile(app_name, config_name);
 
-	private void check() {
-		if (props == null) {
-			loadProps();
-		}
+        File file = new File(new_location);
 
-	}
+        if (file.exists()) {
+            config_file = new_location;
+            check();
+        } else {
+            check();
+            config_file = new_location;
+            saveConfig();
+        }
+    }
 
-	private boolean checkGlobal() {
-		if (global_config == null) {
-			return loadGlobalProps();
-		}
+    private void check() {
+        if (props == null) {
+            loadProps();
+        }
+    }
 
-		return true;
-	}
+    private boolean checkGlobal() {
+        return global_config != null || loadGlobalProps();
 
-	public boolean loadProps() {
-		props = new Properties();
+    }
 
-		try {
-			FileInputStream in = new FileInputStream(config_file);
-			props.load(in);
-			in.close();
+    public void loadProps() {
+        props = new Properties();
 
-		} catch (FileNotFoundException e) {
+        try {
+            FileInputStream in = new FileInputStream(config_file);
+            props.load(in);
+            in.close();
 
-			initial_run = true;
+        } catch (FileNotFoundException e) {
 
-			return true;
+            initial_run = true;
 
-		} catch (IOException ioe) {
+        } catch (IOException ioe) {
 
-			System.err.println("Unhandled exception:");
-			ioe.printStackTrace();
-			return false;
-		}
+            System.err.println("Unhandled exception:");
+            ioe.printStackTrace();
+        }
+    }
+
+    public boolean saveProps() {
+        try {
+            Properties oldProps = new Properties();
+
+            try {
+                FileInputStream in = new FileInputStream(config_file);
+                oldProps.load(in);
+                in.close();
+            } catch (FileNotFoundException ex) {
+                logger.error("File " + config_file + " existiert noch nicht.");
+            }
+
+            Set<String> keys = oldProps.stringPropertyNames();
 
-		return true;
-	}
+            for (String currKey : keys) {
+                DBConfig c = LocalConfigDefinitions.get(currKey);
+                if (c != null) {
+                    PrmActionEvent event = new PrmActionEvent();
+                    event.setOldPrmValue(oldProps.getProperty(currKey, ""));
+                    event.setNewPrmValue(props.getProperty(currKey, ""));
+                    event.setParameterName(currKey);
+                    event.setPossibleVals(c.getPossibleValues());
+                    c.updateListeners(event);
+                }
+            }
 
-	public boolean saveProps() {
-		try {
-			Properties oldProps = new Properties();
+            FileOutputStream out = new FileOutputStream(config_file);
+            props.store(out, "nix");
+            out.close();
 
-			try {
-				FileInputStream in = new FileInputStream(config_file);
-				oldProps.load(in);
-				in.close();
-			} catch (FileNotFoundException ex) {
-				logger.error("File " + config_file + " existiert noch nicht.");
-			}
+        } catch (IOException ioe) {
 
-			Set keys = oldProps.keySet();
+            System.err.println("Unhandled exception:");
+            ioe.printStackTrace();
+            return false;
+        }
 
-			for (String currKey : (Iterable<String>) keys) {
-				DBConfig c = LocalConfigDefinitions.get(currKey);
-				if (c != null) {
-					PrmActionEvent event = new PrmActionEvent();
-					event.setOldPrmValue(oldProps.getProperty(currKey, ""));
-					event.setNewPrmValue(props.getProperty(currKey, ""));
-					event.setParameterName(currKey);
-					event.setPossibleVals(c.getPossibleValues());
-					c.updateListeners(event);
-				}
-			}
+        return true;
+    }
 
-			FileOutputStream out = new FileOutputStream(config_file);
-			props.store(out, "nix");
-			out.close();
+    public boolean loadGlobalProps() {
+        final DBConnection conn = root.getDBConnection();
 
-		} catch (IOException ioe) {
+        if (conn == null) {
+            return false;
+        }
 
-			System.err.println("Unhandled exception:");
-			ioe.printStackTrace();
-			return false;
-		}
+        Transaction trans = conn.getNewTransaction();
 
-		return true;
-	}
+        List<DBStrukt> all = trans.fetchTable(new DBConfig());
 
-	public boolean loadGlobalProps() {
-		final DBConnection conn = root.getDBConnection();
+        for (DBStrukt dbStrukt : all) {
+            DBConfig c = (DBConfig) dbStrukt;
 
-		if (conn == null) {
-			return false;
-		}
+            if (global_config == null) {
+                global_config = new HashMap<>();
+            }
 
-		Transaction trans = conn.getNewTransaction();
+            global_config.put(c.getConfigName(), c);
+        }
 
-		List<DBStrukt> all = trans.fetchTable(new DBConfig());
+        conn.closeTransaction(trans);
 
-		for (DBStrukt dbStrukt : all) {
-			DBConfig c = (DBConfig) dbStrukt;
+        if (global_config == null) {
+            // Noch kein Eintrag in der DB vorhanden...
+            global_config = new HashMap<>();
+        }
 
-			if (global_config == null) {
-				global_config = new HashMap<>();
-			}
+        return true;
+    }
 
-			global_config.put(c.getConfigName(), c);
-		}
+    public boolean saveGlobalProps() {
+        if (global_config == null)
+            return false;
 
-		conn.closeTransaction(trans);
+        final DBConnection conn = root.getDBConnection();
 
-		if (global_config == null) {
-			// Noch kein Eintrag in der DB vorhanden...
-			global_config = new HashMap<>();
-		}
+        if (conn == null)
+            return false;
 
-		return true;
-	}
+        AutoLogger al = new AutoLogger("LocalSetup", () -> {
+            Transaction trans = conn.getNewTransaction();
 
-	public boolean saveGlobalProps() {
-		if (global_config == null)
-			return false;
+            Set<String> keys = global_config.keySet();
 
-		final DBConnection conn = root.getDBConnection();
+            for (String key : keys) {
+                DBConfig c = global_config.get(key);
+                if (c.hasChanged()) {
+                    PrmActionEvent event = new PrmActionEvent();
+                    event.setParameterName(c.name);
+                    event.setOldPrmValue(c.getOldValue());
+                    event.setNewPrmValue(c.value);
+                    event.setPossibleVals(c.getPossibleValues());
+                    DefaultInsertOrUpdater.insertOrUpdateValuesWithPrimKey(
+                            trans, c);
+                    c.updateListeners(event);
+                    c.setChanged(false);
+                }
+            }
 
-		if (conn == null)
-			return false;
+            trans.commit();
+            conn.closeTransaction(trans);
+        });
 
-		AutoLogger al = new AutoLogger("LocalSetup") {
+        return !al.isFailed();
+    }
 
-			@Override
-			public void do_stuff() throws Exception {
-				result = Boolean.FALSE;
+    @Override
+    public String getLocalConfig(String key, String default_value) {
+        check();
+        return props.getProperty(key, default_value);
+    }
 
-				Transaction trans = conn.getNewTransaction();
+    @Override
+    public String getConfig(String key, String default_value) {
 
-				Set<String> keys = global_config.keySet();
+        if (!checkGlobal())
+            return default_value;
 
-				for (String key : keys) {
-					DBConfig c = global_config.get(key);
-					if (c.hasChanged()) {
-						PrmActionEvent event = new PrmActionEvent();
-						event.setParameterName(c.name);
-						event.setOldPrmValue(c.getOldValue());
-						event.setNewPrmValue(c.value);
-						event.setPossibleVals(c.getPossibleValues());
-						DefaultInsertOrUpdater.insertOrUpdateValuesWithPrimKey(
-								trans, c);
-						c.updateListeners(event);
-						c.setChanged(false);
-					}
-				}
+        DBConfig c = global_config.get(key);
 
-				trans.commit();
-				conn.closeTransaction(trans);
+        if (c != null)
+            return c.getConfigValue();
 
-				result = Boolean.TRUE;
-			}
+        c = GlobalConfigDefinitions.get(key);
 
-		};
+        if (c != null) {
+            global_config.put(key, c);
+            return c.getConfigValue();
+        }
 
-		return (Boolean) al.result;
-	}
+        c = new DBConfig(key, default_value);
+        global_config.put(key, c);
 
-	@Override
-	public String getLocalConfig(String key, String default_value) {
-		check();
-		return props.getProperty(key, default_value);
-	}
+        return default_value;
+    }
 
-	@Override
-	public String getConfig(String key, String default_value) {
+    @Override
+    public void setLocalConfig(String key, String value,
+                               boolean only_if_not_exists) {
 
-		if (!checkGlobal())
-			return default_value;
+        check();
 
-		DBConfig c = global_config.get(key);
+        if (props.getProperty(key) == null && only_if_not_exists) {
+            props.setProperty(key, value);
 
-		if (c != null)
-			return c.getConfigValue();
+        } else if (!only_if_not_exists) {
 
-		c = GlobalConfigDefinitions.get(key);
+            props.setProperty(key, value);
+        }
+    }
 
-		if (c != null) {
-			global_config.put(key, c);
-			return c.getConfigValue();
-		}
+    @Override
+    public void setLocalConfig(String key, String value) {
+        setLocalConfig(key, value, false);
+    }
 
-		c = new DBConfig(key, default_value);
-		global_config.put(key, c);
+    @Override
+    public void setConfig(String key, String value, boolean if_not_exists) {
 
-		return default_value;
-	}
+        if (!checkGlobal()) {
+            return;
+        }
 
-	@Override
-	public void setLocalConfig(String key, String value,
-			boolean only_if_not_exists) {
+        DBConfig c = global_config.get(key);
 
-		check();
+        if (c != null && if_not_exists)
+            return;
 
-		if (props.getProperty(key) == null && only_if_not_exists) {
-			props.setProperty(key, value);
+        if (c == null) {
+            c = GlobalConfigDefinitions.get(key);
 
-		} else if (!only_if_not_exists) {
+            if (c != null) {
+                c.setConfigValue(value);
+                c.setChanged();
+                global_config.put(key, c);
+                return;
+            }
 
-			props.setProperty(key, value);
-		}
-	}
+            c = new DBConfig(key, value);
+            c.setChanged();
+            global_config.put(key, c);
 
-	@Override
-	public void setLocalConfig(String key, String value) {
-		setLocalConfig(key, value, false);
-	}
+        } else {
 
-	@Override
-	public void setConfig(String key, String value, boolean if_not_exists) {
+            c.setChanged();
+            c.setConfigValue(value);
+        }
+    }
 
-		if (!checkGlobal()) {
-			return;
-		}
+    @Override
+    public void setConfig(String key, String value) {
+        setConfig(key, value, false);
+    }
 
-		DBConfig c = global_config.get(key);
+    @Override
+    public void saveConfig() {
+        saveProps();
+        saveGlobalProps();
+    }
 
-		if (c != null && if_not_exists)
-			return;
+    @Override
+    public DBConfig getConfig(String key) {
+        return checkGlobal() ? global_config.get(key) : null;
+    }
 
-		if (c == null) {
-			c = GlobalConfigDefinitions.get(key);
+    @Override
+    public DBConfig getLocalConfig(String key) {
+        return LocalConfigDefinitions.get(key);
+    }
 
-			if (c != null) {
-				c.setConfigValue(value);
-				c.setChanged();
-				global_config.put(key, c);
-				return;
-			}
-
-			c = new DBConfig(key, value);
-			c.setChanged();
-			global_config.put(key, c);
-
-		} else {
-
-			c.setChanged();
-			c.setConfigValue(value);
-		}
-	}
-
-	@Override
-	public void setConfig(String key, String value) {
-		setConfig(key, value, false);
-	}
-
-	@Override
-	public void saveConfig() {
-		saveProps();
-		saveGlobalProps();
-	}
-
-	@Override
-	public DBConfig getConfig(String key) {
-		if (!checkGlobal()) {
-			return null;
-		}
-		return (global_config.get(key));
-	}
-
-	@Override
-	public DBConfig getLocalConfig(String key) {
-		return LocalConfigDefinitions.get(key);
-	}
-
-	/**
-	 *
-	 * @return true if local property file was now created
-	 */
-	@Override
-	public boolean initialRun() {
-		return initial_run;
-	}
+    /**
+     * @return true if local property file was now created
+     */
+    @Override
+    public boolean initialRun() {
+        return initial_run;
+    }
 
 }

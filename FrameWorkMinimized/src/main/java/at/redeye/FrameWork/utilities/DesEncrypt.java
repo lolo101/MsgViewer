@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.utilities;
 
 import at.redeye.FrameWork.base.AutoLogger;
@@ -19,41 +14,33 @@ import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 
-/**
- *
- * @author martin
- */
-public class DesEncrypt
-{
+public class DesEncrypt {
     private static final byte[] salt = {
-        (byte)0x79,(byte)0x73,(byte)0xE3,(byte)0x67,(byte)0xE0,(byte)0xB9,(byte)0x31,(byte)0x08
+            (byte) 0x79, (byte) 0x73, (byte) 0xE3, (byte) 0x67, (byte) 0xE0, (byte) 0xB9, (byte) 0x31, (byte) 0x08
     };
 
     private Cipher encode;
     private Cipher decode;
 
-    public DesEncrypt( String password ) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException, InvalidKeyException, InvalidAlgorithmParameterException
-    {
-        init(password,false);
+    public DesEncrypt(String password) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException, InvalidKeyException, InvalidAlgorithmParameterException {
+        init(password, false);
     }
 
-    public DesEncrypt( String password , boolean decode_only ) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException, InvalidKeyException, InvalidAlgorithmParameterException
-    {
-        init(password,decode_only);
+    public DesEncrypt(String password, boolean decode_only) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException, InvalidKeyException, InvalidAlgorithmParameterException {
+        init(password, decode_only);
     }
 
-    private void init( String password, boolean decode_only ) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException, InvalidKeyException, InvalidAlgorithmParameterException
-    {
-        KeySpec keySpec = new PBEKeySpec(password.toCharArray(),salt, 19);
-        SecretKey key = SecretKeyFactory.getInstance( "PBEWithMD5AndDES").generateSecret(keySpec);
+    private void init(String password, boolean decode_only) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException, InvalidKeyException, InvalidAlgorithmParameterException {
+        KeySpec keySpec = new PBEKeySpec(password.toCharArray(), salt, 19);
+        SecretKey key = SecretKeyFactory.getInstance("PBEWithMD5AndDES").generateSecret(keySpec);
 
-        if( !decode_only )
+        if (!decode_only)
             encode = Cipher.getInstance(key.getAlgorithm());
 
         decode = Cipher.getInstance(key.getAlgorithm());
         AlgorithmParameterSpec paramSpec = new PBEParameterSpec(salt, 19);
 
-        if( !decode_only )
+        if (!decode_only)
             encode.init(Cipher.ENCRYPT_MODE, key, paramSpec);
 
         decode.init(Cipher.DECRYPT_MODE, key, paramSpec);
@@ -61,14 +48,9 @@ public class DesEncrypt
 
     /**
      * Ciphers a text with the given password. The resulting cyphered text is base64 encoded.
-     * @param str
-     * @return
-     * @throws IllegalBlockSizeException
-     * @throws BadPaddingException
      */
-    public String encrypt( String str ) throws IllegalBlockSizeException, BadPaddingException
-    {
-        if (str == null || encode == null ) {
+    public String encrypt(String str) throws IllegalBlockSizeException, BadPaddingException {
+        if (str == null || encode == null) {
             return null;
         }
 
@@ -79,11 +61,9 @@ public class DesEncrypt
     }
 
     /**
-     * decyphers a text, if the wrong password was given a exception will be thrown
+     * deciphers a text, if the wrong password was given a exception will be thrown
+     *
      * @param str a ciphered, bas64 encoded text
-     * @return
-     * @throws IllegalBlockSizeException
-     * @throws BadPaddingException
      */
     public String decrypt(String str) throws IllegalBlockSizeException, BadPaddingException {
         if (str == null) {
@@ -97,25 +77,20 @@ public class DesEncrypt
         return new String(decoded_utf8_str, StandardCharsets.UTF_8);
     }
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         final String passwd = "AberHallo";
         final String text = "Ein Hund kam in die Küche";
 
-        new AutoLogger(DesEncrypt.class.getName())
-        {
-            public void do_stuff() throws Exception
-            {
-                DesEncrypt en_cipher = new DesEncrypt( passwd );
-                DesEncrypt de_cipher = new DesEncrypt( passwd );
+        new AutoLogger(DesEncrypt.class.getName(), () -> {
+            DesEncrypt en_cipher = new DesEncrypt(passwd);
+            DesEncrypt de_cipher = new DesEncrypt(passwd);
 
-                String encoded = en_cipher.encrypt(text);
+            String encoded = en_cipher.encrypt(text);
 
-                System.out.println(encoded);
+            System.out.println(encoded);
 
-                System.out.println(de_cipher.decrypt(encoded));
-            }
-        };
+            System.out.println(de_cipher.decrypt(encoded));
+        });
 
     }
 }

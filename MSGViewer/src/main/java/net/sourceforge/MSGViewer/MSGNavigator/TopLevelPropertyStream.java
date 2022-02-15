@@ -1,9 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.sourceforge.MSGViewer.MSGNavigator;
 
+import com.auxilii.msgparser.Ptyp;
 import org.apache.poi.poifs.filesystem.DirectoryEntry;
 import org.apache.poi.poifs.filesystem.DocumentEntry;
 import org.apache.poi.poifs.filesystem.DocumentInputStream;
@@ -13,10 +10,6 @@ import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-/**
- *
- * @author martin
- */
 public class TopLevelPropertyStream
 {
     public static final String NAME = "__properties_version1.0";
@@ -83,11 +76,6 @@ public class TopLevelPropertyStream
 
         for( Entry entry : root )
         {
-            DocumentEntry de = null;
-
-            if( entry.isDocumentEntry() )
-                de = (DocumentEntry) entry;
-
             String name = entry.getName();
             // ignore myself
             if( name.equals(NAME) )
@@ -95,7 +83,7 @@ public class TopLevelPropertyStream
 
             String tagname = "";
 
-            if( name.startsWith("__substg1.0_") )
+            if( name.startsWith(Ptyp.SUBSTORAGE_PREFIX) )
                 tagname = name.substring(12);
 
             String tagtype = tagname.substring(4).toLowerCase();
@@ -110,7 +98,7 @@ public class TopLevelPropertyStream
             if( tagtype.equals("001f")) {
                 // PStringType
                 // length of the String UTF16-LE Coded + 2
-                String lenght_str  = String.format("%08x", de.getSize()+2);
+                String lenght_str  = String.format("%08x", ((DocumentEntry) entry).getSize()+2);
 
                 offset = insert(lenght_str, offset);
             }
@@ -132,8 +120,6 @@ public class TopLevelPropertyStream
     /**
      * deletes one entry and removes it's data from the property stream
      * entry.delete() is called by this function
-     * @param entry
-     * @throws IOException
      */
     void delete(Entry entry) throws IOException
     {
@@ -146,7 +132,7 @@ public class TopLevelPropertyStream
         if( entry.getName().startsWith("__substg_version1.0") )
             throw new  RuntimeException("unly __substg entries are supported yet" );
 
-        boolean found = false;
+        boolean absent = true;
 
         for( int offset = HEADER_SIZE; offset < bytes.length; offset+= 16 )
         {
@@ -157,7 +143,7 @@ public class TopLevelPropertyStream
                 tagname.append(formatByte0S(bytes[i]));
             }
 
-            if( ("__substg1.0_" + tagname).equals(entry.getName() ) )
+            if( (Ptyp.SUBSTORAGE_PREFIX + tagname).equals(entry.getName() ) )
             {
                 if( !entry.delete() )
                 {
@@ -169,12 +155,12 @@ public class TopLevelPropertyStream
                 System.arraycopy(bytes, 0,         new_bytes,  0,      offset);
                 System.arraycopy(bytes, offset+16, new_bytes, offset, new_bytes.length - offset );
                 bytes = new_bytes;
-                found = true;
+                absent = false;
                 break;
             }
         }
 
-        if( !found )
+        if(absent)
             throw new RuntimeException("entry not found");
 
         try {
@@ -198,7 +184,7 @@ public class TopLevelPropertyStream
         if( entry.getName().startsWith("__substg_version1.0") )
             throw new  RuntimeException("unly __substg entries are supported yet" );
 
-        boolean found = false;
+        boolean absent = true;
 
         for( int offset = HEADER_SIZE; offset < bytes.length; offset+= 16 )
         {
@@ -209,7 +195,7 @@ public class TopLevelPropertyStream
                 tagname.append(formatByte0S(bytes[i]));
             }
 
-            if( ("__substg1.0_" + tagname).equals(entry.getName() ) )
+            if( (Ptyp.SUBSTORAGE_PREFIX + tagname).equals(entry.getName() ) )
             {
                 String tagtype = tagname.toString().toLowerCase().substring(4);
 
@@ -227,12 +213,12 @@ public class TopLevelPropertyStream
                     insert(lenght_str, voffset);
                 }
 
-                found = true;
+                absent = false;
                 break;
             }
         }
 
-         if( !found )
+         if(absent)
             throw new RuntimeException("entry not found");
 
         try {

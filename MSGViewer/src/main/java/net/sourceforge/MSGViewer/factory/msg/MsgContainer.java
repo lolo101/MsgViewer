@@ -1,6 +1,7 @@
 package net.sourceforge.MSGViewer.factory.msg;
 
 import com.auxilii.msgparser.Message;
+import com.auxilii.msgparser.Ptyp;
 import com.auxilii.msgparser.RecipientEntry;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
@@ -21,6 +22,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.auxilii.msgparser.Pid.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 public class MsgContainer {
@@ -28,7 +30,7 @@ public class MsgContainer {
     public static final String NAMED_PROPERTY = "__nameid_version1.0";
 
     private final List<PropType> properties = new ArrayList<>();
-    private final List<SubstGEntry> substg_streams = new ArrayList<>();
+    private final List<SubStorageEntry> substg_streams = new ArrayList<>();
 
     private final List<RecipientEntry> recipients = new ArrayList<>();
     private final List<Attachment> attachments = new ArrayList<>();
@@ -36,12 +38,19 @@ public class MsgContainer {
     MsgContainer(Message msg) {
         if (msg.getSubject() != null) {
             addVarEntry(new SubjectEntry(msg.getSubject()));
+            addVarEntry(new StringUTF16SubstgEntry(PidTagNormalizedSubject, msg.getTopic()));
+            addVarEntry(new StringUTF16SubstgEntry(PidTagConversationTopic, msg.getTopic()));
+            addVarEntry(new StringUTF16SubstgEntry(PidTagSubjectPrefix, msg.getSubjectPrefix()));
         }
 
         addVarEntry(new MessageClassEntry());
 
         if (isNotEmpty(msg.getBodyText())) {
             addVarEntry(new BodyTextEntry(msg.getBodyText()));
+        }
+
+        if (isNotEmpty(msg.getBodyHtml())) {
+            addVarEntry(new BodyHtmlEntry(msg.getBodyHtml()));
         }
 
         if (msg.getCompressedRTF() != null) {
@@ -66,35 +75,40 @@ public class MsgContainer {
             addProperty(new PropPtypTime(PidTagClientSubmitTime, msg.getDate().getTime()));
         }
 
-        if (msg.getFromName() != null && !msg.getFromName().isEmpty()) {
-            addVarEntry(new StringUTF16SubstgEntry(PidTagSenderName, msg.getFromName()));
-        }
-
-        if (msg.getFromEmail() != null && !msg.getFromEmail().isEmpty()) {
-            addVarEntry(new StringUTF16SubstgEntry(PidTagSenderEmailAddress, msg.getFromEmail()));
-        }
-
-        if (msg.getToEmail() != null) {
-            addVarEntry(new StringUTF16SubstgEntry(PidTagEmailAddress, msg.getToEmail()));
-        }
-
-        if (msg.getToName() != null) {
-            addVarEntry(new StringUTF16SubstgEntry(PidTagDisplayName, msg.getToName()));
-        }
-
-        if (msg.getMessageId() != null && !msg.getMessageId().isEmpty()) {
+        if (isNotBlank(msg.getMessageId())) {
             addVarEntry(new StringUTF16SubstgEntry(PidTagInternetMessageId, msg.getMessageId()));
         }
 
-        if (msg.getDisplayTo() != null && !msg.getDisplayTo().isEmpty()) {
+        if (isNotBlank(msg.getFromName())) {
+            addVarEntry(new StringUTF16SubstgEntry(PidTagSenderName, msg.getFromName()));
+            addVarEntry(new StringUTF16SubstgEntry(PidTagSentRepresentingName, msg.getFromName()));
+        }
+
+        if (isNotBlank(msg.getFromEmail())) {
+            addVarEntry(new StringUTF16SubstgEntry(PidTagSenderEmailAddress, msg.getFromEmail()));
+            addVarEntry(new StringUTF16SubstgEntry(PidTagSentRepresentingEmailAddress, msg.getFromEmail()));
+        }
+
+        addVarEntry(new StringUTF16SubstgEntry(PidTagSenderAddressType, msg.getFromAddressType()));
+        addVarEntry(new StringUTF16SubstgEntry(PidTagSentRepresentingAddressType, msg.getFromAddressType()));
+
+        if (isNotBlank(msg.getToName())) {
+            addVarEntry(new StringUTF16SubstgEntry(PidTagDisplayName, msg.getToName()));
+        }
+
+        if (isNotBlank(msg.getToEmail())) {
+            addVarEntry(new StringUTF16SubstgEntry(PidTagEmailAddress, msg.getToEmail()));
+        }
+
+        if (isNotBlank(msg.getDisplayTo())) {
             addVarEntry(new StringUTF16SubstgEntry(PidTagDisplayTo, msg.getDisplayTo()));
         }
 
-        if (msg.getDisplayCc() != null && !msg.getDisplayCc().isEmpty()) {
+        if (isNotBlank(msg.getDisplayCc())) {
             addVarEntry(new StringUTF16SubstgEntry(PidTagDisplayCc, msg.getDisplayCc()));
         }
 
-        if (msg.getDisplayBcc() != null && !msg.getDisplayBcc().isEmpty()) {
+        if (isNotBlank(msg.getDisplayBcc())) {
             addVarEntry(new StringUTF16SubstgEntry(PidTagDisplayBcc, msg.getDisplayBcc()));
         }
 
@@ -132,7 +146,7 @@ public class MsgContainer {
             prop.writePropertiesEntry(bytes);
         }
 
-        for (SubstGEntry entry : substg_streams) {
+        for (SubStorageEntry entry : substg_streams) {
             entry.createEntry(root);
         }
 
@@ -152,7 +166,7 @@ public class MsgContainer {
         properties.add(prop);
     }
 
-    private void addVarEntry(SubstGEntry entry) {
+    private void addVarEntry(SubStorageEntry entry) {
         addProperty(entry.getPropType());
         substg_streams.add(entry);
     }
@@ -194,20 +208,20 @@ public class MsgContainer {
     private static void writeRecipientEntry(DirectoryEntry root, RecipientEntry rec, int id) throws IOException {
         DirectoryEntry rec_dir = root.createDirectory(String.format("__recip_version1.0_#%08X", id));
 
-        List<? extends SubstGEntry> entries = Arrays.asList(
+        List<? extends SubStorageEntry> entries = Arrays.asList(
                 new StringUTF16SubstgEntry(PidTagDisplayName, rec.getName()),
                 new StringUTF16SubstgEntry(PidTagAddressType, "SMTP"),
                 new StringUTF16SubstgEntry(PidTagEmailAddress, rec.getEmail())
         );
 
-        for (SubstGEntry entry : entries) {
+        for (SubStorageEntry entry : entries) {
             entry.createEntry(rec_dir);
         }
 
         List<PropType> props = new ArrayList<>();
         props.add(new PropPtypInteger32(PidTagRowid, id));
         props.add(new PropPtypInteger32(PidTagRecipientType, rec.getType().getValue()));
-        for (SubstGEntry entry : entries) {
+        for (SubStorageEntry entry : entries) {
             props.add(entry.getPropType());
         }
 
@@ -216,7 +230,7 @@ public class MsgContainer {
         createPropertyStreamEntry(bytes, rec_dir);
     }
 
-    private void writeAttachment(DirectoryEntry root, Attachment attachment, int id) throws IOException {
+    private static void writeAttachment(DirectoryEntry root, Attachment attachment, int id) throws IOException {
         DirectoryEntry att_dir = root.createDirectory(String.format("__attach_version1.0_#%08X", id));
         if (attachment instanceof FileAttachment) {
             writeFileAttachment((FileAttachment) attachment, att_dir);
@@ -227,7 +241,7 @@ public class MsgContainer {
     }
 
     private static void writeFileAttachment(FileAttachment attachment, DirectoryEntry att_dir) throws IOException {
-        List<? extends SubstGEntry> entries = Arrays.asList(
+        List<? extends SubStorageEntry> entries = Arrays.asList(
                 new BinaryEntry(PidTagAttachDataBinary, attachment.getData()),
                 new StringUTF16SubstgEntry(PidTagAttachExtension, attachment.getExtension()),
                 new StringUTF16SubstgEntry(PidTagAttachFilename, attachment.getFilename()),
@@ -235,12 +249,12 @@ public class MsgContainer {
                 new StringUTF16SubstgEntry(PidTagAttachMimeTag, attachment.getMimeTag())
         );
 
-        for (SubstGEntry entry : entries) {
+        for (SubStorageEntry entry : entries) {
             entry.createEntry(att_dir);
         }
 
         List<PropType> props = entries.stream()
-                .map(SubstGEntry::getPropType)
+                .map(SubStorageEntry::getPropType)
                 .collect(Collectors.toList());
 
         ByteBuffer bytes = createPropertiesEntryContent(props);
@@ -249,21 +263,11 @@ public class MsgContainer {
     }
 
     private static void writeMsgAttachment(MsgAttachment attachment, DirectoryEntry att_dir) throws IOException {
-        List<? extends SubstGEntry> entries = Collections.emptyList();
-
-        for (SubstGEntry entry : entries) {
-            entry.createEntry(att_dir);
-        }
-
-        List<PropType> props = entries.stream()
-                .map(SubstGEntry::getPropType)
-                .collect(Collectors.toList());
-
-        ByteBuffer bytes = createPropertiesEntryContent(props);
+        ByteBuffer bytes = createPropertiesEntryContent(Collections.emptyList());
 
         createPropertyStreamEntry(bytes, att_dir);
 
-        DirectoryEntry msg_dir = att_dir.createDirectory("__substg1.0_3701000D");
+        DirectoryEntry msg_dir = att_dir.createDirectory(Ptyp.SUBSTORAGE_PREFIX + "3701000D");
         writeMessage(attachment.getMessage(), msg_dir);
     }
 

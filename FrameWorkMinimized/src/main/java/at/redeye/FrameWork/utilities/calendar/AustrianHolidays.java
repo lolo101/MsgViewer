@@ -5,15 +5,10 @@
 
 package at.redeye.FrameWork.utilities.calendar;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Vector;
-import at.redeye.FrameWork.utilities.calendar.Holidays.HolidayInfo;
-import org.joda.time.LocalDate;
 
-/**
- *
- * @author Administrator
- */
 public class AustrianHolidays extends BaseHolidays implements Holidays {
 
     static String myCountryCode = "AT";

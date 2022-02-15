@@ -61,10 +61,7 @@ public class DBString extends DBValue {
 
     @Override
     public boolean acceptString(String s) {
-        if( s.length() > max_len )
-            return false;
-
-        return true;
+        return s.length() <= max_len;
     }
 
     @Override

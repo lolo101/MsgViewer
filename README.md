@@ -1,6 +1,8 @@
-[![Build Status](https://travis-ci.org/lolo101/MsgViewer.svg?branch=master)](https://travis-ci.org/lolo101/MsgViewer)
+[![CircleCI](https://circleci.com/gh/lolo101/MsgViewer.svg?style=shield)](https://app.circleci.com/pipelines/github/lolo101/MsgViewer)
+[![Build Status](https://travis-ci.com/lolo101/MsgViewer.svg?branch=master)](https://travis-ci.com/lolo101/MsgViewer)
 [![Codeship Status for lolo101/MsgViewer](https://app.codeship.com/projects/52c429a0-01fe-0135-ab0f-5a532b9c76c0/status?branch=master)](https://app.codeship.com/projects/213000)
-[![CodeScene Code Health](https://codescene.io/projects/2821/status-badges/code-health)](https://codescene.io/projects/2821)
+
+[![CodeScene general](https://codescene.io/images/analyzed-by-codescene-badge.svg)](https://codescene.io/projects/2821)
 
 # msgviewer
 

@@ -1,9 +1,3 @@
-/*
- * HelpWin.java
- *
- * Created on 7. März 2009, 12:01
- */
-
 package at.redeye.FrameWork.widgets.helpwindow;
 
 import at.redeye.FrameWork.base.AutoMBox;
@@ -11,101 +5,87 @@ import at.redeye.FrameWork.base.BaseDialogDialog;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.base.translation.MLUtil;
 
-/**
- *
- * @author martin
- */
 public class HelpWinModal extends BaseDialogDialog {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	String base = "";
-	HelpWinHook hook = null;
+    String base;
+    HelpWinHook hook = null;
 
-	/** Creates new form HelpWin */
-	public HelpWinModal(Root root, String Base, String ModuleName) {
-		super(root, "Hilfe");
+    /**
+     * Creates new form HelpWin
+     */
+    public HelpWinModal(Root root, String Base, String ModuleName) {
+        super(root, "Hilfe");
 
-		base = Base;
+        base = Base;
 
-		initComponents();
+        initComponents();
 
-                jHelp.addHyperlinkListener(new HyperlinkExecuter(root));
+        jHelp.addHyperlinkListener(new HyperlinkExecuter(root));
 
-		loadHelp(ModuleName);
-	}
+        loadHelp(ModuleName);
+    }
 
-	public HelpWinModal(Root root, String Base, String ModuleName, HelpWinHook hook) {
-		super(root, "Hilfe");
+    public HelpWinModal(Root root, String Base, String ModuleName, HelpWinHook hook) {
+        super(root, "Hilfe");
 
-		this.hook = hook;
-		base = Base;
+        this.hook = hook;
+        base = Base;
 
-		initComponents();
+        initComponents();
 
-                jHelp.addHyperlinkListener(new HyperlinkExecuter(root));
+        jHelp.addHyperlinkListener(new HyperlinkExecuter(root));
 
-		loadHelp(ModuleName);
-	}
+        loadHelp(ModuleName);
+    }
 
-	protected void loadHelp(final String ModuleName) {
-		new AutoMBox(ModuleName) {
+    protected void loadHelp(final String ModuleName) {
+        new AutoMBox(ModuleName, () -> {
 
-			@Override
-			public void do_stuff() throws Exception {
+            String locale = root.getDisplayLanguage();
 
-                            String locale = root.getDisplayLanguage();
+            String module_name = null;
 
-                            String module_name = null;
+            if (MLUtil.haveResource(HelpFileLoader.getResourceName(base, ModuleName + "_" + locale))) {
+                module_name = ModuleName + "_" + locale;
+            } else if (MLUtil.haveResource(HelpFileLoader.getResourceName(base, ModuleName + "_" + MLUtil.getLanguageOnly(locale)))) {
+                module_name = ModuleName + "_" + MLUtil.getLanguageOnly(locale);
+            } else {
+                if (!MLUtil.compareLanguagesOnly(root.getBaseLanguage(), root.getDisplayLanguage())) {
+                    if (MLUtil.haveResource(HelpFileLoader.getResourceName(base, ModuleName + "_" + MLUtil.getLanguageOnly(root.getDefaultLanguage()))))
+                        module_name = ModuleName + "_" + MLUtil.getLanguageOnly(root.getDefaultLanguage());
+                }
+            }
 
-                            if( MLUtil.haveResource(HelpFileLoader.getResourceName(base, ModuleName + "_" + locale) ) )
-                            {
-                                module_name = ModuleName + "_" + locale;
-                            }
-                            else if( MLUtil.haveResource(HelpFileLoader.getResourceName(base, ModuleName + "_" +  MLUtil.getLanguageOnly(locale)) ) )
-                            {
-                                module_name = ModuleName + "_" +  MLUtil.getLanguageOnly(locale);
-                            }
-                            else
-                            {
-                                if( !MLUtil.compareLanguagesOnly(root.getBaseLanguage(), root.getDisplayLanguage() ) )
-                                {
-                                    if( MLUtil.haveResource(HelpFileLoader.getResourceName(base, ModuleName + "_" +  MLUtil.getLanguageOnly(root.getDefaultLanguage()) ) ) )
-                                        module_name = ModuleName + "_" +  MLUtil.getLanguageOnly(root.getDefaultLanguage());
-                                }
-                            }
+            if (module_name == null)
+                module_name = ModuleName;
 
-                            if( module_name == null )
-                                module_name = ModuleName;
+            logger.debug("Loading Help for: '" + module_name + "'");
 
-                            logger.debug("Loading Help for: '" + module_name + "'");
+            HelpFileLoader hfl = new HelpFileLoader();
 
-                            HelpFileLoader hfl = new HelpFileLoader();
+            String res = hfl.loadHelp(base, module_name);
 
-                            String res = hfl.loadHelp(base, module_name);
+            if (hook != null) {
+                res = res.replace(hook.getKeyword(), hook.getText());
+            }
 
-                            if (hook != null) {
-                                res = res.replace(hook.getKeyword(), hook.getText());
-                            }
-
-                            // logger.debug(res.toString());
-
-                            jHelp.setText(res);
-                            jHelp.setCaretPosition(0);
-			}
-		};
-	}
+            jHelp.setText(res);
+            jHelp.setCaretPosition(0);
+        });
+    }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
+        javax.swing.JScrollPane jScrollPane1 = new javax.swing.JScrollPane();
         jHelp = new javax.swing.JEditorPane();
-        jBClose = new javax.swing.JButton();
+        javax.swing.JButton jBClose = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jHelp.setContentType("text/html");
+        jHelp.setContentType("text/html"); // NOI18N
         jHelp.setEditable(false);
         jScrollPane1.setViewportView(jHelp);
 
@@ -116,39 +96,36 @@ public class HelpWinModal extends BaseDialogDialog {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 721, Short.MAX_VALUE)
-                    .addComponent(jBClose, javax.swing.GroupLayout.Alignment.TRAILING))
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 721, Short.MAX_VALUE)
+                                        .addComponent(jBClose, javax.swing.GroupLayout.Alignment.TRAILING))
+                                .addContainerGap())
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 469, Short.MAX_VALUE)
-                .addGap(12, 12, 12)
-                .addComponent(jBClose)
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 469, Short.MAX_VALUE)
+                                .addGap(12, 12, 12)
+                                .addComponent(jBClose)
+                                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-	private void jBCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCloseActionPerformed
+    private void jBCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCloseActionPerformed
 
-		close();
+        close();
 
-	}//GEN-LAST:event_jBCloseActionPerformed
+    }//GEN-LAST:event_jBCloseActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jBClose;
     private javax.swing.JEditorPane jHelp;
-    private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
-
 
 
 }

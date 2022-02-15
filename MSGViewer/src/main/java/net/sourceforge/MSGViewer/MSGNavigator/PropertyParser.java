@@ -26,12 +26,12 @@ public class PropertyParser {
                 .map(Pid::toString)
                 .mapToInt(String::length)
                 .max()
-                .getAsInt();
+                .orElse(0);
         max_type_lenght = Arrays.stream(Ptyp.values())
                 .map(Ptyp::toString)
                 .mapToInt(String::length)
                 .max()
-                .getAsInt();
+                .orElse(0);
 
         parse();
     }
@@ -48,9 +48,9 @@ public class PropertyParser {
 
     private void parseHeader(DocumentInputStream in) throws IOException {
         boolean is_toplevel = entry.getParent().getParent() == null;
-        boolean is_msg = is_toplevel || entry.getParent().getName().equals("__substg1.0_3701000D");
+        boolean is_msg = is_toplevel || entry.getParent().getName().equals(Ptyp.SUBSTORAGE_PREFIX + "3701000D");
 
-        // RESERVED 8 bytes (should by zero)
+        // RESERVED 8 bytes (should be zero)
         in.skip(8);
         if (is_msg) {
             int nextRecipientId = in.readInt();
@@ -59,7 +59,7 @@ public class PropertyParser {
             int attachmentCount = in.readInt();
 
             if (is_toplevel) {
-                // RESERVED 8 bytes (should by zero)
+                // RESERVED 8 bytes (should be zero)
                 in.skip(8);
             }
         }

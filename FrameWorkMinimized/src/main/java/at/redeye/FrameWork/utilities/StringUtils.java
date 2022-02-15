@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package at.redeye.FrameWork.utilities;
 
 import org.apache.logging.log4j.Logger;
@@ -9,12 +5,11 @@ import org.apache.logging.log4j.Logger;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-/**
- *
- * @author martin
- */
+import static java.util.stream.Collectors.joining;
+
 public class StringUtils {
 
 	private static int defaultAutoLineLength = 40;
@@ -66,11 +61,7 @@ public class StringUtils {
 	}
 
 	public static boolean is_space(char c) {
-		if (c == ' ' || c == '\t' || c == '\n' || c == '\r') {
-			return true;
-		}
-
-		return false;
+		return c == ' ' || c == '\t' || c == '\n' || c == '\r';
 	}
 
 	public static List<String> split_str(StringBuilder s, String c) {
@@ -147,22 +138,10 @@ public class StringUtils {
 	}
 
 	public static String autoLineBreak(String what, int length) {
-		/**
-		 * Diese Funktion löscht noch überschüssige Leerzeichen weg.
-		 */
-
 		String[] res = autoLineBreak_int(what, length).split("\n");
-
-		StringBuilder stripped_string = new StringBuilder();
-
-		for (String line : res) {
-			if (stripped_string.length() > 0)
-				stripped_string.append('\n');
-
-			stripped_string.append(line.trim());
-		}
-
-		return stripped_string.toString();
+		return Arrays.stream(res)
+				.map(String::trim)
+				.collect(joining("\n"));
 	}
 
 	private static String autoLineBreak_int(String what, int length) {
@@ -173,9 +152,7 @@ public class StringUtils {
 		final int searchWindowLengthPreferedSigns = 20;
 		final int searchWindowLengthSpaceSigns = 50;
 
-		if (length < searchWindowLengthPreferedSigns / 2
-				|| length >= what.length()
-				|| searchWindowLengthPreferedSigns / 2 >= what.length()) {
+		if (searchWindowLengthPreferedSigns / 2 > length || length >= what.length()) {
 			// Doesn't make sense
 			return what;
 		}
@@ -197,7 +174,7 @@ public class StringUtils {
 
 				// try to find a sign in search window
 				boolean found = false;
-				for (int signidx = 0; signidx < myPreferedSigns.length; signidx++) {
+				for (char myPreferedSign : myPreferedSigns) {
 
 					// try with preferred signs
 					for (int index = 1; index <= (searchWindowLengthPreferedSigns / 2); index++) {
@@ -207,15 +184,15 @@ public class StringUtils {
 							break; // not enough left
 						}
 
-						if (in[walker + index] == myPreferedSigns[signidx]) {
+						if (in[walker + index] == myPreferedSign) {
 							str.append(new String(in, 0, walker + index + 1));
 							str.append("\n");
 
 							walker += 1; // jump over break sign
 
 							// spaces überspringen
-							for (int i = 0; i < mySpaceSigns.length; i++) {
-								if (in[walker + 1] == mySpaceSigns[i]) {
+							for (char mySpaceSign : mySpaceSigns) {
+								if (in[walker + 1] == mySpaceSign) {
 									walker++;
 								}
 							}
@@ -226,14 +203,14 @@ public class StringUtils {
 							walker = 0;
 							found = true;
 							break;
-						} else if (in[walker - index] == myPreferedSigns[signidx]) {
+						} else if (in[walker - index] == myPreferedSign) {
 							str.append(new String(in, 0, walker - index + 1));
 							str.append("\n");
 
 							walker += 1; // jump over break sign
 
-							for (int i = 0; i < mySpaceSigns.length; i++) {
-								if (in[walker + 1] == mySpaceSigns[i]) {
+							for (char mySpaceSign : mySpaceSigns) {
+								if (in[walker + 1] == mySpaceSign) {
 									walker++;
 								}
 							}
@@ -253,7 +230,7 @@ public class StringUtils {
 					}
 				}
 
-				for (int signidx = 0; signidx < mySpaceSigns.length; signidx++) {
+				for (char mySpaceSign : mySpaceSigns) {
 					// try with blanks
 					for (int index = 1; index <= (searchWindowLengthSpaceSigns / 2); index++) {
 
@@ -262,7 +239,7 @@ public class StringUtils {
 							break; // not enough left
 						}
 
-						if (in[walker + index] == mySpaceSigns[signidx]) {
+						if (in[walker + index] == mySpaceSign) {
 
 							str.append(new String(in, 0, walker + index));
 							str.append("\n");
@@ -273,7 +250,7 @@ public class StringUtils {
 							walker = 0;
 							found = true;
 							break;
-						} else if (in[walker - index] == mySpaceSigns[signidx]) {
+						} else if (in[walker - index] == mySpaceSign) {
 
 							str.append(new String(in, 0, walker - index + 1));
 							str.append("\n");
@@ -310,10 +287,8 @@ public class StringUtils {
 	 * <li>12.000 => 12</li>
 	 * </ul>
 	 *
-	 * @param d
 	 * @param rounding
 	 *            precision
-	 * @return
 	 */
 	public static String formatDouble(double d, int rounding) {
 		return formatDouble(Rounding.rndDouble(d, rounding));
@@ -330,7 +305,6 @@ public class StringUtils {
 	 *
 	 * @param d
 	 *            the number
-	 * @return
 	 */
 	public static String formatDouble(double d) {
 		String s = String.format("%f", d);
@@ -344,45 +318,20 @@ public class StringUtils {
 	/**
 	 * Finds out, if the given string has the meaning of 'Yes'
 	 *
-	 * @param maybe_a_yes_value
 	 * @return true, false
 	 */
 	public static boolean isYes(String maybe_a_yes_value) {
-		if (maybe_a_yes_value == null) {
-			return false;
-
-		}
-		if (maybe_a_yes_value.equalsIgnoreCase("ja")) {
-			return true;
-
-		}
-		if (maybe_a_yes_value.equalsIgnoreCase("yes")) {
-			return true;
-
-		}
-		if (maybe_a_yes_value.equalsIgnoreCase("true")) {
-			return true;
-
-		}
-		if (maybe_a_yes_value.equalsIgnoreCase("1")) {
-			return true;
-
-		}
-		if (maybe_a_yes_value.equalsIgnoreCase("x")) {
-			return true;
-
-		}
-		if (maybe_a_yes_value.equalsIgnoreCase("+")) {
-			return true;
-
-		}
-		return false;
+		return "ja".equalsIgnoreCase(maybe_a_yes_value)
+				|| "yes".equalsIgnoreCase(maybe_a_yes_value)
+				|| "true".equalsIgnoreCase(maybe_a_yes_value)
+				|| "1".equalsIgnoreCase(maybe_a_yes_value)
+				|| "x".equalsIgnoreCase(maybe_a_yes_value)
+				|| "+".equalsIgnoreCase(maybe_a_yes_value);
 	}
 
 	/**
 	 * Converts the complete Backtrace of an Exception into a String
 	 *
-	 * @param ex
 	 * @return Backtrace of the Exception
 	 * @deprecated Use {@link Logger#error(Object, Throwable)} instead
 	 */
@@ -414,10 +363,10 @@ public class StringUtils {
 
 		String truncatedString;
 		int lbCounter = 0;
-		int idx = 0;
 
 		char[] arr = sourceString.toCharArray();
 
+		int idx;
 		for (idx = 0; idx < arr.length; idx++) {
 			if (lbCounter == lines) {
 				break;
@@ -444,8 +393,8 @@ public class StringUtils {
 			return "";
 		}
 		StringBuilder str = new StringBuilder();
-		for (int index = 0; index < data.length; index++) {
-			str.append((char) (data[index]));
+		for (byte datum : data) {
+			str.append((char) datum);
 		}
 		return str.toString();
 	}
@@ -453,7 +402,6 @@ public class StringUtils {
 	/**
 	 * Adds Line numbers as prefix to the text
 	 *
-	 * @param text
 	 * @return Line numbered String
 	 */
 	public static String addLineNumbers(String text) {
@@ -473,4 +421,8 @@ public class StringUtils {
 
 		return sb.toString();
 	}
+
+    public static String limitLength(String data, int max) {
+        return data.length() > max ? data.substring(0, max) + "…" : data;
+    }
 }

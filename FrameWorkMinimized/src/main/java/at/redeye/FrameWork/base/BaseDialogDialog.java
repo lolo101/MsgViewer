@@ -1,32 +1,17 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package at.redeye.FrameWork.base;
 
 import at.redeye.FrameWork.base.bindtypes.DBDateTime;
 import at.redeye.FrameWork.base.bindtypes.DBFlagInteger;
 import at.redeye.FrameWork.base.bindtypes.DBValue;
-import at.redeye.FrameWork.base.tablemanipulator.TableManipulator;
 import at.redeye.FrameWork.base.transaction.Transaction;
 import at.redeye.FrameWork.widgets.datetime.IDateTimeComponent;
-import at.redeye.SqlDBInterface.SqlDBIO.impl.TableBindingNotRegisteredException;
-import at.redeye.SqlDBInterface.SqlDBIO.impl.UnsupportedDBDataTypeException;
-import at.redeye.SqlDBInterface.SqlDBIO.impl.WrongBindFileFormatException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Collection;
-import java.util.Timer;
 
-/**
- *
- * @author martin
- */
 public class BaseDialogDialog extends javax.swing.JDialog implements
 		BindVarInterface, BaseDialogBase {
 
@@ -38,7 +23,6 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	protected Root root;
 
 	public BaseDialogDialog(Root root, String title) {
-		super();
 		this.root = root;
 
 		helper = new BaseDialogBaseHelper(this, root, title, myrootPane, false);
@@ -67,34 +51,11 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	 * @return true if the size of the dialog should be stored
 	 */
 	public boolean openWithLastWidthAndHeight() {
-		if (Setup.is_win_system()) {
-			// weil unter Windows wird das Fenster immer im Zentrum vom
-			// Parentfenster geöffnet und nicht inder nähe der Maus
-			return false;
-		}
-
-		return true;
+		return !Setup.is_win_system();
 	}
 
 	/**
-	 * automatically opens the Help Windows, when F1 is pressed
-	 *
-	 * @param runnable
-	 *            This runnable should open the Help Window
-	 */
-	public void registerHelpWin(Runnable runnable) {
-		helper.registerHelpWin(runnable);
-	}
-
-	/**
-	 * opens the registerd Help win by Hand
-	 */
-	public void callHelpWin() {
-		helper.callHelpWin();
-	}
-
-	/**
-	 * Registers a listener for a F1, ESC, or somthing global keypressed Event
+	 * Registers a listener for a F1, ESC, or something global keypressed Event
 	 *
 	 * @param to_listen_Key
 	 *            Keyboard Key
@@ -104,10 +65,6 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	public void registerActionKeyListener(KeyStroke to_listen_Key,
 			Runnable runnable) {
 		helper.registerActionKeyListener(to_listen_Key, runnable);
-	}
-
-	private void registerActionKeyListenerOnRootPane(KeyStroke key) {
-		helper.registerActionKeyListenerOnRootPane(key);
 	}
 
 	@Override
@@ -129,31 +86,6 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	}
 
 	/**
-	 * @return A new Transaction object, of the current database connection This
-	 *         Transactino won't be closed on dialog closing event automatically
-	 *         You have to close each allocated Transaction object yourself by
-	 *         calling <b>closeTransaction()</b>
-	 *
-	 *         The Transaction object will by destroyed atomatically on
-	 *         appliaction shutdown
-	 */
-	public Transaction getNewTransaction() {
-		return helper.getNewTransaction();
-	}
-
-	/**
-	 * closes a given Transaction object. Rollback is done automatically.
-	 *
-	 * @param tran
-	 *            a valid Transaction object
-	 * @throws SQLException
-	 *             if rollback fails
-	 */
-	public void closeTransaction(Transaction tran) throws SQLException {
-		helper.closeTransaction(tran);
-	}
-
-	/**
 	 * closes the current dialog.
 	 */
 	public void close() {
@@ -168,75 +100,6 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	 */
 	public void closeNoAppExit() {
 		close();
-	}
-
-	/**
-	 * Ermittelt den nächsten Wert für eine gegebene Sequenz
-	 *
-	 * @param seqName
-	 * @return den nächsten Wert der Sequenz
-	 * @throws java.sql.SQLException
-	 * @throws at.redeye.SqlDBInterface.SqlDBIO.impl.UnsupportedDBDataTypeException
-	 * @throws WrongBindFileFormatException
-	 * @throws TableBindingNotRegisteredException
-	 * @throws IOException
-	 */
-	@Override
-	public int getNewSequenceValue(String seqName) throws SQLException,
-			UnsupportedDBDataTypeException, WrongBindFileFormatException,
-			TableBindingNotRegisteredException, IOException {
-		return helper.getNewSequenceValue(seqName);
-	}
-
-	/**
-	 * Ermittelt den nächsten Wert für eine gegebene Sequenz. Die <b>number</b>
-	 * gibt dabei an wieviele Werte benötigt werden. Im Endeffekt darf dann der
-	 * zurückgegeben Wert so oft, wie durch die Varible <b>number</> angeben
-	 * erhöht werden.
-	 *
-	 * @param seqName
-	 * @param number
-	 *            die Anzahl der Werte die geliefert werden soll.
-	 * @return den nächsten Wert der Sequenz
-	 * @throws java.sql.SQLException
-	 * @throws at.redeye.SqlDBInterface.SqlDBIO.impl.UnsupportedDBDataTypeException
-	 * @throws WrongBindFileFormatException
-	 * @throws TableBindingNotRegisteredException
-	 * @throws IOException
-	 */
-	@Override
-	public int getNewSequenceValues(String seqName, int number)
-			throws SQLException, UnsupportedDBDataTypeException,
-			WrongBindFileFormatException, TableBindingNotRegisteredException,
-			IOException {
-		return helper.getNewSequenceValues(seqName, number);
-	}
-
-	/**
-	 * @return 1 on Save Data <br/>
-	 *         0 on Don't Save <br/>
-	 *         -1 on Cancel <br/>
-	 */
-	public int checkSave() {
-		return helper.checkSave();
-	}
-
-	/**
-	 * Checks, if data within the table have been change, asks the user what
-	 * sould be done (save it, don't save it, or cancel current operation
-	 *
-	 * @param tm
-	 *            TableManipulator object
-	 * @return 1 when the data should by saved <br/>
-	 *         0 on saving should be done <br/>
-	 *         -1 cancel current operation <br/>
-	 *
-	 */
-	public int checkSave(TableManipulator tm) {
-		return helper.checkSave(tm);
-	}
-
-	public void doAutoRefresh() {
 	}
 
 	/**
@@ -260,27 +123,6 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 		helper.setEdited(val);
 	}
 
-	public void clearEdited() {
-		helper.setEdited(false);
-	}
-
-	/**
-	 * Kontrolliert, ob in der übergebenen Tabelle nur ein Eintrag selektiert
-	 * wurde. Wurde mehr als ein Eintrag selektiert, bekommt der User eine
-	 * entsprechende Fehlermeldeung aufgeschalten und der Rückgabewert der
-	 * Funktion ist false.
-	 *
-	 * @param table
-	 *            eine jTable
-	 * @return <b>true</b> Wenn nur ein Eintrag selektiert wurde und
-	 *         <b>false</b>, wenn kein, oder mehrere Einträge selektiert wurden.
-	 *         Eine ensprechende Fehlermeldung ist dabei dem User schon
-	 *         aufgeschalten worden.
-	 */
-	public boolean checkAnyAndSingleSelection(JTable table) {
-		return helper.checkAnyAndSingleSelection(table);
-	}
-
 	/**
 	 * in jTextField an einen StringBuffer anbinden
 	 *
@@ -294,22 +136,6 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	 *            Variablen, oder umgekehrt übertragen.
 	 */
 	public void bindVar(JTextField jtext, StringBuffer var) {
-		helper.bindVar(jtext, var);
-	}
-
-	/**
-	 * in jTextField an einen StringBuffer anbinden
-	 *
-	 * @param jtext
-	 *            das Textfeld
-	 * @param var
-	 *            der StringBuffer
-	 *
-	 *            Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
-	 *            dann der demenstprechende Inhalt entweder vom GUI zu
-	 *            Variablen, oder umgekehrt übertragen.
-	 */
-	public void bindVar(JPasswordField jtext, StringBuffer var) {
 		helper.bindVar(jtext, var);
 	}
 
@@ -359,7 +185,7 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	 *            Variablen, oder umgekehrt übertragen.
 	 */
 	@Override
-	public void bindVar(JComboBox jComboBox, DBValue var) {
+	public void bindVar(JComboBox<?> jComboBox, DBValue var) {
 		helper.bindVar(jComboBox, var);
 	}
 
@@ -432,11 +258,6 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 		helper.gui_to_var();
 	}
 
-	/**
-	 * gibt die <b>root</b> Klasse zurück
-	 *
-	 * @return
-	 */
 	public Root getRoot() {
 		return helper.root;
 	}
@@ -449,30 +270,12 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	}
 
 	/**
-	 * Setzt den Sanduhr, oder "normale" Mauscursor
-	 *
-	 * @param state
-	 *            <b>true</b> für die Sanduhr und <b>false</b> für den nurmalen
-	 *            Cursor
-	 */
-	public void setWaitCursor(boolean state) {
-		helper.setWaitCursor(state);
-	}
-
-	/**
 	 * Setzt wieder den "normalen" Mauscursor
 	 */
 	public void setNormalCursor() {
 		helper.setNormalCursor();
 	}
 
-	/**
-	 * Konfiguriert das jScrollpanel entsprechen dem im Setup hinterlegten
-	 * Geschwindigkeit. Vom User über den Parameter VerticalScrollingSpeed
-	 * einstellbar.
-	 *
-	 * @param scroll_panel
-	 */
 	public void adjustScrollingSpeed(JScrollPane scroll_panel) {
 		helper.adjustScrollingSpeed(scroll_panel);
 	}
@@ -480,8 +283,6 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	/**
 	 * Little helper function that sets the frame visible and push it to front,
 	 * by useing the wait cursor.
-	 *
-	 * @param frame
 	 */
 	public void invokeDialog(JFrame frame) {
 		helper.invokeDialog(frame);
@@ -490,8 +291,6 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	/**
 	 * Little helper function that sets the frame visible and push it to front,
 	 * by useing the wait cursor.
-	 *
-	 * @param dlg
 	 */
 	public void invokeDialog(BaseDialogBase dlg) {
 		helper.invokeDialog(dlg);
@@ -501,20 +300,8 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 		helper.invokeDialogUnique(dialog);
 	}
 
-	/**
-	 * @return should return a unique identifier for this dialog, by default
-	 *         it's the Classname + "/" + title
-	 */
-	public String getUniqueIdentifier() {
-		return this.getClass().getName() + "/" + getTitle();
-	}
-
 	public void registerOnCloseListener(Runnable runnable) {
 		helper.registerOnCloseListener(runnable);
-	}
-
-	public void deregisterOnCloseListener(Runnable runnable) {
-		helper.deregisterOnCloseListener(runnable);
 	}
 
 	public boolean closeSubdialogsOnClose() {
@@ -525,24 +312,12 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 		return this;
 	}
 
-	public void invokeDialogModal(BaseDialogDialog dlg) {
-		helper.invokeDialogModal(dlg);
-	}
-
-	public void setBindVarsChanged(boolean state) {
-		helper.setBindVarsChanged(state);
-	}
-
 	public Collection<Pair> getBindVarPairs() {
 		return helper.getBindVarPairs();
 	}
 
 	public void addBindVarPair(Pair pair) {
 		helper.addBindVarPair(pair);
-	}
-
-	public void setBindVars(BindVarInterface bind_vars) {
-		helper.setBindVars(bind_vars);
 	}
 
 	/**
@@ -596,11 +371,6 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	@Override
 	public void invokeMainDialog(BaseDialogBase dialog) {
 		helper.invokeMainDialog(dialog);
-	}
-
-	@Override
-	public Timer getAutoRefreshTimer() {
-		return helper.getAutoRefreshTimer();
 	}
 
 }

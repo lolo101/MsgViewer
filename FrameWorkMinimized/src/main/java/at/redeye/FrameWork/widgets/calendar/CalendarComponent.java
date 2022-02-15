@@ -1,32 +1,15 @@
-/*
- * CalendarComponent.java
- *
- * Created on 2. Januar 2009, 10:51
- */
-
 package at.redeye.FrameWork.widgets.calendar;
-
 
 import at.redeye.FrameWork.utilities.calendar.Holidays;
 import at.redeye.FrameWork.utilities.calendar.Holidays.HolidayInfo;
 import at.redeye.FrameWork.utilities.calendar.MonthNames;
-import at.redeye.FrameWork.widgets.calendarday.CalendarDay;
-import at.redeye.FrameWork.widgets.calendarday.CommonInfoRenderer;
-import at.redeye.FrameWork.widgets.calendarday.DayEventListener;
-import at.redeye.FrameWork.widgets.calendarday.DisplayDay;
-import at.redeye.FrameWork.widgets.calendarday.InfoRenderer;
+import at.redeye.FrameWork.widgets.calendarday.*;
 
 import java.awt.*;
+import java.time.LocalDate;
 import java.util.Collection;
-import java.util.GregorianCalendar;
 import java.util.Vector;
-import org.joda.time.DateMidnight;
-import org.joda.time.LocalDate;
 
-/**
- *
- * @author  martin
- */
 public class CalendarComponent extends javax.swing.JPanel implements DisplayMonth, DayEventListener {
 
     protected Vector<DisplayDay> days = new Vector<>();
@@ -37,7 +20,6 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
     protected InfoRenderer info_renderer = new CommonInfoRenderer();
     protected int month = 0;
     protected int year = 0;
-    protected boolean showMonth = true;
     protected boolean allowClickOnInactiveDays = false;
 
     /** Creates new form CalendarComponent */
@@ -99,27 +81,10 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
         return getDay(isWhatDayOfMonth(day));
     }
 
-    public void setShowMonthName( boolean state )
-    {
-        showMonth = state;
-        jPMonth.setVisible(false);
-    }
-
-    /**
-     * by default an inactive element is not clickable
-     * and a listener will not be informed. By using this
-     * function the behavior can be changed
-     * @param state
-     */
-    public void setAllowClickOnInactiveElements( boolean state )
-    {
-        allowClickOnInactiveDays = state;
-    }
-
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
+        javax.swing.JPanel jPanel1 = new javax.swing.JPanel();
         calendarDay1 = new at.redeye.FrameWork.widgets.calendarday.CalendarDay();
         calendarDay2 = new at.redeye.FrameWork.widgets.calendarday.CalendarDay();
         calendarDay3 = new at.redeye.FrameWork.widgets.calendarday.CalendarDay();
@@ -162,15 +127,15 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
         calendarDay40 = new at.redeye.FrameWork.widgets.calendarday.CalendarDay();
         calendarDay41 = new at.redeye.FrameWork.widgets.calendarday.CalendarDay();
         calendarDay42 = new at.redeye.FrameWork.widgets.calendarday.CalendarDay();
-        jPanel2 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        jPMonth = new javax.swing.JPanel();
+        javax.swing.JPanel jPanel2 = new javax.swing.JPanel();
+        javax.swing.JLabel jLabel1 = new javax.swing.JLabel();
+        javax.swing.JLabel jLabel2 = new javax.swing.JLabel();
+        javax.swing.JLabel jLabel3 = new javax.swing.JLabel();
+        javax.swing.JLabel jLabel4 = new javax.swing.JLabel();
+        javax.swing.JLabel jLabel5 = new javax.swing.JLabel();
+        javax.swing.JLabel jLabel6 = new javax.swing.JLabel();
+        javax.swing.JLabel jLabel7 = new javax.swing.JLabel();
+        javax.swing.JPanel jPMonth = new javax.swing.JPanel();
         jLTitle = new javax.swing.JLabel();
 
         setPreferredSize(new java.awt.Dimension(800, 602));
@@ -261,7 +226,7 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
             jPMonthLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPMonthLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLTitle, javax.swing.GroupLayout.DEFAULT_SIZE, 752, Short.MAX_VALUE)
+                .addComponent(jLTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPMonthLayout.setVerticalGroup(
@@ -277,7 +242,7 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
                 .addContainerGap()
                 .addComponent(jPMonth, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 800, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
             .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
@@ -337,16 +302,6 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
     private at.redeye.FrameWork.widgets.calendarday.CalendarDay calendarDay8;
     private at.redeye.FrameWork.widgets.calendarday.CalendarDay calendarDay9;
     private javax.swing.JLabel jLTitle;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JPanel jPMonth;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -357,10 +312,10 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
         month = Month;
         year = Year;
 
-        DateMidnight cal = new DateMidnight(Year, Month, 1 );
+        LocalDate cal = LocalDate.of(Year, Month, 1 );
 
-        int dayOfWeek = cal.getDayOfWeek();
-        int maxDays = cal.toGregorianCalendar().getActualMaximum(GregorianCalendar.DAY_OF_MONTH);
+        int dayOfWeek = cal.getDayOfWeek().getValue();
+        int maxDays = cal.lengthOfMonth();
         daysOfMonth = maxDays;
 
         System.out.println("Day of Week:" + dayOfWeek + " Month: " + maxDays );
@@ -383,9 +338,9 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
             InfoRenderer renderer = days.get(i).getInfoRenderer();
 
             if( renderer != null )
-                renderer.setDay(cal.plusDays(count-1));
+                renderer.setDay(cal.plusDays(count- 1L));
 
-            days.get(i).setWeekDay(cal.plusDays(count-1).getDayOfWeek());
+            days.get(i).setWeekDay(cal.plusDays(count- 1L).getDayOfWeek().getValue());
         }
 
         // Samstage hervorheben
@@ -406,13 +361,13 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
             InfoRenderer renderer = days.get(i).getInfoRenderer();
 
             if( renderer != null )
-                renderer.setDay(cal.plusDays(maxDays + count - 1));
+                renderer.setDay(cal.plusDays(maxDays + count - 1L ));
         }
 
-        DateMidnight cal2 = new DateMidnight(Year,Month,1);
-        DateMidnight cal3 = cal2.minusMonths(1);
+        LocalDate cal2 = LocalDate.of(Year,Month,1);
+        LocalDate cal3 = cal2.minusMonths(1);
 
-        int maxDaysbefore = cal3.toGregorianCalendar().getActualMaximum(GregorianCalendar.DAY_OF_MONTH);
+        int maxDaysbefore = cal3.lengthOfMonth();
 
         System.out.println( "maxDaysBefore:" + maxDaysbefore );
 
@@ -425,7 +380,7 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
             InfoRenderer renderer = days.get(i).getInfoRenderer();
 
             if( renderer != null )
-                renderer.setDay(cal3.plusDays(count - 1));
+                renderer.setDay(cal3.plusDays(count - 1L ));
         }
 
         jLTitle.setText( MonthNames.getFullMonthName(month)+ " " + cal.getYear());
@@ -439,7 +394,7 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
             {
                     LocalDate d = hinfo.date;
 
-                    if( d.getMonthOfYear() == Month )
+                    if( d.getMonthValue() == Month )
                     {
                         DisplayDay day = getDay(d.getDayOfMonth());
 
@@ -459,24 +414,18 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
                         } else {
                             System.out.println( "cant get " + d + "day: " + d.getDayOfMonth() );
                         }
-                    } else {
-                        // System.out.println( "ignoring " + d );
                     }
             }
         }
 
         setAktualDay();
 
-        for( DisplayDay day : days )
-            day.update();
+        days.forEach(DisplayDay::update);
     }
 
     public void clear()
     {
-        for( DisplayDay day : days )
-        {
-           day.clear();
-        }
+        days.forEach(DisplayDay::clear);
     }
 
     // from DayEventListener
@@ -486,11 +435,9 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
         if( !day.isActive() && !allowClickOnInactiveDays )
             return;
 
-        for( DisplayDay d : days )
-        {
-            if( d.isSelected() && d != day )
-                d.setUnSelected();
-        }
+        days.stream()
+                .filter(d -> d.isSelected() && d != day)
+                .forEach(DisplayDay::setUnSelected);
 
         day.setSelected();
 
@@ -505,11 +452,7 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
 
     @Override
     public DisplayDay getDay(int day) {
-        if( day > daysOfMonth )
-            return null;
-
-        if( day < 1 )
-            return null;
+        if (day > daysOfMonth || day < 1) return null;
 
         return days.get(day-1+offset);
     }
@@ -538,10 +481,7 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
     public void setInfoRenderer(InfoRenderer renderer) {
         info_renderer = renderer;
 
-        for( DisplayDay day : days )
-        {
-            day.setInfoRenderer(renderer.getNewInstance());
-        }
+        days.forEach(day -> day.setInfoRenderer(renderer.getNewInstance()));
     }
 
     @Override
@@ -555,22 +495,15 @@ public class CalendarComponent extends javax.swing.JPanel implements DisplayMont
     }
 
     private void setAktualDay() {
-        DateMidnight today = new DateMidnight();
+        LocalDate today = LocalDate.now();
 
         int this_year = today.getYear();
-        int this_mon = today.getMonthOfYear();
+        int this_mon = today.getMonthValue();
         int this_day = today.getDayOfMonth();
-
-        if( year != this_year )
-            return;
-
-        if( month != this_mon )
-            return;
 
         DisplayDay dd = getDay(this_day);
 
-        if( dd == null )
-            return;
+        if (year != this_year || month != this_mon || dd == null) return;
 
         dd.setToday();
     }

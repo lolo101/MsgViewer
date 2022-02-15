@@ -51,6 +51,12 @@
               <Properties>
                 <Property name="editable" type="boolean" value="false"/>
               </Properties>
+              <Events>
+                <EventHandler event="hyperlinkUpdate" listener="javax.swing.event.HyperlinkListener" parameters="javax.swing.event.HyperlinkEvent" handler="headerHyperlinkUpdate"/>
+              </Events>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="header.addPropertyChangeListener(&quot;paintingForPrint&quot;, new PrintListener());"/>
+              </AuxValues>
             </Component>
           </SubComponents>
         </Container>
@@ -96,6 +102,12 @@
                   <Properties>
                     <Property name="editable" type="boolean" value="false"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="hyperlinkUpdate" listener="javax.swing.event.HyperlinkListener" parameters="javax.swing.event.HyperlinkEvent" handler="bodyHyperlinkUpdate"/>
+                  </Events>
+                  <AuxValues>
+                    <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="body.addPropertyChangeListener(&quot;paintingForPrint&quot;, new PrintListener());"/>
+                  </AuxValues>
                 </Component>
               </SubComponents>
             </Container>
@@ -159,6 +171,9 @@
                 <Component class="javax.swing.JCheckBox" name="JCBfix">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Fixed Font"/>
+                    <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="jRText.isSelected()" type="code"/>
+                    </Property>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="JCBfixActionPerformed"/>

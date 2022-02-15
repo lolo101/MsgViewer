@@ -1,57 +1,33 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.base;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-/**
- *
- * @author martin
- */
-public abstract class AutoLogger {
+public class AutoLogger {
 
-    protected Logger logger;
-    protected Exception thrown_ex = null;
-    private boolean failed = true;
-    protected boolean logical_failure = false;
-    public Object result = null;
+    private final Logger logger;
+    private boolean failed;
 
-    public AutoLogger( String className )
+    public AutoLogger(String className, Invokable invokable)
     {
         logger = LogManager.getLogger(className);
 
-        invoke();
+        invoke(invokable);
     }
 
-    private void invoke()
+    private void invoke(Invokable invokable)
     {
         try {
-            do_stuff();
-            failed = false;
+            invokable.invoke();
         } catch ( Exception ex ) {
+            failed = true;
             logger.error("Exception: " + ex, ex);
-            thrown_ex = ex;
         }
     }
 
-    public abstract void do_stuff() throws Exception;
-
     public boolean isFailed()
     {
-        return failed || logical_failure;
+        return failed;
     }
 
-    protected void setFailed()
-    {
-        logical_failure = true;
-    }
-
-    protected void clearFailed()
-    {
-        logical_failure = false;
-    }
 }

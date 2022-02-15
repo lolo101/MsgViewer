@@ -18,8 +18,8 @@
 package com.auxilii.msgparser.attachment;
 
 import com.auxilii.msgparser.Property;
+import org.apache.commons.lang3.StringUtils;
 
-import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
@@ -178,9 +178,6 @@ public class FileAttachment implements Attachment {
 
     public void setProperty(Property property) throws ClassCastException {
         switch (property.getPid()) {
-            case PidTagRecordKey:
-                //TODO setRecordKey((byte[]) value);
-                break;
             case PidTagDisplayName:
                 setDisplayName((String) property.getValue());
                 break;
@@ -216,8 +213,7 @@ public class FileAttachment implements Attachment {
     @Override
     public String toString() {
         return Stream.of(displayName, longFilename, filename)
-                .filter(Objects::nonNull)
-                .filter(name -> !name.isBlank())
+                .filter(StringUtils::isNotBlank)
                 .findFirst()
                 .orElse(null);
     }

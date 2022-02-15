@@ -1,18 +1,11 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.utilities.calendar;
 
 import at.redeye.FrameWork.base.Root;
-import java.util.Locale;
-import org.joda.time.DateMidnight;
 
-/**
- *
- * @author martin
- */
+import java.time.LocalDate;
+import java.time.format.TextStyle;
+import java.util.Locale;
+
 public class MonthNames
 {
     protected static String[][] codes = {
@@ -59,9 +52,9 @@ public class MonthNames
 
         // Default verhalten
 
-        DateMidnight cal = new DateMidnight(2009, month, 1 );
+        LocalDate cal = LocalDate.of(2009, month, 1 );
 
-        return cal.monthOfYear().getAsText(locale);
+        return cal.getMonth().getDisplayName(TextStyle.FULL, locale);
     }
 
 }

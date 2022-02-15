@@ -1,44 +1,13 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.utilities;
 
-import org.junit.*;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-/**
- *
- * @author martin
- */
 public class StringUtilsTest {
 
-    public StringUtilsTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() {
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
-
-    /**
-     * Test of contains method, of class StringUtils.
-     */
     @Test
     public void testContains() {
         System.out.println("contains");
@@ -48,17 +17,9 @@ public class StringUtilsTest {
         assertTrue(StringUtils.contains('x', "xyz"));
         assertFalse(StringUtils.contains('x', "yyyyyyyyyyyy"));
 
-        try {
-            StringUtils.contains('x', null);
-            fail( "nullpointer throws no exception");
-        } catch( NullPointerException ex ) {
-
-        }
+        assertThrows(NullPointerException.class, () -> StringUtils.contains('x', null));
     }
 
-    /**
-     * Test of skip_char method, of class StringUtils.
-     */
     @Test
     public void testSkip_char() {
         System.out.println("skip_char");
@@ -68,31 +29,11 @@ public class StringUtilsTest {
         assertEquals(4,  StringUtils.skip_char(new StringBuilder( "das ist     ein Text"), " ", 4));
         assertEquals(4,  StringUtils.skip_char(new StringBuilder( "das ist     ein Text"), " ", 3));
 
-        try {
-            StringUtils.skip_char(null, null, 0);
-            fail( "nullpointer throws no exception");
-        } catch( NullPointerException ex ) {
-
-        }
-
-        try {
-            StringUtils.skip_char(new StringBuilder("x"), null, 0);
-            fail( "nullpointer throws no exception");
-        } catch( NullPointerException ex ) {
-
-        }
-
-        try {
-            StringUtils.skip_char(null, " ", 0);
-            fail( "nullpointer throws no exception");
-        } catch( NullPointerException ex ) {
-
-        }
+        assertThrows(NullPointerException.class, () -> StringUtils.skip_char(null, null, 0));
+        assertThrows(NullPointerException.class, () -> StringUtils.skip_char(new StringBuilder("x"), null, 0));
+        assertThrows(NullPointerException.class, () -> StringUtils.skip_char(null, " ", 0));
     }
 
-    /**
-     * Test of skip_char_reverse method, of class StringUtils.
-     */
     @Test
     public void testSkip_char_reverse() {
         System.out.println("skip_char_reverse");
@@ -105,31 +46,11 @@ public class StringUtilsTest {
         assertEquals(0,StringUtils.skip_char_reverse(new StringBuilder("x"), null, 0));
         assertEquals(0,StringUtils.skip_char_reverse(null, " ", 0));
 
-        try {
-            StringUtils.skip_char_reverse(null, null, 10);
-            fail( "nullpointer throws no exception");
-        } catch( NullPointerException ex ) {
-
-        }
-
-        try {
-            StringUtils.skip_char_reverse(new StringBuilder("xyz"), null, 1);
-            fail( "nullpointer throws no exception");
-        } catch( NullPointerException ex ) {
-
-        }
-
-        try {
-            StringUtils.skip_char_reverse(null, " ", 1);
-            fail( "nullpointer throws no exception");
-        } catch( NullPointerException ex ) {
-
-        }
+        assertThrows(NullPointerException.class, () -> StringUtils.skip_char_reverse(null, null, 10));
+        assertThrows(NullPointerException.class, () -> StringUtils.skip_char_reverse(new StringBuilder("xyz"), null, 1));
+        assertThrows(NullPointerException.class, () -> StringUtils.skip_char_reverse(null, " ", 1));
     }
 
-    /**
-     * Test of skip_spaces_reverse method, of class StringUtils.
-     */
     @Test
     public void testSkip_spaces_reverse() {
         System.out.println("skip_spaces_reverse");
@@ -138,19 +59,9 @@ public class StringUtilsTest {
         assertEquals(10, StringUtils.skip_spaces_reverse(new StringBuilder("das ist ein \t   Test"), 14));
         assertEquals(10, StringUtils.skip_spaces_reverse(new StringBuilder("das ist ein    Test"), 10));
 
-
-        try
-        {
-            StringUtils.skip_spaces_reverse(null, 1 );
-            fail( "nullpointer throws no exception");
-        } catch( NullPointerException ex ) {
-
-        }
+        assertThrows(NullPointerException.class, () -> StringUtils.skip_spaces_reverse(null, 1 ));
     }
 
-    /**
-     * Test of skip_spaces method, of class StringUtils.
-     */
     @Test
     public void testSkip_spaces() {
         System.out.println("skip_spaces");
@@ -160,20 +71,9 @@ public class StringUtilsTest {
         assertEquals(4,  StringUtils.skip_spaces(new StringBuilder( "das ist     ein Text"), 4));
         assertEquals(4,  StringUtils.skip_spaces(new StringBuilder( "das ist     ein Text"), 3));
 
-
-        try
-        {
-            StringUtils.skip_spaces(null, 1 );
-            fail( "nullpointer throws no exception");
-        } catch( NullPointerException ex ) {
-
-        }
-
+        assertThrows(NullPointerException.class, () -> StringUtils.skip_spaces(null, 1 ));
     }
 
-    /**
-     * Test of is_space method, of class StringUtils.
-     */
     @Test
     public void testIs_space() {
         System.out.println("is_space");
@@ -186,9 +86,6 @@ public class StringUtilsTest {
         assertFalse(StringUtils.is_space('x'));
     }
 
-    /**
-     * Test of split_str method, of class StringUtils.
-     */
     @Test
     public void testSplit_str() {
         System.out.println("split_str");
@@ -220,36 +117,13 @@ public class StringUtilsTest {
 
     }
 
-    /**
-     * Test of strip method, of class StringUtils.
-     */
     @Test
     public void testStrip_StringBuilder_String() {
         System.out.println("strip");
 
-        try
-        {
-            StringUtils.strip( (StringBuilder)null, "" );
-            fail( "nullpointer throws no exception");
-        } catch( NullPointerException ex ) {
-
-        }
-
-        try
-        {
-            StringUtils.strip( (StringBuilder)null, null );
-            fail( "nullpointer throws no exception");
-        } catch( NullPointerException ex ) {
-
-        }
-
-        try
-        {
-            StringUtils.strip( new StringBuilder("xxxx"), null );
-            fail( "nullpointer throws no exception");
-        } catch( NullPointerException ex ) {
-
-        }
+        assertThrows(NullPointerException.class, () -> StringUtils.strip( (StringBuilder)null, "" ));
+        assertThrows(NullPointerException.class, () -> StringUtils.strip( (StringBuilder)null, null ));
+        assertThrows(NullPointerException.class, () -> StringUtils.strip( new StringBuilder("xxxx"), null ));
 
         assertEquals("xyz", StringUtils.strip( new StringBuilder("xyz"), ""));
         assertEquals("xyz", StringUtils.strip( new StringBuilder(" xyz "), " "));
@@ -261,36 +135,13 @@ public class StringUtilsTest {
         assertEquals("xy z", StringUtils.strip( new StringBuilder("  xy z\t \n"), " \t\n"));
     }
 
-    /**
-     * Test of strip_post method, of class StringUtils.
-     */
     @Test
     public void testStrip_post_StringBuilder_String() {
         System.out.println("strip_post");
 
-        try
-        {
-            StringUtils.strip_post( (StringBuilder)null, "" );
-            fail( "nullpointer throws no exception");
-        } catch( NullPointerException ex ) {
-
-        }
-
-        try
-        {
-            StringUtils.strip_post( (StringBuilder)null, null );
-            fail( "nullpointer throws no exception");
-        } catch( NullPointerException ex ) {
-
-        }
-
-        try
-        {
-            StringUtils.strip_post( new StringBuilder("xxxx"), null );
-            fail( "nullpointer throws no exception");
-        } catch( NullPointerException ex ) {
-
-        }
+        assertThrows(NullPointerException.class, () -> StringUtils.strip_post( (StringBuilder)null, "" ));
+        assertThrows(NullPointerException.class, () -> StringUtils.strip_post( (StringBuilder)null, null ));
+        assertThrows(NullPointerException.class, () -> StringUtils.strip_post( new StringBuilder("xxxx"), null ));
 
         assertEquals("xyz", StringUtils.strip_post(new StringBuilder("xyz"), ""));
         assertEquals(" xyz", StringUtils.strip_post(new StringBuilder(" xyz "), " "));
@@ -303,36 +154,13 @@ public class StringUtilsTest {
 
     }
 
-    /**
-     * Test of strip_post method, of class StringUtils.
-     */
     @Test
     public void testStrip_post_String_String() {
         System.out.println("strip_post");
 
-        try
-        {
-            StringUtils.strip_post( (String)null, "" );
-            fail( "nullpointer throws no exception");
-        } catch( NullPointerException ex ) {
-
-        }
-
-        try
-        {
-            StringUtils.strip_post( (String)null, null );
-            fail( "nullpointer throws no exception");
-        } catch( NullPointerException ex ) {
-
-        }
-
-        try
-        {
-            StringUtils.strip_post( "xxxx", null );
-            fail( "nullpointer throws no exception");
-        } catch( NullPointerException ex ) {
-
-        }
+        assertThrows(NullPointerException.class, () -> StringUtils.strip_post( (String)null, "" ));
+        assertThrows(NullPointerException.class, () -> StringUtils.strip_post( (String)null, null ));
+        assertThrows(NullPointerException.class, () -> StringUtils.strip_post( "xxxx", null ));
 
         assertEquals("xyz", StringUtils.strip_post("xyz", ""));
         assertEquals(" xyz", StringUtils.strip_post(" xyz ", " "));
@@ -345,36 +173,13 @@ public class StringUtilsTest {
 
     }
 
-    /**
-     * Test of strip method, of class StringUtils.
-     */
     @Test
     public void testStrip_String_String() {
         System.out.println("strip");
 
-        try
-        {
-            StringUtils.strip( (String)null, "" );
-            fail( "nullpointer throws no exception");
-        } catch( NullPointerException ex ) {
-
-        }
-
-        try
-        {
-            StringUtils.strip( (String)null, null );
-            fail( "nullpointer throws no exception");
-        } catch( NullPointerException ex ) {
-
-        }
-
-        try
-        {
-            StringUtils.strip( "xxxx", null );
-            fail( "nullpointer throws no exception");
-        } catch( NullPointerException ex ) {
-
-        }
+        assertThrows(NullPointerException.class, () -> StringUtils.strip( (String)null, "" ));
+        assertThrows(NullPointerException.class, () -> StringUtils.strip( (String)null, null ));
+        assertThrows(NullPointerException.class, () -> StringUtils.strip( "xxxx", null ));
 
         assertEquals("xyz", StringUtils.strip("xyz", ""));
         assertEquals("xyz", StringUtils.strip(" xyz ", " "));
@@ -386,9 +191,6 @@ public class StringUtilsTest {
         assertEquals("xy z", StringUtils.strip("  xy z\t \n", " \t\n"));
     }
 
-    /**
-     * Test of set_defaultAutoLineLenght method, of class StringUtils.
-     */
     @Test
     public void testSet_defaultAutoLineLenght() {
         System.out.println("set_defaultAutoLineLenght");
@@ -397,9 +199,6 @@ public class StringUtilsTest {
         assertEquals(10, StringUtils.get_defaultAutoLineLenght());
     }
 
-    /**
-     * Test of get_defaultAutoLineLenght method, of class StringUtils.
-     */
     @Test
     public void testGet_defaultAutoLineLenght() {
         System.out.println("get_defaultAutoLineLenght");
@@ -465,7 +264,7 @@ public class StringUtilsTest {
             "und Elfenbeinküste. Bla ist die Hauptstadt der \"Djonka\",\n"+
             "einer Untergruppe der Bambara.";
 
-    protected String diff_text( String a, String b )
+    protected static String diff_text(String a, String b)
     {
         if( a.equals(b) ) {
             return "";
@@ -511,20 +310,12 @@ public class StringUtilsTest {
         return res.toString();
     }
 
-    void assertText( String expResult, String Result )
+    static void assertText(String expResult, String Result)
     {
         String erg = diff_text(expResult, Result);
-
-        if( !erg.isEmpty() )
-        {
-            System.out.println(erg);
-            fail( erg );
-        }
+        assertEquals("", erg);
     }
 
-    /**
-     * Test of autoLineBreak method, of class StringUtils.
-     */
     @Test
     public void testAutoLineBreak_String() {
         System.out.println("autoLineBreak");
@@ -567,9 +358,6 @@ public class StringUtilsTest {
         assertText(testTextC50, res);
     }
 
-    /**
-     * Test of autoLineBreak method, of class StringUtils.
-     */
     @Test
     public void testAutoLineBreak_StringBuilder_int() {
         System.out.println("autoLineBreak");
@@ -605,9 +393,6 @@ public class StringUtilsTest {
         assertText(testTextC50, res);
     }
 
-    /**
-     * Test of autoLineBreak method, of class StringUtils.
-     */
     @Test
     public void testAutoLineBreak_StringBuilder() {
         System.out.println("autoLineBreak");
@@ -650,9 +435,6 @@ public class StringUtilsTest {
         assertText(testTextC50, res);
     }
 
-    /**
-     * Test of autoLineBreak method, of class StringUtils.
-     */
     @Test
     public void testAutoLineBreak_String_int() {
         System.out.println("autoLineBreak");
@@ -688,9 +470,6 @@ public class StringUtilsTest {
         assertText(testTextC50, res);
     }
 
-    /**
-     * Test of formatDouble method, of class StringUtils.
-     */
     @Test
     public void testFormatDouble_double_int() {
         System.out.println("formatDouble");
@@ -701,9 +480,6 @@ public class StringUtilsTest {
 
     }
 
-    /**
-     * Test of formatDouble method, of class StringUtils.
-     */
     @Test
     public void testFormatDouble_double() {
         System.out.println("formatDouble");
@@ -714,9 +490,6 @@ public class StringUtilsTest {
 
     }
 
-    /**
-     * Test of isYes method, of class StringUtils.
-     */
     @Test
     public void testIsYes() {
         System.out.println("isYes");
@@ -731,16 +504,12 @@ public class StringUtilsTest {
         assertFalse(StringUtils.isYes("hugo"));
     }
 
-    /**
-     * Test of exceptionToString method, of class StringUtils.
-     */
     @Test
     public void testExceptionToString() {
         System.out.println("exceptionToString");
 
-        try
-        {
-            int i = Integer.parseInt("asdfasdf");
+        try {
+            Integer.parseInt("asdfasdf");
         } catch( NumberFormatException ex ) {
 
             String res = StringUtils.exceptionToString(ex);
@@ -755,9 +524,6 @@ public class StringUtilsTest {
 
     }
 
-    /**
-     * Test of skipLeadingLines method, of class StringUtils.
-     */
     @Test
     public void testSkipLeadingLines() {
         System.out.println("skipLeadingLines");
@@ -778,9 +544,6 @@ public class StringUtilsTest {
         assertEquals("", StringUtils.skipLeadingLines(testTest, 100));
     }
 
-    /**
-     * Test of byteArrayToString method, of class StringUtils.
-     */
     @Test
     public void testByteArrayToString() {
         System.out.println("byteArrayToString");

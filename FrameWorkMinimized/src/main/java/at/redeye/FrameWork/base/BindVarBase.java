@@ -1,21 +1,14 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package at.redeye.FrameWork.base;
 
 import at.redeye.FrameWork.base.bindtypes.DBDateTime;
 import at.redeye.FrameWork.base.bindtypes.DBFlagInteger;
 import at.redeye.FrameWork.base.bindtypes.DBValue;
 import at.redeye.FrameWork.widgets.datetime.IDateTimeComponent;
+
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Collection;
-import javax.swing.*;
 
-/**
- *
- * @author martin
- */
 public class BindVarBase implements BindVarInterface {
 
     public ArrayList<Pair> pairs = new ArrayList<>();
@@ -40,12 +33,8 @@ public class BindVarBase implements BindVarInterface {
         pairs.add(new DateComponentPair(comp, dateTime));
     }
 
-    public void bindVar(JPasswordField jtext, StringBuffer var) {
-        pairs.add(new TextStringPair(jtext, var));
-    }
-
     @Override
-    public void bindVar(JComboBox jcombo, DBValue var) {
+    public void bindVar(JComboBox<?> jcombo, DBValue var) {
         pairs.add(new ComboStringPair(jcombo, var));
     }
 
@@ -90,18 +79,6 @@ public class BindVarBase implements BindVarInterface {
     public void gui_to_var() {
         for (Pair pair : pairs) {
             pair.gui_to_var();
-        }
-    }
-
-    public void var_to_gui(DBValue val) {
-
-        for (Pair pair : pairs) {
-
-            if (pair.get_second() == val) {
-                System.out.println("var_to_gui for " + val.getName());
-                pair.var_to_gui();
-                break;
-            }
         }
     }
 

@@ -18,34 +18,36 @@
 package com.auxilii.msgparser;
 
 import org.apache.poi.poifs.filesystem.DocumentEntry;
+import org.apache.poi.poifs.filesystem.DocumentInputStream;
 
-/**
- * Convenience class for storing type information
- * about a {@link DocumentEntry}.
- *
- * @author roman.kurmanowytsch
- */
+import java.io.IOException;
+
 public class FieldInformation {
-    private final Pid id;
-    private final Ptyp type;
+    private final DocumentEntry entry;
 
-    /**
-     * Constructor that allows to set the id
-     * and type of the properties.
-     *
-     * @param id   The id of the {@link DocumentEntry}.
-     * @param type The type of the {@link DocumentEntry}.
-     */
-    public FieldInformation(String id, String type) {
-        this.id = Pid.from(Integer.valueOf(id, 16));
-        this.type = Ptyp.from(Integer.parseInt(type, 16));
+    public FieldInformation(DocumentEntry de) {
+        this.entry = de;
     }
 
     public Pid getId() {
-        return id;
+        int index = Ptyp.SUBSTORAGE_PREFIX.length();
+        return Pid.from(Integer.parseInt(entry.getName().substring(index, index + 4), 16));
     }
 
-    public Ptyp getType() {
-        return type;
+    public Object getData() throws IOException {
+        Ptyp type = getType();
+        try (DocumentInputStream dstream = new DocumentInputStream(entry)) {
+            return type.convert(dstream);
+        }
+    }
+
+    private Ptyp getType() {
+        int index = Ptyp.SUBSTORAGE_PREFIX.length();
+        Ptyp type = Ptyp.from(Integer.parseInt(entry.getName().substring(index + 4, index + 8), 16));
+        return isOneOfMultipleVariableLengthEntry() ? Ptyp.from(type.id ^ Ptyp.MULTIPLE_VALUED_FLAG) : type;
+    }
+
+    private boolean isOneOfMultipleVariableLengthEntry() {
+        return entry.getName().contains("-");
     }
 }

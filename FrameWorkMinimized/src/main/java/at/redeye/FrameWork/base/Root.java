@@ -5,10 +5,10 @@
 
 package at.redeye.FrameWork.base;
 
-import at.redeye.FrameWork.base.bindtypes.DBStrukt;
-import at.redeye.FrameWork.base.dll_cache.DLLExtractor;
 import at.redeye.FrameWork.Plugin.Plugin;
+import at.redeye.FrameWork.base.dll_cache.DLLExtractor;
 import at.redeye.FrameWork.utilities.calendar.Holidays;
+
 import java.util.List;
 import java.util.Locale;
 
@@ -18,9 +18,8 @@ import java.util.Locale;
  */
 public abstract class Root {
 
-    String app_name;
-    String web_start_url;
-    String app_title;
+    protected final String app_name;
+    private final String app_title;
 
     /**
      * language most of the aplication is programmed in
@@ -59,12 +58,6 @@ public abstract class Root {
 
     static Root static_root;
 
-    public Root( String app_name )
-    {
-        this.app_name = app_name;
-        static_root = this;
-    }
-
     public Root( String app_name, String app_title )
     {
         this.app_name = app_name;
@@ -78,7 +71,6 @@ public abstract class Root {
 
     public abstract void setDBConnection( DBConnection con );
     public abstract DBConnection getDBConnection();
-    public abstract boolean loadDBConnectionFromSetup();
 
     public void informWindowOpened( BaseDialogBase dlg ) {}
     public void informWindowClosed( BaseDialogBase dlg ) {}
@@ -87,54 +79,9 @@ public abstract class Root {
 
     public void appExit() {}
 
-    public void setAktivUser( DBStrukt pb )
-    {
-
-    }
-    /*
-    public int getUserPermissionLevel()
-    {
-        return UserManagementInterface.UM_PERMISSIONLEVEL_ADMIN;
-    }*/
-
-    public String getUserName()
-    {
-        return "";
-    }
-
-    public String getLogin()
-    {
-        return "";
-    }
-/*
-    public DBBindtypeManager getBindtypeManager()
-    {
-        return null;
-    }
-
-    public DBManager getDBManager()
-    {
-        return null;
-    }
-  */
-    public int getUserId()
-    {
-        return 0;
-    }
-
     public String getAppName()
     {
         return app_name;
-    }
-
-    public void setWebStartUlr(String url)
-    {
-        web_start_url = url;
-    }
-
-    public String getWebStartUrl()
-    {
-        return web_start_url;
     }
 
     public String getAppTitle()
@@ -142,22 +89,7 @@ public abstract class Root {
         return app_title;
     }
 
-    public void waitUntilNetworkIsReady()
-    {
-
-    }
-
-    public void noProxyFor(String address)
-    {
-
-    }
-
     public void addDllExtractorToCache( DLLExtractor extractor )
-    {
-
-    }
-
-    public void updateDllCache()
     {
 
     }
@@ -302,7 +234,6 @@ public abstract class Root {
 
     /**
      * load a MlM file for a spacific class
-     * @param obj
      * @param impl_locale the locale the class was originaly implemented
      * eg "de" for german
      */
@@ -310,25 +241,8 @@ public abstract class Root {
 
     /**
      * load a MlM file for a spacific class
-     * as implementation language the value of base_language is used
-     * @param obj
-     */
-    public abstract void loadMlM4Class( Object obj );
-
-    /**
-     * load a MlM file for a spacific class
-     * @param obj
-     * @param impl_locale the locale the class was originaly implemented
-     * eg "de" for german
      */
     public abstract void loadMlM4ClassName(String name, String string);
-
-    /**
-     * load a MlM file for a spacific class
-     * as implementation language the value of base_language is used
-     * @param obj
-     */
-    public abstract void loadMlM4ClassName(String name);
 
     /**
      * only use this in case of emergency
@@ -339,8 +253,4 @@ public abstract class Root {
         return static_root;
     }
 
-    /**
-     * @return the number of currently open windows
-     */
-    public abstract int countOpenWindows();
 }

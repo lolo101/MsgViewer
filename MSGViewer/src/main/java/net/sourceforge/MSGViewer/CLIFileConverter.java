@@ -3,7 +3,8 @@ package net.sourceforge.MSGViewer;
 import at.redeye.FrameWork.base.BaseModuleLauncher;
 import at.redeye.FrameWork.base.Setup;
 import com.auxilii.msgparser.Message;
-import net.sourceforge.MSGViewer.factory.MessageParserFactory;
+import net.sourceforge.MSGViewer.factory.MessageParser;
+import net.sourceforge.MSGViewer.factory.MessageSaver;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
@@ -12,6 +13,9 @@ import java.awt.*;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 public abstract class CLIFileConverter {
 
@@ -24,7 +28,6 @@ public abstract class CLIFileConverter {
 	private boolean openAfterConvert = false;
 
 	/**
-	 * @param module_launcher
 	 * @param sourceType
 	 *            the source file type (i.e. ending) without a leading dot. E.g.
 	 *            "msg"
@@ -66,17 +69,12 @@ public abstract class CLIFileConverter {
 	}
 
 	void work() {
-		boolean converted = false;
-		MessageParserFactory factory = new MessageParserFactory();
+		List<String> processableFiles = Arrays.stream(module_launcher.args)
+				.filter(sourcePath -> sourcePath.toLowerCase().endsWith(String.format(".%s", sourceType)))
+				.collect(toList());
+		processableFiles.forEach(this::processFile);
 
-		for (String sourceFilePath : module_launcher.args) {
-			if (sourceFilePath.toLowerCase().endsWith(String.format(".%s", sourceType))) {
-				converted = true;
-				processFile(factory, sourceFilePath);
-			}
-		}
-
-		if (!converted) {
+		if (processableFiles.isEmpty()) {
 			usage();
 		}
 	}
@@ -86,7 +84,7 @@ public abstract class CLIFileConverter {
 				"usage: %s FILE FILE ....", getCLIParameter())));
 	}
 
-	private void processFile(MessageParserFactory factory, String sourceFilePath) {
+	private void processFile(String sourceFilePath) {
 		File sourceFile = new File(sourceFilePath).getAbsoluteFile();
 		String baseFileName = sourceFile.getName();
 		int idx = baseFileName.lastIndexOf('.');
@@ -97,10 +95,10 @@ public abstract class CLIFileConverter {
 					: Paths.get(sourceFile.getParent(), String.format("%s.%s", baseFileName, targetType)).toFile();
 
 			LOGGER.info("conversion source file: " + sourceFile);
-			Message msg = factory.parseMessage(sourceFile);
+			Message msg = new MessageParser(sourceFile).parseMessage();
 
 			LOGGER.info("conversion target file: " + targetFile);
-			factory.saveMessage(msg, targetFile);
+			new MessageSaver(msg).saveMessage(targetFile);
 
 			if (openAfterConvert) {
 				openFile(targetFile);
@@ -110,7 +108,7 @@ public abstract class CLIFileConverter {
 		}
 	}
 
-	private void openFile(File targetFile) {
+	private static void openFile(File targetFile) {
 		try {
 			Desktop.getDesktop().open(targetFile);
 		} catch (Exception e) {
@@ -137,7 +135,7 @@ public abstract class CLIFileConverter {
 				} catch (Exception e1) {
 					String message = String.format("Unable to open converted file.\nCould not execute command %s",
 							Arrays.toString(cmdarray));
-					LOGGER.error(message.replaceAll("\n", " "));
+					LOGGER.error(message.replace("\n", " "));
 					JOptionPane.showMessageDialog(null, message,
 							"Error opening converted file",
 							JOptionPane.ERROR_MESSAGE);

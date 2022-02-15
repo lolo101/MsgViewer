@@ -4,18 +4,16 @@ import at.redeye.FrameWork.base.AutoLogger;
 import at.redeye.FrameWork.base.BaseModuleLauncher;
 import at.redeye.FrameWork.base.LocalRoot;
 import at.redeye.FrameWork.utilities.ReadFile;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
-import java.util.List;
 
-public class testRTF2HTML extends BaseModuleLauncher
-{
-    public testRTF2HTML(String[] args)
-    {
+public class testRTF2HTML extends BaseModuleLauncher {
+    public testRTF2HTML(String[] args) {
         super(args);
 
-        root = new LocalRoot( "MSGViewer", "MSGViewer");
+        root = new LocalRoot("MSGViewer", "MSGViewer");
 
         configureLogging();
     }
@@ -38,45 +36,27 @@ public class testRTF2HTML extends BaseModuleLauncher
 
                 System.out.println(content);
 
-                new AutoLogger(testRTF2HTML.class.getName()) {
-
-                    @Override
-                    public void do_stuff() throws Exception {
-
+                new AutoLogger(testRTF2HTML.class.getName(), () -> {
                         RTFParser parser = new RTFParser(new FileInputStream(file));
 
                         String message = null;
-
                         Exception exc = null;
                         Error err = null;
 
                         try {
 
-                            StringBuilder sb = new StringBuilder();
-
                             parser.parse();
                             logger.info("done parsing " + file);
 
-                            List<RTFGroup> groups = parser.getGroups();
-
-                            for( RTFGroup group : groups )
-                            {
-                                if( !group.isEmptyText() )
-                                {
-                                    String content = group.getTextContent();
-
-                                    System.out.print(content);
-                                    sb.append(content);
-                                }
-                            }
+                            String htmlContent = parser.getHTML();
+                            System.out.print(htmlContent);
 
                             String file_name = getStartupParam("writehtml");
 
-                            if( file_name != null )
-                            {
-								try (FileWriter fout = new FileWriter(file_name)) {
-									fout.write(sb.toString());
-								}
+                            if (file_name != null) {
+                                try (FileWriter fout = new FileWriter(file_name)) {
+                                    fout.write(htmlContent);
+                                }
                             }
 
                         } catch ( Error ex ) {
@@ -123,12 +103,8 @@ public class testRTF2HTML extends BaseModuleLauncher
                                         col = 40;
                                     }
 
-                                    StringBuilder sb = new StringBuilder();
-
-                                    sb.append(" ".repeat(Math.max(0, col - 1)));
-                                    sb.append("^");
-
-                                    logger.error("\n\n" + ll + "\n" + sb.toString());
+                                    String sb = " ".repeat(Math.max(0, col - 1)) + "^";
+                                    logger.error("\n\n" + ll + "\n" + sb);
                                 }
                             }
                         }
@@ -141,9 +117,7 @@ public class testRTF2HTML extends BaseModuleLauncher
                                 throw exc;
                             }
                         }
-
-                    }
-                };
+                });
 
             }
         }
