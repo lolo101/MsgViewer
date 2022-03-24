@@ -40,23 +40,9 @@ public class ShowNode extends BaseDialog {
 
         if (cont.getEntry().isDocumentEntry()) {
             String name = cont.getEntry().getName();
-            if (name.equals("__properties_version1.0")) {
-                show_properties_entry(cont);
-            } else if (name.equals(Ptyp.SUBSTORAGE_PREFIX + "00020102")) {
-                show_guid_stream(cont);
-            } else if (name.equals(Ptyp.SUBSTORAGE_PREFIX + "00030102")) {
-                show_entry_stream(cont);
-            } else if (name.equals(Ptyp.SUBSTORAGE_PREFIX + "00040102")) {
-                show_string_stream(cont);
-            } else if (NAMED_PROPERTY_SUBSTORAGE.matcher(name).matches() &&
-                    cont.getEntry().getParent().getName().equals("__nameid_version1.0")) {
-                show_nameid_stream(cont);
-            } else {
-                show_data(cont);
-            }
+            jTHex.setText(show_entry(name, cont));
         }
     }
-
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
 
@@ -91,7 +77,28 @@ public class ShowNode extends BaseDialog {
     private javax.swing.JTextArea jTHex;
 
     // End of variables declaration//GEN-END:variables
-    private void show_properties_entry(TreeNodeContainer cont) {
+
+    private String show_entry(String name, TreeNodeContainer cont) {
+        if (name.equals("__properties_version1.0")) {
+            return show_properties_entry(cont);
+        }
+        if (name.equals(Ptyp.SUBSTORAGE_PREFIX + "00020102")) {
+            return show_guid_stream(cont);
+        }
+        if (name.equals(Ptyp.SUBSTORAGE_PREFIX + "00030102")) {
+            return show_entry_stream(cont);
+        }
+        if (name.equals(Ptyp.SUBSTORAGE_PREFIX + "00040102")) {
+            return show_string_stream(cont);
+        }
+        if (NAMED_PROPERTY_SUBSTORAGE.matcher(name).matches() &&
+                cont.getEntry().getParent().getName().equals("__nameid_version1.0")) {
+            return show_nameid_stream(cont);
+        }
+        return show_data(cont);
+    }
+
+    private String show_properties_entry(TreeNodeContainer cont) {
         byte[] bytes = (byte[]) cont.getData();
 
         StringBuilder sb = new StringBuilder();
@@ -145,7 +152,7 @@ public class ShowNode extends BaseDialog {
             sb.append(dumpPropertyEntry(bytes, offset));
         }
 
-        jTHex.setText(sb.toString());
+        return sb.toString();
     }
 
     private static String formatByte(byte b) {
@@ -178,7 +185,7 @@ public class ShowNode extends BaseDialog {
 
         int value_start_offset = offset;
 
-        sb.append(formatBytesSpaced(bytes, offset, 8));
+        sb.append(formatQWordSpaced(bytes, offset));
 
         sb.append(" ");
 
@@ -239,74 +246,24 @@ public class ShowNode extends BaseDialog {
         boolean readable = (b & PROPATTR_READABLE) != 0;
         boolean writable = (b & PROPATTR_WRITABLE) != 0;
         return " FLAGS: "
-                + (mandatory ? "_" : "M")
-                + (readable ? "_" : "R")
-                + (writable ? "_" : "W");
+                + (mandatory ? "M" : "_")
+                + (readable ? "R" : "_")
+                + (writable ? "W" : "_");
     }
 
-    private static String formatBytesSpaced(byte[] bytes, int offset, int length) {
+    private static String formatQWordSpaced(byte[] bytes, int offset) {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < 8; i++) {
             sb.append(String.format("%02X ", bytes[offset + i]));
         }
         return sb.toString();
     }
 
 
-    private void show_string_stream(TreeNodeContainer cont) {
-        StringBuilder sb = new StringBuilder();
-        byte[] bytes = (byte[]) cont.getData();
-
-        sb.append("String Stream ");
-        sb.append(cont.getEntry().getName());
-        sb.append("\n\n");
-
-        int offset = 0;
-
-        while (offset < bytes.length) {
-
-            sb.append("Offset: ");
-            sb.append(String.format("%04X", offset));
-            sb.append(" ");
-
-            // get length 4 bytes
-            StringBuilder s_lenght = new StringBuilder();
-
-            for (int i = offset + 3; i >= offset; i--) {
-                s_lenght.append(formatByte0S(bytes[i]));
-            }
-
-            offset += 4;
-
-            long len = Long.valueOf(s_lenght.toString(), 16);
-
-            sb.append(s_lenght);
-            sb.append(" (").append(len).append(")");
-            sb.append(": ");
-
-            // +2 nullterminating bytes to be for sure
-            byte[] s_byte = new byte[(int) len];
-
-            for (int i = offset, count = 0; i < offset + len; i++, count++) {
-                s_byte[count] = bytes[i];
-                // sb.append(formatByte(bytes[i]));
-            }
-
-            offset += len;
-
-            sb.append(new String(s_byte, StandardCharsets.UTF_16LE));
-
-            sb.append("\n");
-
-            // spool forward to next 4 byte boundary
-
-            offset += offset % 4;
-        }
-
-        jTHex.setText(sb.toString());
-    }
-
-    private void show_guid_stream(TreeNodeContainer cont) {
+    /**
+     * [MS-OXMSG] 2.2.3.1.1
+     */
+    private static String show_guid_stream(TreeNodeContainer cont) {
         StringBuilder sb = new StringBuilder();
         byte[] bytes = (byte[]) cont.getData();
 
@@ -366,7 +323,7 @@ public class ShowNode extends BaseDialog {
         }
 
 
-        jTHex.setText(sb.toString());
+        return sb.toString();
     }
 
     private static String getPropertySetById(String id) {
@@ -406,7 +363,10 @@ public class ShowNode extends BaseDialog {
         }
     }
 
-    private void show_entry_stream(TreeNodeContainer cont) {
+    /**
+     * [MS-OXMSG] 2.2.3.1.2
+     */
+    private static String show_entry_stream(TreeNodeContainer cont) {
         StringBuilder sb = new StringBuilder();
         byte[] bytes = (byte[]) cont.getData();
 
@@ -435,10 +395,66 @@ public class ShowNode extends BaseDialog {
             appendGuid(voffset, bytes, sb);
         }
 
-        jTHex.setText(sb.toString());
+        return sb.toString();
     }
 
-    private void show_nameid_stream(TreeNodeContainer cont) {
+    /**
+     * [MS-OXMSG] 2.2.3.1.3
+     */
+    private static String show_string_stream(TreeNodeContainer cont) {
+        StringBuilder sb = new StringBuilder();
+        byte[] bytes = (byte[]) cont.getData();
+
+        sb.append("String Stream ");
+        sb.append(cont.getEntry().getName());
+        sb.append("\n\n");
+
+        int offset = 0;
+
+        while (offset < bytes.length) {
+
+            sb.append("Offset: ");
+            sb.append(String.format("%04X", offset));
+            sb.append(" ");
+
+            // get length 4 bytes
+            StringBuilder s_lenght = new StringBuilder();
+
+            for (int i = offset + 3; i >= offset; i--) {
+                s_lenght.append(formatByte0S(bytes[i]));
+            }
+
+            offset += 4;
+
+            long len = Long.valueOf(s_lenght.toString(), 16);
+
+            sb.append(s_lenght);
+            sb.append(" (").append(len).append(")");
+            sb.append(": ");
+
+            // +2 nullterminating bytes to be for sure
+            byte[] s_byte = new byte[(int) len];
+
+            for (int i = offset, count = 0; i < offset + len; i++, count++) {
+                s_byte[count] = bytes[i];
+                // sb.append(formatByte(bytes[i]));
+            }
+
+            offset += len;
+
+            sb.append(new String(s_byte, StandardCharsets.UTF_16LE));
+
+            sb.append("\n");
+
+            // spool forward to next 4 byte boundary
+
+            offset += offset % 4;
+        }
+
+        return sb.toString();
+    }
+
+    private static String show_nameid_stream(TreeNodeContainer cont) {
         StringBuilder sb = new StringBuilder();
         byte[] bytes = (byte[]) cont.getData();
 
@@ -460,67 +476,81 @@ public class ShowNode extends BaseDialog {
             appendGuid(voffset, bytes, sb);
         }
 
-        jTHex.setText(sb.toString());
+        return sb.toString();
     }
 
-    private void show_data(TreeNodeContainer cont) {
+    private static String show_data(TreeNodeContainer cont) {
         Object data = cont.getData();
 
         if (data instanceof String) {
-            jTHex.setText((String) data);
-        } else if (data instanceof byte[]) {
-            StringBuilder sb = new StringBuilder();
-            byte[] bytes = (byte[]) data;
+            return (String) data;
+        }
+        if (data instanceof byte[]) {
+            return show_data((byte[]) data);
+        }
+        return "";
+    }
 
-            for (int i = 0; i < bytes.length; i++) {
+    private static String show_data(byte[] data) {
+        return show_bytes_with_chars(data) +
+                "\n\nASCII only\n" +
+                show_ascii_chars(data) +
+                "\n\n" +
+                show_tnef(data) +
+                "\n\n" +
+                '[' + Hex.encodeHexString(data) + ']';
+    }
 
-                if (i > 0 && i % 20 == 0) {
-                    sb.append("\n");
-                }
+    private static String show_bytes_with_chars(byte[] data) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < data.length; i++) {
 
-                if (bytes[i] == 0) {
-                    sb.append("__");
-                } else {
-                    sb.append(String.format("%02X", bytes[i]));
-                }
+            if (i > 0 && i % 20 == 0) {
+                sb.append("\n");
+            }
 
+            if (data[i] == 0) {
+                sb.append("__");
+            } else {
+                sb.append(String.format("%02X", data[i]));
+            }
+
+            sb.append(" ");
+
+            if (data[i] > 30 && data[i] < 127) {
+                sb.append(String.format("%c", (char) data[i]));
+            } else {
                 sb.append(" ");
-
-                if (bytes[i] > 30 && bytes[i] < 127) {
-                    sb.append(String.format("%c", (char) bytes[i]));
-                } else {
-                    sb.append(" ");
-                }
-
-                sb.append("  ");
             }
 
-            sb.append("\n\nASCII only\n");
+            sb.append("  ");
+        }
+        return sb.toString();
+    }
 
-            for (int i = 0; i < bytes.length; i++) {
+    private static String show_ascii_chars(byte[] data) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < data.length; i++) {
 
-                if (i > 0 && i % 20 == 0) {
-                    sb.append("\n");
-                }
-
-                if (bytes[i] > 30 && bytes[i] < 127) {
-                    sb.append(String.format("%c", (char) bytes[i]));
-                }
-
+            if (i > 0 && i % 20 == 0) {
+                sb.append("\n");
             }
 
-            try {
-                byte[] decBytes = new CompressedRTF().decompress(new ByteArrayInputStream(bytes));
-                sb.append("\n\ndecompressed TNEF\n\n");
-                sb.append(new String(decBytes));
-            } catch (Exception ex) {
-                logger.error("failed decompressing", ex);
+            if (data[i] > 30 && data[i] < 127) {
+                sb.append(String.format("%c", (char) data[i]));
             }
 
-            sb.append("\n\n");
-            sb.append('[').append(Hex.encodeHexString(bytes)).append(']');
+        }
+        return sb.toString();
+    }
 
-            jTHex.setText(sb.toString());
+    private static String show_tnef(byte[] data) {
+        try {
+            byte[] decBytes = new CompressedRTF().decompress(new ByteArrayInputStream(data));
+            return "decompressed TNEF\n\n" + new String(decBytes);
+        } catch (Exception ex) {
+            logger.error("failed decompressing", ex);
+            return "No TNEF content detected";
         }
     }
 
