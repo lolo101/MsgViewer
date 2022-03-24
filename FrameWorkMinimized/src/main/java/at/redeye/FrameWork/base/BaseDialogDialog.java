@@ -16,23 +16,18 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 		BindVarInterface, BaseDialogBase {
 
 	private static final long serialVersionUID = 1L;
+	protected static final Logger logger = LogManager.getLogger(BaseDialogDialog.class);
 
-	public BaseDialogBaseHelper helper;
-	JRootPane myrootPane;
-	protected static Logger logger = LogManager.getLogger(BaseDialogDialog.class);
-	protected Root root;
+	protected final Root root;
+	private final BaseDialogBaseHelper helper;
+	private JRootPane myrootPane;
 
 	public BaseDialogDialog(Root root, String title) {
-		this.root = root;
-
-		helper = new BaseDialogBaseHelper(this, root, title, myrootPane, false);
+		this(null, root, title, false);
 	}
 
 	public BaseDialogDialog(JFrame owner, Root root, String title) {
-		super(owner);
-		this.root = root;
-
-		helper = new BaseDialogBaseHelper(this, root, title, myrootPane, false);
+		this(owner, root, title, false);
 	}
 
 	public BaseDialogDialog(JFrame owner, Root root, String title,

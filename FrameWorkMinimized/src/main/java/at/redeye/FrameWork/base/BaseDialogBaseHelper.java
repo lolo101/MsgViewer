@@ -23,10 +23,10 @@ import java.util.Timer;
 import java.util.*;
 
 public class BaseDialogBaseHelper implements BindVarInterface {
-    protected Root root;
+    protected final Root root;
     private Transaction transaction = null;
 
-    protected String title;
+    protected final String title;
     private DBConnection con = null;
 
     protected static Logger logger = LogManager.getLogger(BaseDialogBaseHelper.class);
@@ -36,15 +36,15 @@ public class BaseDialogBaseHelper implements BindVarInterface {
     boolean edited = false;
     public BindVarInterface bind_vars;
     protected List<Runnable> onCloseListeners;
-    protected CloseSubDialogHelper close_subdialog_helper;
+    protected final CloseSubDialogHelper close_subdialog_helper;
 
     /**
      * All keys ESC, or F1, F2 listeners are registered in this container
      */
-    protected HashMap<KeyStroke, Vector<Runnable>> listen_key_events = null;
+    protected final Map<KeyStroke, Vector<Runnable>> listen_key_events = new HashMap<>();
     private final JRootPane myrootPane;
     protected Runnable HelpWinRunnable;
-    protected UniqueDialogHelper unique_dialog_helper;
+    protected final UniqueDialogHelper unique_dialog_helper = new UniqueDialogHelper();
     protected TranslationHelper translation_helper;
     protected boolean autoswitch_trans_first_run = true;
 
@@ -64,19 +64,11 @@ public class BaseDialogBaseHelper implements BindVarInterface {
         }
 
         public void actionPerformed(ActionEvent e) {
-            if (listen_key_events == null) {
-                return;
-            }
-
-            Vector<Runnable> functions = listen_key_events.get(key);
-
-            for (Runnable runnable : functions) {
-                runnable.run();
-            }
+            listen_key_events.get(key).forEach(Runnable::run);
         }
     }
 
-    BaseDialogBase parent;
+    final BaseDialogBase parent;
 
     public BaseDialogBaseHelper(final BaseDialogBase parent, Root root,
                                 String title, JRootPane myrootPane, boolean do_not_inform_root) {
@@ -84,11 +76,12 @@ public class BaseDialogBaseHelper implements BindVarInterface {
         this.root = root;
         this.title = title;
         this.myrootPane = myrootPane;
+        this.close_subdialog_helper = new CloseSubDialogHelper(parent);
 
         initCommon(do_not_inform_root);
     }
 
-    protected void initCommon(boolean do_not_inform_root) {
+    protected final void initCommon(boolean do_not_inform_root) {
         translation_helper = new TranslationHelper(root, parent, this);
         parent.setTitle(MlM(title));
 
@@ -315,9 +308,6 @@ public class BaseDialogBaseHelper implements BindVarInterface {
         dlg.setVisible(true);
         dlg.toFront();
 
-        if (close_subdialog_helper == null)
-            close_subdialog_helper = new CloseSubDialogHelper(parent);
-
         if (parent.closeSubdialogsOnClose())
             close_subdialog_helper.closeSubDialog(dlg);
 
@@ -333,12 +323,6 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 
     public void invokeDialogUnique(BaseDialogBase dialog) {
         setWaitCursor();
-
-        if (unique_dialog_helper == null)
-            unique_dialog_helper = new UniqueDialogHelper();
-
-        if (close_subdialog_helper == null)
-            close_subdialog_helper = new CloseSubDialogHelper(parent);
 
         BaseDialogBase d_unique = unique_dialog_helper
                 .invokeUniqueDialog(dialog);
@@ -530,9 +514,6 @@ public class BaseDialogBaseHelper implements BindVarInterface {
      */
     public void registerActionKeyListener(KeyStroke to_listen_Key,
                                           Runnable runnable) {
-        if (listen_key_events == null)
-            listen_key_events = new HashMap<>();
-
         Vector<Runnable> listeners = listen_key_events.get(to_listen_Key);
 
         if (listeners == null) {

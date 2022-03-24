@@ -13,13 +13,13 @@ public class UniqueDialogHelper
 
     public BaseDialogBase invokeUniqueDialog( final BaseDialogBase dialog )
     {
-        BaseDialogBase d = dialogs.get(dialog.getUniqueDialogIdentifier());
+        String identifier = dialog.getUniqueDialogIdentifier();
+        BaseDialogBase d = dialogs.get(identifier);
 
-        if( d == null )
-        {
-            dialogs.put(dialog.getUniqueDialogIdentifier(), dialog);
+        if (d == null) {
+            dialogs.put(identifier, dialog);
 
-            dialog.registerOnCloseListener(() -> dialogs.remove(dialog.getUniqueDialogIdentifier()));
+            dialog.registerOnCloseListener(() -> dialogs.remove(identifier));
 
             return dialog;
 
