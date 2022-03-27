@@ -1,45 +1,20 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.base.translation;
 
 import at.redeye.FrameWork.base.Root;
+
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.Properties;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- *
- * @author martin
- */
 public class MLUtil {
 
     static Pattern number_pattern = Pattern.compile("^[0-9 \t\\n,.]+$");
-
-    public static Properties convertResourceBundleToProperties(ResourceBundle resource) {
-        Properties properties = new Properties();
-
-        Enumeration<String> keys = resource.getKeys();
-        while (keys.hasMoreElements()) {
-            String key = keys.nextElement();
-            properties.put(key, resource.getString(key));
-            //System.out.println("key: '" + key + "' value: '" + properties.get(key) + "'");
-        }
-
-        return properties;
-    }
 
     public static String getAltResourcePath(String resourceName, String subdir)
     {
@@ -50,8 +25,6 @@ public class MLUtil {
 
     /**
      * Adds all Properties from b to a
-     * @param a
-     * @param b
      */
     public static void addAllProps( Properties a , Properties b )
     {
@@ -82,10 +55,7 @@ public class MLUtil {
 
         // System.out.println("testing: " + name  + (url != null ? " found" : " not found"));
 
-        if( url != null )
-            return true;
-
-        return false;
+        return url != null;
     }
 
     public static Properties autoLoadFile4Class(Root root, Object object, String locale, boolean no_default)
@@ -97,26 +67,21 @@ public class MLUtil {
     {
         try {
             return loadFile4ClassName(root, name, locale, no_default);
-        } catch( FileNotFoundException ex ) {
-            return null;
         } catch( IOException ex ) {
             return null;
         }
     }
 
-    private static Properties loadFile4ClassName(Root root, String name, String locale, boolean no_default) throws FileNotFoundException, IOException
-    {
-        Properties p = null;
+    private static Properties loadFile4ClassName(Root root, String name, String locale, boolean no_default) throws IOException {
+        Properties p = loadFile4ClassInt(root, name, locale);
 
-        p = loadFile4ClassInt(root, name, locale);
-
-        if( p != null )
+        if (p != null)
             return p;
 
         String[] parts = locale.split("_");
 
-        if ( parts.length == 1 ) {
-            if( !no_default )
+        if (parts.length == 1) {
+            if (!no_default)
                 p = loadFile4ClassInt(root, name,root.getDefaultLanguage());
         }
 
@@ -134,54 +99,47 @@ public class MLUtil {
         return p;
     }
 
-    private static Properties loadFile4ClassInt( Root root, String name, String lang ) throws FileNotFoundException, IOException
-    {
+    private static Properties loadFile4ClassInt(Root root, String name, String lang) throws IOException {
         String dir = TranslationDialog.getTranslationsDir(root);
 
-        String file_name =  "/" + name;
+        String file_name = "/" + name;
 
         String base_name = dir + file_name;
         String prop = ".properties";
 
-        String extra = "_";
+        String extra = lang.isEmpty() ? "" : "_";
 
-        if( lang.isEmpty() )
-            extra = "";
+        File dir_exact = new File(base_name + extra + lang + prop);
 
-        File dir_exact = new File( base_name + extra + lang + prop );
+        String resource_name = "/" + name.replace('.', '/') + extra + lang + prop;
 
-        String resource_name = "/" + name.replaceAll("\\.", "/") + extra + lang + prop;
-
-        String alt1_resource_name = "/" + MLUtil.getAltResourcePath(name.replaceAll("\\.", "/"), "translations") + extra + lang + prop;
-        String alt2_resource_name = "/" + MLUtil.getAltResourcePath(name.replaceAll("\\.", "/"), "resources/translations") + extra + lang + prop;
+        String alt1_resource_name = "/" + MLUtil.getAltResourcePath(name.replace('.', '/'), "translations") + extra + lang + prop;
+        String alt2_resource_name = "/" + MLUtil.getAltResourcePath(name.replace('.', '/'), "resources/translations") + extra + lang + prop;
 
         Properties local_props = new Properties();
 
-         boolean not_found = false;
+        if (dir_exact.isFile()) {
+            try (InputStream in = new FileInputStream(dir_exact)) {
+                local_props.load(in);
+            }
 
-        if( dir_exact.isFile() )
-        {
-            FileInputStream in = new FileInputStream(dir_exact);
-            local_props.load(in);
-            in.close();
+        } else if (haveResource(resource_name)) {
 
-        } else if( haveResource( resource_name ) ) {
-
-            InputStream in = root.getClass().getResourceAsStream( resource_name );
-            local_props.load( in );
-            in.close();
+            try (InputStream in = root.getClass().getResourceAsStream(resource_name)) {
+                local_props.load(in);
+            }
 
         } else if( haveResource( alt1_resource_name ) ) {
 
-            InputStream in = root.getClass().getResourceAsStream( alt1_resource_name );
-            local_props.load( in );
-            in.close();
+            try (InputStream in = root.getClass().getResourceAsStream(alt1_resource_name)) {
+                local_props.load(in);
+            }
 
         } else if( haveResource( alt2_resource_name ) ) {
 
-            InputStream in = root.getClass().getResourceAsStream( alt2_resource_name );
-            local_props.load( in );
-            in.close();
+            try (InputStream in = root.getClass().getResourceAsStream(alt2_resource_name)) {
+                local_props.load(in);
+            }
         } else {
              local_props = null;
         }
@@ -197,14 +155,9 @@ public class MLUtil {
     public static Properties autoLoadFile4ClassName(Root root, String name, String locale, String impl_language)
     {
         try {
-            boolean no_default = false;
-
-            if( MLUtil.compareLanguagesOnly(locale, impl_language))
-                no_default = true;
+            boolean no_default = MLUtil.compareLanguagesOnly(locale, impl_language);
 
             return loadFile4ClassName(root, name, locale, no_default);
-        } catch( FileNotFoundException ex ) {
-            return null;
         } catch( IOException ex ) {
             return null;
         }
@@ -212,8 +165,6 @@ public class MLUtil {
 
     /**
      * compares the language part of the given locales
-     * @param locale_a
-     * @param locale_b
      * @return true if both languages are the same
      */
     public static boolean compareLanguagesOnly( String locale_a, String locale_b )
@@ -225,30 +176,20 @@ public class MLUtil {
     }
 
     /**
-     * @param locale
      * @return returns "de" when the locale was "de_AT"
      */
     public static String getLanguageOnly( String locale )
     {
-        if( locale.length() == 2 )
-            return locale;
-
         return locale.substring(0,2);
     }
 
     public static boolean shouldBeTranslated(String s)
     {
-        if( s.isEmpty() )
-            return false;
-
         if( s.trim().isEmpty() )
             return false;
 
         Matcher matcher = number_pattern.matcher(s);
 
-        if( matcher.matches() )
-            return false;
-
-        return true;
+        return !matcher.matches();
     }
 }

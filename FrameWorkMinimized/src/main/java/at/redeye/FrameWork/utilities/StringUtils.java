@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
 
 public class StringUtils {
@@ -103,15 +104,9 @@ public class StringUtils {
 	}
 
 	public static String strip_post(String str, String what) {
-
-		if (str == null) {
-			throw new NullPointerException();
-		}
-
-		StringBuilder s = new StringBuilder();
-		s.append(str);
-		return strip_post(s, what);
-	}
+        requireNonNull(str);
+        return strip_post(new StringBuilder(str), what);
+    }
 
 	public static String strip(String s, String what) {
 		return strip(new StringBuilder(s), what);

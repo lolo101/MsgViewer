@@ -28,7 +28,7 @@ The build will generate a number of files. The main file is a 'uber-jar' placed 
 
 You can now run the project with:
 
-```
+```shell
 cd MSGViewer/target
 java -jar msgviewer.jar
 ```

@@ -1,24 +1,21 @@
 package at.redeye.FrameWork.widgets;
 
+import javax.swing.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.Vector;
-import javax.swing.ComboBoxEditor;
-import javax.swing.JTextField;
+import java.util.List;
 
 public class AutoCompleteTextField extends JTextField
         implements FocusListener, KeyListener, ComboBoxEditor {
 
-    private Vector items = null;
+    private List<String> items = null;
     private int matched_index = -1;
     private boolean do_completion = true;
 
     public AutoCompleteTextField() {
-        addFocusListener(this);
-        enable_complete(true);
-        setEnabled(true);
+        this(0);
     }
 
     public AutoCompleteTextField(int size) {
@@ -28,7 +25,7 @@ public class AutoCompleteTextField extends JTextField
         setEnabled(true);
     }
 
-    public void set_items(Vector v) {
+    public void set_items(List<String> v) {
         // it is assumed that 'items' is pre-sorted in manner that
         // auto-complete will operate on (namely, first match wins)
         //
@@ -55,12 +52,12 @@ public class AutoCompleteTextField extends JTextField
     }
 
     public Object getItem() {
-        return ((matched_index > -1 ? items.get(matched_index) : null));
+        return matched_index > -1 ? items.get(matched_index) : null;
     }
 
     public void setItem(Object o) {
-        String match = get_completion((o == null ? null : o.toString()));
-        setText((match == null ? "" : match));
+        String match = get_completion(o == null ? null : o.toString());
+        setText(match == null ? "" : match);
     }
 
     private String get_completion(String str) {
@@ -70,7 +67,7 @@ public class AutoCompleteTextField extends JTextField
         if (str != null && items != null) {
             int len = str.length();
             for (int i = 0; i < items.size(); i++) {
-                String candidate = (items.get(i)).toString(); // ?
+                String candidate = items.get(i);
                 if (len > candidate.length()) {
                     continue;
                 }
@@ -88,8 +85,6 @@ public class AutoCompleteTextField extends JTextField
         // this runs *just* before the user's keystroke
         // does anything to the text field. the text
         // field will be affected after this finishes.
-        
-        // System.out.println( "keyPressed" );
     }
 
     public void keyTyped(KeyEvent ke) {
@@ -97,8 +92,6 @@ public class AutoCompleteTextField extends JTextField
         // keyReleased (and before the textfield value
         // is modified; the event can be cancelled here
         // to prevent action)
-
-        // System.out.println( "keyTyped" );
     }
 
     public void keyReleased(KeyEvent ke) {
@@ -106,12 +99,9 @@ public class AutoCompleteTextField extends JTextField
         // has already had it's effect on the textfield value
         // (a normal keypress is inserted/appended, etc.)
 
-        // System.out.println( "keyReleased" );
-
         char ch = ke.getKeyChar();
         int code = ke.getKeyCode();
         String input = getText();
-        int i_len = input.length();
         int pos = getCaretPosition();
         if (ch == KeyEvent.CHAR_UNDEFINED) {
             // arrow keys and other non-displayable chars
@@ -134,7 +124,6 @@ public class AutoCompleteTextField extends JTextField
     }
 
     public void focusGained(FocusEvent e) {
-        // System.out.println("FOCUS_GAINED");
         selectAll();
     }
 
@@ -144,7 +133,7 @@ public class AutoCompleteTextField extends JTextField
 
     public java.awt.Component getEditorComponent() {
         // this satisfies ComboBoxEditor interface
-        // (along with getItem and setItem        
+        // (along with getItem and setItem)
 
         return this;
     }

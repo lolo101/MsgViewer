@@ -53,10 +53,10 @@ public class PropertyParser {
         // RESERVED 8 bytes (should be zero)
         in.skip(8);
         if (is_msg) {
-            int nextRecipientId = in.readInt();
-            int nextAttachmentId = in.readInt();
-            int recipientCount = in.readInt();
-            int attachmentCount = in.readInt();
+            in.readInt(); // nextRecipientId
+            in.readInt(); // nextAttachmentId
+            in.readInt(); // recipientCount
+            in.readInt(); // attachmentCount
 
             if (is_toplevel) {
                 // RESERVED 8 bytes (should be zero)
@@ -84,7 +84,7 @@ public class PropertyParser {
 
         if (typ.variableLength || typ.multipleValued) {
             int size = in.readInt();
-            int reserved = in.readInt();
+            in.readInt(); // reserved
             sb.append(" size: ").append(size);
         } else {
             sb.append(" value: ").append(typ.convert(in));

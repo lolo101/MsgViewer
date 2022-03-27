@@ -13,7 +13,7 @@ public class Property {
     Property(DocumentInputStream propertyStream, DirectoryEntry dir) throws IOException {
         short pType = propertyStream.readShort();
         short id = propertyStream.readShort();
-        int flags = propertyStream.readInt();
+        propertyStream.readInt(); // flags
         Ptyp typ = Ptyp.from(pType);
 
         pid = Pid.from(id);

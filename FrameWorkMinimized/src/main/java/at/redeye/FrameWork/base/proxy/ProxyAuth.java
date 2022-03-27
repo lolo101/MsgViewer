@@ -1,26 +1,12 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
- * ProxyAuth.java
- *
- * Created on 26.07.2010, 14:51:04
- */
-
 package at.redeye.FrameWork.base.proxy;
 
 import at.redeye.FrameWork.base.BaseDialogDialog;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.utilities.StringUtils;
-import java.awt.event.KeyEvent;
-import javax.swing.KeyStroke;
 
-/**
- *
- * @author martin
- */
+import javax.swing.*;
+import java.awt.event.KeyEvent;
+
 public class ProxyAuth extends BaseDialogDialog {
 
     public static final String SAVE_PASSWORD="ProxyAuth.SAVE_PASSWORD";
@@ -54,13 +40,7 @@ public class ProxyAuth extends BaseDialogDialog {
             jCSavePasswd.setSelected(true);
         }
 
-        registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,0), new Runnable() {
-
-            @Override
-            public void run() {
-                jButtonOkActionPerformed(null);
-            }
-        });
+        registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), () -> jButtonOkActionPerformed(null));
     }
 
     public String getUserName()
@@ -98,16 +78,16 @@ public class ProxyAuth extends BaseDialogDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
+        javax.swing.JLabel jLabel1 = new javax.swing.JLabel();
+        javax.swing.JLabel jLabel2 = new javax.swing.JLabel();
+        javax.swing.JLabel jLabel3 = new javax.swing.JLabel();
         jTName = new javax.swing.JTextField();
         jTDomain = new javax.swing.JTextField();
         JPassword = new javax.swing.JPasswordField();
         jCSavePasswd = new javax.swing.JCheckBox();
-        jButtonOk = new javax.swing.JButton();
-        jButtonCancel = new javax.swing.JButton();
-        jLabel4 = new javax.swing.JLabel();
+        javax.swing.JButton jButtonOk = new javax.swing.JButton();
+        javax.swing.JButton jButtonCancel = new javax.swing.JButton();
+        javax.swing.JLabel jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -200,13 +180,7 @@ public class ProxyAuth extends BaseDialogDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPasswordField JPassword;
-    private javax.swing.JButton jButtonCancel;
-    private javax.swing.JButton jButtonOk;
     private javax.swing.JCheckBox jCSavePasswd;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JTextField jTDomain;
     private javax.swing.JTextField jTName;
     // End of variables declaration//GEN-END:variables

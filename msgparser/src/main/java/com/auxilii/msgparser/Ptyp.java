@@ -75,8 +75,8 @@ public enum Ptyp {
 
     public Object parseValue(DocumentInputStream propertyStream, DirectoryEntry dir, String pTag) throws IOException {
         if (variableLength || multipleValued) {
-            int byteCount = propertyStream.readInt();
-            int reserved = propertyStream.readInt();
+            propertyStream.readInt(); // byteCount
+            propertyStream.readInt(); // reserved
             return parseSubStorage(dir, pTag);
         }
         return convert(propertyStream);
@@ -152,7 +152,7 @@ public enum Ptyp {
         int[] lengths = new int[subStream.available() / 8];
         for (int i = 0; i < lengths.length; i++) {
             lengths[i] = subStream.readInt();
-            int reserved = subStream.readInt();
+            subStream.readInt(); // reserved
         }
         return lengths;
     }

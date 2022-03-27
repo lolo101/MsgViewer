@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.base.proxy;
 
 import at.redeye.FrameWork.utilities.StringUtils;
@@ -13,18 +8,17 @@ import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
-/**
- *
- * @author martin
- */
 public class SimpleProxySelector extends ProxySelector
 {
+    private static final Pattern HOST_AND_PORT = Pattern.compile(".*:[0-9]+$");
     public static Logger logger = LogManager.getLogger(SimpleProxySelector.class);
-    private static ArrayList<Proxy> no_proxy_list;
+    private static final ArrayList<Proxy> no_proxy_list = new ArrayList<>(List.of(Proxy.NO_PROXY));
 
     public static class WhiteListEntry
     {
+        private static final Pattern IP_ADDRESS = Pattern.compile("[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+");
         public String entry;
         public boolean is_ip_address;
 
@@ -32,7 +26,7 @@ public class SimpleProxySelector extends ProxySelector
         {
             this.entry = white_list_url_entry.trim();
 
-            is_ip_address = entry.matches("[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+");
+            is_ip_address = IP_ADDRESS.matcher(entry).matches();
 
             if( entry.contains("*") )
             {
@@ -47,17 +41,8 @@ public class SimpleProxySelector extends ProxySelector
 
     public SimpleProxySelector( String host, int port )
     {
-        super();
-
         Proxy proxy = new Proxy(Proxy.Type.HTTP, InetSocketAddress.createUnresolved(host, port));
         proxy_list.add(proxy);
-
-        if( no_proxy_list == null )
-        {
-            no_proxy_list = new ArrayList<>();
-            no_proxy_list.add(Proxy.NO_PROXY);
-        }
-
     }
 
     @Override
@@ -85,10 +70,9 @@ public class SimpleProxySelector extends ProxySelector
         // dann kommt auch noch ein zweiter request, der dann so aussieht:
         // socket://sis.salomon.at:80
 
-        if( suri.matches(".*:[0-9]+$") )
-        {
+        if (HOST_AND_PORT.matcher(suri).matches()) {
             int i = suri.lastIndexOf(':');
-            suri = suri.substring(0,i);
+            suri = suri.substring(0, i);
         }
 
         logger.info("suri: " + suri);

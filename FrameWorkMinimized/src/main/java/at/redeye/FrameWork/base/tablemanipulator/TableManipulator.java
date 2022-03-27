@@ -76,7 +76,6 @@ public class TableManipulator {
 
     /**
      * reconfigure the table for a new bindtype
-     * @param binddesc
      */
     public void reconfigure(DBStrukt binddesc)
     {
@@ -98,7 +97,7 @@ public class TableManipulator {
         Vector<TableDesign.Coll> vec = new Vector<>();
 
         ArrayList<String> names = binddesc.getAllNames();
-        ArrayList<DBValue> values = binddesc.getAllValues();
+        List<DBValue> values = binddesc.getAllValues();
 
         for( int i = 0; i < names.size(); i++ )
         {
@@ -235,7 +234,7 @@ public class TableManipulator {
 
     public void add(DBStrukt binddesc)
     {
-        ArrayList<DBValue> values = binddesc.getAllValues();
+        List<DBValue> values = binddesc.getAllValues();
 
         addRow( values );
     }
@@ -258,7 +257,7 @@ public class TableManipulator {
     {
         for( DBStrukt s : col )
         {
-            ArrayList<DBValue> values = s.getAllValues();
+            List<DBValue> values = s.getAllValues();
 
             addRow( values, false );
         }
@@ -285,7 +284,7 @@ public class TableManipulator {
             TableDesign.Coll tcoll = tabledesign.colls.get(i);
 
             if( tcoll.dbval instanceof DBEnum ) {
-                col.setCellEditor(new AdvancedEnumTableCellEditor(tabledesign, (DBEnum)tcoll.dbval));
+                col.setCellEditor(new AdvancedEnumTableCellEditor(tabledesign, (DBEnum<?>) tcoll.dbval));
             } else if( tcoll.dbval instanceof DBEnumAsInteger ) {
                 col.setCellEditor(new AdvancedEnumTableCellEditor(tabledesign, (DBEnumAsInteger)tcoll.dbval));
             } else {
@@ -455,7 +454,7 @@ public class TableManipulator {
 
     public void setEditable( DBValue column, boolean isEditable )
     {
-        ArrayList<DBValue> values = binddesc.getAllValues();
+        List<DBValue> values = binddesc.getAllValues();
 
         for( int i = 0, col=0; i < values.size(); i++ )
         {
@@ -475,11 +474,9 @@ public class TableManipulator {
 
     /**
      * disable, or enables the Autocompletet feature for this column
-     * @param column
-     * @param doAutocomplete
      */
     public void setAutoCompleteForAllOfThisColl(DBValue column, boolean doAutocomplete) {
-        ArrayList<DBValue> values = binddesc.getAllValues();
+        List<DBValue> values = binddesc.getAllValues();
 
         for (int i = 0, col = 0; i < values.size(); i++) {
             if (isHidden(i)) {
@@ -497,11 +494,9 @@ public class TableManipulator {
 
     /**
      * disable, or enables the Autocompletet feature
-     * @param column
-     * @param doAutocomplete
      */
     public void setAutoCompleteForCollAtAll(DBValue column, boolean doAutocomplete) {
-        ArrayList<DBValue> values = binddesc.getAllValues();
+        List<DBValue> values = binddesc.getAllValues();
 
         for (int i = 0, col = 0; i < values.size(); i++) {
             if (isHidden(i)) {
@@ -520,7 +515,7 @@ public class TableManipulator {
 
     public void setValidator(DBValue column,TableValidator validator)
     {
-        ArrayList<DBValue> values = binddesc.getAllValues();
+        List<DBValue> values = binddesc.getAllValues();
 
         for( int i = 0, col=0; i < values.size(); i++ )
         {
@@ -539,7 +534,7 @@ public class TableManipulator {
 
     public void setAdditionalAutocompleteData( DBValue column, Vector<Object> data )
     {
-        ArrayList<DBValue> values = binddesc.getAllValues();
+        List<DBValue> values = binddesc.getAllValues();
 
         for( int i = 0, col=0; i < values.size(); i++ )
         {
@@ -573,7 +568,7 @@ public class TableManipulator {
             if( column == null )
                 continue;
 
-            ArrayList<DBValue> values = binddesc.getAllValues();
+            List<DBValue> values = binddesc.getAllValues();
 
             boolean found = false;
 
@@ -606,7 +601,7 @@ public class TableManipulator {
 
     public void setCellColor (DBValue column, int row, Color color) {
 
-        ArrayList<DBValue> values = binddesc.getAllValues();
+        List<DBValue> values = binddesc.getAllValues();
 
 
         for( int i = 0, col=0; i < values.size(); i++ )
@@ -627,7 +622,7 @@ public class TableManipulator {
 
     public void setToolTip (DBValue column, int row, String tooltip) {
 
-        ArrayList<DBValue> values = binddesc.getAllValues();
+        List<DBValue> values = binddesc.getAllValues();
 
 
         for( int i = 0, col=0; i < values.size(); i++ )
@@ -648,7 +643,7 @@ public class TableManipulator {
 
     public void updateValue( DBValue value, int row )
     {
-        ArrayList<DBValue> values = binddesc.getAllValues();
+        List<DBValue> values = binddesc.getAllValues();
 
         for( int i = 0, col=0; i < values.size(); i++ )
         {
@@ -658,7 +653,6 @@ public class TableManipulator {
             if( values.get(i).getName().equals(value.getName()) )
             {
                 model.setValueAt(value, row, col);
-                //model.fireTableCellUpdated(row, col);
                 return;
             }
 
@@ -670,7 +664,6 @@ public class TableManipulator {
     {
         model.fireTableDataChanged();
         row_header.updateUI();
-        //table.updateUI();
     }
 
     /**

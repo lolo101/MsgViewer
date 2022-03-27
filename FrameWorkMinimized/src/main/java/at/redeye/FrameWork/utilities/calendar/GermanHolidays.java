@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.utilities.calendar;
 
 import java.time.LocalDate;
@@ -24,10 +19,6 @@ public class GermanHolidays extends BaseHolidays implements Holidays {
 
         // siehe http://de.wikipedia.org/wiki/Feiertage_in_Deutschland
         Vector<HolidayInfo> res = new Vector<>();
-
-        Easterformular easter_formular = new Easterformular(year);
-
-        int day = easter_formular.easterday();
 
         LocalDate easter = getEaster(year);
 

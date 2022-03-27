@@ -45,7 +45,7 @@ public class HyperlinkExecuter implements HyperlinkListener {
             command_array[0] = open_command;
             command_array[1] = e.getURL().toString();
 
-            Process p = Runtime.getRuntime().exec(command_array);
+            Runtime.getRuntime().exec(command_array);
         }
     }
 
