@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package at.redeye.FrameWork.base.tablemanipulator;
 
 import at.redeye.FrameWork.base.bindtypes.DBEnum;
@@ -14,12 +10,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.table.TableCellEditor;
 import java.awt.*;
 
-/**
- *
- * @author martin
- */
 public class AdvancedEnumTableCellEditor extends AbstractCellEditor implements TableCellEditor {
-
 
     private static final long serialVersionUID = 1L;
     AutoCompleteCombo component = new AutoCompleteCombo();
@@ -28,15 +19,13 @@ public class AdvancedEnumTableCellEditor extends AbstractCellEditor implements T
     int last_col = 0;
     Object current_value;
 
-    public AdvancedEnumTableCellEditor(TableDesign tabledesign, DBEnum value ) {
+    public AdvancedEnumTableCellEditor(TableDesign tabledesign, DBEnum<?> value) {
         this.tabledesign = tabledesign;
 
-        for( String s : value.getLocalizedPossibleValues() )
-        {
+        for (String s : value.getLocalizedPossibleValues()) {
             component.addItem(s);
         }
 
-        // component.set_items(value.getPossibleValues());
         component.setEditable(true);
     }
 
@@ -48,21 +37,13 @@ public class AdvancedEnumTableCellEditor extends AbstractCellEditor implements T
             component.addItem(s);
         }
 
-        // component.set_items(value.getPossibleValues());
         component.setEditable(true);
     }
 
     @Override
     public Object getCellEditorValue() {
-        /*
-        System.out.println( "value+:" + ((JTextField)component).getText() );
-        System.out.println( "add row:" + last_row );
-         */
-        // System.out.println("getCellEditorValue");
-
         tabledesign.edited_cols.add(last_col);
         tabledesign.edited_rows.add(last_row);
-        // return component.getSelectedItem().toString();
         return component.getText();
     }
 
@@ -70,30 +51,25 @@ public class AdvancedEnumTableCellEditor extends AbstractCellEditor implements T
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
 
         last_row = TableDesign.getModelRow(table, row);
-        last_col =  TableDesign.getModelCol(table, column);
+        last_col = TableDesign.getModelCol(table, column);
 
         current_value = value;
 
         System.out.println("getTableCellEditorComponent for column " + last_col);
 
-       java.awt.EventQueue.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                if(component.isVisible())
-                    component.requestFocus();
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            if (component.isVisible())
+                component.requestFocus();
         });
 
         component.setBorder(new LineBorder(Color.BLACK));
 
-        if( tabledesign.colls.get(last_col).validator != null )
-        {
+        if (tabledesign.colls.get(last_col).validator != null) {
             tabledesign.colls.get(last_col).validator.updateComponentBeforeEdit(component, value, tabledesign, last_row, last_col);
         }
 
-        if( value instanceof DBEnum )
-            component.setSelectedItem(((DBEnum)value).getLocalizedString());
+        if (value instanceof DBEnum)
+            component.setSelectedItem(((DBEnum<?>) value).getLocalizedString());
         else
             component.setSelectedItem(value);
 

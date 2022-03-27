@@ -1,30 +1,19 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package at.redeye.FrameWork.base.tablemanipulator;
 
-import at.redeye.FrameWork.widgets.documentfields.DocumentFieldDateTime;
-import at.redeye.FrameWork.widgets.documentfields.DocumentFieldInteger;
-import at.redeye.FrameWork.widgets.documentfields.DocumentFieldLimit;
 import at.redeye.FrameWork.base.bindtypes.DBDateTime;
 import at.redeye.FrameWork.base.bindtypes.DBInteger;
 import at.redeye.FrameWork.base.bindtypes.DBString;
 import at.redeye.FrameWork.base.bindtypes.DBValue;
-
 import at.redeye.FrameWork.widgets.AutoCompleteTextField;
-import java.awt.Color;
-import java.awt.Component;
-import javax.swing.AbstractCellEditor;
-import javax.swing.JTable;
-import javax.swing.JTextField;
+import at.redeye.FrameWork.widgets.documentfields.DocumentFieldDateTime;
+import at.redeye.FrameWork.widgets.documentfields.DocumentFieldInteger;
+import at.redeye.FrameWork.widgets.documentfields.DocumentFieldLimit;
+
+import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.table.TableCellEditor;
+import java.awt.*;
 
-/**
- *
- * @author martin
- */
 public class AdvancedTableCellEditor extends AbstractCellEditor implements TableCellEditor {
 
     private static final long serialVersionUID = 1L;
@@ -39,10 +28,6 @@ public class AdvancedTableCellEditor extends AbstractCellEditor implements Table
     }
 
     public Object getCellEditorValue() {
-        /*
-        System.out.println( "value+:" + ((JTextField)component).getText() );
-        System.out.println( "add row:" + last_row );
-         */
         System.out.println("getCellEditorValue");
 
         tabledesign.edited_cols.add(last_col);

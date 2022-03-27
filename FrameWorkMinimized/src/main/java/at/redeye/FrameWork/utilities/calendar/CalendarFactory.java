@@ -18,14 +18,15 @@ public class CalendarFactory
         Locale l = Locale.getDefault();
         String country = l.getCountry();
 
-        if (country.equals("AT")) {
-            return new AustrianHolidays();
-        } else if( country.equals("DE") ) {
-            return new GermanHolidays();
-        } else if( country.equals("CH") ) {
-            return new SwitzerlandHolidays();
+        switch (country) {
+            case "AT":
+                return new AustrianHolidays();
+            case "DE":
+                return new GermanHolidays();
+            case "CH":
+                return new SwitzerlandHolidays();
+            default:
+                return null;
         }
-
-        return null;
     }
 }

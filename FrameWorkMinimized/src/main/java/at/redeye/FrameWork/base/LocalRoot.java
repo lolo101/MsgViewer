@@ -11,9 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.security.AccessControlException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 public class LocalRoot extends Root {
 
@@ -25,8 +23,8 @@ public class LocalRoot extends Root {
     protected boolean appExitAllowed = true;
     DelayedProxyLoader loader_proxy;
     AutoProxyHandler proxy_handler;
-    ArrayList<Plugin> plugins;
-    Holidays holidays;
+    final Map<String, Plugin> plugins = new HashMap<>();
+    Holidays holidays = CalendarFactory.getDefaultHolidays();
     MLHelper ml_helper;
 
     public class DelayedProxyLoader extends Thread {
@@ -124,12 +122,9 @@ public class LocalRoot extends Root {
 
     @Override
     public void closeAllWindowsExceptThisOne(BaseDialogBase dlg) {
-        Vector<BaseDialogBase> dlgs = new Vector<>(dialogs);
-
-        for (BaseDialogBase frame : dlgs) {
-            if (frame != dlg)
-                frame.closeNoAppExit();
-        }
+        dialogs.stream()
+                .filter(frame -> frame != dlg)
+                .forEach(BaseDialogBase::closeNoAppExit);
     }
 
     @Override
@@ -147,20 +142,13 @@ public class LocalRoot extends Root {
 
     @Override
     public void registerPlugin(Plugin plugin) {
-        if (plugins == null)
-            plugins = new ArrayList<>();
-        else {
-            for (Plugin p : plugins) {
-                // already registered
-                if (p.getName().equals(plugin.getName()))
-                    return;
-            }
-        }
+        if (plugins.containsKey(plugin.getName()))
+            return;
 
         if (plugin.isAvailable()) {
             try {
                 plugin.initPlugin(this);
-                plugins.add(plugin);
+                plugins.put(plugin.getName(), plugin);
             } catch (AccessControlException ex) {
                 logger.error(ex, ex);
             }
@@ -169,28 +157,17 @@ public class LocalRoot extends Root {
 
     @Override
     public List<Plugin> getRegisteredPlugins() {
-        return plugins;
+        return new ArrayList<>(plugins.values());
     }
 
     @Override
     public Plugin getPlugin(String name) {
-        for (Plugin plugin : plugins) {
-            if (plugin.getName().equals(name)) {
-                if (!plugin.isAvailable())
-                    return null;
-
-                return plugin;
-            }
-        }
-
-        return null;
+        Plugin plugin = plugins.get(name);
+        return plugin != null && plugin.isAvailable() ? plugin : null;
     }
 
     @Override
     public Holidays getHolidays() {
-        if (holidays == null)
-            holidays = CalendarFactory.getDefaultHolidays();
-
         return holidays;
     }
 

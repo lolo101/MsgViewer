@@ -1,9 +1,3 @@
-/*
- * About.java
- *
- * Created on 14. Juli 2009, 20:39
- */
-
 package net.sourceforge.MSGViewer;
 
 import at.redeye.FrameWork.base.BaseDialog;
@@ -11,13 +5,8 @@ import at.redeye.FrameWork.base.Root;
 
 import java.awt.*;
 
-/**
- *
- * @author  martin
- */
 public class About extends BaseDialog {
 
-    /** Creates new form About */
     public About(Root root)
     {
         super(root,"About");
@@ -32,11 +21,11 @@ public class About extends BaseDialog {
     private void initComponents() {
 
         jLTitle = new javax.swing.JLabel();
-        jBCancel = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
+        javax.swing.JButton jBCancel = new javax.swing.JButton();
+        javax.swing.JLabel jLabel1 = new javax.swing.JLabel();
         jLVersion = new javax.swing.JLabel();
-        jBLicence = new javax.swing.JButton();
-        jLabel2 = new javax.swing.JLabel();
+        javax.swing.JButton jBLicence = new javax.swing.JButton();
+        javax.swing.JLabel jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -119,12 +108,8 @@ private void jBLicenceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jBCancel;
-    private javax.swing.JButton jBLicence;
     private javax.swing.JLabel jLTitle;
     private javax.swing.JLabel jLVersion;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     // End of variables declaration//GEN-END:variables
 
 }

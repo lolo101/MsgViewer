@@ -298,7 +298,7 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
      * Root.getBaseLangague() are used
      */
     @Override
-    public void setBaseLanguage(String language) {
+    public final void setBaseLanguage(String language) {
         helper.setBaseLanguage(language);
     }
 
@@ -322,7 +322,7 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
      * @return translated message, if available
      */
     @Override
-    public String MlM(String message) {
+    public final String MlM(String message) {
         return helper.MlM(message);
     }
 

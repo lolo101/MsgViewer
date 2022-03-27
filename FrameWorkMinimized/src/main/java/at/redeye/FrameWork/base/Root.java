@@ -101,7 +101,7 @@ public abstract class Root {
 
     public List<Plugin> getRegisteredPlugins()
     {
-        return null;
+        return List.of();
     }
 
 

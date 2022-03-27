@@ -1,43 +1,65 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.base.bindtypes;
 
 import at.redeye.FrameWork.base.Root;
-
 import at.redeye.SqlDBInterface.SqlDBIO.impl.DBDataType;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-/**
- *
- * @author martin
- */
-public class DBEnum extends DBValue {
+public class DBEnum<T extends Enum<T>> extends DBValue {
 
-    public static abstract class EnumHandler
-    {
-        public abstract int getMaxSize();
-        public abstract boolean setValue( String val );
-        public abstract String getValue();
-        public abstract EnumHandler getNewOne();
-        public abstract List<String> getPossibleValues();
+    public static abstract class EnumHandler<T extends Enum<T>> {
+        protected final Class<T> type;
+        protected T value;
+
+        protected EnumHandler(Class<T> type, T value) {
+            this.type = type;
+            this.value = value;
+        }
+
+        public abstract EnumHandler<T> getNewOne();
+
+        public int getMaxSize() {
+            return Arrays.stream(type.getEnumConstants())
+                    .mapToInt(val -> val.toString().length())
+                    .max()
+                    .orElse(0);
+        }
+
+        public boolean setValue(String val) {
+            try {
+                value = Enum.valueOf(type, val);
+                return true;
+            } catch (IllegalArgumentException ex) {
+                return false;
+            }
+        }
+
+        public String getValue() {
+            return value.toString();
+        }
+
+        public List<String> getPossibleValues() {
+            List<String> res = new ArrayList<>();
+
+            for (T t : type.getEnumConstants())
+                res.add(t.toString());
+
+            return res;
+        }
     }
 
-    public EnumHandler handler;
+    public EnumHandler<T> handler;
 
-    public DBEnum( String name, EnumHandler enumval )
-    {
-        super( name );
+    public DBEnum(String name, EnumHandler<T> enumval) {
+        super(name);
         handler = enumval;
     }
 
-    public DBEnum( String name, String title, EnumHandler enumval )
-    {
-        super( name, title );
+    public DBEnum(String name, String title, EnumHandler<T> enumval) {
+        super(name, title);
         handler = enumval;
     }
 
@@ -74,7 +96,7 @@ public class DBEnum extends DBValue {
 
     @Override
     public DBValue getCopy() {
-        DBEnum copy = new DBEnum(name, handler.getNewOne() );
+        DBEnum<?> copy = new DBEnum<>(name, handler.getNewOne());
         copy.handler.setValue(handler.getValue());
         return copy;
     }
@@ -142,7 +164,6 @@ public class DBEnum extends DBValue {
 
     /**
      * call here root.loadMlM4Class(root, language);
-     * @param root
      */
     public void initLocalization(Root root)
     {

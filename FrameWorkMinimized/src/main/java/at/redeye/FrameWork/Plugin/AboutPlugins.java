@@ -1,14 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
- * AboutPlugins.java
- *
- * Created on 15.09.2010, 13:52:03
- */
-
 package at.redeye.FrameWork.Plugin;
 
 import at.redeye.FrameWork.base.BaseDialog;
@@ -16,27 +5,19 @@ import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.widgets.helpwindow.HyperlinkExecuter;
 
 import java.awt.*;
-import java.util.Vector;
+import java.util.List;
 
-/**
- *
- * @author martin
- */
 public class AboutPlugins extends BaseDialog {
 
-    /** Creates new form AboutPlugins */
     public AboutPlugins( Root root ) {
         super(root, "Plugins" );
         setBaseLanguage("de");
 
         initComponents();
 
-        Vector<Plugin> plugins = new Vector();
+        List<Plugin> plugins = root.getRegisteredPlugins();
 
-        if( root.getRegisteredPlugins() != null )
-            plugins.addAll(root.getRegisteredPlugins());
-
-        jLPlugins.setListData( plugins );
+        jLPlugins.setListData(plugins.toArray(Plugin[]::new));
 
         if( !plugins.isEmpty() )
         {
@@ -53,19 +34,19 @@ public class AboutPlugins extends BaseDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLTitle = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jLPlugins = new javax.swing.JList();
-        jTPlugin = new javax.swing.JTabbedPane();
-        jScrollPane2 = new javax.swing.JScrollPane();
+        javax.swing.JLabel jLTitle = new javax.swing.JLabel();
+        javax.swing.JScrollPane jScrollPane1 = new javax.swing.JScrollPane();
+        jLPlugins = new javax.swing.JList<>();
+        javax.swing.JTabbedPane jTPlugin = new javax.swing.JTabbedPane();
+        javax.swing.JScrollPane jScrollPane2 = new javax.swing.JScrollPane();
         jTLicenceText = new javax.swing.JEditorPane();
-        jScrollPane3 = new javax.swing.JScrollPane();
+        javax.swing.JScrollPane jScrollPane3 = new javax.swing.JScrollPane();
         jTChangeLog = new javax.swing.JEditorPane();
-        jBCancel = new javax.swing.JButton();
+        javax.swing.JButton jBCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jLTitle.setFont(new java.awt.Font("Dialog", Font.BOLD, 18));
+        jLTitle.setFont(new java.awt.Font("Dialog", Font.BOLD, 18)); // NOI18N
         jLTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLTitle.setText("Installierte Erweiterungen");
 
@@ -77,13 +58,13 @@ public class AboutPlugins extends BaseDialog {
         });
         jScrollPane1.setViewportView(jLPlugins);
 
-        jTLicenceText.setContentType("text/html");
+        jTLicenceText.setContentType("text/html"); // NOI18N
         jTLicenceText.setEditable(false);
         jScrollPane2.setViewportView(jTLicenceText);
 
         jTPlugin.addTab("Lizenz", jScrollPane2);
 
-        jTChangeLog.setContentType("text/html");
+        jTChangeLog.setContentType("text/html"); // NOI18N
         jTChangeLog.setEditable(false);
         jScrollPane3.setViewportView(jTChangeLog);
 
@@ -96,18 +77,18 @@ public class AboutPlugins extends BaseDialog {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jBCancel)
-                            .addComponent(jTPlugin, javax.swing.GroupLayout.DEFAULT_SIZE, 626, Short.MAX_VALUE)))
-                    .addComponent(jLTitle, javax.swing.GroupLayout.DEFAULT_SIZE, 792, Short.MAX_VALUE))
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                        .addComponent(jBCancel)
+                                                        .addComponent(jTPlugin, javax.swing.GroupLayout.DEFAULT_SIZE, 626, Short.MAX_VALUE)))
+                                        .addComponent(jLTitle, javax.swing.GroupLayout.DEFAULT_SIZE, 792, Short.MAX_VALUE))
+                                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -128,7 +109,7 @@ public class AboutPlugins extends BaseDialog {
 
     private void jLPluginsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLPluginsMouseClicked
 
-        Plugin plugin = (Plugin) jLPlugins.getSelectedValue();
+        Plugin plugin = jLPlugins.getSelectedValue();
 
         if(plugin == null)
             return;
@@ -148,15 +129,9 @@ public class AboutPlugins extends BaseDialog {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jBCancel;
-    private javax.swing.JList jLPlugins;
-    private javax.swing.JLabel jLTitle;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JList<Plugin> jLPlugins;
     private javax.swing.JEditorPane jTChangeLog;
     private javax.swing.JEditorPane jTLicenceText;
-    private javax.swing.JTabbedPane jTPlugin;
     // End of variables declaration//GEN-END:variables
 
 }

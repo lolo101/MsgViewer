@@ -1,11 +1,3 @@
-/*
-
- * To change this template, choose Tools | Templates
-
- * and open the template in the editor.
-
- */
-
 package at.redeye.FrameWork.base.bindtypes;
 
 import at.redeye.SqlDBInterface.SqlDBIO.impl.ColumnAttribute;
@@ -15,10 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Set;
-
-/**
- * @author martin
- */
 
 public abstract class DBStrukt {
 
@@ -47,7 +35,6 @@ public abstract class DBStrukt {
         /**
          * removes an element. The DBValue has to be from the same instance
          * as this object
-         * @param value
          */
 	public void remove(DBValue value) {
 		element_by_name.remove(value.getName());
@@ -103,15 +90,12 @@ public abstract class DBStrukt {
 				continue;
 			}
 
-			for (int i = 0; i < sub_strukts.size(); i++) {
-				DBStrukt strukt = sub_strukts.get(i);
-
+			for (DBStrukt strukt : sub_strukts) {
 				if (k.startsWith(strukt.getName()) && (k.charAt(strukt.getName().length()) == '_')) {
 					if (prefix != null)
 						strukt.consume(map, prefix + strukt.getName() + "_");
 					else
 						strukt.consume(map, strukt.getName() + "_");
-
 					break;
 				}
 			}
@@ -120,53 +104,46 @@ public abstract class DBStrukt {
 
         /**
          * Same as consume(), but all column names has to be lower case
-         * @param map
          */
 	public void consumeFast(HashMap<String, Object> map) {
 		consumeFast(map, null);
 	}
 
-        /**
-         * Same as consume(), but all column names and the prefix has to be lower case
-         * @param map
-         * @param prefix
-         */
+	/**
+	 * Same as consume(), but all column names and the prefix has to be lower case
+	 */
 	public void consumeFast(HashMap<String, Object> map, String prefix) {
 
-            FastArray consumed = null;
+		FastArray consumed = null;
 
-             if( !sub_strukts.isEmpty() )
-                consumed = new FastArray(map.size());
+		if (!sub_strukts.isEmpty())
+			consumed = new FastArray(map.size());
 
-            consumeFast(map, prefix, consumed);
-        }
+		consumeFast(map, prefix, consumed);
+	}
 
-    /**
-     * Simple array wrapper of an initial fixed size
-     * This is much more simplier than ArrayList but it's
-     * compare method is faster, because does not call the euqal method
-     */
-    private static class FastArray
-    {
-        Object[] data;
-        int idx;
+	/**
+	 * Simple array wrapper of an initial fixed size
+	 * This is much more simplier than ArrayList but its
+	 * compare method is faster, because does not call the euqal method
+	 */
+	private static class FastArray {
+		Object[] data;
+		int idx;
 
-        FastArray( int capacity )
-        {
-            data = new Object[capacity];
-            idx = 0;
-        }
+		FastArray(int capacity) {
+			data = new Object[capacity];
+			idx = 0;
+		}
 
-        void add( Object o )
-        {
-            data[idx] = o;
-            idx++;
-        }
+		void add(Object o) {
+			data[idx] = o;
+			idx++;
+		}
 
-        /**
-         * @param o
-         * @return true if the same object was found in the array
-         */
+		/**
+		 * @return true if the same object was found in the array
+		 */
         boolean contains( Object o )
         {
             for( int i = 0; i < idx; i++ )
@@ -187,45 +164,42 @@ public abstract class DBStrukt {
 
         for (Entry<String, Object> entry : entries) {
 
-            // bereits geladene Einträge überspringen
-            if( consumed != null && consumed.contains(entry.getKey()) ) {
-                    continue;
-             }
+			// bereits geladene Einträge überspringen
+			if (consumed != null && consumed.contains(entry.getKey())) {
+				continue;
+			}
 
-            if (prefix != null && entry.getKey().length() <= prefix.length()) {
-                continue;
-            }
+			if (prefix != null && entry.getKey().length() <= prefix.length()) {
+				continue;
+			}
 
-            if (prefix != null) {
-                k = entry.getKey().substring(prefix.length());
-            } else {
-                k = entry.getKey();
-            }
+			if (prefix != null) {
+				k = entry.getKey().substring(prefix.length());
+			} else {
+				k = entry.getKey();
+			}
 
-            DBValue val = getValueByNameLowerCase(k);
+			DBValue val = getValueByNameLowerCase(k);
 
-            if (val != null) {
-                val.loadFromDB(entry.getValue());
+			if (val != null) {
+				val.loadFromDB(entry.getValue());
 
-                if( consumed != null )
-                    consumed.add(entry.getKey());
-                continue;
-            }
+				if (consumed != null)
+					consumed.add(entry.getKey());
+				continue;
+			}
 
-            for (int i = 0; i < sub_strukts.size(); i++) {
-                DBStrukt strukt = sub_strukts.get(i);
-
-                if (k.startsWith(strukt.getName()) && (k.charAt(strukt.getName().length()) == '_')) {
-                    if (prefix != null) {
-                        strukt.consumeFast(map, prefix + strukt.getNameLowerCase() + "_", consumed);
-                    } else {
-                        strukt.consumeFast(map, strukt.getNameLowerCase() + "_", consumed);
-                    }
-
-                    break;
-                }
-            }
-        }
+			for (DBStrukt strukt : sub_strukts) {
+				if (k.startsWith(strukt.getName()) && (k.charAt(strukt.getName().length()) == '_')) {
+					if (prefix != null) {
+						strukt.consumeFast(map, prefix + strukt.getNameLowerCase() + "_", consumed);
+					} else {
+						strukt.consumeFast(map, strukt.getNameLowerCase() + "_", consumed);
+					}
+					break;
+				}
+			}
+		}
     }
 
 	public String getName() {
@@ -243,7 +217,6 @@ public abstract class DBStrukt {
          * Get DBValue by its index. Each member that is added to DBStrukt by using the add()
          * method is stored in a vector. So the elements can also be accessed by the idx of this
          * vector.
-         * @param idx
          * @return DBValue
          */
 	public DBValue getValue(int idx) {
@@ -252,8 +225,6 @@ public abstract class DBStrukt {
 
         /**
          * retuns the DBValue by searching the element by its name by using DBValue.getName() function
-         * @param val
-         * @return
          */
 	public DBValue getValue(DBValue val) {
 		return getValue(val.getName());
@@ -265,14 +236,6 @@ public abstract class DBStrukt {
 
 	public int countValues() {
 		return elements_with_version.size();
-	}
-
-	public int countSubStrukts() {
-		return sub_strukts.size();
-	}
-
-        public ArrayList<DBStrukt> getSubStrukts() {
-		return sub_strukts;
 	}
 
 	public DBStrukt getSubStrukt(int idx) {
@@ -289,7 +252,7 @@ public abstract class DBStrukt {
 
 	protected boolean VersionExists(DBValue val, Integer Version) {
 		for (Entry<Integer, DBValue> pair : elements_with_version) {
-			if (pair.getKey() == Version) {
+			if (pair.getKey().equals(Version)) {
 				if (pair.getValue() == val)
 					return true;
 			}
@@ -298,16 +261,12 @@ public abstract class DBStrukt {
 		return false;
 	}
 
-	public HashMap<String, ColumnAttribute> getHashMapForVersion(Integer Version) {
-		return getHashMap("", Version);
-	}
-
 	protected HashMap<String, ColumnAttribute> getHashMap(String prefix,
 			Integer Version) {
 		HashMap<String, ColumnAttribute> colls = new HashMap<>();
 
-		for (int i = 0; i < elements_with_version.size(); i++) {
-			DBValue val = elements_with_version.get(i).getValue();
+		for (Entry<Integer, DBValue> integerDBValueEntry : elements_with_version) {
+			DBValue val = integerDBValueEntry.getValue();
 
 			if (Version != null) {
 				if (!VersionExists(val, Version))
@@ -322,15 +281,13 @@ public abstract class DBStrukt {
 			if (val instanceof DBString) {
 				attr.setWidth(((DBString) val).getMaxLen());
 			} else if (val instanceof DBEnum) {
-				attr.setWidth(((DBEnum) val).getMaxLen());
+				attr.setWidth(((DBEnum<?>) val).getMaxLen());
 			}
 
 			colls.put(prefix + val.getName(), attr);
 		}
 
-		for (int i = 0; i < sub_strukts.size(); i++) {
-			DBStrukt strukt = sub_strukts.get(i);
-
+		for (DBStrukt strukt : sub_strukts) {
 			HashMap<String, ColumnAttribute> sub_colls = strukt.getHashMap(
 					prefix + strukt.getName() + "_", Version);
 
@@ -351,14 +308,12 @@ public abstract class DBStrukt {
 	protected HashMap<String, Object> getHashMapAndData(String prefix) {
 		HashMap<String, Object> colls = new HashMap<>();
 
-		for (int i = 0; i < elements_with_version.size(); i++) {
-			DBValue val = elements_with_version.get(i).getValue();
+		for (Entry<Integer, DBValue> integerDBValueEntry : elements_with_version) {
+			DBValue val = integerDBValueEntry.getValue();
 			colls.put(prefix + val.getName(), val.getValue());
 		}
 
-		for (int i = 0; i < sub_strukts.size(); i++) {
-			DBStrukt strukt = sub_strukts.get(i);
-
+		for (DBStrukt strukt : sub_strukts) {
 			HashMap<String, Object> sub_colls = strukt.getHashMapAndData(prefix
 					+ strukt.getName() + "_");
 
@@ -375,15 +330,13 @@ public abstract class DBStrukt {
 	public ArrayList<DBValue> getAllValues() {
 		ArrayList<DBValue> values = new ArrayList<>();
 
-		for (int i = 0; i < elements_with_version.size(); i++) {
-			DBValue val = elements_with_version.get(i).getValue();
+		for (Entry<Integer, DBValue> integerDBValueEntry : elements_with_version) {
+			DBValue val = integerDBValueEntry.getValue();
 
 			values.add(val);
 		}
 
-		for (int i = 0; i < sub_strukts.size(); i++) {
-			DBStrukt strukt = sub_strukts.get(i);
-
+		for (DBStrukt strukt : sub_strukts) {
 			values.addAll(strukt.getAllValues());
 		}
 
@@ -397,8 +350,8 @@ public abstract class DBStrukt {
 	protected ArrayList<String> getAllNames(String prefix) {
 		ArrayList<String> values = new ArrayList<>();
 
-		for (int i = 0; i < elements_with_version.size(); i++) {
-			DBValue val = elements_with_version.get(i).getValue();
+		for (Entry<Integer, DBValue> integerDBValueEntry : elements_with_version) {
+			DBValue val = integerDBValueEntry.getValue();
 
 			if (val.getTitle().isEmpty())
 				values.add(prefix + val.getName());
@@ -406,9 +359,7 @@ public abstract class DBStrukt {
 				values.add(prefix + val.getTitle());
 		}
 
-		for (int i = 0; i < sub_strukts.size(); i++) {
-			DBStrukt strukt = sub_strukts.get(i);
-
+		for (DBStrukt strukt : sub_strukts) {
 			if (strukt.getTitle().isEmpty())
 				values.addAll(strukt.getAllNames(strukt.getName() + " "));
 			else
@@ -440,7 +391,6 @@ public abstract class DBStrukt {
         /**
          * find Value by name without converting the name to lower case
          * @param key has to be lower case
-         * @return
          */
         private DBValue getValueByNameLowerCase(String key) {
 		return element_by_name.get(key);

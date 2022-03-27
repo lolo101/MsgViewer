@@ -9,22 +9,11 @@ public class HelpWin extends BaseDialog {
 
     private static final long serialVersionUID = 1L;
 
-    String base;
-    HelpWinHook hook = null;
+    final String base;
+    final HelpWinHook hook;
 
-    /**
-     * Creates new form HelpWin
-     */
     public HelpWin(Root root, String Base, String ModuleName) {
-        super(root, "Hilfe");
-
-        base = Base;
-
-        initComponents();
-
-        jHelp.addHyperlinkListener(new HyperlinkExecuter(root));
-
-        loadHelp(ModuleName);
+        this(root, Base, ModuleName, null);
     }
 
     public HelpWin(Root root, String Base, String ModuleName, HelpWinHook hook) {
@@ -38,55 +27,6 @@ public class HelpWin extends BaseDialog {
         jHelp.addHyperlinkListener(new HyperlinkExecuter(root));
 
         loadHelp(ModuleName);
-    }
-
-    protected void loadHelp(final String ModuleName) {
-        new AutoMBox(ModuleName, () -> {
-
-            String locale = root.getDisplayLanguage();
-
-            String module_name = null;
-
-            if (haveResource(HelpFileLoader.getResourceName(base, ModuleName + "_" + locale))) {
-                module_name = ModuleName + "_" + locale;
-            } else if (haveResource(HelpFileLoader.getResourceName(base, ModuleName + "_" + MLUtil.getLanguageOnly(locale)))) {
-                module_name = ModuleName + "_" + MLUtil.getLanguageOnly(locale);
-            } else {
-                if (!MLUtil.compareLanguagesOnly(root.getBaseLanguage(), root.getDisplayLanguage())) {
-                    if (haveResource(HelpFileLoader.getResourceName(base, ModuleName + "_" + MLUtil.getLanguageOnly(root.getDefaultLanguage()))))
-                        module_name = ModuleName + "_" + MLUtil.getLanguageOnly(root.getDefaultLanguage());
-                }
-            }
-
-            if (module_name == null)
-                module_name = ModuleName;
-
-            logger.debug("Loading Help for: '" + module_name + "'");
-
-            HelpFileLoader hfl = new HelpFileLoader();
-
-            String res = hfl.loadHelp(base, module_name);
-
-            if (hook != null) {
-                res = res.replace(hook.getKeyword(), hook.getText());
-            }
-
-            jHelp.setText(res);
-            jHelp.setCaretPosition(0);
-        });
-    }
-
-    static boolean haveResource(String resource_name) {
-        boolean result = MLUtil.haveResource(resource_name);
-
-        if (logger.isDebugEnabled()) {
-            if (result)
-                logger.debug("loaded: " + resource_name);
-            else
-                logger.debug("failed loading: " + resource_name);
-        }
-
-        return result;
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -140,5 +80,52 @@ public class HelpWin extends BaseDialog {
     private javax.swing.JEditorPane jHelp;
     // End of variables declaration//GEN-END:variables
 
+    protected final void loadHelp(final String ModuleName) {
+        new AutoMBox(ModuleName, () -> {
 
+            String module_name = getModuleName(ModuleName);
+
+            logger.debug("Loading Help for: '" + module_name + "'");
+
+            HelpFileLoader hfl = new HelpFileLoader();
+
+            String res = hfl.loadHelp(base, module_name);
+
+            if (hook != null) {
+                res = res.replace(hook.getKeyword(), hook.getText());
+            }
+
+            jHelp.setText(res);
+            jHelp.setCaretPosition(0);
+        });
+    }
+
+    private String getModuleName(String ModuleName) {
+        String locale = root.getDisplayLanguage();
+
+        if (haveResource(HelpFileLoader.getResourceName(base, ModuleName + "_" + locale))) {
+            return ModuleName + "_" + locale;
+        } else if (haveResource(HelpFileLoader.getResourceName(base, ModuleName + "_" + MLUtil.getLanguageOnly(locale)))) {
+            return ModuleName + "_" + MLUtil.getLanguageOnly(locale);
+        } else {
+            if (!MLUtil.compareLanguagesOnly(root.getBaseLanguage(), root.getDisplayLanguage())
+                    && haveResource(HelpFileLoader.getResourceName(base, ModuleName + "_" + MLUtil.getLanguageOnly(root.getDefaultLanguage()))))
+                return ModuleName + "_" + MLUtil.getLanguageOnly(root.getDefaultLanguage());
+        }
+
+        return ModuleName;
+    }
+
+    static boolean haveResource(String resource_name) {
+        boolean result = MLUtil.haveResource(resource_name);
+
+        if (logger.isDebugEnabled()) {
+            if (result)
+                logger.debug("loaded: " + resource_name);
+            else
+                logger.debug("failed loading: " + resource_name);
+        }
+
+        return result;
+    }
 }
