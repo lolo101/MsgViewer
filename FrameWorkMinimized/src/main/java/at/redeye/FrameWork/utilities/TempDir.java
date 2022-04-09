@@ -1,28 +1,20 @@
 package at.redeye.FrameWork.utilities;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-public class TempDir
-{
+public class TempDir {
+
     /**
-     * creates a temporary directory
-     * prefix and suffix maybe null
-     *
-     * @return the path to the directory on success, or null. The directory and it's
+     * creates a temporary directory. The directory and it's
      * content will be automatically deleted after exit of the virtual machine.
+     *
+     * @return the path to the directory
      */
-    public static File getTempDir() throws IOException {
-        File tmpfile = File.createTempFile("xxxx", null);
-
-        if (!tmpfile.delete())
-            return null;
-
-        if (!tmpfile.mkdirs())
-            return null;
-
-        tmpfile.deleteOnExit();
-
+    public static Path getTempDir() throws IOException {
+        Path tmpfile = Files.createTempDirectory("msgviewer-");
+        tmpfile.toFile().deleteOnExit();
         return tmpfile;
     }
 

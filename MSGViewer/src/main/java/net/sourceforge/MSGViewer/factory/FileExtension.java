@@ -1,13 +1,13 @@
 package net.sourceforge.MSGViewer.factory;
 
-import java.io.File;
+import java.nio.file.Path;
 
 public class FileExtension {
 
     private final String filename;
 
-    public FileExtension(File file) {
-        this.filename = file.getName();
+    public FileExtension(Path file) {
+        this.filename = file.getFileName().toString();
     }
 
     public FileExtension(String filename) {

@@ -138,7 +138,7 @@ public class SingleWin extends BaseWin {
 
     private void jMFileSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMFileSaveActionPerformed
         filesRepository.chooseFilesToSave().ifPresent(file ->
-                new AutoMBox(this.getClass().getName(), () -> viewerPanel.exportFile(file))
+                new AutoMBox(this.getClass().getName(), () -> viewerPanel.exportFile(file.toPath()))
         );
     }//GEN-LAST:event_jMFileSaveActionPerformed
 

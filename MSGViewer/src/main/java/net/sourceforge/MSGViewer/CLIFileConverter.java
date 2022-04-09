@@ -11,7 +11,8 @@ import org.apache.logging.log4j.Logger;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
-import java.nio.file.Paths;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
@@ -85,49 +86,49 @@ public abstract class CLIFileConverter {
 	}
 
 	private void processFile(String sourceFilePath) {
-		File sourceFile = new File(sourceFilePath).getAbsoluteFile();
-		String baseFileName = sourceFile.getName();
-		int idx = baseFileName.lastIndexOf('.');
-		baseFileName = baseFileName.substring(0, idx);
-		try {
-			File targetFile = convertToTemp
-					? File.createTempFile(baseFileName, String.format(".%s", targetType))
-					: Paths.get(sourceFile.getParent(), String.format("%s.%s", baseFileName, targetType)).toFile();
+        Path sourceFile = Path.of(sourceFilePath).toAbsolutePath();
+        String fileName = sourceFile.getFileName().toString();
+        int idx = fileName.lastIndexOf('.');
+        String baseFileName = fileName.substring(0, idx);
+        try {
+            Path targetFile = convertToTemp
+                    ? Files.createTempFile(baseFileName, String.format(".%s", targetType))
+                    : sourceFile.getParent().resolve(String.format("%s.%s", baseFileName, targetType));
 
-			LOGGER.info("conversion source file: " + sourceFile);
-			Message msg = new MessageParser(sourceFile).parseMessage();
+            LOGGER.info("conversion source file: " + sourceFile);
+            Message msg = new MessageParser(sourceFile).parseMessage();
 
-			LOGGER.info("conversion target file: " + targetFile);
-			new MessageSaver(msg).saveMessage(targetFile);
+            LOGGER.info("conversion target file: " + targetFile);
+            new MessageSaver(msg).saveMessage(targetFile);
 
-			if (openAfterConvert) {
-				openFile(targetFile);
-			}
+            if (openAfterConvert) {
+                openFile(targetFile);
+            }
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 	}
 
-	private static void openFile(File targetFile) {
-		try {
-			Desktop.getDesktop().open(targetFile);
-		} catch (Exception e) {
-			LOGGER.warn("failed to open default application with Desktop.open(), trying system dependent command.");
-			String[] cmdarray = null;
+    private static void openFile(Path targetFile) {
+        try {
+            Desktop.getDesktop().open(targetFile.toFile());
+        } catch (Exception e) {
+            LOGGER.warn("failed to open default application with Desktop.open(), trying system dependent command.");
+            String[] cmdarray = null;
 
-			if (Setup.is_linux_system()) {
-				cmdarray = new String[2];
-				cmdarray[0] = "xdg-open";
-				cmdarray[1] = targetFile.getAbsolutePath();
+            if (Setup.is_linux_system()) {
+                cmdarray = new String[2];
+                cmdarray[0] = "xdg-open";
+                cmdarray[1] = targetFile.toAbsolutePath().toString();
 			} else if (Setup.is_mac_system()) {
 				cmdarray = new String[2];
-				cmdarray[0] = "open";
-				cmdarray[1] = targetFile.getAbsolutePath();
+                cmdarray[0] = "open";
+                cmdarray[1] = targetFile.toAbsolutePath().toString();
 			} else if (Setup.is_win_system()) {
 				cmdarray = new String[3];
 				cmdarray[0] = "cmd";
-				cmdarray[1] = "/c";
-				cmdarray[2] = targetFile.getAbsolutePath();
+                cmdarray[1] = "/c";
+                cmdarray[2] = targetFile.toAbsolutePath().toString();
 			}
 			if (cmdarray != null) {
 				try {

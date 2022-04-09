@@ -1,33 +1,19 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.utilities;
 
-import java.io.File;
+import org.apache.commons.io.file.DeletingPathVisitor;
 
-/**
- *
- * @author martin
- */
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 public class DeleteDir {
 
-    static public boolean deleteDirectory(File path) {
-        if (path.exists()) {
-            File[] files = path.listFiles();
-            
-            if( files == null )
-                return true;
-
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    deleteDirectory(file);
-                } else {
-                    file.delete();
-                }
-            }
+    static public void deleteDirectory(Path path) {
+        try {
+            Files.walkFileTree(path, DeletingPathVisitor.withLongCounters());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
-        return (path.delete());
     }
 }

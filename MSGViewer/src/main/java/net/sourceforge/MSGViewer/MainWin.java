@@ -171,7 +171,7 @@ public class MainWin extends BaseWin {
 
     private void jMSaveAsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMSaveAsActionPerformed
         filesRepository.chooseFilesToSave().ifPresent(file ->
-                new AutoMBox(this.getClass().getName(), () -> viewerPanel.exportFile(file))
+                new AutoMBox(this.getClass().getName(), () -> viewerPanel.exportFile(file.toPath()))
         );
     }//GEN-LAST:event_jMSaveAsActionPerformed
 

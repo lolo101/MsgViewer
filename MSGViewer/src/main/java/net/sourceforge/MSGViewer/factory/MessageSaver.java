@@ -5,10 +5,10 @@ import net.sourceforge.MSGViewer.factory.mbox.EMLWriterViaJavaMail;
 import net.sourceforge.MSGViewer.factory.mbox.MBoxWriterViaJavaMail;
 import net.sourceforge.MSGViewer.factory.msg.MsgWriter;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class MessageSaver {
 
@@ -18,7 +18,7 @@ public class MessageSaver {
         this.msg = msg;
     }
 
-    public void saveMessage(File file) throws Exception {
+    public void saveMessage(Path file) throws Exception {
         FileExtension extension = new FileExtension(file);
 
         switch (extension.toString()) {
@@ -36,27 +36,27 @@ public class MessageSaver {
         }
     }
 
-    private void saveMsgFile(File file) throws IOException {
-        try (OutputStream stream = new FileOutputStream(file)) {
+    private void saveMsgFile(Path file) throws IOException {
+        try (OutputStream stream = Files.newOutputStream(file)) {
             MsgWriter msg_writer = new MsgWriter(msg);
             msg_writer.write(stream);
         }
     }
 
-    private void saveMBoxFile(File file) throws Exception {
+    private void saveMBoxFile(Path file) throws Exception {
         try (MBoxWriterViaJavaMail mbox_writer = new MBoxWriterViaJavaMail()) {
             write(mbox_writer, msg, file);
         }
     }
 
-    private void saveEMLFile(File file) throws Exception {
+    private void saveEMLFile(Path file) throws Exception {
         try (EMLWriterViaJavaMail eml_writer = new EMLWriterViaJavaMail()) {
             write(eml_writer, msg, file);
         }
     }
 
-    private static void write(MBoxWriterViaJavaMail writer, Message msg, File file) throws Exception {
-        try (OutputStream stream = new FileOutputStream(file)) {
+    private static void write(MBoxWriterViaJavaMail writer, Message msg, Path file) throws Exception {
+        try (OutputStream stream = Files.newOutputStream(file)) {
             writer.write(msg, stream);
         }
     }

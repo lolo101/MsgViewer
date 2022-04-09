@@ -2,18 +2,23 @@ package net.sourceforge.MSGViewer;
 
 import com.auxilii.msgparser.Message;
 import com.auxilii.msgparser.attachment.FileAttachment;
+import com.google.common.jimfs.Jimfs;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.File;
+import java.nio.file.FileSystem;
 
+import static com.google.common.jimfs.Configuration.unix;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PrepareImagesTest {
+
+    private static final FileSystem fileSystem = Jimfs.newFileSystem("host", unix());
+
     @Mock
     private ViewerHelper fileRepository;
 
@@ -24,7 +29,7 @@ class PrepareImagesTest {
 
         String actual = sut.prepareImages("<img src=\"cid:content-id-1\"></img>");
 
-        assertEquals("<img src=\"file:/tmp/xxx.tmp/long-filename-1\"></img>", actual);
+        assertEquals("<img src=\"jimfs://host/tmp/xxx.tmp/long-filename-1\"></img>", actual);
     }
 
     @Test
@@ -34,7 +39,7 @@ class PrepareImagesTest {
 
         String actual = sut.prepareImages("<img src=\"content-location-2\"></img>");
 
-        assertEquals("<img src=\"file:/tmp/xxx.tmp/content-location-2\"></img>", actual);
+        assertEquals("<img src=\"jimfs://host/tmp/xxx.tmp/content-location-2\"></img>", actual);
     }
 
     private Message messageWithAttachmentWithContentId() {
@@ -42,7 +47,7 @@ class PrepareImagesTest {
         FileAttachment attachmentWithContentId = new FileAttachment();
         attachmentWithContentId.setContentId("content-id-1");
         message.addAttachment(attachmentWithContentId);
-        when(fileRepository.getTempFile(attachmentWithContentId)).thenReturn(new File("/tmp/xxx.tmp/long-filename-1"));
+        when(fileRepository.getTempFile(attachmentWithContentId)).thenReturn(fileSystem.getPath("/tmp/xxx.tmp/long-filename-1"));
         return message;
     }
 
@@ -51,7 +56,7 @@ class PrepareImagesTest {
         FileAttachment attachmentWithContentLocation = new FileAttachment();
         attachmentWithContentLocation.setContentLocation("content-location-2");
         message.addAttachment(attachmentWithContentLocation);
-        when(fileRepository.getTempFile(attachmentWithContentLocation)).thenReturn(new File("/tmp/xxx.tmp/content-location-2"));
+        when(fileRepository.getTempFile(attachmentWithContentLocation)).thenReturn(fileSystem.getPath("/tmp/xxx.tmp/content-location-2"));
         return message;
     }
 }

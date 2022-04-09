@@ -8,17 +8,17 @@ import org.apache.poi.poifs.filesystem.DocumentEntry;
 import org.apache.poi.poifs.filesystem.DocumentInputStream;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class MsgParser {
 
     public static final String PROPERTIES_ENTRY = "__properties_version1.0";
-    private final File msgFile;
+    private final Path msgFile;
 
-    public MsgParser(File msgFile) {
+    public MsgParser(Path msgFile) {
         this.msgFile = msgFile;
     }
 
@@ -29,7 +29,7 @@ public class MsgParser {
      * @throws IOException Thrown if the file could not be loaded or parsed.
      */
     public Message parseMsg() throws IOException {
-        try (InputStream stream = new FileInputStream(msgFile)) {
+        try (InputStream stream = Files.newInputStream(msgFile)) {
             return parseMsg(stream);
         }
     }

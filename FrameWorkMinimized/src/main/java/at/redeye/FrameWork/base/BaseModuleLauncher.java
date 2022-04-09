@@ -19,7 +19,7 @@ import java.util.Properties;
 
 public abstract class BaseModuleLauncher {
     public StartupWindow splash = null;
-    public static Logger logger = LogManager.getRootLogger();
+    public static final Logger logger = LogManager.getRootLogger();
     public Root root;
     public String[] args;
     Properties jnlp_properties;

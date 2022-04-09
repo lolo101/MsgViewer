@@ -6,7 +6,6 @@ import net.sourceforge.MSGViewer.ModuleLauncher;
 import net.sourceforge.MSGViewer.factory.MessageParser;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
 import java.io.OutputStream;
 import java.net.URI;
 import java.nio.file.Files;
@@ -21,7 +20,7 @@ class MBoxWriterViaJavaMailTest {
         ModuleLauncher.BaseConfigureLogging();
 
         URI uri = Objects.requireNonNull(MBoxWriterViaJavaMailTest.class.getResource("/danke.msg")).toURI();
-        Message msg = new MessageParser(new File(uri)).parseMessage();
+        Message msg = new MessageParser(Path.of(uri)).parseMessage();
 
         Path testOut = Jimfs.newFileSystem().getPath("test_out.mbox");
         try (OutputStream outputStream = Files.newOutputStream(testOut)) {

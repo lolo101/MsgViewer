@@ -34,11 +34,13 @@ import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
@@ -376,11 +378,11 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
             return;
         }
 
-        File content = helper.extractUrl(url, message);
+        Path content = helper.extractUrl(url, message);
 
         if (content == null) {
             // maybe the url points to a local directory
-            content = new File(url.getFile());
+            content = Path.of(url.getFile());
         }
 
         if (ViewerHelper.is_mail_message(content.toString())) {
@@ -389,7 +391,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
                 open_new_mail_handler.openMail(content.toString());
             }
         } else {
-            open(content.getPath());
+            open(content.toString());
         }
 
     }
@@ -446,8 +448,8 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
     }
 
     private void parseMessage() throws Exception {
-        File file = new File(file_name);
-        if (!file.exists())
+        Path file = Path.of(file_name);
+        if (!Files.exists(file))
             throw new FileNotFoundException(parent.MlM(String.format("File %s not found", file_name)));
         message = new MessageParser(file).parseMessage();
         logger.info("Message From:" + message.getFromName() + "\n To:" + message.getToName() + "\n Email: " + message.getFromEmail());
@@ -520,22 +522,22 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
     }
 
     private String printFileAttachment(FileAttachment att) throws MimeTypeParseException, IOException {
-        File content = helper.getTempFile(att);
+        Path content = helper.getTempFile(att);
 
         StringBuilder sb = new StringBuilder();
         sb.append("<a href=\"");
-        sb.append(content.toURI());
+        sb.append(content.toUri());
         sb.append("\">");
 
         String mime_type = att.getMimeTag();
 
-        logger.info("<a href=\"" + content.toURI() + "\"> " + mime_type);
+        logger.info("<a href=\"" + content.toUri() + "\"> " + mime_type);
 
         if (mime_type != null
                 && ViewerHelper.is_image_mime_type(new MimeType(mime_type))
                 && att.getSize() < 1024 * 1024 * 2) {
-            File thumbnailFile = new File(content.getAbsolutePath() + "-small.jpg");
-            if (!content.exists()) {
+            File thumbnailFile = new File(content.toAbsolutePath() + "-small.jpg");
+            if (!Files.exists(content)) {
                 write(content, att.getData());
                 async(() -> printThumbnail(att, thumbnailFile));
             }
@@ -544,7 +546,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         }
 
         if (ViewerHelper.is_mail_message(att.getFilename())) {
-            if (!content.exists()) {
+            if (!Files.exists(content)) {
                 write(content, att.getData());
             }
 
@@ -559,11 +561,11 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
     private String printMsgAttachment(MsgAttachment att) throws IOException {
         final Message msg = att.getMessage();
 
-        File sub_file = helper.getTempFile(att);
+        Path sub_file = helper.getTempFile(att);
 
         async(() -> new AutoMBox(file_name, () -> new MessageSaver(msg).saveMessage(sub_file)));
 
-        return "<a href=\"" + sub_file.toURI() + "\">" + helper.printMailIconHtml() + msg.getSubject() + "</a>&nbsp;";
+        return "<a href=\"" + sub_file.toUri() + "\">" + helper.printMailIconHtml() + msg.getSubject() + "</a>&nbsp;";
     }
 
     private void printThumbnail(FileAttachment att, File thumbnailFile) {
@@ -593,9 +595,9 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
                 : "<a href='mailto:" + email + "'>" + (isBlank(name) ? email : name + " &lt;" + email + "&gt;") + "</a>";
     }
 
-    private void write(File content, byte[] data) {
+    private void write(Path content, byte[] data) {
         async(() -> {
-            try (FileOutputStream fout = new FileOutputStream(content)) {
+            try (OutputStream fout = Files.newOutputStream(content)) {
                 fout.write(data);
             } catch (IOException ex) {
                 logger.error(ex, ex);
@@ -625,7 +627,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         return message;
     }
 
-    public void exportFile(File export_file) throws Exception {
+    public void exportFile(Path export_file) throws Exception {
         if (message == null) {
             JOptionPane.showMessageDialog(parent,
                     root.MlM("No message to save"),

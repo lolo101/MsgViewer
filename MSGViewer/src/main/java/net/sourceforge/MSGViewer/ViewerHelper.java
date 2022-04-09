@@ -19,12 +19,14 @@ import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.poi.util.IOUtils;
 
 import javax.activation.MimeType;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -34,7 +36,7 @@ public class ViewerHelper {
 
     private static final Pattern META_PATTERN = Pattern.compile("<meta\\s.*>", Pattern.CASE_INSENSITIVE);
     private final Root root;
-    private File tmp_dir;
+    private Path tmp_dir;
     private boolean delete_tmp_dir = false;
 
     public ViewerHelper(Root root) {
@@ -44,7 +46,7 @@ public class ViewerHelper {
             tmp_dir = TempDir.getTempDir();
             delete_tmp_dir = true;
         } catch (IOException ex) {
-            tmp_dir = new File(System.getProperty("java.io.tmpdir"), root.getAppName());
+            tmp_dir = Path.of(System.getProperty("java.io.tmpdir"), root.getAppName());
         }
     }
 
@@ -96,7 +98,7 @@ public class ViewerHelper {
 
 
     public void dispose() {
-        if (delete_tmp_dir && tmp_dir.exists())
+        if (delete_tmp_dir && Files.isDirectory(tmp_dir))
             DeleteDir.deleteDirectory(tmp_dir);
     }
 
@@ -112,20 +114,20 @@ public class ViewerHelper {
         return prep_images.prepareImages(html);
     }
 
-    public File extractUrl(URL url, Message message) throws IOException {
+    public Path extractUrl(URL url, Message message) throws IOException {
         List<Attachment> attachments = message.getAttachments();
 
         for (Attachment att : attachments) {
             if (att instanceof FileAttachment) {
                 FileAttachment fatt = (FileAttachment) att;
 
-                File content = getTempFile(fatt);
+                Path content = getTempFile(fatt);
 
-                if (content.toURI().toURL().equals(url)) {
+                if (content.toUri().toURL().equals(url)) {
                     logger.info("opening " + fatt);
 
-                    if (!content.exists()) {
-                        try (FileOutputStream fout = new FileOutputStream(content)) {
+                    if (!Files.exists(content)) {
+                        try (OutputStream fout = Files.newOutputStream(content)) {
                             fout.write(fatt.getData());
                         }
                     }
@@ -138,19 +140,21 @@ public class ViewerHelper {
         return null;
     }
 
-    public File getTempFile(FileAttachment fatt) {
+    public Path getTempFile(FileAttachment fatt) {
         return getTempFile(StringUtils.isBlank(fatt.getLongFilename()) ? fatt.getFilename() : fatt.getLongFilename());
     }
 
-    public File getTempFile(MsgAttachment matt) {
+    public Path getTempFile(MsgAttachment matt) {
         return getTempFile(matt.getMessage().hashCode() + ".msg");
     }
 
-    private File getTempFile(String fileName) {
-        if (!tmp_dir.isDirectory() && !tmp_dir.mkdirs()) {
-            throw new RuntimeException("Cannot create tmp dir: " + tmp_dir);
+    private Path getTempFile(String fileName) {
+        try {
+            tmp_dir = Files.createDirectories(tmp_dir);
+            return tmp_dir.resolve(fileName);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
-        return new File(tmp_dir, fileName);
     }
 
     public static boolean isValidEmail(String email) {
@@ -163,15 +167,15 @@ public class ViewerHelper {
     }
 
     private URI getMailIconFile() throws IOException {
-        File file = new File(tmp_dir, "mail.png");
+        Path file = tmp_dir.resolve("mail.png");
 
-        if (!file.exists()) {
+        if (!Files.exists(file)) {
             try (InputStream stream = ViewerHelper.class.getResourceAsStream("/icons/rg1024_yellow_mail.png");
-                 FileOutputStream writer = new FileOutputStream(file)) {
+                 OutputStream writer = Files.newOutputStream(file)) {
                 IOUtils.copy(stream, writer);
             }
         }
 
-        return file.toURI();
+        return file.toUri();
     }
 }

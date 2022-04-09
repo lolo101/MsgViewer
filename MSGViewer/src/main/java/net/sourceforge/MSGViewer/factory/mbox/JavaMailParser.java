@@ -13,7 +13,12 @@ import javax.mail.Message.RecipientType;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Enumeration;
 
 public class JavaMailParser {
@@ -24,9 +29,9 @@ public class JavaMailParser {
     private static final RecipientHeader CC_PARSER = new CcHeader();
     private static final RecipientHeader BCC_PARSER = new BccHeader();
     private static final DateHeader DATE_PARSER = new DateHeader();
-    private final File file;
+    private final Path file;
 
-    public JavaMailParser(File file) {
+    public JavaMailParser(Path file) {
         this.file = file;
     }
 
@@ -54,7 +59,7 @@ public class JavaMailParser {
     }
 
     private javax.mail.Message parseJMessage() throws MessagingException, IOException {
-        try (InputStream stream = new FileInputStream(file)) {
+        try (InputStream stream = Files.newInputStream(file)) {
             Session session = Session.getInstance(System.getProperties());
             return new MimeMessage(session, stream);
         }

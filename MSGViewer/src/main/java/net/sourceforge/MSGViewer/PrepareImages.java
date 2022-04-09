@@ -73,7 +73,7 @@ public class PrepareImages {
     private URI getImgsrc(String src) {
         URI imgsrc = URI.create(src);
         FileAttachment fatt = getFileAttachment(imgsrc);
-        return fatt == null ? imgsrc : fileRepository.getTempFile(fatt).toURI();
+        return fatt == null ? imgsrc : fileRepository.getTempFile(fatt).toUri();
     }
 
     private FileAttachment getFileAttachment(URI imgsrc) {

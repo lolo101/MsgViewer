@@ -19,18 +19,18 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimeUtility;
 import javax.mail.util.ByteArrayDataSource;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Date;
 
 import static java.util.Objects.requireNonNullElse;
 
 public class MBoxWriterViaJavaMail implements AutoCloseable {
     private final Session session = Session.getInstance(System.getProperties());
-    private File tmp_dir;
+    private Path tmp_dir;
 
     public void write(Message msg, OutputStream out) throws Exception {
         javax.mail.Message jmsg = new MimeMessage(session);
@@ -78,10 +78,10 @@ public class MBoxWriterViaJavaMail implements AutoCloseable {
             if (att instanceof FileAttachment) {
                 FileAttachment fatt = (FileAttachment) att;
                 part.setFileName(MimeUtility.encodeText(fatt.getDisplayName(), "UTF-8", null));
-                part.attachFile(dumpAttachment(fatt));
+                part.attachFile(dumpAttachment(fatt).toFile());
             } else if (att instanceof MsgAttachment) {
                 MsgAttachment msgAtt = (MsgAttachment) att;
-                part.attachFile(dumpAttachment(msgAtt));
+                part.attachFile(dumpAttachment(msgAtt).toFile());
             }
             mp.addBodyPart(part);
         }
@@ -95,29 +95,29 @@ public class MBoxWriterViaJavaMail implements AutoCloseable {
         close();
     }
 
-    private File getTmpDir() {
+    private Path getTmpDir() {
         if (tmp_dir == null) {
             try {
                 tmp_dir = TempDir.getTempDir();
             } catch (IOException ex) {
-                tmp_dir = new File(System.getProperty("java.io.tmpdir"), this.getClass().getSimpleName());
+                tmp_dir = Path.of(System.getProperty("java.io.tmpdir"), this.getClass().getSimpleName());
             }
         }
 
         return tmp_dir;
     }
 
-    private File dumpAttachment(FileAttachment fatt) throws IOException {
-        File content = new File(getTmpDir(), fatt.getFilename());
+    private Path dumpAttachment(FileAttachment fatt) throws IOException {
+        Path content = getTmpDir().resolve(fatt.getFilename());
 
-        try (FileOutputStream fout = new FileOutputStream(content)) {
+        try (OutputStream fout = Files.newOutputStream(content)) {
             fout.write(fatt.getData());
         }
 
         return content;
     }
 
-    private File dumpAttachment(MsgAttachment msgAtt) throws Exception {
+    private Path dumpAttachment(MsgAttachment msgAtt) throws Exception {
         Message message = msgAtt.getMessage();
 
         String message_file_name = message.getSubject();
@@ -126,7 +126,7 @@ public class MBoxWriterViaJavaMail implements AutoCloseable {
         }
         message_file_name = message_file_name.replace("/", " ");
 
-        File subMessage = new File(getTmpDir(), message_file_name + "." + getExtension());
+        Path subMessage = getTmpDir().resolve(message_file_name + "." + getExtension());
         new MessageSaver(message).saveMessage(subMessage);
         return subMessage;
     }

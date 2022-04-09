@@ -4,14 +4,14 @@ import com.auxilii.msgparser.Message;
 import com.auxilii.msgparser.MsgParser;
 import net.sourceforge.MSGViewer.factory.mbox.JavaMailParser;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 public class MessageParser {
 
-    private final File file;
+    private final Path file;
 
-    public MessageParser(File file) {
+    public MessageParser(Path file) {
         this.file = file;
     }
 
