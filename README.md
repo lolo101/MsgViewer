@@ -12,37 +12,36 @@ It has been Mavenized, and support for .eml to .msg has been added.
 
 ## Build
 
-In order to build this project, make sure to have Maven and JDK 11+ installed, then clone the project sources:
+In order to build this project, make sure to have JDK 11+ installed, then clone the project sources:
 
 `git clone https://github.com/lolo101/MsgViewer.git`
 
-`cd` to the sources directory:
+cd to the sources directory:
 
 `cd MsgViewer`
 
 At last, run the Maven build:
 
-`mvn package`
+`./mvnw package`
 
 The build will generate a number of files. The main file is a 'uber-jar' placed under **MSGViewer/target** directory.
-
-You can now run the project with:
-
-```shell
-cd MSGViewer/target
-java -jar msgviewer.jar
-```
 
 ## GUI
 
 You can run the application's Graphic User Interface by calling :
 
-`java -jar msgviewer.jar`
+```
+cd MSGViewer/target
+java -jar msgviewer.jar
+```
 
 ## Command Line
 
 The application may also be used on the command line. Just type :
 
-`java -jar msgviewer.jar -h`
+```
+cd MSGViewer/target
+java -jar msgviewer.jar -h
+```
 
 to display command line help.
