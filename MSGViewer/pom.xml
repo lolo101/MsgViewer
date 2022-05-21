@@ -4,7 +4,7 @@
     <parent>
         <groupId>net.sourceforge.msgviewer</groupId>
         <artifactId>parent</artifactId>
-        <version>1.8.5-SNAPSHOT</version>
+        <version>1.8.5</version>
     </parent>
     <artifactId>msgviewer</artifactId>
     <name>MSGViewer</name>
