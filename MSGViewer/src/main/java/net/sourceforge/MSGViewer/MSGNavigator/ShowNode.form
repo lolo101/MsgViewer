@@ -44,11 +44,11 @@
       <SubComponents>
         <Component class="javax.swing.JTextArea" name="jTHex">
           <Properties>
-            <Property name="columns" type="int" value="20"/>
+            <Property name="columns" type="int" value="80"/>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-              <Font name="Courier New" size="12" style="0"/>
+              <Font name="Monospaced" size="12" style="0"/>
             </Property>
-            <Property name="rows" type="int" value="5"/>
+            <Property name="rows" type="int" value="25"/>
           </Properties>
         </Component>
       </SubComponents>

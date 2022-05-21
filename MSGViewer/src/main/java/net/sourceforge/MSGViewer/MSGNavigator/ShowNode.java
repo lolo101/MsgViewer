@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 public class ShowNode extends BaseDialog {
 
     private static final long serialVersionUID = 3130592579862038804L;
-    private static final Pattern NAMED_PROPERTY_SUBSTORAGE = Pattern.compile("__substg1\\.0_[0-9]{4}0102");
+    private static final Pattern NAMED_PROPERTY_SUBSTORAGE = Pattern.compile("__substg1\\.0_\\d{4}0102");
     private static final int PROPATTR_MANDATORY = 0x00000001;
     private static final int PROPATTR_READABLE = 0x00000002;
     private static final int PROPATTR_WRITABLE = 0x00000004;
@@ -45,7 +45,6 @@ public class ShowNode extends BaseDialog {
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-
     private void initComponents() {
 
         javax.swing.JScrollPane jScrollPane1 = new javax.swing.JScrollPane();
@@ -53,9 +52,9 @@ public class ShowNode extends BaseDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
 
-        jTHex.setColumns(20);
-        jTHex.setFont(new java.awt.Font("Courier New", Font.PLAIN, 12)); // NOI18N
-        jTHex.setRows(5);
+        jTHex.setColumns(80);
+        jTHex.setFont(new java.awt.Font("Monospaced", Font.PLAIN, 12)); // NOI18N
+        jTHex.setRows(25);
         jScrollPane1.setViewportView(jTHex);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -73,9 +72,7 @@ public class ShowNode extends BaseDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-
     private javax.swing.JTextArea jTHex;
-
     // End of variables declaration//GEN-END:variables
 
     private String show_entry(String name, TreeNodeContainer cont) {
@@ -547,9 +544,9 @@ public class ShowNode extends BaseDialog {
     private static String show_tnef(byte[] data) {
         try {
             byte[] decBytes = new CompressedRTF().decompress(new ByteArrayInputStream(data));
-            return "decompressed TNEF\n\n" + new String(decBytes);
+            return "decompressed TNEF\n\n" + new String(decBytes, StandardCharsets.UTF_8);
         } catch (Exception ex) {
-            logger.error("failed decompressing", ex);
+            logger.info("failed decompressing: {}", ex.getLocalizedMessage());
             return "No TNEF content detected";
         }
     }

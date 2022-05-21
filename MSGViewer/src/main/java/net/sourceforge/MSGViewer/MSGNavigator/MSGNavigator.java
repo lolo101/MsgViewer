@@ -161,6 +161,7 @@ public class MSGNavigator extends BaseDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(250, 250));
 
+        tree.setFont(new java.awt.Font("Monospaced", Font.PLAIN, 15)); // NOI18N
         tree.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 treeMouseClicked(evt);
