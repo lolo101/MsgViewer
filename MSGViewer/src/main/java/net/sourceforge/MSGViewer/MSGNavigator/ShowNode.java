@@ -323,6 +323,9 @@ public class ShowNode extends BaseDialog {
         return sb.toString();
     }
 
+    /**
+     * [MS-OXPROPS] 1.3.2
+     */
     private static String getPropertySetById(String id) {
         switch (id) {
             case "00020386-0000-0000-C000-000000000046":

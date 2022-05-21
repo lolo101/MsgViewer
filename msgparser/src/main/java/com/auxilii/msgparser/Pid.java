@@ -4,6 +4,9 @@ import java.util.Arrays;
 
 import static com.auxilii.msgparser.Ptyp.*;
 
+/**
+ * [MS-OXPROPS]
+ */
 public enum Pid {
     PidTagGuidStream(0x0002, PtypBinary),
     PidTagEntryStream(0x0003, PtypBinary),
@@ -82,6 +85,8 @@ public enum Pid {
     PidTagCreationTime(0x3007, PtypTime),
     PidTagLastModificationTime(0x3008, PtypTime),
     PidTagSearchKey(0x300b, PtypBinary),
+    PidTagTargetEntryId(0x3010, PtypBinary),
+    PidTagConversationId(0x3013, PtypBinary),
 
     // 0x3400-0x35FF Message store property; reserved
     PidTagStoreSupportMask(0x340d, PtypInteger32),
@@ -104,10 +109,13 @@ public enum Pid {
     PidTagAttachFlags(0x3714, PtypInteger32),
 
     // 0x3900-0x39FF Address Book object property; reserved
+    PidTagDisplayType(0x3900, PtypInteger32),
+    PidTagDisplayTypeEx(0x3905, PtypInteger32),
     PidTagSmtpAddress(0x39fe, PtypString),
     PidTagAddressBookDisplayNamePrintable(0x39ff, PtypString),
 
     // 0x3A00 0x3BFF Mail user object property; reserved
+    PidTagAccount(0x3a00, PtypString),
     PidTagLanguage(0x3a0c, PtypString),
     PidTagTransmittableDisplayName(0x3a20, PtypString),
     PidTagSendRichInfo(0x3a40, PtypBoolean),
@@ -120,17 +128,28 @@ public enum Pid {
 
     PidTagInternetCodepage(0x3fde, PtypInteger32),
     PidTagCreatorName(0x3ff8, PtypString),
+    PidTagCreatorEntryId(0x3ff9, PtypBinary),
     PidTagLastModifierName(0x3ffa, PtypString),
+    PidTagLastModifierEntryId(0x3ffb, PtypBinary),
 
     // 0x4000 0x57FF Transport-defined envelope property
 
     // 0x5800 0x5FFF Transport-defined recipient property
+    PidTagSenderSmtpAddress(0x5d01, PtypString),
     PidTagSentRepresentingSmtpAddress(0x5d02, PtypString),
     PidTagReceivedBySmtpAddress(0x5d07, PtypString),
     PidTagReceivedRepresentingSmtpAddress(0x5d08, PtypString),
+    PidTagRecipientOrder(0x5fdf, PtypInteger32),
+    PidTagRecipientDisplayName(0x5ff6, PtypString),
     PidTagRecipientEntryId(0x5ff7, PtypBinary),
+    PidTagRecipientFlags(0x5ffd, PtypInteger32),
+    PidTagRecipientTrackStatus(0x5fff, PtypInteger32),
 
     // 0x6000 0x65FF User-defined non-transmittable property
+    PidTagSourceKey(0x65e0, PtypBinary),
+    PidTagParentSourceKey(0x65e1, PtypBinary),
+    PidTagChangeKey(0x65e2, PtypBinary),
+    PidTagPredecessorChangeList(0x65e3, PtypBinary),
 
     // 0x6600 0x67FF Provider-defined internal non-transmittable property
 
