@@ -31,7 +31,8 @@ public class FieldInformation {
 
     public Pid getId() {
         int index = Ptyp.SUBSTORAGE_PREFIX.length();
-        return Pid.from(Integer.parseInt(entry.getName().substring(index, index + 4), 16));
+        Ptyp type = Ptyp.from(Integer.parseInt(entry.getName().substring(index + 4, index + 8), 16));
+        return Pid.from(Integer.parseInt(entry.getName().substring(index, index + 4), 16), type);
     }
 
     public Object getData() throws IOException {
@@ -44,7 +45,7 @@ public class FieldInformation {
     private Ptyp getType() {
         int index = Ptyp.SUBSTORAGE_PREFIX.length();
         Ptyp type = Ptyp.from(Integer.parseInt(entry.getName().substring(index + 4, index + 8), 16));
-        return isOneOfMultipleVariableLengthEntry() ? Ptyp.from(type.id ^ Ptyp.MULTIPLE_VALUED_FLAG) : type;
+        return isOneOfMultipleVariableLengthEntry() ? Ptyp.from(type.id & ~Ptyp.MULTIPLE_VALUED_FLAG) : type;
     }
 
     private boolean isOneOfMultipleVariableLengthEntry() {

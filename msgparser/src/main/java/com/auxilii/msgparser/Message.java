@@ -27,6 +27,7 @@ import org.apache.poi.hmef.CompressedRTF;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -185,6 +186,9 @@ public class Message {
                 break;
             case PidTagBodyHtml:
                 this.setBodyHtml((String) property.getValue());
+                break;
+            case PidTagHtml:
+                this.setBodyHtml(new String((byte[]) property.getValue(), StandardCharsets.UTF_8));
                 break;
             case PidTagRtfCompressed:
                 this.setCompressedRTF((byte[]) property.getValue());

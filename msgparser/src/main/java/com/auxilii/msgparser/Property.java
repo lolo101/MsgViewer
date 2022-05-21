@@ -16,7 +16,7 @@ public class Property {
         propertyStream.readInt(); // flags
         Ptyp typ = Ptyp.from(pType);
 
-        pid = Pid.from(id);
+        pid = Pid.from(id, typ);
         value = typ.parseValue(propertyStream, dir, String.format("%04X%04X", id, pType));
     }
 

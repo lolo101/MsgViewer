@@ -133,9 +133,7 @@ public class MSGNavigator extends BaseDialog {
     }
 
     private static MutableTreeNode parseProperties(DocumentEntry de) throws IOException {
-        TreeNodeContainer node = new TreeNodeContainer(de,
-                "<html><body><b>" + de.getName() + "</b></body></html>",
-                new DocumentInputStream(de).readAllBytes());
+        TreeNodeContainer node = toNode(de);
         PropertyParser pp = new PropertyParser(de);
         for (String tag : pp.getPropertyTags()) {
             TreeNodeContainer pnode = new TreeNodeContainer(de,
@@ -144,6 +142,14 @@ public class MSGNavigator extends BaseDialog {
             node.add(pnode);
         }
         return node;
+    }
+
+    private static TreeNodeContainer toNode(DocumentEntry de) throws IOException {
+        try (DocumentInputStream dstream = new DocumentInputStream(de)) {
+            return new TreeNodeContainer(de,
+                    "<html><body><b>" + de.getName() + "</b></body></html>",
+                    dstream.readAllBytes());
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

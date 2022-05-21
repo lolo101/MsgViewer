@@ -190,10 +190,10 @@ public class ShowNode extends BaseDialog {
         sb.append(" ");
 
         String lTagname = tagname.toString().toLowerCase();
-        Pid descr = Pid.from(Integer.parseInt(lTagname.substring(0, 4), 16));
-        sb.append(StringUtils.rightPad(descr.toString(), max_descr_lenght));
-
         Ptyp tagtype = Ptyp.from(Integer.parseInt(lTagname.substring(4), 16));
+        Pid descr = Pid.from(Integer.parseInt(lTagname.substring(0, 4), 16), tagtype);
+
+        sb.append(StringUtils.rightPad(descr.toString(), max_descr_lenght));
 
         switch (tagtype) {
             case PtypString: {

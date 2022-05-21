@@ -76,7 +76,7 @@ public class PropertyParser {
         sb.append((flags & 0x0004) > 0 ? "W" : "_");
         sb.append(" ");
 
-        Pid id = Pid.from(tag >> 16);
+        Pid id = Pid.from(tag >> 16, Ptyp.from(tag & 0xffff));
         Ptyp typ = Ptyp.from(tag & 0xffff);
         sb.append(StringUtils.rightPad(id.toString(), max_id_lenght));
         sb.append(" ");
