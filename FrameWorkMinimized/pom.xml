@@ -4,7 +4,7 @@
     <parent>
         <groupId>net.sourceforge.msgviewer</groupId>
         <artifactId>parent</artifactId>
-        <version>1.8.5</version>
+        <version>1.8.6-SNAPSHOT</version>
     </parent>
     <groupId>at.redeye</groupId>
     <artifactId>FrameWorkMinimized</artifactId>
