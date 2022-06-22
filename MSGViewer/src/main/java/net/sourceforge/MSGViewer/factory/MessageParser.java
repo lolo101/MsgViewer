@@ -20,6 +20,7 @@ public class MessageParser {
 
         switch (extention.toString()) {
             case "msg":
+            case "oft":
                 return parseMsgFile();
             case "mbox":
             case "eml":
