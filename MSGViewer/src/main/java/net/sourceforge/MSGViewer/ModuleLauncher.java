@@ -72,6 +72,8 @@ public class ModuleLauncher extends BaseModuleLauncher {
             return new MBox2Msg(this);
         } else if (getStartupFlag(Msg2Eml.CLI_PARAMETER)) {
             return new Msg2Eml(this);
+        } else if (getStartupFlag(Oft2Eml.CLI_PARAMETER)) {
+            return new Oft2Eml(this);
         } else if (getStartupFlag(Eml2Msg.CLI_PARAMETER)) {
             return new Eml2Msg(this);
         } else {

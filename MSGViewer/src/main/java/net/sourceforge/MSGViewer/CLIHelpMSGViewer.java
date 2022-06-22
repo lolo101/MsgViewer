@@ -25,6 +25,7 @@ public class CLIHelpMSGViewer extends CLIHelp
 
         add( new CLIOption( Msg2MBox.CLI_PARAMETER, "Converts a msg file to a mbox file.") );
         add( new CLIOption( Msg2Eml.CLI_PARAMETER, "Converts a msg file to an eml file.") );
+        add( new CLIOption( Oft2Eml.CLI_PARAMETER, "Converts an oft file to an eml file.") );
         add( new CLIOption( Eml2Msg.CLI_PARAMETER, "Converts an eml file to a msg file.") );
         add( new CLIOption( MBox2Msg.CLI_PARAMETER, "Converts a mbox file to a msg file.",
                                                     "This feature is in pre alpla state and may never will work." ) );
