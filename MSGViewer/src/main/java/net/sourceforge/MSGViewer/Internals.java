@@ -30,19 +30,20 @@ public class Internals extends BaseDialog {
         jTRTF.setText(message.getBodyRTF());
         jTRTF.setCaretPosition(0);
 
-        if (message.getBodyRTF() != null && message.getBodyRTF().contains("\\fromhtml")) {
-            AutoLogger al = new AutoLogger(Internals.class.getName(), () -> jTHTML.setText(extractHTMLFromRTF(message.getBodyRTF())));
-
-            if (al.isFailed()) {
-                jTHTML.setText(MlM(MESSAGE_UNPARSABLE_CODE));
-            }
-        } else if (message.getBodyHtml() != null) {
-            jTHTML.setText(message.getBodyHtml());
-        } else {
-            jTHTML.setText(MlM(MESSAGE_NOHTML_CODE));
-        }
-
+        jTHTML.setText(getText(message));
         jTHTML.setCaretPosition(0);
+    }
+
+    private String getText(Message message) {
+        if (message.getBodyRTF() != null && message.getBodyRTF().contains("\\fromhtml")) {
+            return new AutoLogger<>(Internals.class.getName(),
+                    () -> extractHTMLFromRTF(message.getBodyRTF())
+            ).resultOrElse(MlM(MESSAGE_UNPARSABLE_CODE));
+        }
+        if (message.getBodyHtml() != null) {
+            return message.getBodyHtml();
+        }
+        return MlM(MESSAGE_NOHTML_CODE);
     }
 
 

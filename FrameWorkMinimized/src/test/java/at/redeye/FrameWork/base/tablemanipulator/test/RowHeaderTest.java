@@ -188,15 +188,16 @@ public class RowHeaderTest extends BaseDialog {
     }
 
     final void changeStyle(final String className) {
-        new AutoMBox(RowHeaderTest.class.getName(), () -> {
+        new AutoMBox<>(RowHeaderTest.class.getName(), () -> {
             UIManager.setLookAndFeel(className);
             root.closeAllWindowsNoAppExit();
             run();
-        });
+        }).run();
     }
 
     private static Root main_root;
 
+    // FIXME make me a JUnit test
     public static void main(String[] args) {
 
         main_root = new LocalRoot("TT");

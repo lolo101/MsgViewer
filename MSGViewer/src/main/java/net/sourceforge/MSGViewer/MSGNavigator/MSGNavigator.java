@@ -64,7 +64,7 @@ public class MSGNavigator extends BaseDialog {
 
         setting_show_size = StringUtils.isYes(root.getSetup().getLocalConfig(SETTING_SHOW_SIZE, "true"));
 
-        EventQueue.invokeLater(() -> new AutoMBox(MSGNavigator.class.getName(), () -> parse(file)));
+        EventQueue.invokeLater(() -> new AutoMBox<>(MSGNavigator.class.getName(), () -> parse(file)).run());
     }
 
     void parse(File file) throws IOException {
@@ -207,7 +207,7 @@ public class MSGNavigator extends BaseDialog {
     }//GEN-LAST:event_treeMouseClicked
 
     public void deleteSelectedElement() {
-        new AutoMBox(this.getClass().getName(), () -> {
+        new AutoMBox<>(this.getClass().getName(), () -> {
             TreePath path = tree.getSelectionPath();
 
             if (path == null) {
@@ -228,7 +228,7 @@ public class MSGNavigator extends BaseDialog {
                 save();
                 reload();
             }
-        });
+        }).run();
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -9,10 +9,10 @@ import java.util.Properties;
 import java.util.Set;
 
 public class MLHelper {
-    Root root;
+    final Root root;
     Properties props;
     String current_lang;
-    String locale;
+    final String locale;
     Properties missing_props;
     String missing_props_file_name;
 
@@ -43,9 +43,9 @@ public class MLHelper {
         current_lang = lang;
 
         if (dir_exact.isFile()) {
-            FileInputStream in = new FileInputStream(dir_exact);
-            props.load(in);
-            in.close();
+            try (FileInputStream in = new FileInputStream(dir_exact)) {
+                props.load(in);
+            }
             loaded_something = true;
         }
 
@@ -56,12 +56,11 @@ public class MLHelper {
 
             resource_name = resource_name.replaceAll("//", "/");
 
-            InputStream in = this.getClass().getResourceAsStream(resource_name);
-
-            if (in != null) {
-                props.load(in);
-                in.close();
-                loaded_something = true;
+            try (InputStream in = this.getClass().getResourceAsStream(resource_name)) {
+                if (in != null) {
+                    props.load(in);
+                    loaded_something = true;
+                }
             }
         }
 
@@ -76,7 +75,7 @@ public class MLHelper {
         }
     }
 
-    public void autoLoadCurrentLocale() {
+    public final void autoLoadCurrentLocale() {
         if (loadTrans(locale)) {
             return;
         }
@@ -131,11 +130,11 @@ public class MLHelper {
         if (missing_props == null)
             return;
 
-        new AutoLogger(MLHelper.class.getName(), () -> {
-            FileOutputStream out = new FileOutputStream(getMissingPropsFileName());
-            missing_props.store(out, "Untranslated messages");
-            out.close();
-        });
+        new AutoLogger<>(MLHelper.class.getName(), () -> {
+            try (FileOutputStream out = new FileOutputStream(getMissingPropsFileName())) {
+                missing_props.store(out, "Untranslated messages");
+            }
+        }).run();
 
     }
 

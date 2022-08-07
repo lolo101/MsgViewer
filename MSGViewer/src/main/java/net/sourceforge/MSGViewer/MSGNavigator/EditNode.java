@@ -94,7 +94,7 @@ public class EditNode extends BaseDialog {
 
     private void jSaveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jSaveButtonActionPerformed
 
-        new AutoMBox(this.getClass().getName(), () -> {
+        new AutoMBox<>(this.getClass().getName(), () -> {
 
             if (cont.getEntry().getName().matches("__substg1\\.0_[0-9][0-9][0-9][0-9]001[fF]")) {
                 String data = jtHex.getText().trim();
@@ -106,18 +106,16 @@ public class EditNode extends BaseDialog {
                 DirectoryEntry parent = entry.getParent();
                 entry.delete();
 
-                ByteArrayInputStream buf = new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_16LE));
-
-                DocumentEntry new_entry = parent.createDocument(name, buf);
+                DocumentEntry new_entry;
+                try (ByteArrayInputStream buf = new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_16LE))) {
+                    new_entry = parent.createDocument(name, buf);
+                }
 
                 TopLevelPropertyStream stream = new TopLevelPropertyStream(parent);
                 stream.update(new_entry);
 
 
                 navwin.edited();
-
-
-                close();
             } else {
                 String data = jtHex.getText();
 
@@ -140,12 +138,13 @@ public class EditNode extends BaseDialog {
                 DirectoryEntry parent = entry.getParent();
                 entry.delete();
 
-                parent.createDocument(name, new ByteArrayInputStream(bytes));
-
-                close();
+                try (ByteArrayInputStream buf = new ByteArrayInputStream(bytes)) {
+                    parent.createDocument(name, buf);
+                }
             }
+            close();
 
-        });
+        }).run();
 
 
     }//GEN-LAST:event_jSaveButtonActionPerformed

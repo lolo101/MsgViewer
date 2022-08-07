@@ -13,16 +13,9 @@ public class Plugin implements at.redeye.FrameWork.Plugin.Plugin {
 
     @Override
     public String getLicenceText() {
-        final StringBuilder builder = new StringBuilder();
-
-        new AutoMBox(Plugin.class.getSimpleName(), () -> {
-            HelpFileLoader helper = new HelpFileLoader();
-
-            String licence = helper.loadHelp("/net/sourceforge/MSGViewer/Plugins/javamail", "oracle");
-            builder.append(licence);
-        });
-
-        return builder.toString();
+        return new AutoMBox<>(Plugin.class.getSimpleName(),
+                () -> new HelpFileLoader().loadHelp("/net/sourceforge/MSGViewer/Plugins/javamail", "oracle")
+        ).resultOrElse("");
     }
 
     @Override
@@ -42,17 +35,9 @@ public class Plugin implements at.redeye.FrameWork.Plugin.Plugin {
 
     @Override
     public String getChangeLog() {
-
-        final StringBuilder builder = new StringBuilder();
-
-        new AutoMBox(Plugin.class.getSimpleName(), () -> {
-            HelpFileLoader helper = new HelpFileLoader();
-
-            String changelog = helper.loadHelp("/net/sourceforge/MSGViewer/Plugins/javamail", "ChangeLog");
-            builder.append(changelog);
-        });
-
-        return builder.toString();
+        return new AutoMBox<>(Plugin.class.getSimpleName(),
+                () -> new HelpFileLoader().loadHelp("/net/sourceforge/MSGViewer/Plugins/javamail", "ChangeLog")
+        ).resultOrElse("");
     }
 
     @Override

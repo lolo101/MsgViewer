@@ -105,11 +105,9 @@ public class LocalRoot extends Root {
     public void informWindowClosed(BaseDialogBase dlg) {
         dialogs.remove(dlg);
 
-        if (dialogs.size() <= 0) {
-            if (appExitAllowed) {
-                System.out.println("All Windows closed, normal exit");
-                appExit();
-            }
+        if (dialogs.isEmpty() && appExitAllowed) {
+            System.out.println("All Windows closed, normal exit");
+            appExit();
         }
     }
 
@@ -122,7 +120,7 @@ public class LocalRoot extends Root {
 
     @Override
     public void closeAllWindowsExceptThisOne(BaseDialogBase dlg) {
-        dialogs.stream()
+        List.copyOf(dialogs).stream()
                 .filter(frame -> frame != dlg)
                 .forEach(BaseDialogBase::closeNoAppExit);
     }

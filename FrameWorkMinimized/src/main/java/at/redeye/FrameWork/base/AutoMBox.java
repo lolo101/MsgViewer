@@ -5,37 +5,24 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
+import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 
-public class AutoMBox {
+public class AutoMBox<R> {
 
-    protected Logger logger;
-    protected boolean failed;
-    protected final boolean do_mbox;
-
-    public AutoMBox(String loggerName, boolean do_mbox, Invokable invokable) {
-        logger = LogManager.getLogger(loggerName);
-        this.do_mbox = do_mbox;
-        invoke(invokable);
-    }
+    protected final Logger logger;
+    protected final Callable<R> callable;
 
     public AutoMBox(String loggerName, Invokable invokable) {
-        this(loggerName, true, invokable);
-    }
-
-    private void invoke(Invokable invokable) {
-        try {
+        this(loggerName, () -> {
             invokable.invoke();
-        } catch (Exception ex) {
-            failed = true;
-            logger.error("Exception: " + ex + "\n" + ex.getLocalizedMessage(), ex);
-            if (do_mbox) {
-                showErrorDialog(ex);
-            }
-        }
+            return null;
+        });
     }
 
-    public boolean isFailed() {
-        return failed;
+    public AutoMBox(String loggerName, Callable<R> callable) {
+        logger = LogManager.getLogger(loggerName);
+        this.callable = callable;
     }
 
     private static void showErrorDialog(Exception ex) {
@@ -47,5 +34,33 @@ public class AutoMBox {
                                 + ex.getLocalizedMessage()),
                 root.MlM("Error"),
                 JOptionPane.ERROR_MESSAGE);
+    }
+
+    public R resultOrElse(R defaultValue) {
+        try {
+            return callable.call();
+        } catch (Exception ex) {
+            logger.error("Exception: " + ex, ex);
+            showErrorDialog(ex);
+            return defaultValue;
+        }
+    }
+
+    public void onSuccess(Consumer<R> consumer) {
+        try {
+            consumer.accept(callable.call());
+        } catch (Exception ex) {
+            logger.error("Exception: " + ex, ex);
+            showErrorDialog(ex);
+        }
+    }
+
+    public void run() {
+        try {
+            callable.call();
+        } catch (Exception ex) {
+            logger.error("Exception: " + ex, ex);
+            showErrorDialog(ex);
+        }
     }
 }

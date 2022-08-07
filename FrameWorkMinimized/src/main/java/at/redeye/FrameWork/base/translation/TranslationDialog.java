@@ -444,16 +444,16 @@ public class TranslationDialog extends BaseDialog {
 
     private void jBCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCloseActionPerformed
 
-        new AutoMBox(getTitle(), () -> {
+        new AutoMBox<>(getTitle(), () -> {
             if (canClose()) {
                 close();
             }
-        });
+        }).run();
     }//GEN-LAST:event_jBCloseActionPerformed
 
     private void jBSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBSaveActionPerformed
 
-        new AutoMBox(getTitle(), () -> {
+        new AutoMBox<>(getTitle(), () -> {
 
             gui_to_var();
 
@@ -474,15 +474,14 @@ public class TranslationDialog extends BaseDialog {
                 }
             }
 
-            FileOutputStream out = new FileOutputStream(file_name);
-            props.store(out, "nix");
-            out.close();
+            try (FileOutputStream out = new FileOutputStream(file_name)) {
+                props.store(out, "nix");
+            }
 
-            for (NoticeIfChangedTextField field : fields)
-                field.setChanged(false);
+            fields.forEach(field -> field.setChanged(false));
 
             setEdited(false);
-        });
+        }).run();
     }//GEN-LAST:event_jBSaveActionPerformed
 
 
@@ -521,16 +520,13 @@ public class TranslationDialog extends BaseDialog {
 
     private void colsLeftStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_colsLeftStateChanged
         Integer val = (Integer) colsLeft.getValue();
-        for (JTextField field : left_cols)
-            field.setColumns(val);
+        left_cols.forEach(field -> field.setColumns(val));
         panel.updateUI();
     }//GEN-LAST:event_colsLeftStateChanged
 
     private void colsRightStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_colsRightStateChanged
         Integer val = (Integer) colsRight.getValue();
-        for (JTextField field : right_cols)
-            field.setColumns(val);
-
+        right_cols.forEach(field -> field.setColumns(val));
         panel.updateUI();
     }//GEN-LAST:event_colsRightStateChanged
 
@@ -562,7 +558,9 @@ public class TranslationDialog extends BaseDialog {
 
         locale_string.setText(lang);
 
-        new AutoMBox(TranslationDialog.class.getName(), () -> loadTranslationsFor(ClassName, locale_string.getText()));
+        new AutoMBox<>(TranslationDialog.class.getName(),
+                () -> loadTranslationsFor(ClassName, locale_string.getText())
+        ).run();
     }
 
     public static String getTranslationsDir(Root root) {
@@ -584,9 +582,9 @@ public class TranslationDialog extends BaseDialog {
         Properties props = new Properties();
 
         if (file.isFile()) {
-            FileInputStream in = new FileInputStream(file);
-            props.load(in);
-            in.close();
+            try (FileInputStream in = new FileInputStream(file)) {
+                props.load(in);
+            }
         }
 
         for (SimpleEntry<String, StringBuffer> p : data) {
@@ -602,9 +600,7 @@ public class TranslationDialog extends BaseDialog {
 
         var_to_gui();
 
-        for (NoticeIfChangedTextField field : fields) {
-            field.setChanged(false);
-        }
+        fields.forEach(field -> field.setChanged(false));
 
         setEdited(false);
     }
