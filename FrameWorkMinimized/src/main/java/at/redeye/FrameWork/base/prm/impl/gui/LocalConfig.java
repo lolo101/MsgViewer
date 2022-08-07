@@ -18,17 +18,19 @@ import at.redeye.FrameWork.widgets.helpwindow.HelpWin;
 import at.redeye.FrameWork.widgets.helpwindow.HelpWinHook;
 
 import java.awt.*;
+import java.util.Collection;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.Vector;
 
 public class LocalConfig extends BaseDialog implements Saveable, PrmListener {
 
     private static final long serialVersionUID = 1L;
-    Vector<DBStrukt> values = new Vector<>();
-    TableManipulator tm;
+    final Vector<DBStrukt> values = new Vector<>();
+    final TableManipulator tm;
 
-    /** Creates new form Config */
+    /**
+     * Creates new form Config
+     */
     public LocalConfig(Root root) {
         super(root, "Lokale Einstellungen");
         setBaseLanguage("de");
@@ -55,10 +57,7 @@ public class LocalConfig extends BaseDialog implements Saveable, PrmListener {
         tm.autoResize();
 
         // Register all local PRM
-        Set<String> keys = LocalConfigDefinitions.entries.keySet();
-        for (String key : keys) {
-            LocalConfigDefinitions.get(key).addPrmListener(this);
-        }
+        LocalConfigDefinitions.entries.values().forEach(c -> c.addPrmListener(this));
     }
 
     private void feed_table() {
@@ -66,27 +65,16 @@ public class LocalConfig extends BaseDialog implements Saveable, PrmListener {
         values.clear();
         tm.clear();
 
-        TreeMap<String, DBConfig> vals = new TreeMap<>();
+        Collection<DBConfig> configs = LocalConfigDefinitions.entries.values();
 
-        Set<String> keys = LocalConfigDefinitions.entries.keySet();
-
-        for (String key : keys) {
-            vals.put(key, LocalConfigDefinitions.get(key));
-        }
-
-        for (String key : keys) {
-
-            DBConfig c = (DBConfig) vals.get(key).getCopy();
-
+        for (DBConfig c : configs) {
             String val = root.getSetup().getLocalConfig(c.getConfigName(), c.getConfigValue());
-
             c.descr.loadFromCopy(MlM(c.descr.getValue()));
-
             c.setConfigValue(val);
-            tm.add(c);
-            values.add(c);
         }
 
+        tm.addAll(configs);
+        values.addAll(configs);
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

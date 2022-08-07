@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
 
 public class StringUtils {
@@ -19,7 +18,7 @@ public class StringUtils {
 		return what.indexOf(c) >= 0;
 	}
 
-	static int skip_char(StringBuilder s, String what, int pos) {
+	static int skip_char(String s, String what, int pos) {
 		while (pos <= (s.length() - 1)) {
 			char c;
 
@@ -36,7 +35,7 @@ public class StringUtils {
 		return pos;
 	}
 
-	static int skip_char_reverse(StringBuilder s, String what, int pos) {
+	static int skip_char_reverse(String s, String what, int pos) {
 		while (pos > 0) {
 			char c;
 
@@ -53,11 +52,11 @@ public class StringUtils {
 		return pos;
 	}
 
-	public static int skip_spaces_reverse(StringBuilder s, int pos) {
+	public static int skip_spaces_reverse(String s, int pos) {
 		return skip_char_reverse(s, " \t\n\r", pos);
 	}
 
-	public static int skip_spaces(StringBuilder s, int pos) {
+	public static int skip_spaces(String s, int pos) {
 		return skip_char(s, " \t\n\r", pos);
 	}
 
@@ -65,29 +64,22 @@ public class StringUtils {
 		return c == ' ' || c == '\t' || c == '\n' || c == '\r';
 	}
 
-	public static List<String> split_str(StringBuilder s, String c) {
+	public static List<String> split_str(String s, String c) {
 
 		List<String> res = new ArrayList<>();
-
-		int start = 0;
-		do {
-			int pos = s.indexOf(c, start);
+		for (int pos, start = 0; true; start = pos + 1) {
+			pos = s.indexOf(c, start);
 
 			if (pos < 0) {
 				res.add(s.substring(start));
-				break;
+				return res;
 			}
 
 			res.add(s.substring(start, pos));
-
-			start = pos + 1;
-
-		} while (start > 0);
-
-		return res;
+		}
 	}
 
-	public static String strip(StringBuilder s, String what) {
+	public static String strip(String s, String what) {
 		int start = skip_char(s, what, 0);
 		int end = skip_char_reverse(s, what, s.length() - 1);
 
@@ -97,19 +89,10 @@ public class StringUtils {
 		return s.substring(start, end + 1);
 	}
 
-	public static String strip_post(StringBuilder s, String what) {
+	public static String strip_post(String s, String what) {
 		int end = skip_char_reverse(s, what, s.length() - 1);
 
 		return s.substring(0, end + 1);
-	}
-
-	public static String strip_post(String str, String what) {
-        requireNonNull(str);
-        return strip_post(new StringBuilder(str), what);
-    }
-
-	public static String strip(String s, String what) {
-		return strip(new StringBuilder(s), what);
 	}
 
 	public static void set_defaultAutoLineLenght(int length) {

@@ -1,12 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.base.prm.impl;
 
 import at.redeye.FrameWork.base.FrameWorkConfigDefinitions;
 import at.redeye.FrameWork.base.Root;
+import at.redeye.FrameWork.base.Setup;
 import at.redeye.FrameWork.base.prm.bindtypes.DBConfig;
 import at.redeye.FrameWork.base.prm.impl.gui.GlobalConfig;
 import at.redeye.FrameWork.base.prm.impl.gui.LocalConfig;
@@ -18,21 +14,16 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.Map;
 
-/**
- *
- * @author martin
- */
 public class ConfigParamHook implements HelpWinHook
 {
     String keyword;
     Root root;
     boolean global;
-    TreeMap<String, DBConfig> config;
-    Collection<String>  search_path;
-    private static Logger logger = LogManager.getLogger(ConfigParamHook.class);
+    Map<String, DBConfig> config;
+    Collection<String> search_path;
+    private static final Logger logger = LogManager.getLogger(ConfigParamHook.class);
     String color_even;
     String color_odd;
     String color_title;
@@ -44,20 +35,18 @@ public class ConfigParamHook implements HelpWinHook
         this.global = global;
         this.search_path = search_path;
 
-        if( global )
-        {
+        if( global ) {
             config = GlobalConfigDefinitions.entries;
             root.loadMlM4ClassName(GlobalConfig.class.getName(), "de");
-        }
-        else
-        {
+        } else {
             config = LocalConfigDefinitions.entries;
             root.loadMlM4ClassName(LocalConfig.class.getName(), "de");
         }
 
-        color_even = root.getSetup().getLocalConfig(FrameWorkConfigDefinitions.HelpParamColorEven);
-        color_odd = root.getSetup().getLocalConfig(FrameWorkConfigDefinitions.HelpParamColorOdd);
-        color_title = root.getSetup().getLocalConfig(FrameWorkConfigDefinitions.HelpParamColorTitle);
+        Setup setup = root.getSetup();
+        color_even = setup.getLocalConfig(FrameWorkConfigDefinitions.HelpParamColorEven);
+        color_odd = setup.getLocalConfig(FrameWorkConfigDefinitions.HelpParamColorOdd);
+        color_title = setup.getLocalConfig(FrameWorkConfigDefinitions.HelpParamColorTitle);
     }
 
 
@@ -68,8 +57,6 @@ public class ConfigParamHook implements HelpWinHook
     public String getText() {
 
         StringBuilder res = new StringBuilder();
-
-        Set<String> keys = config.keySet();
 
         res.append("<table>\n");
         res.append("<tr bgcolor=\"").append(color_title).append("\"><td><b>");
@@ -87,12 +74,10 @@ public class ConfigParamHook implements HelpWinHook
 
         int count = 1;
 
-        for( String key : keys )
-        {
+        for (String key : config.keySet()) {
             String color;
 
-            if( count % 2 == 1 )
-            {
+            if (count % 2 == 1) {
                 color = color_even;
             } else {
                 color = color_odd;
@@ -100,28 +85,25 @@ public class ConfigParamHook implements HelpWinHook
 
             count++;
 
-            DBConfig c = config.get(key);
-
             res.append("<tr bgcolor=\"").append(color).append("\">\n");
 
             res.append("<td><font face=\"Verdana\">\n");
-            res.append( key );
+            res.append(key);
             res.append("</font></td>\n");
 
             res.append("<td>\n");
             res.append("<font face=\"Verdana\">\n");
 
-            if( global )
-                res.append( root.getSetup().getConfig(c) );
-            else
-                res.append( root.getSetup().getLocalConfig(c) );
+            DBConfig c = config.get(key);
+            Setup setup = root.getSetup();
+            res.append(global ? setup.getConfig(c) : setup.getLocalConfig(c));
 
             res.append("</font>\n");
             res.append("</td>\n");
 
             res.append("<td>\n");
             res.append("<font face=\"Verdana\">\n");
-            res.append( c.getConfigValue());
+            res.append(c.getConfigValue());
             res.append("</font>\n");
             res.append("</td>\n");
 
@@ -132,44 +114,9 @@ public class ConfigParamHook implements HelpWinHook
             res.append("</tr>\n");
 
 
-            HelpFileLoader hfl = new HelpFileLoader();
+            String extra = findFirstHelp(key);
 
-            String extra = null;
-
-            for(String path : search_path)
-            {
-                try {
-                    String locale = root.getDisplayLanguage();
-
-                    String module_name = null;
-
-                    if (MLUtil.haveResource(HelpFileLoader.getResourceName(path, key + "_" + locale))) {
-                        module_name = key + "_" + locale;
-                    } else if (MLUtil.haveResource(HelpFileLoader.getResourceName(path, key + "_" + MLUtil.getLanguageOnly(locale)))) {
-                        module_name = key + "_" + MLUtil.getLanguageOnly(locale);
-                    } else {
-                        if (!MLUtil.compareLanguagesOnly(root.getBaseLanguage(), root.getDisplayLanguage())) {
-                            if (MLUtil.haveResource(HelpFileLoader.getResourceName(path, key + "_" + MLUtil.getLanguageOnly(root.getDefaultLanguage())))) {
-                                module_name = key + "_" + MLUtil.getLanguageOnly(root.getDefaultLanguage());
-                            }
-                        }
-                    }
-
-                    if( module_name == null )
-                        module_name = key;
-
-                    extra = hfl.loadHelp(path, module_name);
-
-                } catch (IOException ex) {
-                    logger.trace("Hilfemodul: '" + path + "/" + key + ".html' konnte nicht geöffnet werden." );
-                }
-
-                if( extra != null && !extra.isEmpty() )
-                    break;
-            }
-
-            if( extra != null && extra.isEmpty() == false )
-            {
+            if (extra != null && !extra.isEmpty()) {
                 res.append("<tr>");
                 res.append("<td colspan=4 bgcolor=\"").append(color).append("\">").append("<blockquote>").append("<font face=\"Verdana\">");
                 res.append(extra);
@@ -182,6 +129,43 @@ public class ConfigParamHook implements HelpWinHook
         res.append("</table>");
 
         return res.toString();
+    }
+
+    private String findFirstHelp(String key) {
+        String extra = null;
+
+        HelpFileLoader hfl = new HelpFileLoader();
+        for (String path : search_path) {
+            try {
+                String locale = root.getDisplayLanguage();
+
+                String module_name = null;
+
+                if (MLUtil.haveResource(HelpFileLoader.getResourceName(path, key + "_" + locale))) {
+                    module_name = key + "_" + locale;
+                } else if (MLUtil.haveResource(HelpFileLoader.getResourceName(path, key + "_" + MLUtil.getLanguageOnly(locale)))) {
+                    module_name = key + "_" + MLUtil.getLanguageOnly(locale);
+                } else {
+                    if (!MLUtil.compareLanguagesOnly(root.getBaseLanguage(), root.getDisplayLanguage())) {
+                        if (MLUtil.haveResource(HelpFileLoader.getResourceName(path, key + "_" + MLUtil.getLanguageOnly(root.getDefaultLanguage())))) {
+                            module_name = key + "_" + MLUtil.getLanguageOnly(root.getDefaultLanguage());
+                        }
+                    }
+                }
+
+                if (module_name == null)
+                    module_name = key;
+
+                extra = hfl.loadHelp(path, module_name);
+
+            } catch (IOException ex) {
+                logger.trace("Hilfemodul: '" + path + "/" + key + ".html' konnte nicht geöffnet werden.");
+            }
+
+            if (extra != null && !extra.isEmpty())
+                break;
+        }
+        return extra;
     }
 
 }
