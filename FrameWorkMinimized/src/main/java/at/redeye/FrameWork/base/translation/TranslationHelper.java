@@ -7,60 +7,54 @@ import at.redeye.FrameWork.base.Root;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
-import java.io.IOException;
 import java.util.*;
 
-public class TranslationHelper
-{
-     BaseDialogBase base_dlg;
-     Root  root;
-     ExtractStrings extract_strings;
-     Properties currentProps;
-     List<String> additional_strings;
-     boolean tried_autoloading_locale = false;
-     BaseDialogBaseHelper helper;
+public class TranslationHelper {
+    final BaseDialogBase base_dlg;
+    final Root root;
+    ExtractStrings extract_strings;
+    Properties currentProps;
+    List<String> additional_strings;
+    boolean tried_autoloading_locale = false;
+    final BaseDialogBaseHelper helper;
 
-     class OpenTransDialog implements Runnable
-     {
-         public void run() {
+    class OpenTransDialog implements Runnable {
+        public void run() {
 
-             if( extract_strings != null )
-             {
-                 if( additional_strings != null )
+            if (extract_strings != null) {
+                if (additional_strings != null)
                     extract_strings.strings.addAll(additional_strings);
 
-                 // alle in der property Datei gefundenen Strings hinzufügen
-                 if( currentProps != null )
-                 {
-                     Set<Object> keys = currentProps.keySet();
+                // alle in der property Datei gefundenen Strings hinzufügen
+                if (currentProps != null) {
+                    Set<Object> keys = currentProps.keySet();
 
-                     for (Object key : keys) extract_strings.strings.add((String) key);
-                 }
-             }
+                    for (Object key : keys) extract_strings.strings.add((String) key);
+                }
+            }
 
 
-             base_dlg.invokeDialogUnique(
-                new TranslationDialog(root, base_dlg.getContainer(), base_dlg.getClass().getName(), extract_strings)
-             );
-         }
-     }
+            base_dlg.invokeDialogUnique(
+                    new TranslationDialog(root, base_dlg.getContainer(), base_dlg.getClass().getName(), extract_strings)
+            );
+        }
+    }
 
-     class SwitchTrans_DE_EN implements Runnable
-     {
-         String lang_a = "";
-         String lang_b = "en";
-         String lang_current;
+    class SwitchTrans_DE_EN implements Runnable {
+        static final String lang_a = "";
+        static final String lang_b = "en";
+        String lang_current;
 
-         public void run() {
-             if (lang_b.equals(lang_current)) {
-                 lang_current = lang_a;
-             } else {
-                 lang_current = lang_b;
-             }
+        public void run() {
+            if (lang_b.equals(lang_current)) {
+                lang_current = lang_a;
+            } else {
+                lang_current = lang_b;
+            }
 
-             new AutoLogger(this.getClass().getName(), () -> switchTranslation(lang_current));
-         }
-     }
+            new AutoLogger<>(this.getClass().getName(), () -> switchTranslation(lang_current)).run();
+        }
+    }
 
     public TranslationHelper(Root root, BaseDialogBase base_dlg, BaseDialogBaseHelper helper)
     {
@@ -72,23 +66,21 @@ public class TranslationHelper
         helper.registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_F11, 0), new SwitchTrans_DE_EN() );
     }
 
-    private boolean loadTranslation( String new_trans ) throws IOException
-    {
+    private boolean loadTranslation(String new_trans) {
         return switchTranslation(new_trans, true);
     }
 
-    private boolean switchTranslation( String new_trans ) throws IOException
-    {
+    private boolean switchTranslation(String new_trans) {
         return switchTranslation(new_trans, false);
     }
 
     private boolean switchTranslation( String new_trans, boolean load_only ) {
-        boolean not_found = false;
+        boolean found = true;
 
         Properties props = MLUtil.autoLoadFile4Class(root, base_dlg, new_trans, true);
 
         if( props == null ) {
-            not_found = true;
+            found = false;
             props = new Properties();
         }
 
@@ -97,7 +89,7 @@ public class TranslationHelper
                 extract_strings = new ExtractStrings(base_dlg.getContainer());
             }
 
-            HashMap<String, List<JComponent>> all = extract_strings.getComponents();
+            Map<String, List<JComponent>> all = extract_strings.getComponents();
 
             Set<String> keys = all.keySet();
 
@@ -116,28 +108,12 @@ public class TranslationHelper
 
         currentProps = props;
 
-        return !not_found;
+        return found;
     }
 
     private static void assign( JComponent comp, String value )
     {
         ExtractStrings.assign( comp, value );
-    }
-
-    public boolean switchTrans(String trans) {
-        try {
-            return switchTranslation(trans);
-        } catch (IOException ex) {
-            return false;
-        }
-    }
-
-    public boolean loadTrans(String trans) {
-        try {
-            return loadTranslation(trans);
-        } catch (IOException ex) {
-            return false;
-        }
     }
 
     public void autoSwitchToCurrentLocale()
@@ -148,16 +124,16 @@ public class TranslationHelper
             return;
         }
 
-        if (switchTrans(locale)) {
+        if (switchTranslation(locale)) {
             return;
         }
 
         if (locale.length() == 2 && !MLUtil.compareLanguagesOnly(root.getDefaultLanguage(), helper.getBaseLanguage())) {
-            switchTrans(root.getDefaultLanguage());
+            switchTranslation(root.getDefaultLanguage());
             return;
         }
 
-        if (switchTrans(MLUtil.getLanguageOnly(locale))) {
+        if (switchTranslation(MLUtil.getLanguageOnly(locale))) {
             return;
         }
 
@@ -167,7 +143,7 @@ public class TranslationHelper
         }
 
         if (!root.getDefaultLanguage().equals(helper.getBaseLanguage())) {
-            switchTrans(root.getDefaultLanguage());
+            switchTranslation(root.getDefaultLanguage());
         }
     }
 
@@ -179,16 +155,16 @@ public class TranslationHelper
             return;
         }
 
-        if (loadTrans(locale)) {
+        if (loadTranslation(locale)) {
             return;
         }
 
         if (locale.length() == 2  && !MLUtil.compareLanguagesOnly(root.getDefaultLanguage(), helper.getBaseLanguage())) {
-            loadTrans(root.getDefaultLanguage());
+            loadTranslation(root.getDefaultLanguage());
             return;
         }
 
-        if (loadTrans(MLUtil.getLanguageOnly(locale))) {
+        if (loadTranslation(MLUtil.getLanguageOnly(locale))) {
             return;
         }
 
@@ -198,7 +174,7 @@ public class TranslationHelper
         }
 
         if (!root.getDefaultLanguage().equals(helper.getBaseLanguage())) {
-            loadTrans(root.getDefaultLanguage());
+            loadTranslation(root.getDefaultLanguage());
         }
     }
 

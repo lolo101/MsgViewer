@@ -73,45 +73,45 @@ public class GlobalConfig extends BaseDialog implements Saveable,
 
     }
 
-    public void feed_table(boolean autombox) {
-
-        new AutoMBox("GlobalConfig", autombox, () -> {
-            values.clear();
-            tm.clear();
-
-            TreeMap<String, DBConfig> vals = new TreeMap<>();
-
-            Set<String> keys = GlobalConfigDefinitions.entries.keySet();
-
-            for (String key : keys) {
-                vals.put(key, GlobalConfigDefinitions.get(key));
-            }
-
-            // nun alle Einträge aus der DB dazumergen
-
-            List<DBStrukt> res = getTransaction()
-                    .fetchTable(new DBConfig());
-
-            for (DBStrukt s : res) {
-                DBConfig c = (DBConfig) s;
-                vals.put(c.getConfigName(), c);
-            }
-
-            keys = vals.keySet();
-
-            for (String key : keys) {
-
-                DBConfig c = vals.get(key);
-                c.descr.loadFromCopy(MlM(c.descr.getValue()));
-                values.add(c);
-                tm.add(c);
-            }
-        });
-
+    public final void feed_table(boolean autombox) {
+        if (autombox) {
+            new AutoMBox<>("GlobalConfig", () -> feed_table()).run();
+        } else {
+            new AutoLogger<>("GlobalConfig", () -> feed_table()).run();
+        }
     }
 
     private void feed_table() {
-        feed_table(true);
+        values.clear();
+        tm.clear();
+
+        TreeMap<String, DBConfig> vals = new TreeMap<>();
+
+        Set<String> keys = GlobalConfigDefinitions.entries.keySet();
+
+        for (String key : keys) {
+            vals.put(key, GlobalConfigDefinitions.get(key));
+        }
+
+        // nun alle Einträge aus der DB dazumergen
+
+        List<DBStrukt> res = getTransaction()
+                .fetchTable(new DBConfig());
+
+        for (DBStrukt s : res) {
+            DBConfig c = (DBConfig) s;
+            vals.put(c.getConfigName(), c);
+        }
+
+        keys = vals.keySet();
+
+        for (String key : keys) {
+
+            DBConfig c = vals.get(key);
+            c.descr.loadFromCopy(MlM(c.descr.getValue()));
+            values.add(c);
+            tm.add(c);
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -224,11 +224,11 @@ public class GlobalConfig extends BaseDialog implements Saveable,
         }
 
         root.saveSetup();
-        feed_table();
+        feed_table(true);
     }
 
     private void jBCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCloseActionPerformed
-        new AutoMBox(getTitle(), () -> {
+        new AutoMBox<>(getTitle(), () -> {
             if (canClose()) {
                 getTransaction().rollback();
                 Set<String> keys = GlobalConfigDefinitions.entries.keySet();
@@ -240,7 +240,7 @@ public class GlobalConfig extends BaseDialog implements Saveable,
                 }
                 close();
             }
-        });
+        }).run();
 
     }//GEN-LAST:event_jBCloseActionPerformed
 

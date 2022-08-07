@@ -8,19 +8,16 @@ import at.redeye.FrameWork.base.prm.impl.PrmActionEvent;
 import at.redeye.FrameWork.base.transaction.Transaction;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 public class LocalSetup extends Setup {
 
     String config_file;
-    String app_name;
+    final String app_name;
     Properties props;
-    Root root;
-    HashMap<String, DBConfig> global_config = null;
-    boolean initial_run = false;
+    final Root root;
+    Map<String, DBConfig> global_config;
+    boolean initial_run;
 
     public LocalSetup(Root root, String app_name) {
         this.app_name = app_name;
@@ -58,10 +55,8 @@ public class LocalSetup extends Setup {
     public void loadProps() {
         props = new Properties();
 
-        try {
-            FileInputStream in = new FileInputStream(config_file);
+        try (FileInputStream in = new FileInputStream(config_file)) {
             props.load(in);
-            in.close();
 
         } catch (FileNotFoundException e) {
 
@@ -78,10 +73,8 @@ public class LocalSetup extends Setup {
         try {
             Properties oldProps = new Properties();
 
-            try {
-                FileInputStream in = new FileInputStream(config_file);
+            try (FileInputStream in = new FileInputStream(config_file)) {
                 oldProps.load(in);
-                in.close();
             } catch (FileNotFoundException ex) {
                 logger.error("File " + config_file + " existiert noch nicht.");
             }
@@ -154,13 +147,10 @@ public class LocalSetup extends Setup {
         if (conn == null)
             return false;
 
-        AutoLogger al = new AutoLogger("LocalSetup", () -> {
+        return new AutoLogger<>("LocalSetup", () -> {
             Transaction trans = conn.getNewTransaction();
 
-            Set<String> keys = global_config.keySet();
-
-            for (String key : keys) {
-                DBConfig c = global_config.get(key);
+            for (DBConfig c : global_config.values()) {
                 if (c.hasChanged()) {
                     PrmActionEvent event = new PrmActionEvent();
                     event.setParameterName(c.name);
@@ -175,10 +165,8 @@ public class LocalSetup extends Setup {
             }
 
             trans.commit();
-            conn.closeTransaction(trans);
-        });
-
-        return !al.isFailed();
+            return conn.closeTransaction(trans);
+        }).resultOrElse(false);
     }
 
     @Override
@@ -270,7 +258,7 @@ public class LocalSetup extends Setup {
     }
 
     @Override
-    public void saveConfig() {
+    public final void saveConfig() {
         saveProps();
         saveGlobalProps();
     }

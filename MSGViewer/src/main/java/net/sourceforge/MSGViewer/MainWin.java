@@ -171,7 +171,7 @@ public class MainWin extends BaseWin {
 
     private void jMSaveAsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMSaveAsActionPerformed
         filesRepository.chooseFilesToSave().ifPresent(file ->
-                new AutoMBox(this.getClass().getName(), () -> viewerPanel.exportFile(file.toPath()))
+                new AutoMBox<>(this.getClass().getName(), () -> viewerPanel.exportFile(file.toPath())).run()
         );
     }//GEN-LAST:event_jMSaveAsActionPerformed
 
@@ -181,7 +181,7 @@ public class MainWin extends BaseWin {
 
     private void jMPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMPrintActionPerformed
         if (printerJob.printDialog()) {
-            new AutoMBox(this.getClass().getName(), printerJob::print);
+            new AutoMBox<>(this.getClass().getName(), () -> printerJob.print()).run();
         }
     }//GEN-LAST:event_jMPrintActionPerformed
 

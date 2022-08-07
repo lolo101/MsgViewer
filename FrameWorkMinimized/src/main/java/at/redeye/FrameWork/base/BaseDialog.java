@@ -34,8 +34,8 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
     }
 
     /**
-     * Overload this method, if the window shouldn't open with with the last
-     * stored with and height.
+     * Overload this method, if the window shouldn't open with the last
+     * stored width and height.
      *
      * @return true if the size of the dialog should be stored
      */
@@ -49,7 +49,7 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
      *
      * @param runnable This runnable should open the Help Window
      */
-    public void registerHelpWin(Runnable runnable) {
+    public final void registerHelpWin(Runnable runnable) {
         helper.registerHelpWin(runnable);
     }
 
@@ -81,7 +81,7 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
 
     /**
      * @return The Transaction object for this dialog This Transaction object
-     * will be automatically closed, on closing this this dialog. The
+     * will be automatically closed, on closing this dialog. The
      * Transaction object will be only created once in the lifetime of
      * the dialog. So caching the Transaction object is not required.
      * <b>Can return null, in case of no database connection.</b>
@@ -124,7 +124,7 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
      * sould be done (save it, don't save it, or cancel current operation
      *
      * @param tm TableManipulator object
-     * @return 1 when the data should by saved <br/>
+     * @return 1 when the data should be saved <br/>
      * 0 on saving should be done <br/>
      * -1 cancel current operation <br/>
      */
@@ -157,7 +157,7 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
     }
 
     @Override
-    public void bindVar(JTextField jtext, StringBuffer var) {
+    public final void bindVar(JTextField jtext, StringBuffer var) {
         helper.bindVar(jtext, var);
     }
 
@@ -216,7 +216,7 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
     }
 
     @Override
-    public void adjustScrollingSpeed(JScrollPane scroll_panel) {
+    public final void adjustScrollingSpeed(JScrollPane scroll_panel) {
         helper.adjustScrollingSpeed(scroll_panel);
     }
 
@@ -266,10 +266,6 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
         return this;
     }
 
-    public Window getWindow() {
-        return this;
-    }
-
     @Override
     public Collection<Pair> getBindVarPairs() {
         return helper.getBindVarPairs();
@@ -281,10 +277,10 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
     }
 
     /**
-     * @return a Dialog identifier for saving some data, eg: width an height of
+     * @return a Dialog identifier for saving some data, e.g. width and height of
      * the dialog. The default behavior is retuning the dialog title.
      * This function should be overloaded if some instances of dialogs
-     * should all have the same eg size but it's no possible, because
+     * should all have the same e.g. size, but it's not possible, because
      * each one has a different title.
      */
 
