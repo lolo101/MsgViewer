@@ -56,7 +56,6 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
 
     public static final String FILE_NAME_PROPERTY = "file_name";
     private static final Pattern RTF_FONT_SIZE_PATTERN = Pattern.compile("(\\\\fs)([0-9]+)");
-    private String bodyText;
     private Message message;
     private ViewerHelper helper;
     private Root root;
@@ -280,10 +279,11 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
 
         } else {
 
-            if (bodyText != null) {
-                bodyText = RTF_FONT_SIZE_PATTERN.matcher(bodyText).replaceAll("$1" + ((jSFontSize.getValue()) * 2));
-                System.out.println(bodyText);
-                body.setText(bodyText);
+            String text = body.getText();
+            if (text != null) {
+                String resizedText = RTF_FONT_SIZE_PATTERN.matcher(text).replaceAll("$1" + ((jSFontSize.getValue()) * 2));
+                System.out.println(resizedText);
+                body.setText(resizedText);
             }
         }
         body.setCaretPosition(0);
@@ -319,53 +319,43 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         if (message == null)
             return;
 
-        bodyText();
+        Content content = bodyText();
 
-        logger.trace(bodyText);
+        logger.trace(content.text);
 
-        body.setText(bodyText);
+        body.setContentType(content.type);
+        body.setText(content.text);
         body.setCaretPosition(0);
     }
 
-    private void bodyText() {
+    private Content bodyText() {
         if (jRRTF.isSelected() && message.getBodyRTF() != null && !message.getBodyRTF().isEmpty()) {
             if (message.getBodyRTF().contains("\\fromhtml")) {
-                AutoMBox am = new AutoMBox(MainWin.class.getName(), () -> {
+                return new AutoMBox<>(MainWin.class.getName(), () -> {
                     logger.info("extracting HTML data from RTF Code");
 
                     if (logger.isTraceEnabled()) {
                         logger.trace("\n" + StringUtils.addLineNumbers(message.getBodyRTF()));
                     }
 
-                    body.setContentType("text/html");
-                    bodyText = helper.extractHTMLFromRTF(message.getBodyRTF(), message);
-                });
-
-                if (am.isFailed()) {
-                    body.setContentType("text/rtf");
-                    bodyText = message.getBodyRTF();
-                }
-            } else {
-                body.setContentType("text/rtf");
-                bodyText = message.getBodyRTF();
+                    return new Content("text/html", helper.extractHTMLFromRTF(message.getBodyRTF(), message));
+                }).resultOrElse(new Content("text/rtf", message.getBodyRTF()));
             }
-        } else if (message.getBodyHtml() != null) {
-            PrepareImages prep_images = new PrepareImages(helper, message);
-
-            body.setContentType("text/html");
-            bodyText = prep_images.prepareImages(ViewerHelper.stripMetaTags(message.getBodyHtml()));
-        } else {
-            body.setContentType("text/plain");
-            bodyText = message.getBodyText();
+            return new Content("text/rtf", message.getBodyRTF());
         }
+        if (message.getBodyHtml() != null) {
+            PrepareImages prep_images = new PrepareImages(helper, message);
+            return new Content("text/html", prep_images.prepareImages(ViewerHelper.stripMetaTags(message.getBodyHtml())));
+        }
+        return new Content("text/plain", message.getBodyText());
     }
 
     private void hyperlinkUpdate(final HyperlinkEvent e) {
-        new AutoMBox(ViewerPanel.class.getName(), () -> {
+        new AutoMBox<>(ViewerPanel.class.getName(), () -> {
             if (message != null && e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
                 openUrl(e.getURL());
             }
-        });
+        }).run();
     }
 
     public void openUrl(URL url) throws IOException {
@@ -425,7 +415,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
 
         parent.setWaitCursor();
 
-        new AutoMBox(MainWin.class.getName(), this::doParse);
+        new AutoMBox<>(MainWin.class.getName(), this::doParse).run();
 
         parent.setNormalCursor();
     }
@@ -438,12 +428,12 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         updateBody();
 
         if (wating_thread_pool_counter > 0) {
-            new AutoMBox(file_name, () -> {
+            new AutoMBox<>(file_name, () -> {
                 thread_pool.shutdown();
                 if (wating_thread_pool_counter > 0) {
                     thread_pool.awaitTermination(1, TimeUnit.DAYS);
                 }
-            });
+            }).run();
         }
     }
 
@@ -563,7 +553,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
 
         Path sub_file = helper.getTempFile(att);
 
-        async(() -> new AutoMBox(file_name, () -> new MessageSaver(msg).saveMessage(sub_file)));
+        async(() -> new AutoMBox<>(file_name, () -> new MessageSaver(msg).saveMessage(sub_file)).run());
 
         return "<a href=\"" + sub_file.toUri() + "\">" + helper.printMailIconHtml() + msg.getSubject() + "</a>&nbsp;";
     }
@@ -639,10 +629,6 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
 
     public String getFileName() {
         return file_name;
-    }
-
-    public JEditorPane getBodyPane() {
-        return body;
     }
 
     private void async(Runnable runnable) {

@@ -1,6 +1,5 @@
 package at.redeye.FrameWork.base;
 
-import at.redeye.FrameWork.base.prm.bindtypes.DBConfig;
 import at.redeye.FrameWork.utilities.ParseJNLP;
 import at.redeye.FrameWork.utilities.StringUtils;
 import at.redeye.FrameWork.widgets.StartupWindow;
@@ -86,10 +85,9 @@ public abstract class BaseModuleLauncher {
                 final File jnlp_file = new File(arg);
 
                 if (jnlp_file.exists()) {
-                    new AutoLogger(BaseModuleLauncher.class.getName(), () -> {
-                            ParseJNLP parser = new ParseJNLP(jnlp_file);
-                            jnlp_properties = parser.getProperties();
-                    });
+                    new AutoLogger<>(BaseModuleLauncher.class.getName(),
+                            () -> new ParseJNLP(jnlp_file).getProperties()
+                    ).onSuccess(result -> jnlp_properties = result);
                 }
             }
         }
@@ -97,7 +95,7 @@ public abstract class BaseModuleLauncher {
 
     /**
      * configures logger for the first usage
-     * The default logging level is Leve.ALL
+     * The default logging level is {@link Level#ALL}
      */
     public static void BaseConfigureLogging() {
         BaseConfigureLogging(Level.ALL);
@@ -121,7 +119,7 @@ public abstract class BaseModuleLauncher {
         loggerConfig.addAppender(consoleAppender, null, null);
     }
 
-    public void configureLogging() {
+    public final void configureLogging() {
 
         PatternLayout layout = PatternLayout.newBuilder()
                 .withPattern("%d{ISO8601} %-5p (%F:%L): %m%n")
@@ -168,63 +166,6 @@ public abstract class BaseModuleLauncher {
 
     public abstract String getVersion();
 
-    public void setSetupParam(String value, DBConfig config,
-                              boolean if_not_exist) {
-        if (value == null)
-            return;
-
-        if (value.trim().isEmpty())
-            return;
-
-        root.getSetup().setLocalConfig(config.getConfigName(), value,
-                if_not_exist);
-    }
-
-    public void setCommonLoggingLevel() {
-
-        String do_logging = getStartupParam("dl", "do-logging", "LOGGING");
-        String level = getStartupParam("ll", "logging-level", "LOGGING_LEVEL");
-        String dir = getStartupParam("ld", "logging-dir", "LOGGING_DIR");
-        String force_logging = getStartupParam("fl", "force-logging",
-                "FORCE_LOGGING");
-
-        String enable_logging_on_new_version = getStartupParam("",
-                "enable-logging-on-new_version",
-                "ENABLE_LOGGING_ON_NEW_VERSION");
-
-        if (StringUtils.isYes(enable_logging_on_new_version)) {
-            String version = root.getSetup().getLocalConfig(
-                    BaseAppConfigDefinitions.Version);
-
-            if (version == null || !version.equalsIgnoreCase(getVersion())) {
-                if (!StringUtils.isYes(do_logging))
-                    do_logging = "true";
-
-                if (!StringUtils.isYes(force_logging))
-                    force_logging = "true";
-            }
-        }
-
-        root.getSetup().setLocalConfig(
-                BaseAppConfigDefinitions.Version.getConfigName(), getVersion());
-
-        if (dir != null && dir.equalsIgnoreCase("APPHOME")) {
-            dir = Setup.getAppConfigDir(root.getAppName() + "/log");
-        }
-
-        boolean force = StringUtils.isYes(force_logging);
-
-        setSetupParam(do_logging, BaseAppConfigDefinitions.DoLogging, force);
-        setSetupParam(level, BaseAppConfigDefinitions.LoggingLevel, force);
-        setSetupParam(dir, BaseAppConfigDefinitions.LoggingDir, force);
-
-        root.getSetup().saveConfig();
-
-        // I think this is too much...
-
-        configureLogging();
-    }
-
     public boolean splashEnabled() {
         return !StringUtils.isYes(getStartupParam(null, "nosplash", "NOSPLASH"));
     }
@@ -263,20 +204,6 @@ public abstract class BaseModuleLauncher {
             return "com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel";
         } else {
             return UIManager.getSystemLookAndFeelClassName();
-        }
-    }
-
-    /**
-     * Sets a local config param if it is set detected by <b>getStartupParam()</b>
-     *
-     * @param param             Name of the parameter
-     * @param always_over_write set it to true, if you wan't to override existing settings.
-     */
-    public void initIfSet(String param, boolean always_over_write) {
-        String val = getStartupParam(param, param, param);
-
-        if (val != null) {
-            root.getSetup().setLocalConfig(param, val, !always_over_write);
         }
     }
 }

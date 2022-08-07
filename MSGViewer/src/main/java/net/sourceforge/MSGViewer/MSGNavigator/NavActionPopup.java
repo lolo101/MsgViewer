@@ -35,25 +35,25 @@ public class NavActionPopup extends JPopupMenu {
 
         {
             JMenuItem menuItem = new JMenuItem(mainwin.MlM("Save"));
-            menuItem.addActionListener(e -> new AutoMBox(NavActionPopup.class.getName(), mainwin::save));
+            menuItem.addActionListener(e -> new AutoMBox<>(NavActionPopup.class.getName(), mainwin::save).run());
             add(menuItem);
         }
 
         {
             JMenuItem menuItem = new JMenuItem(mainwin.MlM("Delete element"));
-            menuItem.addActionListener(e -> new AutoMBox(NavActionPopup.class.getName(), mainwin::deleteSelectedElement));
+            menuItem.addActionListener(e -> new AutoMBox<>(NavActionPopup.class.getName(), mainwin::deleteSelectedElement).run());
             add(menuItem);
         }
 
         {
             JMenuItem menuItem = new JMenuItem(mainwin.MlM("Inspect element"));
-            menuItem.addActionListener(e -> new AutoMBox(NavActionPopup.class.getName(), mainwin::showSelectedElement));
+            menuItem.addActionListener(e -> new AutoMBox<>(NavActionPopup.class.getName(), mainwin::showSelectedElement).run());
             add(menuItem);
         }
 
         {
             JMenuItem menuItem = new JMenuItem(mainwin.MlM("Edit element"));
-            menuItem.addActionListener(e -> new AutoMBox(NavActionPopup.class.getName(), mainwin::editSelectedElement));
+            menuItem.addActionListener(e -> new AutoMBox<>(NavActionPopup.class.getName(), mainwin::editSelectedElement).run());
             add(menuItem);
         }
     }

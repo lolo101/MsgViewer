@@ -81,7 +81,7 @@ public class HelpWin extends BaseDialog {
     // End of variables declaration//GEN-END:variables
 
     protected final void loadHelp(final String ModuleName) {
-        new AutoMBox(ModuleName, () -> {
+        new AutoMBox<>(ModuleName, () -> {
 
             String module_name = getModuleName(ModuleName);
 
@@ -91,11 +91,9 @@ public class HelpWin extends BaseDialog {
 
             String res = hfl.loadHelp(base, module_name);
 
-            if (hook != null) {
-                res = res.replace(hook.getKeyword(), hook.getText());
-            }
-
-            jHelp.setText(res);
+            return hook == null ? res : res.replace(hook.getKeyword(), hook.getText());
+        }).onSuccess(result -> {
+            jHelp.setText(result);
             jHelp.setCaretPosition(0);
         });
     }
