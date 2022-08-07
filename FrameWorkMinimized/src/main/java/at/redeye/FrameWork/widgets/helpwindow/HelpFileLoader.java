@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.widgets.helpwindow;
 
 import at.redeye.FrameWork.utilities.StringUtils;
@@ -16,22 +11,18 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.stream.Collectors;
 
-/**
- *
- * @author martin
- */
 public class HelpFileLoader {
 
-	private static Logger logger = LogManager.getLogger(HelpFileLoader.class);
+	private static final Logger logger = LogManager.getLogger(HelpFileLoader.class);
 
-	public int findImgTag(StringBuilder s, int start) {
+	private static int findImgTag(String s) {
 		int pos;
+		int start = 0;
 
 		do {
 			pos = s.indexOf("img", start);
-
-			// System.out.println("pos:" + pos);
 
 			if (pos <= 0) {
 				// weil bei start 0 getht sich keine <img aus
@@ -60,7 +51,7 @@ public class HelpFileLoader {
 		return -1;
 	}
 
-	public String replace_src(StringBuilder s) {
+	public String replace_src(String s) {
 
 		List<String> res = StringUtils.split_str(s, "=");
 
@@ -79,7 +70,7 @@ public class HelpFileLoader {
 			ret.append("=");
 
 			String src = StringUtils
-					.strip(new StringBuilder(part), " \t\r\n\"");
+					.strip(part, " \t\r\n\"");
 
 			URL resource = getClass().getResource(src);
 
@@ -102,26 +93,22 @@ public class HelpFileLoader {
 		return ret.toString();
 	}
 
-	public StringBuilder prepareImages(StringBuilder s) {
-		int start = 0;
-
-		while ((start = findImgTag(s, start)) >= 0) {
-			// System.out.println("HERE");
-
+	public String prepareImages(String s) {
+		StringBuilder res = new StringBuilder(s);
+		for (int start = findImgTag(s); start >= 0; ) {
 			int end = s.indexOf(">", start);
 
 			if (end < 0)
 				break;
 
-			String res = replace_src(new StringBuilder(
-					s.subSequence(start, end)));
+			String substitute = replace_src(res.substring(start, end));
 
-			s.replace(start, end, res);
+			res.replace(start, end, substitute);
 
-			start += res.length();
+			start += substitute.length();
 		}
 
-		return s;
+		return res.toString();
 	}
 
         public static String getResourceName( String Base, String ModuleName )
@@ -130,34 +117,23 @@ public class HelpFileLoader {
         }
 
 	public String loadHelp(String Base, String ModuleName) throws IOException {
-		String resource = getResourceName( Base, ModuleName);
+		String resource = getResourceName(Base, ModuleName);
 
 		resource = resource.replaceAll("//", "/");
 
-		InputStream stream = getClass().getResourceAsStream(resource);
+		try (InputStream stream = getClass().getResourceAsStream(resource)) {
+			if (stream == null) {
+				System.out.println("Failed loading resource:" + resource);
+				return "";
+			}
+			System.out.println("Loading resource:" + resource);
 
-		System.out.println("Loading resource:" + resource);
-
-		if (stream == null) {
-			System.out.println("Failed loading resource:" + resource);
-			return "";
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+					stream, StandardCharsets.UTF_8))) {
+				String res = reader.lines().collect(Collectors.joining());
+				return prepareImages(res);
+			}
 		}
-
-		StringBuilder res = new StringBuilder();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(
-				stream, StandardCharsets.UTF_8));
-
-		while (reader.ready()) {
-			String line = reader.readLine();
-			res.append(line);
-		}
-
-		reader.close();
-		stream.close();
-
-		res = prepareImages(res);
-
-		return res.toString();
 	}
 
 	public static void main(String[] argv) {

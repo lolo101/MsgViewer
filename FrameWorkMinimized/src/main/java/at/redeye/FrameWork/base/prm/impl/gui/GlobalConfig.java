@@ -16,17 +16,15 @@ import at.redeye.FrameWork.widgets.helpwindow.HelpWinHook;
 
 import java.awt.*;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.Vector;
+import java.util.*;
 
 public class GlobalConfig extends BaseDialog implements Saveable,
         PrmListener {
 
     private static final long serialVersionUID = 1L;
-    Vector<DBStrukt> values = new Vector<>();
-    TableManipulator tm;
-    GlobalConfig myself;
+    final Vector<DBStrukt> values = new Vector<>();
+    final TableManipulator tm;
+    final GlobalConfig myself;
 
     /**
      * Creates new form Config
@@ -85,13 +83,7 @@ public class GlobalConfig extends BaseDialog implements Saveable,
         values.clear();
         tm.clear();
 
-        TreeMap<String, DBConfig> vals = new TreeMap<>();
-
-        Set<String> keys = GlobalConfigDefinitions.entries.keySet();
-
-        for (String key : keys) {
-            vals.put(key, GlobalConfigDefinitions.get(key));
-        }
+        Map<String, DBConfig> vals = new TreeMap<>(GlobalConfigDefinitions.entries);
 
         // nun alle Einträge aus der DB dazumergen
 
@@ -103,15 +95,14 @@ public class GlobalConfig extends BaseDialog implements Saveable,
             vals.put(c.getConfigName(), c);
         }
 
-        keys = vals.keySet();
+        Collection<DBConfig> configs = vals.values();
 
-        for (String key : keys) {
+        configs.stream()
+                .map(c -> c.descr)
+                .forEach(descr -> descr.loadFromCopy(MlM(descr.getValue())));
 
-            DBConfig c = vals.get(key);
-            c.descr.loadFromCopy(MlM(c.descr.getValue()));
-            values.add(c);
-            tm.add(c);
-        }
+        values.addAll(configs);
+        tm.addAll(configs);
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -217,8 +208,8 @@ public class GlobalConfig extends BaseDialog implements Saveable,
     }
 
     public void saveData() {
-        for (Integer i : tm.getEditedRows()) {
-            DBConfig entry = (DBConfig) values.get(i);
+        for (Integer editedRow : tm.getEditedRows()) {
+            DBConfig entry = (DBConfig) values.get(editedRow);
             root.getSetup().setConfig(entry.getConfigName(),
                     entry.getConfigValue());
         }
@@ -249,8 +240,6 @@ public class GlobalConfig extends BaseDialog implements Saveable,
     // End of variables declaration//GEN-END:variables
 
     public void onChange(PrmDefaultChecksInterface checks, PrmActionEvent event) {
-        // System.out.println("PRM "+event.getParameterName()+" ," +
-        // " OLD: "+event.getOldPrmValue()+" , NEW: "+event.getNewPrmValue());
         if (!checks.doChecks(event)) {
             PrmErrUtil.displayPrmError(this, event.getParameterName()
                     .toString());

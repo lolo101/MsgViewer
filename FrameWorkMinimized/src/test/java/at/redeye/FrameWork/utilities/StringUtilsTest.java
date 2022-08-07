@@ -24,13 +24,13 @@ public class StringUtilsTest {
     public void testSkip_char() {
         System.out.println("skip_char");
 
-        assertEquals(12, StringUtils.skip_char(new StringBuilder( "das ist     ein Text"), " ", 7));
-        assertEquals(2,  StringUtils.skip_char(new StringBuilder( "das ist     ein Text"), " ", 2));
-        assertEquals(4,  StringUtils.skip_char(new StringBuilder( "das ist     ein Text"), " ", 4));
-        assertEquals(4,  StringUtils.skip_char(new StringBuilder( "das ist     ein Text"), " ", 3));
+        assertEquals(12, StringUtils.skip_char("das ist     ein Text", " ", 7));
+        assertEquals(2, StringUtils.skip_char("das ist     ein Text", " ", 2));
+        assertEquals(4, StringUtils.skip_char("das ist     ein Text", " ", 4));
+        assertEquals(4, StringUtils.skip_char("das ist     ein Text", " ", 3));
 
         assertThrows(NullPointerException.class, () -> StringUtils.skip_char(null, null, 0));
-        assertThrows(NullPointerException.class, () -> StringUtils.skip_char(new StringBuilder("x"), null, 0));
+        assertThrows(NullPointerException.class, () -> StringUtils.skip_char("x", null, 0));
         assertThrows(NullPointerException.class, () -> StringUtils.skip_char(null, " ", 0));
     }
 
@@ -38,16 +38,16 @@ public class StringUtilsTest {
     public void testSkip_char_reverse() {
         System.out.println("skip_char_reverse");
 
-        assertEquals(15, StringUtils.skip_char_reverse(new StringBuilder("das ist ein    Test"), " ", 15));
-        assertEquals(10, StringUtils.skip_char_reverse(new StringBuilder("das ist ein    Test"), " ", 14));
-        assertEquals(10, StringUtils.skip_char_reverse(new StringBuilder("das ist ein    Test"), " ", 10));
+        assertEquals(15, StringUtils.skip_char_reverse("das ist ein    Test", " ", 15));
+        assertEquals(10, StringUtils.skip_char_reverse("das ist ein    Test", " ", 14));
+        assertEquals(10, StringUtils.skip_char_reverse("das ist ein    Test", " ", 10));
 
-        assertEquals(0,StringUtils.skip_char_reverse(null, null, 0));
-        assertEquals(0,StringUtils.skip_char_reverse(new StringBuilder("x"), null, 0));
-        assertEquals(0,StringUtils.skip_char_reverse(null, " ", 0));
+        assertEquals(0, StringUtils.skip_char_reverse(null, null, 0));
+        assertEquals(0, StringUtils.skip_char_reverse("x", null, 0));
+        assertEquals(0, StringUtils.skip_char_reverse(null, " ", 0));
 
         assertThrows(NullPointerException.class, () -> StringUtils.skip_char_reverse(null, null, 10));
-        assertThrows(NullPointerException.class, () -> StringUtils.skip_char_reverse(new StringBuilder("xyz"), null, 1));
+        assertThrows(NullPointerException.class, () -> StringUtils.skip_char_reverse("xyz", null, 1));
         assertThrows(NullPointerException.class, () -> StringUtils.skip_char_reverse(null, " ", 1));
     }
 
@@ -55,23 +55,23 @@ public class StringUtilsTest {
     public void testSkip_spaces_reverse() {
         System.out.println("skip_spaces_reverse");
 
-        assertEquals(15, StringUtils.skip_spaces_reverse(new StringBuilder("das ist ein    Test"), 15));
-        assertEquals(10, StringUtils.skip_spaces_reverse(new StringBuilder("das ist ein \t   Test"), 14));
-        assertEquals(10, StringUtils.skip_spaces_reverse(new StringBuilder("das ist ein    Test"), 10));
+        assertEquals(15, StringUtils.skip_spaces_reverse("das ist ein    Test", 15));
+        assertEquals(10, StringUtils.skip_spaces_reverse("das ist ein \t   Test", 14));
+        assertEquals(10, StringUtils.skip_spaces_reverse("das ist ein    Test", 10));
 
-        assertThrows(NullPointerException.class, () -> StringUtils.skip_spaces_reverse(null, 1 ));
+        assertThrows(NullPointerException.class, () -> StringUtils.skip_spaces_reverse(null, 1));
     }
 
     @Test
     public void testSkip_spaces() {
         System.out.println("skip_spaces");
 
-        assertEquals(12, StringUtils.skip_spaces(new StringBuilder( "das ist     ein Text"), 7));
-        assertEquals(2,  StringUtils.skip_spaces(new StringBuilder( "das ist     ein Text"), 2));
-        assertEquals(4,  StringUtils.skip_spaces(new StringBuilder( "das ist     ein Text"), 4));
-        assertEquals(4,  StringUtils.skip_spaces(new StringBuilder( "das ist     ein Text"), 3));
+        assertEquals(12, StringUtils.skip_spaces("das ist     ein Text", 7));
+        assertEquals(2, StringUtils.skip_spaces("das ist     ein Text", 2));
+        assertEquals(4, StringUtils.skip_spaces("das ist     ein Text", 4));
+        assertEquals(4, StringUtils.skip_spaces("das ist     ein Text", 3));
 
-        assertThrows(NullPointerException.class, () -> StringUtils.skip_spaces(null, 1 ));
+        assertThrows(NullPointerException.class, () -> StringUtils.skip_spaces(null, 1));
     }
 
     @Test
@@ -92,16 +92,7 @@ public class StringUtilsTest {
 
         String[] testArr = { "hallo", "das", "ist", "", "ein", "" , "", "test", "" };
 
-        StringBuilder joined_string = new StringBuilder();
-
-        for( String str: testArr )
-        {
-            if( joined_string.length() > 0 ) {
-                joined_string.append('|');
-            }
-
-            joined_string.append(str);
-        }
+        String joined_string = String.join("|", testArr);
 
         List<String> split_str = StringUtils.split_str(joined_string, "|");
 
@@ -121,36 +112,36 @@ public class StringUtilsTest {
     public void testStrip_StringBuilder_String() {
         System.out.println("strip");
 
-        assertThrows(NullPointerException.class, () -> StringUtils.strip( (StringBuilder)null, "" ));
-        assertThrows(NullPointerException.class, () -> StringUtils.strip( (StringBuilder)null, null ));
-        assertThrows(NullPointerException.class, () -> StringUtils.strip( new StringBuilder("xxxx"), null ));
+        assertThrows(NullPointerException.class, () -> StringUtils.strip(null, ""));
+        assertThrows(NullPointerException.class, () -> StringUtils.strip(null, null));
+        assertThrows(NullPointerException.class, () -> StringUtils.strip("xxxx", null));
 
-        assertEquals("xyz", StringUtils.strip( new StringBuilder("xyz"), ""));
-        assertEquals("xyz", StringUtils.strip( new StringBuilder(" xyz "), " "));
-        assertEquals("xyz", StringUtils.strip( new StringBuilder("  xyz"), " "));
-        assertEquals("xyz\t", StringUtils.strip( new StringBuilder("  xyz\t"), " "));
-        assertEquals("xyz\t", StringUtils.strip( new StringBuilder("  xyz\t "), " "));
-        assertEquals("xy z", StringUtils.strip( new StringBuilder("  xy z\t "), " \t"));
-        assertEquals("xy z", StringUtils.strip( new StringBuilder("  xy z\t \t"), " \t"));
-        assertEquals("xy z", StringUtils.strip( new StringBuilder("  xy z\t \n"), " \t\n"));
+        assertEquals("xyz", StringUtils.strip("xyz", ""));
+        assertEquals("xyz", StringUtils.strip(" xyz ", " "));
+        assertEquals("xyz", StringUtils.strip("  xyz", " "));
+        assertEquals("xyz\t", StringUtils.strip("  xyz\t", " "));
+        assertEquals("xyz\t", StringUtils.strip("  xyz\t ", " "));
+        assertEquals("xy z", StringUtils.strip("  xy z\t ", " \t"));
+        assertEquals("xy z", StringUtils.strip("  xy z\t \t", " \t"));
+        assertEquals("xy z", StringUtils.strip("  xy z\t \n", " \t\n"));
     }
 
     @Test
     public void testStrip_post_StringBuilder_String() {
         System.out.println("strip_post");
 
-        assertThrows(NullPointerException.class, () -> StringUtils.strip_post( (StringBuilder)null, "" ));
-        assertThrows(NullPointerException.class, () -> StringUtils.strip_post( (StringBuilder)null, null ));
-        assertThrows(NullPointerException.class, () -> StringUtils.strip_post( new StringBuilder("xxxx"), null ));
+        assertThrows(NullPointerException.class, () -> StringUtils.strip_post(null, ""));
+        assertThrows(NullPointerException.class, () -> StringUtils.strip_post(null, null));
+        assertThrows(NullPointerException.class, () -> StringUtils.strip_post("xxxx", null));
 
-        assertEquals("xyz", StringUtils.strip_post(new StringBuilder("xyz"), ""));
-        assertEquals(" xyz", StringUtils.strip_post(new StringBuilder(" xyz "), " "));
-        assertEquals("  xyz", StringUtils.strip_post(new StringBuilder("  xyz"), " "));
-        assertEquals("  xyz\t", StringUtils.strip_post(new StringBuilder("  xyz\t"), " "));
-        assertEquals("  xyz\t", StringUtils.strip_post(new StringBuilder("  xyz\t "), " "));
-        assertEquals("  xy z", StringUtils.strip_post(new StringBuilder("  xy z\t "), " \t"));
-        assertEquals("  xy z", StringUtils.strip_post(new StringBuilder("  xy z\t \t"), " \t"));
-        assertEquals("  xy z", StringUtils.strip_post(new StringBuilder("  xy z\t \n"), " \t\n"));
+        assertEquals("xyz", StringUtils.strip_post("xyz", ""));
+        assertEquals(" xyz", StringUtils.strip_post(" xyz ", " "));
+        assertEquals("  xyz", StringUtils.strip_post("  xyz", " "));
+        assertEquals("  xyz\t", StringUtils.strip_post("  xyz\t", " "));
+        assertEquals("  xyz\t", StringUtils.strip_post("  xyz\t ", " "));
+        assertEquals("  xy z", StringUtils.strip_post("  xy z\t ", " \t"));
+        assertEquals("  xy z", StringUtils.strip_post("  xy z\t \t", " \t"));
+        assertEquals("  xy z", StringUtils.strip_post("  xy z\t \n", " \t\n"));
 
     }
 
@@ -158,9 +149,9 @@ public class StringUtilsTest {
     public void testStrip_post_String_String() {
         System.out.println("strip_post");
 
-        assertThrows(NullPointerException.class, () -> StringUtils.strip_post( (String)null, "" ));
-        assertThrows(NullPointerException.class, () -> StringUtils.strip_post( (String)null, null ));
-        assertThrows(NullPointerException.class, () -> StringUtils.strip_post( "xxxx", null ));
+        assertThrows(NullPointerException.class, () -> StringUtils.strip_post(null, ""));
+        assertThrows(NullPointerException.class, () -> StringUtils.strip_post(null, null));
+        assertThrows(NullPointerException.class, () -> StringUtils.strip_post("xxxx", null));
 
         assertEquals("xyz", StringUtils.strip_post("xyz", ""));
         assertEquals(" xyz", StringUtils.strip_post(" xyz ", " "));
@@ -177,9 +168,9 @@ public class StringUtilsTest {
     public void testStrip_String_String() {
         System.out.println("strip");
 
-        assertThrows(NullPointerException.class, () -> StringUtils.strip( (String)null, "" ));
-        assertThrows(NullPointerException.class, () -> StringUtils.strip( (String)null, null ));
-        assertThrows(NullPointerException.class, () -> StringUtils.strip( "xxxx", null ));
+        assertThrows(NullPointerException.class, () -> StringUtils.strip(null, ""));
+        assertThrows(NullPointerException.class, () -> StringUtils.strip(null, null));
+        assertThrows(NullPointerException.class, () -> StringUtils.strip("xxxx", null));
 
         assertEquals("xyz", StringUtils.strip("xyz", ""));
         assertEquals("xyz", StringUtils.strip(" xyz ", " "));
