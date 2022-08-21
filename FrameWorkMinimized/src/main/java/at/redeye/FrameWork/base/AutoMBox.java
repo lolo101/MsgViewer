@@ -10,8 +10,8 @@ import java.util.function.Consumer;
 
 public class AutoMBox<R> {
 
-    protected final Logger logger;
-    protected final Callable<R> callable;
+    private final Logger logger;
+    private final Callable<R> callable;
 
     public AutoMBox(String loggerName, Invokable invokable) {
         this(loggerName, () -> {
@@ -56,11 +56,6 @@ public class AutoMBox<R> {
     }
 
     public void run() {
-        try {
-            callable.call();
-        } catch (Exception ex) {
-            logger.error("Exception: " + ex, ex);
-            showErrorDialog(ex);
-        }
+        resultOrElse(null);
     }
 }

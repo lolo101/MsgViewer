@@ -41,10 +41,6 @@ public class AutoLogger<R> {
     }
 
     public void run() {
-        try {
-            callable.call();
-        } catch (Exception ex) {
-            logger.error("Exception: " + ex, ex);
-        }
+        resultOrElse(null);
     }
 }
