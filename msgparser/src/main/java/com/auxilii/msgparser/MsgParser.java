@@ -15,7 +15,7 @@ import java.nio.file.Path;
 
 public class MsgParser {
 
-    public static final String PROPERTIES_ENTRY = "__properties_version1.0";
+    private static final String PROPERTIES_ENTRY = "__properties_version1.0";
     private final Path msgFile;
 
     public MsgParser(Path msgFile) {
@@ -43,7 +43,7 @@ public class MsgParser {
      */
     private static Message parseMsg(InputStream msgFileStream) throws IOException {
         // the .msg file, like a file system, contains directories
-        // and documents within this directories
+        // and documents within these directories
         // we now gain access to the root node
         // and recursively go through the complete 'filesystem'.
         POIFSFileSystem fs = new POIFSFileSystem(msgFileStream);
@@ -81,7 +81,7 @@ public class MsgParser {
     }
 
     /**
-     * Parses a recipient directory entry which holds informations about one of possibly multiple recipients.
+     * Parses a recipient directory entry which holds information about one of possibly multiple recipients.
      * The parsed information is put into the {@link Message} object.
      *
      * @param dir The current node in the .msg file.
@@ -89,7 +89,7 @@ public class MsgParser {
      * @throws IOException Thrown if the .msg file could not
      *                     be parsed.
      */
-    protected static void parseRecipient(DirectoryEntry dir, Message msg) throws IOException {
+    private static void parseRecipient(DirectoryEntry dir, Message msg) throws IOException {
         RecipientEntry recipient = new RecipientEntry();
         DocumentEntry propertyEntry = (DocumentEntry) dir.getEntry(PROPERTIES_ENTRY);
         try (DocumentInputStream propertyStream = new DocumentInputStream(propertyEntry)) {
@@ -117,7 +117,7 @@ public class MsgParser {
      * @throws IOException Thrown if the attachment could
      *                     not be parsed/read.
      */
-    protected static void parseAttachment(DirectoryEntry dir, Message msg) throws IOException {
+    private static void parseAttachment(DirectoryEntry dir, Message msg) throws IOException {
         if (dir.hasEntry(Ptyp.SUBSTORAGE_PREFIX + "3701000D")) {
             parseEmbeddedMessage(dir, msg);
         } else {

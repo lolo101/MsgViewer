@@ -12,12 +12,12 @@ import java.io.IOException;
 
 public class TopLevelPropertyStream
 {
-    public static final String NAME = "__properties_version1.0";
+    private static final String NAME = "__properties_version1.0";
     private static final int HEADER_SIZE = 8 + 4 + 4 + 4 + 4 + 8;
 
     private final DirectoryEntry root;
     private DocumentEntry property_entry;
-    private byte[] bytes = null;
+    private byte[] bytes;
 
     TopLevelPropertyStream(DirectoryEntry root) throws IOException
     {
@@ -25,15 +25,11 @@ public class TopLevelPropertyStream
 
         try {
             property_entry = (DocumentEntry) root.getEntry(NAME);
+            try (DocumentInputStream stream = new DocumentInputStream(property_entry)) {
+                bytes = stream.readAllBytes();
+            }
 
-        } catch (FileNotFoundException ex) {
-        }
-
-        if( property_entry != null )
-        {
-            bytes = new byte[property_entry.getSize()];
-            DocumentInputStream stream = new DocumentInputStream( property_entry );
-            stream.read(bytes);
+        } catch (FileNotFoundException ignored) {
         }
     }
 
@@ -110,7 +106,7 @@ public class TopLevelPropertyStream
         try {
             property_entry = (DocumentEntry) root.getEntry(NAME);
             property_entry.delete();
-        } catch( FileNotFoundException ex ) {
+        } catch (FileNotFoundException ignored) {
 
         }
 
@@ -118,7 +114,7 @@ public class TopLevelPropertyStream
     }
 
     /**
-     * deletes one entry and removes it's data from the property stream
+     * deletes one entry and removes its data from the property stream
      * entry.delete() is called by this function
      */
     void delete(Entry entry) throws IOException
@@ -166,7 +162,7 @@ public class TopLevelPropertyStream
         try {
             property_entry = (DocumentEntry) root.getEntry(NAME);
             property_entry.delete();
-        } catch( FileNotFoundException ex ) {
+        } catch (FileNotFoundException ignored) {
 
         }
 
@@ -182,7 +178,7 @@ public class TopLevelPropertyStream
             throw new RuntimeException("deleting directories not supported yet");
 
         if( entry.getName().startsWith("__substg_version1.0") )
-            throw new  RuntimeException("unly __substg entries are supported yet" );
+            throw new RuntimeException("only __substg entries are supported yet");
 
         boolean absent = true;
 
@@ -201,6 +197,7 @@ public class TopLevelPropertyStream
 
                 int voffset = offset + 8;
 
+                // FIXME those two alternatives are identical:
                 if (tagtype.equals("001f")) {
                     // PStringType
                     // length of the String UTF16-LE Coded + 2
@@ -224,7 +221,7 @@ public class TopLevelPropertyStream
         try {
             property_entry = (DocumentEntry) root.getEntry(NAME);
             property_entry.delete();
-        } catch( FileNotFoundException ex ) {
+        } catch (FileNotFoundException ignored) {
 
         }
 

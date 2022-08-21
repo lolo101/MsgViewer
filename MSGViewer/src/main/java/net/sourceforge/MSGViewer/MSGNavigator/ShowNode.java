@@ -328,14 +328,14 @@ public class ShowNode extends BaseDialog {
      */
     private static String getPropertySetById(String id) {
         switch (id) {
-            case "00020386-0000-0000-C000-000000000046":
-                return "PS_INTERNET_HEADERS";
             case "00020329-0000-0000-C000-000000000046":
                 return "PS_PUBLIC_STRINGS";
             case "00062008-0000-0000-C000-000000000046":
                 return "PSETID_Common";
             case "00062004-0000-0000-C000-000000000046":
                 return "PSETID_Address";
+            case "00020386-0000-0000-C000-000000000046":
+                return "PS_INTERNET_HEADERS";
             case "00062002-0000-0000-C000-000000000046":
                 return "PSETID_Appointment";
             case "6ED8DA90-450B-101B-98DA-00AA003F1305":
@@ -358,6 +358,10 @@ public class ShowNode extends BaseDialog {
                 return "PSETID_AirSync";
             case "00062040-0000-0000-C000-000000000046":
                 return "PSETID_Sharing";
+            case "23239608-685D-4732-9C55-4C95CB4E8E33":
+                return "PSETID_XmlExtractedEntities";
+            case "96357F7F-59E1-47D0-99A7-46515C183B54":
+                return "PSETID_Attachment";
             default:
                 return "";
         }
@@ -375,7 +379,7 @@ public class ShowNode extends BaseDialog {
         sb.append("\n\n");
 
         for (int offset = 0; offset < bytes.length; offset += 8) {
-            sb.append("Offset in Stream: ");
+            sb.append("LID / Offset in Stream: ");
 
             int voffset = offset;
 
@@ -432,13 +436,9 @@ public class ShowNode extends BaseDialog {
             sb.append(" (").append(len).append(")");
             sb.append(": ");
 
-            // +2 nullterminating bytes to be for sure
             byte[] s_byte = new byte[(int) len];
 
-            for (int i = offset, count = 0; i < offset + len; i++, count++) {
-                s_byte[count] = bytes[i];
-                // sb.append(formatByte(bytes[i]));
-            }
+            System.arraycopy(bytes, offset, s_byte, 0, (int) len);
 
             offset += len;
 
