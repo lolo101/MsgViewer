@@ -32,8 +32,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.poi.util.StringUtil.getFromUnicodeLE;
 
@@ -48,7 +48,7 @@ import static org.apache.poi.util.StringUtil.getFromUnicodeLE;
  */
 public class Message {
     private static final Logger LOGGER = LogManager.getLogger(Message.class);
-    public static final Pattern PREFIX_PATTERN = Pattern.compile("^[^:\\s\\d]{1,3}:\\s+");
+    private static final Pattern PREFIX_PATTERN = Pattern.compile("^[^:\\s\\d]{1,3}:\\s+");
 
     /**
      * The message class as defined in the .msg file.
@@ -57,48 +57,41 @@ public class Message {
     /**
      * The message Id.
      */
-    private String messageId = null;
+    private String messageId;
     /**
      * The address part of From: mail address.
      */
-    private String fromEmail = null;
+    private String fromEmail;
 
-    private String fromSMTPAddress = null;
+    private String fromSMTPAddress;
 
     /**
      * The name part of the From: mail address
      */
-    private String fromName = null;
+    private String fromName;
     private String fromAddressType;
 
     private String toEmail;
     private String toName;
-    private final List<String> ccEmail = new ArrayList<>();
-    private final List<String> ccName = new ArrayList<>();
-    private final List<String> bccEmail = new ArrayList<>();
-    private final List<String> bccName = new ArrayList<>();
-    /**
-     * The mail's subject.
-     */
-    private String subject = null;
+    private String subject;
     private String subjectPrefix;
     private String topic;
     /**
      * The normalized body text.
      */
-    private String bodyText = null;
+    private String bodyText;
     /**
      * The displayed To: field
      */
-    private String displayTo = null;
+    private String displayTo;
     /**
      * The displayed Cc: field
      */
-    private String displayCc = null;
+    private String displayCc;
     /**
      * The displayed Bcc: field
      */
-    private String displayBcc = null;
+    private String displayBcc;
 
     private byte[] compressedRTF;
 
@@ -109,27 +102,27 @@ public class Message {
     /**
      * Email headers (if available)
      */
-    private String headers = null;
+    private String headers;
 
     /**
      * Email Date
      */
-    private Date date = null;
+    private Date date;
 
     /**
      * A list of all attachments (both {@link FileAttachment} and
      * {@link MsgAttachment}).
      */
-    private List<Attachment> attachments = new ArrayList<>();
+    private final List<Attachment> attachments = new ArrayList<>();
     /**
      * Contains all properties that are not covered by the special properties.
      */
-    private final Map<Pid, Object> properties = new HashMap<>();
+    private final Collection<Property> properties = new ArrayList<>();
     /**
      * A list containing all recipients for this message (which can be set in the
      * 'to:', 'cc:' and 'bcc:' field, respectively).
      */
-    private List<RecipientEntry> recipients = new ArrayList<>();
+    private final List<RecipientEntry> recipients = new ArrayList<>();
 
     public void addAttachment(Attachment attachment) {
         this.attachments.add(attachment);
@@ -140,6 +133,7 @@ public class Message {
     }
 
     void setProperty(Property property) {
+        this.properties.add(property);
         switch (property.getPid()) {
             case PidTagMessageClass:
                 this.setMessageClass((String) property.getValue());
@@ -204,9 +198,6 @@ public class Message {
                 }
                 break;
         }
-
-        // save all properties (incl. those identified above)
-        this.properties.put(property.getPid(), property.getValue());
     }
 
     /**
@@ -216,59 +207,32 @@ public class Message {
      */
     @Override
     public String toString() {
-        StringBuilder sb = headerString();
-        sb.append(this.attachments.size()).append(" attachments.");
-        return sb.toString();
+        return headerString() + this.attachments.size() + " attachments.";
     }
 
-    /**
-     * Provides all information of this message object.
-     *
-     * @return The full message information.
-     */
-    public String toLongString() {
-        StringBuilder sb = headerString();
-        sb.append("\n");
-        if (this.bodyText != null) {
-            sb.append(this.bodyText);
-        }
-        if (this.attachments.size() > 0) {
-            sb.append("\n");
-            sb.append(this.attachments.size()).append(" attachments.\n");
-            for (Attachment att : this.attachments) {
-                sb.append(att.toString()).append("\n");
-            }
-        }
-        return sb.toString();
-    }
-
-    private StringBuilder headerString() {
+    private String headerString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("From: ").append(Message.createMailString(this.fromEmail, this.fromName)).append("\n");
+        sb.append("From: ").append(Message.createMailString(this.fromEmail, this.fromName)).append('\n');
         if (toEmail != null || toName != null) {
             sb.append("To: ");
-            sb.append(Message.createMailString(toEmail, toName)).append("\n");
+            sb.append(Message.createMailString(toEmail, toName)).append('\n');
         }
+        String ccEmail = display(RecipientType.CC);
         if (!ccEmail.isEmpty()) {
-            sb.append("Cc: ");
-            for (int i = 0; i < ccEmail.size(); ++i) {
-                sb.append(Message.createMailString(ccEmail.get(i), ccName.get(i))).append("\n");
-            }
+            sb.append("Cc: ").append(ccEmail).append('\n');
         }
+        String bccEmail = display(RecipientType.BCC);
         if (!bccEmail.isEmpty()) {
-            sb.append("Bcc: ");
-            for (int i = 0; i < bccEmail.size(); ++i) {
-                sb.append(Message.createMailString(bccEmail.get(i), bccName.get(i))).append("\n");
-            }
+            sb.append("Bcc: ").append(bccEmail).append('\n');
         }
         if (this.date != null) {
             SimpleDateFormat formatter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss z", Locale.ENGLISH);
-            sb.append("Date: ").append(formatter.format(this.date)).append("\n");
+            sb.append("Date: ").append(formatter.format(this.date)).append('\n');
         }
         if (this.subject != null) {
-            sb.append("Subject: ").append(this.subject).append("\n");
+            sb.append("Subject: ").append(this.subject).append('\n');
         }
-        return sb;
+        return sb.toString();
     }
 
     /**
@@ -279,7 +243,7 @@ public class Message {
      * @param name The name part of the address.
      * @return A combination of the name and address.
      */
-    public static String createMailString(String mail, String name) {
+    private static String createMailString(String mail, String name) {
         if (isBlank(mail) && isBlank(name)) {
             return null;
         }
@@ -292,7 +256,7 @@ public class Message {
         if (mail.equalsIgnoreCase(name)) {
             return mail;
         }
-        return "\"" + name + "\" <" + mail + ">";
+        return '"' + name + "\" <" + mail + '>';
     }
 
     /**
@@ -303,24 +267,10 @@ public class Message {
     }
 
     /**
-     * @param attachments the attachments to set
-     */
-    public void setAttachments(List<Attachment> attachments) {
-        this.attachments = attachments;
-    }
-
-    /**
      * @return the recipients
      */
     public List<RecipientEntry> getRecipients() {
         return recipients;
-    }
-
-    /**
-     * @param recipients the recipients to set
-     */
-    public void setRecipients(List<RecipientEntry> recipients) {
-        this.recipients = recipients;
     }
 
     /**
@@ -406,13 +356,6 @@ public class Message {
     }
 
     /**
-     * @return the messageClass
-     */
-    public String getMessageClass() {
-        return messageClass;
-    }
-
-    /**
      * @param messageClass the messageClass to set
      */
     private void setMessageClass(String messageClass) {
@@ -450,7 +393,7 @@ public class Message {
     }
 
     public String getSubjectPrefix() {
-        return subjectPrefix.isEmpty() ? "" : subjectPrefix.trim() + " ";
+        return subjectPrefix.isEmpty() ? "" : subjectPrefix.trim() + ' ';
     }
 
     public String getTopic() {
@@ -485,43 +428,11 @@ public class Message {
         this.toName = trimNonNull(toName);
     }
 
-    public List<String> getCcEmail() {
-        return ccEmail;
-    }
-
-    public void addCcEmail(String ccEmail) {
-        this.ccEmail.add(trimNonNull(ccEmail));
-    }
-
-    public List<String> getCcName() {
-        return ccName;
-    }
-
-    public void addCcName(String ccName) {
-        this.ccName.add(trimNonNull(ccName));
-    }
-
-    public List<String> getBccEmail() {
-        return bccEmail;
-    }
-
-    public void addBccEmail(String bccEmail) {
-        this.bccEmail.add(trimNonNull(bccEmail));
-    }
-
-    public List<String> getBccName() {
-        return bccName;
-    }
-
-    public void addBccName(String bccName) {
-        this.bccName.add(trimNonNull(bccName));
-    }
-
     public byte[] getCompressedRTF() {
         return compressedRTF;
     }
 
-    public void setCompressedRTF(byte[] compressedRTF) {
+    private void setCompressedRTF(byte[] compressedRTF) {
         this.compressedRTF = compressedRTF;
     }
 
@@ -565,7 +476,7 @@ public class Message {
      * @param headers The headers in a single String object
      * @return The Date object or null, if no valid Date: has been found
      */
-    public static Date getDateFromHeaders(String headers) {
+    private static Date getDateFromHeaders(String headers) {
         if (headers == null) {
             return null;
         }
@@ -600,10 +511,6 @@ public class Message {
         this.date = date;
     }
 
-    public Object getProperty(Pid name) {
-        return this.properties.get(name);
-    }
-
     private String findSubjectPrefix() {
         Matcher matcher = PREFIX_PATTERN.matcher(subject);
         return matcher.find() ? matcher.group() : "";
@@ -613,7 +520,7 @@ public class Message {
         return this.recipients.stream()
                 .filter(recipientEntry -> recipientEntry.getType() == type)
                 .map(recipientEntry -> createMailString(recipientEntry.mailTo(), recipientEntry.getName()))
-                .collect(Collectors.joining(";"));
+                .collect(joining("; "));
     }
 
     private String decompressRTF() {

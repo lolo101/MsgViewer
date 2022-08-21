@@ -54,8 +54,8 @@ public class MsgParser {
     }
 
     private static void parseMsg(DirectoryEntry dir, Message msg) throws IOException {
-        DocumentEntry propertyEntry = (DocumentEntry) dir.getEntry(PROPERTIES_ENTRY);
-        try (DocumentInputStream propertyStream = new DocumentInputStream(propertyEntry)) {
+        DocumentEntry propertiesEntry = (DocumentEntry) dir.getEntry(PROPERTIES_ENTRY);
+        try (DocumentInputStream propertyStream = new DocumentInputStream(propertiesEntry)) {
             propertyStream.skip(8);
             propertyStream.readInt(); // nextRecipientId
             propertyStream.readInt(); // nextAttachmentId

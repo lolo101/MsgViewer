@@ -390,13 +390,15 @@ public class ShowNode extends BaseDialog {
 
             voffset += 4;
 
-            sb.append(" (in HEX) ");
+            sb.append(" / ");
 
             for (int i = voffset + 3; i >= voffset; i--) {
                 sb.append(formatByte0S(bytes[i]));
             }
 
-            appendGuid(voffset, bytes, sb);
+            sb.append(" -> ");
+
+            sb.append(show_index_and_kind(voffset, bytes));
         }
 
         return sb.toString();
@@ -473,7 +475,8 @@ public class ShowNode extends BaseDialog {
 
             voffset += 4;
 
-            appendGuid(voffset, bytes, sb);
+            sb.append(" / ");
+            sb.append(show_index_and_kind(voffset, bytes));
         }
 
         return sb.toString();
@@ -554,8 +557,9 @@ public class ShowNode extends BaseDialog {
         }
     }
 
-    private static void appendGuid(int voffset, byte[] bytes, StringBuilder sb) throws NumberFormatException {
+    private static String show_index_and_kind(int voffset, byte[] bytes) throws NumberFormatException {
         StringBuilder s_guid = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
 
         // 15 Bytes GUID
         for (int i = voffset + 1; i >= voffset; i--) {
@@ -564,7 +568,7 @@ public class ShowNode extends BaseDialog {
 
         voffset += 2;
 
-        sb.append(" INDEX: ");
+        sb.append("INDEX: ");
 
         for (int i = voffset + 1; i >= voffset; i--) {
             sb.append(formatByte0S(bytes[i]));
@@ -582,5 +586,6 @@ public class ShowNode extends BaseDialog {
         sb.append(" ");
         sb.append(is_string ? "STRING " : "NUM ");
         sb.append("\n");
+        return sb.toString();
     }
 }
