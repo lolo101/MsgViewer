@@ -12,15 +12,12 @@ import java.util.*;
 
 public class LocalSetup extends Setup {
 
-    String config_file;
-    final String app_name;
-    Properties props;
-    final Root root;
-    Map<String, DBConfig> global_config;
-    boolean initial_run;
+    private String config_file;
+    private Properties props;
+    private final Root root;
+    private Map<String, DBConfig> global_config;
 
     public LocalSetup(Root root, String app_name) {
-        this.app_name = app_name;
         this.root = root;
 
         String config_name = app_name + ".properties";
@@ -52,15 +49,14 @@ public class LocalSetup extends Setup {
 
     }
 
-    public void loadProps() {
+    private void loadProps() {
         props = new Properties();
 
         try (FileInputStream in = new FileInputStream(config_file)) {
             props.load(in);
 
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException ignored) {
 
-            initial_run = true;
 
         } catch (IOException ioe) {
 
@@ -107,7 +103,7 @@ public class LocalSetup extends Setup {
         return true;
     }
 
-    public boolean loadGlobalProps() {
+    private boolean loadGlobalProps() {
         final DBConnection conn = root.getDBConnection();
 
         if (conn == null) {
@@ -271,14 +267,6 @@ public class LocalSetup extends Setup {
     @Override
     public DBConfig getLocalConfig(String key) {
         return LocalConfigDefinitions.get(key);
-    }
-
-    /**
-     * @return true if local property file was now created
-     */
-    @Override
-    public boolean initialRun() {
-        return initial_run;
     }
 
 }
