@@ -13,6 +13,7 @@ import net.sourceforge.MSGViewer.factory.mbox.headers.DateHeader;
 import javax.activation.DataHandler;
 import javax.mail.BodyPart;
 import javax.mail.MessagingException;
+import javax.mail.Part;
 import javax.mail.Session;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
@@ -33,7 +34,7 @@ public class MBoxWriterViaJavaMail implements AutoCloseable {
     private Path tmp_dir;
 
     public void write(Message msg, OutputStream out) throws Exception {
-        javax.mail.Message jmsg = new MimeMessage(session);
+        Part jmsg = new MimeMessage(session);
 
         writeMBoxHeader(msg, out);
 
@@ -77,7 +78,7 @@ public class MBoxWriterViaJavaMail implements AutoCloseable {
             part.setDisposition(BodyPart.ATTACHMENT);
             if (att instanceof FileAttachment) {
                 FileAttachment fatt = (FileAttachment) att;
-                part.setFileName(MimeUtility.encodeText(fatt.getDisplayName(), "UTF-8", null));
+                part.setFileName(MimeUtility.encodeText(fatt.toString(), "UTF-8", null));
                 part.attachFile(dumpAttachment(fatt).toFile());
             } else if (att instanceof MsgAttachment) {
                 MsgAttachment msgAtt = (MsgAttachment) att;
@@ -150,7 +151,7 @@ public class MBoxWriterViaJavaMail implements AutoCloseable {
         out.write(sb.toString().getBytes(StandardCharsets.US_ASCII));
     }
 
-    static void addHeaders(Message msg, javax.mail.Message jmsg) throws MessagingException {
+    private static void addHeaders(Message msg, Part jmsg) throws MessagingException {
         if (msg.getHeaders() == null) {
             return;
         }

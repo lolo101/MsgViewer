@@ -54,21 +54,12 @@ public class FileAttachment implements Attachment {
     private byte[] data;
 
     /**
-     * Subdir where the attachment was found
-     */
-    private String subdir;
-
-    /**
      * AttachContentId
      */
     private String contentId;
     private String contentLocation;
 
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public void setDisplayName(String displayName) {
+    private void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
 
@@ -110,7 +101,7 @@ public class FileAttachment implements Attachment {
     /**
      * @param longFilename the longFilename to set
      */
-    public void setLongFilename(String longFilename) {
+    private void setLongFilename(String longFilename) {
         this.longFilename = longFilename;
     }
 
@@ -147,17 +138,6 @@ public class FileAttachment implements Attachment {
      */
     public long getSize() {
         return data == null ? -1 : data.length;
-    }
-
-    /**
-     * @return the subdir where the attachment was found
-     */
-    public String getSubDir() {
-        return subdir;
-    }
-
-    public void setSubDir(String subdir) {
-        this.subdir = subdir;
     }
 
     public void setContentId(String contentId) {
