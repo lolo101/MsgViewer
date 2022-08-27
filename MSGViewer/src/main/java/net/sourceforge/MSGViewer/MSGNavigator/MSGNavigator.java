@@ -21,31 +21,12 @@ public class MSGNavigator extends BaseDialog {
 
     public static final String SETTING_SHOW_SIZE = "MSG_NAVIGATOR_SHOW_SIZE";
     public static final String SETTING_AUTOSAVE = "MSG_SETTING_AUTOSAVE";
-    public static final String PROPERTIES_ENTRY = "__properties_version1.0";
+    private static final String PROPERTIES_ENTRY = "__properties_version1.0";
 
     private POIFSFileSystem fs;
     private final File file;
 
-    private boolean setting_show_size = false;
-
-    public static class TreeNodeContainer extends DefaultMutableTreeNode {
-        private final Entry entry;
-        private final Object data;
-
-        public TreeNodeContainer(Entry entry, String name, Object data) {
-            super(name);
-            this.entry = entry;
-            this.data = data;
-        }
-
-        public Entry getEntry() {
-            return entry;
-        }
-
-        public Object getData() {
-            return data;
-        }
-    }
+    private boolean setting_show_size;
 
     /**
      * Creates new form MSGNavigator
@@ -64,10 +45,10 @@ public class MSGNavigator extends BaseDialog {
 
         setting_show_size = StringUtils.isYes(root.getSetup().getLocalConfig(SETTING_SHOW_SIZE, "true"));
 
-        EventQueue.invokeLater(() -> new AutoMBox<>(MSGNavigator.class.getName(), () -> parse(file)).run());
+        EventQueue.invokeLater(() -> new AutoMBox<>(MSGNavigator.class.getName(), () -> parse()).run());
     }
 
-    void parse(File file) throws IOException {
+    private void parse() throws IOException {
         try (InputStream in = new FileInputStream(file)) {
             fs = new POIFSFileSystem(in);
             DirectoryNode fs_root = fs.getRoot();

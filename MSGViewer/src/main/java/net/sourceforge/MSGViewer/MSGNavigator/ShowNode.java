@@ -4,7 +4,6 @@ import at.redeye.FrameWork.base.BaseDialog;
 import at.redeye.FrameWork.base.Root;
 import com.auxilii.msgparser.Pid;
 import com.auxilii.msgparser.Ptyp;
-import net.sourceforge.MSGViewer.MSGNavigator.MSGNavigator.TreeNodeContainer;
 import net.sourceforge.MSGViewer.factory.msg.lib.ByteConvert;
 import net.sourceforge.MSGViewer.factory.msg.lib.MSTimeConvert;
 import org.apache.commons.codec.binary.Hex;
