@@ -27,14 +27,14 @@ public class ModuleLauncher extends BaseModuleLauncher {
         new ModuleLauncher(args).invoke();
     }
 
-    public void invoke() {
-        if (getStartupFlag(CLIHelpMSGViewer.CLI_HELP)) {
+    private void invoke() {
+        if (anyArgumentMatches(CLIHelpMSGViewer.CLI_HELP)) {
             CLIHelpMSGViewer help = new CLIHelpMSGViewer(this);
             help.printHelpScreen();
             return;
         }
 
-        if (getStartupFlag(CLIHelpMSGViewer.CLI_VERSION)) {
+        if (anyArgumentMatches(CLIHelpMSGViewer.CLI_VERSION)) {
             CLIHelpMSGViewer help = new CLIHelpMSGViewer(this);
             help.printVersion();
 
@@ -57,8 +57,8 @@ public class ModuleLauncher extends BaseModuleLauncher {
         CLIFileConverter converter = getConverter();
 
         if (converter != null) {
-            converter.setConvertToTemp(getStartupFlag(CLIHelpMSGViewer.CLI_CONVERT_TEMP));
-            converter.setOpenAfterConvert(getStartupFlag(CLIHelpMSGViewer.CLI_CONVERT_OPEN));
+            converter.setConvertToTemp(anyArgumentMatches(CLIHelpMSGViewer.CLI_CONVERT_TEMP));
+            converter.setOpenAfterConvert(anyArgumentMatches(CLIHelpMSGViewer.CLI_CONVERT_OPEN));
             converter.work();
         } else {
             invokeGui();
@@ -66,19 +66,12 @@ public class ModuleLauncher extends BaseModuleLauncher {
     }
 
     private CLIFileConverter getConverter() {
-        if (getStartupFlag(Msg2MBox.CLI_PARAMETER)) {
-            return new Msg2MBox(this);
-        } else if (getStartupFlag(MBox2Msg.CLI_PARAMETER)) {
-            return new MBox2Msg(this);
-        } else if (getStartupFlag(Msg2Eml.CLI_PARAMETER)) {
-            return new Msg2Eml(this);
-        } else if (getStartupFlag(Oft2Eml.CLI_PARAMETER)) {
-            return new Oft2Eml(this);
-        } else if (getStartupFlag(Eml2Msg.CLI_PARAMETER)) {
-            return new Eml2Msg(this);
-        } else {
-            return null;
-        }
+        if (anyArgumentMatches(Msg2MBox.CLI_PARAMETER)) return new Msg2MBox(this);
+        if (anyArgumentMatches(MBox2Msg.CLI_PARAMETER)) return new MBox2Msg(this);
+        if (anyArgumentMatches(Msg2Eml.CLI_PARAMETER)) return new Msg2Eml(this);
+        if (anyArgumentMatches(Oft2Eml.CLI_PARAMETER)) return new Oft2Eml(this);
+        if (anyArgumentMatches(Eml2Msg.CLI_PARAMETER)) return new Eml2Msg(this);
+        return null;
     }
 
     @Override
@@ -86,7 +79,7 @@ public class ModuleLauncher extends BaseModuleLauncher {
         return Version.getVersion();
     }
 
-    public void invokeGui() {
+    private void invokeGui() {
         if (splashEnabled()) {
             splash = new StartupWindow(
                     "/at/redeye/FrameWork/base/resources/pictures/redeye.png");
@@ -101,11 +94,11 @@ public class ModuleLauncher extends BaseModuleLauncher {
 
         configureLogging();
 
-        BaseWin mainwin = getStartupFlag(CLIHelpMSGViewer.CLI_MAINWIN)
+        BaseWin mainwin = anyArgumentMatches(CLIHelpMSGViewer.CLI_MAINWIN)
                 ? new MainWin(root)
                 : new SingleWin(root);
 
-        if (getStartupFlag(CLIHelpMSGViewer.CLI_HIDEMENUBAR)) {
+        if (anyArgumentMatches(CLIHelpMSGViewer.CLI_HIDEMENUBAR)) {
             mainwin.hideMenuBar();
         }
 
@@ -122,16 +115,9 @@ public class ModuleLauncher extends BaseModuleLauncher {
         if (Setup.is_win_system()) {
             root.registerPlugin(new at.redeye.Plugins.ShellExec.Plugin());
         }
-
-        root.registerPlugin(new net.sourceforge.MSGViewer.Plugins.msgparser.Plugin());
-        root.registerPlugin(new net.sourceforge.MSGViewer.Plugins.tnef.Plugin());
-        root.registerPlugin(new net.sourceforge.MSGViewer.Plugins.poi.Plugin());
-        root.registerPlugin(new net.sourceforge.MSGViewer.Plugins.javamail.Plugin());
-        root.registerPlugin(new at.redeye.Plugins.CommonsLang.Plugin());
-        root.registerPlugin(new at.redeye.Plugins.JerichoHtml.Plugin());
     }
 
-    private boolean getStartupFlag(String string) {
+    private boolean anyArgumentMatches(String string) {
         return Arrays.stream(args).anyMatch(string::equalsIgnoreCase);
     }
 
