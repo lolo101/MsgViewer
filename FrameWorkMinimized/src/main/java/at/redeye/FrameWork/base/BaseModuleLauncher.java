@@ -15,13 +15,13 @@ import org.apache.logging.log4j.core.layout.PatternLayout;
 import javax.swing.*;
 import java.io.File;
 import java.util.Properties;
+import java.util.stream.Stream;
 
 public abstract class BaseModuleLauncher {
-    public StartupWindow splash = null;
+    public StartupWindow splash;
     public static final Logger logger = LogManager.getRootLogger();
     public Root root;
-    public String[] args;
-    Properties jnlp_properties;
+    public final String[] args;
 
     public BaseModuleLauncher(String[] args) {
 
@@ -29,68 +29,43 @@ public abstract class BaseModuleLauncher {
         BaseConfigureLogging();
     }
 
-    public String getStartupParam(String name) {
-        return getStartupParam(name, name, name, null);
+    private String getNoSplash() {
+        return Stream.of(args)
+                .filter("-nosplash"::equalsIgnoreCase)
+                .findFirst()
+                .orElseGet(this::getNoSplashProperty);
     }
 
-    public String getStartupParam(String shortname, String longname, String envname) {
-        return getStartupParam(shortname, longname, envname, null);
+    private String getNoSplashProperty() {
+
+        String envValue = System.getProperty("NOSPLASH");
+        if (envValue != null) {
+            System.out.println("env NOSPLASH=" + envValue);
+            return envValue;
+        }
+
+        Properties jnlp_properties = findJnlpProperties();
+        String jnlpValue = jnlp_properties.getProperty("NOSPLASH");
+        if (jnlpValue != null) {
+            System.out.println("JNLP NOSPLASH" + "=" + jnlpValue);
+            return jnlpValue;
+        }
+
+        if (logger.isTraceEnabled())
+            logger.trace("NOSPLASH undefined");
+        return null;
     }
 
-    public String getStartupParam(String shortname, String longname, String envname, String default_value) {
-
-        shortname = "-" + shortname;
-        longname = "-" + longname;
-
-        if (args != null) {
-            boolean next = false;
-
-            for (String arg : args) {
-                if (next) {
-                    return arg;
-                } else if (arg.equalsIgnoreCase(shortname)
-                        || arg.equalsIgnoreCase(longname)) {
-                    next = true;
-                }
-            }
-        }
-
-        parseJNLP();
-
-        String url = System.getProperty(envname.toUpperCase());
-
-        if (url == null && jnlp_properties != null)
-            url = jnlp_properties.getProperty(envname.toUpperCase());
-
-        if (url == null || url.trim().isEmpty()) {
-            String sdev = default_value;
-            if (sdev == null)
-                sdev = "(null)";
-
-            if (logger.isTraceEnabled())
-                logger.trace(envname + "=" + sdev + " (default)");
-            return default_value;
-        }
-
-        System.out.println(envname + "=" + url);
-        return url;
-    }
-
-    private void parseJNLP() {
-        if (jnlp_properties != null)
-            return;
-
-        for (String arg : args) {
-            if (arg.endsWith(".jnlp")) {
-                final File jnlp_file = new File(arg);
-
-                if (jnlp_file.exists()) {
-                    new AutoLogger<>(BaseModuleLauncher.class.getName(),
-                            () -> new ParseJNLP(jnlp_file).getProperties()
-                    ).onSuccess(result -> jnlp_properties = result);
-                }
-            }
-        }
+    private Properties findJnlpProperties() {
+        return Stream.of(args)
+                .filter(arg -> arg.endsWith(".jnlp"))
+                .map(File::new)
+                .filter(File::exists)
+                .findFirst()
+                .flatMap(jnlp_file -> new AutoLogger<>(BaseModuleLauncher.class.getName(),
+                        () -> new ParseJNLP(jnlp_file).getProperties()
+                ).result())
+                .orElseGet(Properties::new);
     }
 
     /**
@@ -167,7 +142,7 @@ public abstract class BaseModuleLauncher {
     public abstract String getVersion();
 
     public boolean splashEnabled() {
-        return !StringUtils.isYes(getStartupParam(null, "nosplash", "NOSPLASH"));
+        return !StringUtils.isYes(getNoSplash());
     }
 
     public void closeSplash() {
@@ -194,16 +169,11 @@ public abstract class BaseModuleLauncher {
         }
     }
 
-    public static String getLookAndFeelStrByName(String name) {
+    private static String getLookAndFeelStrByName(String name) {
 
-        if (name.equalsIgnoreCase("motif")) {
-            return "com.sun.java.swing.plaf.motif.MotifLookAndFeel";
-        } else if (name.equalsIgnoreCase("metal")) {
-            return "javax.swing.plaf.metal.MetalLookAndFeel";
-        } else if (name.equalsIgnoreCase("nimbus")) {
-            return "com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel";
-        } else {
-            return UIManager.getSystemLookAndFeelClassName();
-        }
+        if (name.equalsIgnoreCase("motif")) return "com.sun.java.swing.plaf.motif.MotifLookAndFeel";
+        if (name.equalsIgnoreCase("metal")) return "javax.swing.plaf.metal.MetalLookAndFeel";
+        if (name.equalsIgnoreCase("nimbus")) return "com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel";
+        return UIManager.getSystemLookAndFeelClassName();
     }
 }

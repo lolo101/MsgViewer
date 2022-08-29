@@ -45,7 +45,7 @@ public class testRTF2HTML extends BaseModuleLauncher {
                     String htmlContent = parser.getHTML();
                     System.out.print(htmlContent);
 
-                    String file_name = getStartupParam("writehtml");
+                    String file_name = "writehtml";
 
                     if (file_name != null) {
                         try (FileWriter fout = new FileWriter(file_name)) {
