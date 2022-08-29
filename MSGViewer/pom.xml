@@ -92,17 +92,7 @@
         <dependency>
             <groupId>at.redeye.Plugins</groupId>
             <artifactId>ShellExec</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>at.redeye.Plugins</groupId>
-            <artifactId>CommonsLang</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>at.redeye.Plugins</groupId>
-            <artifactId>JerichoHtml</artifactId>
-            <version>1.0.0</version>
+            <version>2.0.0</version>
         </dependency>
         <dependency>
             <groupId>com.auxilii</groupId>
