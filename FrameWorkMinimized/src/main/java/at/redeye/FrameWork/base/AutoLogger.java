@@ -3,8 +3,8 @@ package at.redeye.FrameWork.base;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Optional;
 import java.util.concurrent.Callable;
-import java.util.function.Consumer;
 
 public class AutoLogger<R> {
 
@@ -32,11 +32,12 @@ public class AutoLogger<R> {
         }
     }
 
-    public void onSuccess(Consumer<R> consumer) {
+    public Optional<R> result() {
         try {
-            consumer.accept(callable.call());
+            return Optional.ofNullable(callable.call());
         } catch (Exception ex) {
             logger.error("Exception: " + ex, ex);
+            return Optional.empty();
         }
     }
 
