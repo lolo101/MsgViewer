@@ -28,7 +28,7 @@ public class RTFParser {
 
     public void pushGroup()
     {
-        current_group = new RTFGroup(characterSet, htmlContent);
+        current_group = new RTFGroup(characterSet, htmlContent, current_group);
         groups.push(current_group);
     }
 
