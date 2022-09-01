@@ -64,7 +64,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
     private BaseDialog parent;
 
     private final ExecutorService thread_pool = Executors.newCachedThreadPool();
-    private int wating_thread_pool_counter = 0;
+    private int wating_thread_pool_counter;
 
     public ViewerPanel() {
         initComponents();
@@ -358,7 +358,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         }).run();
     }
 
-    public void openUrl(URL url) throws IOException {
+    private void openUrl(URL url) throws IOException {
         logger.info(url);
 
         final String protocol = url.getProtocol();
@@ -523,9 +523,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
 
         logger.info("<a href=\"" + content.toUri() + "\"> " + mime_type);
 
-        if (mime_type != null
-                && ViewerHelper.is_image_mime_type(new MimeType(mime_type))
-                && att.getSize() < 1024 * 1024 * 2) {
+        if (mime_type != null && ViewerHelper.is_image_mime_type(new MimeType(mime_type))) {
             File thumbnailFile = new File(content.toAbsolutePath() + "-small.jpg");
             if (!Files.exists(content)) {
                 write(content, att.getData());

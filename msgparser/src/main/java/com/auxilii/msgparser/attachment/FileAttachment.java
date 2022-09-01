@@ -186,7 +186,7 @@ public class FileAttachment implements Attachment {
     }
 
     /**
-     * Returns either the long filename or the short filename, depending on which is available.
+     * Returns either the display name, the long filename or the short filename, the first non-blank in that order.
      *
      * @see java.lang.Object#toString()
      */
