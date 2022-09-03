@@ -23,16 +23,6 @@
             <version>2.11.0</version>
         </dependency>
         <dependency>
-            <groupId>com.github.markusbernhardt</groupId>
-            <artifactId>proxy-vole</artifactId>
-            <version>1.0.5</version>
-        </dependency>
-        <dependency>
-            <groupId>org.javadelight</groupId>
-            <artifactId>delight-nashorn-sandbox</artifactId>
-            <version>0.2.5</version>
-        </dependency>
-        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>5.9.0</version>
