@@ -16,14 +16,13 @@ import net.htmlparser.jericho.StartTag;
 import net.sourceforge.MSGViewer.rtfparser.ParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
-import org.apache.poi.util.IOUtils;
 
 import javax.activation.MimeType;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -164,20 +163,15 @@ public class ViewerHelper implements AttachmentRepository {
         return emailValidator.isValid(email);
     }
 
-    public String printMailIconHtml() throws IOException {
+    public static String printMailIconHtml() {
         return "<img border=0 align=\"baseline\" src=\"" + getMailIconFile() + "\"/>";
     }
 
-    private URI getMailIconFile() throws IOException {
-        Path file = tmp_dir.resolve("mail.png");
-
-        if (!Files.exists(file)) {
-            try (InputStream stream = ViewerHelper.class.getResourceAsStream("/icons/rg1024_yellow_mail.png");
-                 OutputStream writer = Files.newOutputStream(file)) {
-                IOUtils.copy(stream, writer);
-            }
+    private static URI getMailIconFile() {
+        try {
+            return ViewerHelper.class.getResource("/icons/rg1024_yellow_mail.png").toURI();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
         }
-
-        return file.toUri();
     }
 }

@@ -445,13 +445,13 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         logger.info("Message From:" + message.getFromName() + "\n To:" + message.getToName() + "\n Email: " + message.getFromEmail());
     }
 
-    private void updateHeader() throws MimeTypeParseException, IOException {
+    private void updateHeader() throws MimeTypeParseException {
         header.setContentType("text/html");
         header.setText(headerHtml());
         header.setCaretPosition(0);
     }
 
-    private String headerHtml() throws MimeTypeParseException, IOException {
+    private String headerHtml() throws MimeTypeParseException {
         return "<html><body>" + "<b>" + printSubject() + "</b><br/>"
                 + printLine("From: ", printFrom())
                 + printLine("Date: ", printDate())
@@ -492,7 +492,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         return isBlank(recipientsTo) ? "" : recipientsTo;
     }
 
-    private String printAttachments() throws MimeTypeParseException, IOException {
+    private String printAttachments() throws MimeTypeParseException {
         StringBuilder sb = new StringBuilder();
         for (Attachment att : message.getAttachments()) {
             sb.append(printAttachment(att));
@@ -500,7 +500,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         return sb.toString();
     }
 
-    private String printAttachment(Attachment att) throws MimeTypeParseException, IOException {
+    private String printAttachment(Attachment att) throws MimeTypeParseException {
         if (att instanceof FileAttachment) {
             return printFileAttachment((FileAttachment) att);
         }
@@ -511,7 +511,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         return "";
     }
 
-    private String printFileAttachment(FileAttachment att) throws MimeTypeParseException, IOException {
+    private String printFileAttachment(FileAttachment att) throws MimeTypeParseException {
         Path content = helper.getTempFile(att);
 
         StringBuilder sb = new StringBuilder();
@@ -538,7 +538,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
                 write(content, att.getData());
             }
 
-            sb.append(helper.printMailIconHtml());
+            sb.append(ViewerHelper.printMailIconHtml());
         }
 
         sb.append(att);
@@ -546,14 +546,14 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         return sb.toString();
     }
 
-    private String printMsgAttachment(MsgAttachment att) throws IOException {
+    private String printMsgAttachment(MsgAttachment att) {
         final Message msg = att.getMessage();
 
         Path sub_file = helper.getTempFile(att);
 
         async(() -> new AutoMBox<>(file_name, () -> new MessageSaver(msg).saveMessage(sub_file)).run());
 
-        return "<a href=\"" + sub_file.toUri() + "\">" + helper.printMailIconHtml() + msg.getSubject() + "</a>&nbsp;";
+        return "<a href=\"" + sub_file.toUri() + "\">" + ViewerHelper.printMailIconHtml() + msg.getSubject() + "</a>&nbsp;";
     }
 
     private void printThumbnail(FileAttachment att, File thumbnailFile) {
