@@ -170,13 +170,13 @@ public class MainWin extends BaseWin {
     }//GEN-LAST:event_jMSettingsActionPerformed
 
     private void jMSaveAsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMSaveAsActionPerformed
-        filesRepository.chooseFilesToSave().ifPresent(file ->
+        fileChooser.chooseFilesToSave().ifPresent(file ->
                 new AutoMBox<>(this.getClass().getName(), () -> viewerPanel.exportFile(file.toPath())).run()
         );
     }//GEN-LAST:event_jMSaveAsActionPerformed
 
     private void jMOpenFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMOpenFileActionPerformed
-        filesRepository.chooseFilesToOpen().forEach(this::openFile);
+        fileChooser.chooseFilesToOpen().forEach(this::openFile);
     }//GEN-LAST:event_jMOpenFileActionPerformed
 
     private void jMPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMPrintActionPerformed

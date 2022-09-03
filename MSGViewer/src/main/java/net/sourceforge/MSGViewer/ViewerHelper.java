@@ -32,12 +32,12 @@ import java.util.regex.Pattern;
 
 import static at.redeye.FrameWork.base.BaseDialog.logger;
 
-public class ViewerHelper {
+public class ViewerHelper implements AttachmentRepository {
 
     private static final Pattern META_PATTERN = Pattern.compile("<meta\\s.*>", Pattern.CASE_INSENSITIVE);
     private final Root root;
     private Path tmp_dir;
-    private boolean delete_tmp_dir = false;
+    private boolean delete_tmp_dir;
 
     public ViewerHelper(Root root) {
         this.root = root;
@@ -140,10 +140,12 @@ public class ViewerHelper {
         return null;
     }
 
+    @Override
     public Path getTempFile(FileAttachment fatt) {
         return getTempFile(StringUtils.isBlank(fatt.getLongFilename()) ? fatt.getFilename() : fatt.getLongFilename());
     }
 
+    @Override
     public Path getTempFile(MsgAttachment matt) {
         return getTempFile(matt.getMessage().hashCode() + ".msg");
     }

@@ -20,12 +20,12 @@ class PrepareImagesTest {
     private static final FileSystem fileSystem = Jimfs.newFileSystem("host", unix());
 
     @Mock
-    private ViewerHelper fileRepository;
+    private AttachmentRepository attachmentRepository;
 
     @Test
     void should_replace_images_sources_with_content_id() {
         Message message = messageWithAttachmentWithContentId();
-        PrepareImages sut = new PrepareImages(fileRepository, message);
+        PrepareImages sut = new PrepareImages(attachmentRepository, message);
 
         String actual = sut.prepareImages("<img src=\"cid:content-id-1\"></img>");
 
@@ -35,7 +35,7 @@ class PrepareImagesTest {
     @Test
     void should_replace_images_sources_with_relative_path() {
         Message message = messageWithAttachmentWithContentLocation();
-        PrepareImages sut = new PrepareImages(fileRepository, message);
+        PrepareImages sut = new PrepareImages(attachmentRepository, message);
 
         String actual = sut.prepareImages("<img src=\"content-location-2\"></img>");
 
@@ -47,7 +47,7 @@ class PrepareImagesTest {
         FileAttachment attachmentWithContentId = new FileAttachment();
         attachmentWithContentId.setContentId("content-id-1");
         message.addAttachment(attachmentWithContentId);
-        when(fileRepository.getTempFile(attachmentWithContentId)).thenReturn(fileSystem.getPath("/tmp/xxx.tmp/long-filename-1"));
+        when(attachmentRepository.getTempFile(attachmentWithContentId)).thenReturn(fileSystem.getPath("/tmp/xxx.tmp/long-filename-1"));
         return message;
     }
 
@@ -56,7 +56,7 @@ class PrepareImagesTest {
         FileAttachment attachmentWithContentLocation = new FileAttachment();
         attachmentWithContentLocation.setContentLocation("content-location-2");
         message.addAttachment(attachmentWithContentLocation);
-        when(fileRepository.getTempFile(attachmentWithContentLocation)).thenReturn(fileSystem.getPath("/tmp/xxx.tmp/content-location-2"));
+        when(attachmentRepository.getTempFile(attachmentWithContentLocation)).thenReturn(fileSystem.getPath("/tmp/xxx.tmp/content-location-2"));
         return message;
     }
 }
