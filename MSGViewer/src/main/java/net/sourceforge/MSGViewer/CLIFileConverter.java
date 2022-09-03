@@ -25,16 +25,14 @@ public abstract class CLIFileConverter {
 	private final ModuleLauncher module_launcher;
 	private final String sourceType;
 	private final String targetType;
-	private boolean convertToTemp = false;
-	private boolean openAfterConvert = false;
+	private boolean convertToTemp;
+	private boolean openAfterConvert;
 
 	/**
-	 * @param sourceType
-	 *            the source file type (i.e. ending) without a leading dot. E.g.
-	 *            "msg"
-	 * @param targetType
-	 *            the target file type (i.e. ending) without a leading dot. E.g.
-	 *            "mbox"
+	 * @param sourceType the source file type (i.e. ending) without a leading dot. E.g.
+	 *                   "msg"
+	 * @param targetType the target file type (i.e. ending) without a leading dot. E.g.
+	 *                   "mbox"
 	 */
 	CLIFileConverter(ModuleLauncher module_launcher, String sourceType,
 					 String targetType) {
@@ -98,11 +96,11 @@ public abstract class CLIFileConverter {
             LOGGER.info("conversion source file: " + sourceFile);
             Message msg = new MessageParser(sourceFile).parseMessage();
 
-            LOGGER.info("conversion target file: " + targetFile);
-            new MessageSaver(msg).saveMessage(targetFile);
+			LOGGER.info("conversion target file: " + targetFile);
+			new MessageSaver(module_launcher.root, msg).saveMessage(targetFile);
 
-            if (openAfterConvert) {
-                openFile(targetFile);
+			if (openAfterConvert) {
+				openFile(targetFile);
             }
 		} catch (Exception ex) {
 			ex.printStackTrace();

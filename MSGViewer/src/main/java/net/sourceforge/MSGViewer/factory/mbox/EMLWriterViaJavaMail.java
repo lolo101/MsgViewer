@@ -1,18 +1,15 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.sourceforge.MSGViewer.factory.mbox;
 
-/**
- *
- * @author kingleo
- */
+import at.redeye.FrameWork.base.Root;
+
 public class EMLWriterViaJavaMail extends MBoxWriterViaJavaMail {
- 
+
+    public EMLWriterViaJavaMail(Root root) {
+        super(root);
+    }
+
     @Override
-    public String getExtension()
-    {
+    public String getExtension() {
         return "eml";
     }
 }

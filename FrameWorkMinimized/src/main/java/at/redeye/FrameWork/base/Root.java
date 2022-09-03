@@ -1,21 +1,13 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.base;
 
 import at.redeye.FrameWork.Plugin.Plugin;
 import at.redeye.FrameWork.base.dll_cache.DLLExtractor;
-import at.redeye.FrameWork.utilities.calendar.Holidays;
+import at.redeye.FrameWork.utilities.Storage;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
 
-/**
- *
- * @author martin
- */
 public abstract class Root {
 
     protected final String app_name;
@@ -25,10 +17,10 @@ public abstract class Root {
      * language most of the aplication is programmed in
      * can be set in each dialog but if not set
      * here you can define the default
-     *
+     * <p>
      * This is set to "en" by default.
      */
-    String base_language;
+    private String base_language;
 
     /**
      * fallback language if the target language is not
@@ -39,30 +31,31 @@ public abstract class Root {
      * Here you can define the default language which can be
      * diferrent from the language the dialog was translated
      * for.
-     *
+     * <p>
      * This is set to "en" by default
      */
-    String default_language;
+    private String default_language;
 
     /**
      * path to transaltion files as resource view
      * eg: /at/redeye/Zeiterfassung/resources/translations
      */
-    String language_resource_path;
+    private String language_resource_path;
 
     /**
      * language used in messages, can differ from
      * Locale.getDefault()
      */
-    String display_language;
+    private String display_language;
 
-    static Root static_root;
+    private static Root static_root;
+    private final Path storage;
 
-    public Root( String app_name, String app_title )
-    {
+    public Root(String app_name, String app_title) {
         this.app_name = app_name;
         this.app_title = app_title;
         static_root = this;
+        storage = Storage.getEphemeralStorage(this.app_name);
     }
 
     public abstract Setup getSetup();
@@ -110,20 +103,11 @@ public abstract class Root {
         return null;
     }
 
-    public Holidays getHolidays() {
-        return null;
-    }
-
-    public void setHolidays( Holidays  holidays )
-    {
-
-    }
-
     /**
      * language most of the aplication is programmed in
      * can be set in each dialog but if not set
      * here you can define the default
-     *
+     * <p>
      * This is set to "en" by default.
      */
     public void setBaseLanguage( String language )
@@ -140,7 +124,7 @@ public abstract class Root {
      * Here you can define the default language which can be
      * diferrent from the language the dialog was translated
      * for.
-     *
+     * <p>
      * This is set to "en" by default
      */
     public void setDefaultLanguage( String language )
@@ -157,7 +141,7 @@ public abstract class Root {
      * Here you can define the default language which can be
      * diferrent from the language the dialog was translated
      * for.
-     *
+     * <p>
      * This is set to "en" by default
      */
     public String getDefaultLanguage()
@@ -172,7 +156,7 @@ public abstract class Root {
      * language most of the aplication is programmed in
      * can be set in each dialog but if not set
      * here you can define the default
-     *
+     * <p>
      * This is set to "en" by default.
      */
     public String getBaseLanguage()
@@ -246,11 +230,14 @@ public abstract class Root {
 
     /**
      * only use this in case of emergency
+     *
      * @return the last instace of the root class
      */
-    public static Root getLastRoot()
-    {
+    public static Root getLastRoot() {
         return static_root;
     }
 
+    public Path getStorage() {
+        return storage;
+    }
 }

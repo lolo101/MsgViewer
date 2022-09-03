@@ -1,5 +1,7 @@
 package net.sourceforge.MSGViewer.factory.mbox;
 
+import at.redeye.FrameWork.base.LocalRoot;
+import at.redeye.FrameWork.base.Root;
 import com.auxilii.msgparser.Message;
 import com.google.common.jimfs.Jimfs;
 import net.sourceforge.MSGViewer.ModuleLauncher;
@@ -25,8 +27,8 @@ class MBoxWriterViaJavaMailTest {
 
         try (FileSystem fileSystem = Jimfs.newFileSystem()) {
             Path testOut = fileSystem.getPath("test_out.mbox");
-            try (OutputStream outputStream = Files.newOutputStream(testOut);
-                 MBoxWriterViaJavaMail writer = new MBoxWriterViaJavaMail()) {
+            try (OutputStream outputStream = Files.newOutputStream(testOut)) {
+                MBoxWriterViaJavaMail writer = new MBoxWriterViaJavaMail(null);
                 writer.write(msg, outputStream);
             }
             assertThat(Files.lines(testOut)).contains("Subject:  danke ...");
@@ -42,8 +44,9 @@ class MBoxWriterViaJavaMailTest {
 
         try (FileSystem fileSystem = Jimfs.newFileSystem()) {
             Path testOut = fileSystem.getPath("test_out.mbox");
-            try (OutputStream outputStream = Files.newOutputStream(testOut);
-                 MBoxWriterViaJavaMail writer = new MBoxWriterViaJavaMail()) {
+            try (OutputStream outputStream = Files.newOutputStream(testOut)) {
+                Root root = new LocalRoot("test");
+                MBoxWriterViaJavaMail writer = new MBoxWriterViaJavaMail(root);
                 writer.write(msg, outputStream);
             }
             assertThat(Files.lines(testOut)).contains("Content-Disposition: attachment; filename=Behinder.pdf");

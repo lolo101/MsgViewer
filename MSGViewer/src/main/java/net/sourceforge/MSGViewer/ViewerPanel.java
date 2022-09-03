@@ -551,7 +551,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
 
         Path sub_file = helper.getTempFile(att);
 
-        async(() -> new AutoMBox<>(file_name, () -> new MessageSaver(msg).saveMessage(sub_file)).run());
+        async(() -> new AutoMBox<>(file_name, () -> new MessageSaver(root, msg).saveMessage(sub_file)).run());
 
         return "<a href=\"" + sub_file.toUri() + "\">" + ViewerHelper.printMailIconHtml() + msg.getSubject() + "</a>&nbsp;";
     }
@@ -597,8 +597,6 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         root.getSetup().setLocalConfig("RTFFormat", jRRTF.isSelected() ? "yes" : "no");
         root.getSetup().setLocalConfig("FixedFont", JCBfix.isSelected() ? "yes" : "no");
         root.getSetup().setLocalConfig("DividerLocation", String.valueOf(jSplitPane.getDividerLocation()));
-
-        helper.dispose();
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -622,7 +620,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
                     root.MlM("Error"),
                     JOptionPane.ERROR_MESSAGE);
         }
-        new MessageSaver(message).saveMessage(export_file);
+        new MessageSaver(root, message).saveMessage(export_file);
     }
 
     public String getFileName() {

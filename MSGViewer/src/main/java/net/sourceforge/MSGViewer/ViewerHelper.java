@@ -3,8 +3,6 @@ package net.sourceforge.MSGViewer;
 import at.redeye.FrameWork.base.FrameWorkConfigDefinitions;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.base.Setup;
-import at.redeye.FrameWork.utilities.DeleteDir;
-import at.redeye.FrameWork.utilities.TempDir;
 import com.auxilii.msgparser.Message;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
@@ -20,7 +18,6 @@ import org.apache.commons.validator.routines.EmailValidator;
 import javax.activation.MimeType;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UncheckedIOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -35,18 +32,9 @@ public class ViewerHelper implements AttachmentRepository {
 
     private static final Pattern META_PATTERN = Pattern.compile("<meta\\s.*>", Pattern.CASE_INSENSITIVE);
     private final Root root;
-    private Path tmp_dir;
-    private boolean delete_tmp_dir;
 
     public ViewerHelper(Root root) {
         this.root = root;
-
-        try {
-            tmp_dir = TempDir.getTempDir();
-            delete_tmp_dir = true;
-        } catch (IOException ex) {
-            tmp_dir = Path.of(System.getProperty("java.io.tmpdir"), root.getAppName());
-        }
     }
 
     static boolean is_image_mime_type(MimeType mime) {
@@ -95,11 +83,6 @@ public class ViewerHelper implements AttachmentRepository {
         return body_text.toString();
     }
 
-
-    public void dispose() {
-        if (delete_tmp_dir && Files.isDirectory(tmp_dir))
-            DeleteDir.deleteDirectory(tmp_dir);
-    }
 
     public String extractHTMLFromRTF(String bodyText, Message message) throws ParseException {
         HtmlFromRtf rtf2html = new HtmlFromRtf(bodyText);
@@ -150,12 +133,7 @@ public class ViewerHelper implements AttachmentRepository {
     }
 
     private Path getTempFile(String fileName) {
-        try {
-            tmp_dir = Files.createDirectories(tmp_dir);
-            return tmp_dir.resolve(fileName);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        return root.getStorage().resolve(fileName);
     }
 
     public static boolean isValidEmail(String email) {

@@ -1,7 +1,6 @@
 package net.sourceforge.MSGViewer.factory.mbox;
 
-import at.redeye.FrameWork.utilities.DeleteDir;
-import at.redeye.FrameWork.utilities.TempDir;
+import at.redeye.FrameWork.base.Root;
 import com.auxilii.msgparser.Message;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
@@ -29,9 +28,13 @@ import java.util.Date;
 
 import static java.util.Objects.requireNonNullElse;
 
-public class MBoxWriterViaJavaMail implements AutoCloseable {
+public class MBoxWriterViaJavaMail {
     private final Session session = Session.getInstance(System.getProperties());
-    private Path tmp_dir;
+    private final Root root;
+
+    public MBoxWriterViaJavaMail(Root root) {
+        this.root = root;
+    }
 
     public void write(Message msg, OutputStream out) throws Exception {
         Part jmsg = new MimeMessage(session);
@@ -92,24 +95,10 @@ public class MBoxWriterViaJavaMail implements AutoCloseable {
         jmsg.setContent(mp);
 
         jmsg.writeTo(out);
-
-        close();
-    }
-
-    private Path getTmpDir() {
-        if (tmp_dir == null) {
-            try {
-                tmp_dir = TempDir.getTempDir();
-            } catch (IOException ex) {
-                tmp_dir = Path.of(System.getProperty("java.io.tmpdir"), this.getClass().getSimpleName());
-            }
-        }
-
-        return tmp_dir;
     }
 
     private Path dumpAttachment(FileAttachment fatt) throws IOException {
-        Path content = getTmpDir().resolve(fatt.getFilename());
+        Path content = root.getStorage().resolve(fatt.getFilename());
 
         try (OutputStream fout = Files.newOutputStream(content)) {
             fout.write(fatt.getData());
@@ -127,8 +116,8 @@ public class MBoxWriterViaJavaMail implements AutoCloseable {
         }
         message_file_name = message_file_name.replace("/", " ");
 
-        Path subMessage = getTmpDir().resolve(message_file_name + "." + getExtension());
-        new MessageSaver(message).saveMessage(subMessage);
+        Path subMessage = root.getStorage().resolve(message_file_name + "." + getExtension());
+        new MessageSaver(root, message).saveMessage(subMessage);
         return subMessage;
     }
 
@@ -187,15 +176,6 @@ public class MBoxWriterViaJavaMail implements AutoCloseable {
                 sb.setLength(0);
             }
         }
-    }
-
-    @Override
-    public void close() {
-        if (tmp_dir != null) {
-            DeleteDir.deleteDirectory(tmp_dir);
-        }
-
-        tmp_dir = null;
     }
 
     public String getExtension() {
