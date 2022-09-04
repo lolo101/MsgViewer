@@ -10,8 +10,8 @@ import org.apache.logging.log4j.Logger;
 
 import javax.mail.*;
 import javax.mail.Message.RecipientType;
-import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimePart;
 import javax.mail.internet.MimeUtility;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -20,6 +20,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Enumeration;
+import java.util.regex.Pattern;
 
 public class JavaMailParser {
     private static final Logger LOGGER = LogManager.getLogger(JavaMailParser.class);
@@ -29,6 +30,7 @@ public class JavaMailParser {
     private static final RecipientHeader CC_PARSER = new CcHeader();
     private static final RecipientHeader BCC_PARSER = new BccHeader();
     private static final DateHeader DATE_PARSER = new DateHeader();
+    private static final Pattern CHARSET_PATTERN = Pattern.compile(".*;\\s*charset=.*");
     private final Path file;
 
     public JavaMailParser(Path file) {
@@ -104,7 +106,7 @@ public class JavaMailParser {
             } else if (disp == null || disp.equalsIgnoreCase(Part.ATTACHMENT) || disp.equalsIgnoreCase(Part.INLINE)) {
                 // many mailers don't include a Content-Disposition
 
-                MimeBodyPart mpart = (MimeBodyPart)part;
+                MimePart mpart = (MimePart) part;
 
                 FileAttachment att = new FileAttachment();
                 String filename = MimeUtility.decodeText(part.getFileName());
@@ -133,16 +135,15 @@ public class JavaMailParser {
 
     private static String getCharset(String content)
     {
-        if( content.matches(".*;\\s*charset=.*") )
-        {
+        if (CHARSET_PATTERN.matcher(content).matches()) {
             int idx = content.indexOf('=');
 
-            String charset = content.substring(idx+1);
+            String charset = content.substring(idx + 1);
 
             byte[] c = new byte[2];
             c[0] = ' ';
 
-            charset = StringUtils.strip(charset,"\"");
+            charset = StringUtils.strip(charset, "\"");
 
             try {
                 new String(c,charset);
@@ -157,16 +158,11 @@ public class JavaMailParser {
         return "ASCII";
     }
 
-    private static byte[] getContent(Part mp) throws IOException, MessagingException
-    {
-        InputStream in = mp.getInputStream();
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        byte[] bytes = new byte[1024];
-
-        for (int len; (len = in.read(bytes)) > 0;) {
-            bos.write(bytes, 0, len);
+    private static byte[] getContent(Part mp) throws IOException, MessagingException {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(mp.getSize());
+        try (InputStream in = mp.getInputStream()) {
+            in.transferTo(bos);
         }
-
         return bos.toByteArray();
     }
 
