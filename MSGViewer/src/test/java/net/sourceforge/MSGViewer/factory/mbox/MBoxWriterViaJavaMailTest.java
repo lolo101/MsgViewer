@@ -4,6 +4,7 @@ import at.redeye.FrameWork.base.LocalRoot;
 import at.redeye.FrameWork.base.Root;
 import com.auxilii.msgparser.Message;
 import com.google.common.jimfs.Jimfs;
+import net.sourceforge.MSGViewer.AttachmentRepository;
 import net.sourceforge.MSGViewer.ModuleLauncher;
 import net.sourceforge.MSGViewer.factory.MessageParser;
 import org.junit.jupiter.api.Test;
@@ -46,10 +47,11 @@ class MBoxWriterViaJavaMailTest {
             Path testOut = fileSystem.getPath("test_out.mbox");
             try (OutputStream outputStream = Files.newOutputStream(testOut)) {
                 Root root = new LocalRoot("test");
-                MBoxWriterViaJavaMail writer = new MBoxWriterViaJavaMail(root);
+                AttachmentRepository attachmentRepository = new AttachmentRepository(root);
+                MBoxWriterViaJavaMail writer = new MBoxWriterViaJavaMail(attachmentRepository);
                 writer.write(msg, outputStream);
             }
-            assertThat(Files.lines(testOut)).contains("Content-Disposition: attachment; filename=Behinder.pdf");
+            assertThat(Files.lines(testOut)).contains("\tfilename=\"Behinderungsanzeige_02 Baustellenfotos-1.pdf\"");
         }
     }
 }

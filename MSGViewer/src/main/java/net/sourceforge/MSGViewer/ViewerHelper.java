@@ -6,13 +6,11 @@ import at.redeye.FrameWork.base.Setup;
 import com.auxilii.msgparser.Message;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
-import com.auxilii.msgparser.attachment.MsgAttachment;
 import net.htmlparser.jericho.Attribute;
 import net.htmlparser.jericho.Attributes;
 import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.StartTag;
 import net.sourceforge.MSGViewer.rtfparser.ParseException;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 
 import javax.activation.MimeType;
@@ -28,13 +26,15 @@ import java.util.regex.Pattern;
 
 import static at.redeye.FrameWork.base.BaseDialog.logger;
 
-public class ViewerHelper implements AttachmentRepository {
+public class ViewerHelper {
 
     private static final Pattern META_PATTERN = Pattern.compile("<meta\\s.*>", Pattern.CASE_INSENSITIVE);
     private final Root root;
+    private final AttachmentRepository attachmentRepository;
 
     public ViewerHelper(Root root) {
         this.root = root;
+        attachmentRepository = new AttachmentRepository(root);
     }
 
     static boolean is_image_mime_type(MimeType mime) {
@@ -91,7 +91,7 @@ public class ViewerHelper implements AttachmentRepository {
 
         html = ViewerHelper.stripMetaTags(html);
 
-        PrepareImages prep_images = new PrepareImages(this, message);
+        PrepareImages prep_images = new PrepareImages(attachmentRepository, message);
 
         return prep_images.prepareImages(html);
     }
@@ -103,7 +103,7 @@ public class ViewerHelper implements AttachmentRepository {
             if (att instanceof FileAttachment) {
                 FileAttachment fatt = (FileAttachment) att;
 
-                Path content = getTempFile(fatt);
+                Path content = attachmentRepository.getTempFile(fatt);
 
                 if (content.toUri().toURL().equals(url)) {
                     logger.info("opening " + fatt);
@@ -120,20 +120,6 @@ public class ViewerHelper implements AttachmentRepository {
         }
 
         return null;
-    }
-
-    @Override
-    public Path getTempFile(FileAttachment fatt) {
-        return getTempFile(StringUtils.isBlank(fatt.getLongFilename()) ? fatt.getFilename() : fatt.getLongFilename());
-    }
-
-    @Override
-    public Path getTempFile(MsgAttachment matt) {
-        return getTempFile(matt.getMessage().hashCode() + ".msg");
-    }
-
-    private Path getTempFile(String fileName) {
-        return root.getStorage().resolve(fileName);
     }
 
     public static boolean isValidEmail(String email) {

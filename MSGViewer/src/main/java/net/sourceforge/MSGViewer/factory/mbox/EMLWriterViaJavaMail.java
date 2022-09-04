@@ -1,15 +1,15 @@
 package net.sourceforge.MSGViewer.factory.mbox;
 
-import at.redeye.FrameWork.base.Root;
+import net.sourceforge.MSGViewer.AttachmentRepository;
 
 public class EMLWriterViaJavaMail extends MBoxWriterViaJavaMail {
 
-    public EMLWriterViaJavaMail(Root root) {
-        super(root);
+    public EMLWriterViaJavaMail(AttachmentRepository attachmentRepository) {
+        super(attachmentRepository);
     }
 
     @Override
-    public String getExtension() {
-        return "eml";
+    protected String getExtension() {
+        return ".eml";
     }
 }

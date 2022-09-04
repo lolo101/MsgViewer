@@ -1,10 +1,10 @@
 package net.sourceforge.MSGViewer.factory.mbox;
 
-import at.redeye.FrameWork.base.Root;
 import com.auxilii.msgparser.Message;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
 import com.auxilii.msgparser.attachment.MsgAttachment;
+import net.sourceforge.MSGViewer.AttachmentRepository;
 import net.sourceforge.MSGViewer.HtmlFromRtf;
 import net.sourceforge.MSGViewer.factory.MessageSaver;
 import net.sourceforge.MSGViewer.factory.mbox.headers.DateHeader;
@@ -30,10 +30,10 @@ import static java.util.Objects.requireNonNullElse;
 
 public class MBoxWriterViaJavaMail {
     private final Session session = Session.getInstance(System.getProperties());
-    private final Root root;
+    private final AttachmentRepository attachmentRepository;
 
-    public MBoxWriterViaJavaMail(Root root) {
-        this.root = root;
+    public MBoxWriterViaJavaMail(AttachmentRepository attachmentRepository) {
+        this.attachmentRepository = attachmentRepository;
     }
 
     public void write(Message msg, OutputStream out) throws Exception {
@@ -79,14 +79,9 @@ public class MBoxWriterViaJavaMail {
         for (Attachment att : msg.getAttachments()) {
             MimeBodyPart part = new MimeBodyPart();
             part.setDisposition(BodyPart.ATTACHMENT);
-            if (att instanceof FileAttachment) {
-                FileAttachment fatt = (FileAttachment) att;
-                part.setFileName(MimeUtility.encodeText(fatt.toString(), "UTF-8", null));
-                part.attachFile(dumpAttachment(fatt).toFile());
-            } else if (att instanceof MsgAttachment) {
-                MsgAttachment msgAtt = (MsgAttachment) att;
-                part.attachFile(dumpAttachment(msgAtt).toFile());
-            }
+            Path fileName = dumpAttachment(att);
+            part.attachFile(fileName.toFile());
+            part.setFileName(MimeUtility.encodeText(fileName.getFileName().toString(), "UTF-8", null));
             mp.addBodyPart(part);
         }
 
@@ -97,8 +92,16 @@ public class MBoxWriterViaJavaMail {
         jmsg.writeTo(out);
     }
 
-    private Path dumpAttachment(FileAttachment fatt) throws IOException {
-        Path content = root.getStorage().resolve(fatt.getFilename());
+    private Path dumpAttachment(Attachment att) throws Exception {
+        if (att instanceof FileAttachment)
+            return dumpFileAttachment((FileAttachment) att);
+        if (att instanceof MsgAttachment)
+            return dumpMsgAttachment((MsgAttachment) att);
+        throw new IllegalArgumentException("Unknown attchment type: " + att.getClass());
+    }
+
+    private Path dumpFileAttachment(FileAttachment fatt) throws IOException {
+        Path content = attachmentRepository.getTempFile(fatt);
 
         try (OutputStream fout = Files.newOutputStream(content)) {
             fout.write(fatt.getData());
@@ -107,37 +110,21 @@ public class MBoxWriterViaJavaMail {
         return content;
     }
 
-    private Path dumpAttachment(MsgAttachment msgAtt) throws Exception {
-        Message message = msgAtt.getMessage();
-
-        String message_file_name = message.getSubject();
-        if (message_file_name == null || message_file_name.isEmpty()) {
-            message_file_name = String.valueOf(message.hashCode());
-        }
-        message_file_name = message_file_name.replace("/", " ");
-
-        Path subMessage = root.getStorage().resolve(message_file_name + "." + getExtension());
-        new MessageSaver(root, message).saveMessage(subMessage);
-        return subMessage;
+    private Path dumpMsgAttachment(MsgAttachment msgAtt) throws Exception {
+        Message attachedMessage = msgAtt.getMessage();
+        Path attachedMessagePath = attachmentRepository.getTempFile(msgAtt);
+        new MessageSaver(attachmentRepository, attachedMessage).saveMessage(withExtension(attachedMessagePath));
+        return attachedMessagePath;
     }
 
     private static void writeMBoxHeader(Message msg, OutputStream out) throws IOException {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("From ");
-        sb.append(msg.getFromEmail());
-        sb.append(" ");
-
         Date date = msg.getDate();
 
-        if (date == null) {
-            date = new Date(0);
-        }
+        String sb = String.format("From %s %s\r\n",
+                msg.getFromEmail(),
+                date == null ? "" : DateHeader.date_format.format(date));
 
-        sb.append(DateHeader.date_format.format(date));
-        sb.append("\r\n");
-
-        out.write(sb.toString().getBytes(StandardCharsets.US_ASCII));
+        out.write(sb.getBytes(StandardCharsets.US_ASCII));
     }
 
     private static void addHeaders(Message msg, Part jmsg) throws MessagingException {
@@ -178,7 +165,15 @@ public class MBoxWriterViaJavaMail {
         }
     }
 
-    public String getExtension() {
-        return "mbox";
+    private Path withExtension(Path subMessage) {
+        String fileName = subMessage.getFileName().toString();
+        int extensionPosition = fileName.lastIndexOf('.');
+        String fileNameWithoutExtension = extensionPosition > 0 ? fileName.substring(0, extensionPosition) : fileName;
+        Path parent = subMessage.getParent();
+        return parent.resolve(fileNameWithoutExtension + getExtension());
+    }
+
+    protected String getExtension() {
+        return ".mbox";
     }
 }

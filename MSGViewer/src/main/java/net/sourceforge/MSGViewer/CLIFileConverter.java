@@ -89,19 +89,20 @@ public abstract class CLIFileConverter {
         int idx = fileName.lastIndexOf('.');
         String baseFileName = fileName.substring(0, idx);
         try {
-            Path targetFile = convertToTemp
-                    ? Files.createTempFile(baseFileName, String.format(".%s", targetType))
-                    : sourceFile.getParent().resolve(String.format("%s.%s", baseFileName, targetType));
+			Path targetFile = convertToTemp
+					? Files.createTempFile(baseFileName, String.format(".%s", targetType))
+					: sourceFile.getParent().resolve(String.format("%s.%s", baseFileName, targetType));
 
-            LOGGER.info("conversion source file: " + sourceFile);
-            Message msg = new MessageParser(sourceFile).parseMessage();
+			LOGGER.info("conversion source file: " + sourceFile);
+			Message msg = new MessageParser(sourceFile).parseMessage();
 
 			LOGGER.info("conversion target file: " + targetFile);
-			new MessageSaver(module_launcher.root, msg).saveMessage(targetFile);
+			AttachmentRepository attachmentRepository = new AttachmentRepository(module_launcher.root);
+			new MessageSaver(attachmentRepository, msg).saveMessage(targetFile);
 
 			if (openAfterConvert) {
 				openFile(targetFile);
-            }
+			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

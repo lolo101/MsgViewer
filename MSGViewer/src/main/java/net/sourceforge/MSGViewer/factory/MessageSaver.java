@@ -1,7 +1,7 @@
 package net.sourceforge.MSGViewer.factory;
 
-import at.redeye.FrameWork.base.Root;
 import com.auxilii.msgparser.Message;
+import net.sourceforge.MSGViewer.AttachmentRepository;
 import net.sourceforge.MSGViewer.factory.mbox.EMLWriterViaJavaMail;
 import net.sourceforge.MSGViewer.factory.mbox.MBoxWriterViaJavaMail;
 import net.sourceforge.MSGViewer.factory.msg.MsgWriter;
@@ -13,11 +13,11 @@ import java.nio.file.Path;
 
 public class MessageSaver {
 
-    private final Root root;
+    private final AttachmentRepository attachmentRepository;
     private final Message msg;
 
-    public MessageSaver(Root root, Message msg) {
-        this.root = root;
+    public MessageSaver(AttachmentRepository attachmentRepository, Message msg) {
+        this.attachmentRepository = attachmentRepository;
         this.msg = msg;
     }
 
@@ -47,12 +47,12 @@ public class MessageSaver {
     }
 
     private void saveMBoxFile(Path file) throws Exception {
-        MBoxWriterViaJavaMail mbox_writer = new MBoxWriterViaJavaMail(root);
+        MBoxWriterViaJavaMail mbox_writer = new MBoxWriterViaJavaMail(attachmentRepository);
         write(mbox_writer, msg, file);
     }
 
     private void saveEMLFile(Path file) throws Exception {
-        EMLWriterViaJavaMail eml_writer = new EMLWriterViaJavaMail(root);
+        EMLWriterViaJavaMail eml_writer = new EMLWriterViaJavaMail(attachmentRepository);
         write(eml_writer, msg, file);
     }
 

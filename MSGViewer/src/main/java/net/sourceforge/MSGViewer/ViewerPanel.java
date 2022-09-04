@@ -65,6 +65,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
 
     private final ExecutorService thread_pool = Executors.newCachedThreadPool();
     private int wating_thread_pool_counter;
+    private AttachmentRepository attachmentRepository;
 
     public ViewerPanel() {
         initComponents();
@@ -76,6 +77,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         this.parent = parent;
         this.root = root;
         helper = new ViewerHelper(root);
+        attachmentRepository = new AttachmentRepository(root);
 
         boolean rtfFormat = StringUtils.isYes(root.getSetup().getLocalConfig("RTFFormat", "yes"));
         jRRTF.setSelected(rtfFormat);
@@ -344,7 +346,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
             return new Content("text/rtf", message.getBodyRTF());
         }
         if (message.getBodyHtml() != null) {
-            PrepareImages prep_images = new PrepareImages(helper, message);
+            PrepareImages prep_images = new PrepareImages(attachmentRepository, message);
             return new Content("text/html", prep_images.prepareImages(ViewerHelper.stripMetaTags(message.getBodyHtml())));
         }
         return new Content("text/plain", message.getBodyText());
@@ -512,7 +514,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
     }
 
     private String printFileAttachment(FileAttachment att) throws MimeTypeParseException {
-        Path content = helper.getTempFile(att);
+        Path content = attachmentRepository.getTempFile(att);
 
         StringBuilder sb = new StringBuilder();
         sb.append("<a href=\"");
@@ -549,9 +551,9 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
     private String printMsgAttachment(MsgAttachment att) {
         final Message msg = att.getMessage();
 
-        Path sub_file = helper.getTempFile(att);
+        Path sub_file = attachmentRepository.getTempFile(att);
 
-        async(() -> new AutoMBox<>(file_name, () -> new MessageSaver(root, msg).saveMessage(sub_file)).run());
+        async(() -> new AutoMBox<>(file_name, () -> new MessageSaver(attachmentRepository, msg).saveMessage(sub_file)).run());
 
         return "<a href=\"" + sub_file.toUri() + "\">" + ViewerHelper.printMailIconHtml() + msg.getSubject() + "</a>&nbsp;";
     }
@@ -620,7 +622,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
                     root.MlM("Error"),
                     JOptionPane.ERROR_MESSAGE);
         }
-        new MessageSaver(root, message).saveMessage(export_file);
+        new MessageSaver(attachmentRepository, message).saveMessage(export_file);
     }
 
     public String getFileName() {
