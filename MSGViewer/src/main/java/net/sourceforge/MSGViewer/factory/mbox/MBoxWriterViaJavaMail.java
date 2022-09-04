@@ -8,6 +8,7 @@ import net.sourceforge.MSGViewer.AttachmentRepository;
 import net.sourceforge.MSGViewer.HtmlFromRtf;
 import net.sourceforge.MSGViewer.factory.MessageSaver;
 import net.sourceforge.MSGViewer.factory.mbox.headers.DateHeader;
+import net.sourceforge.MSGViewer.rtfparser.ParseException;
 
 import javax.activation.DataHandler;
 import javax.mail.BodyPart;
@@ -27,6 +28,7 @@ import java.nio.file.Path;
 import java.util.Date;
 
 import static java.util.Objects.requireNonNullElse;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class MBoxWriterViaJavaMail {
     private final Session session = Session.getInstance(System.getProperties());
@@ -45,44 +47,21 @@ public class MBoxWriterViaJavaMail {
 
         MimeMultipart mp_alternate = new MimeMultipart("alternative");
 
-        String rtf = msg.getBodyRTF();
+        addHtmlPart(msg, mp_alternate);
+        MimeBodyPart plain_text = new MimeBodyPart();
+        String plain_text_string = msg.getBodyText();
 
-        if (rtf != null && !rtf.isEmpty()) {
-            MimeBodyPart html_text = new MimeBodyPart();
+        plain_text.setText(requireNonNullElse(plain_text_string, ""));
 
-            String html = rtf;
+        mp_alternate.addBodyPart(plain_text);
 
-            if (rtf.contains("\\fromhtml")) {
-                HtmlFromRtf rtf2html = new HtmlFromRtf(rtf);
+        MimeBodyPart part = new MimeBodyPart();
+        part.setContent(mp_alternate);
 
-                html = rtf2html.getHTML();
-            }
-            html_text.setDataHandler(new DataHandler(new ByteArrayDataSource(html, "text/html")));
-
-            mp_alternate.addBodyPart(html_text);
-        }
-        {
-            MimeBodyPart plain_text = new MimeBodyPart();
-            String plain_text_string = msg.getBodyText();
-
-            plain_text.setText(requireNonNullElse(plain_text_string, ""));
-
-            mp_alternate.addBodyPart(plain_text);
-
-            MimeBodyPart part = new MimeBodyPart();
-            part.setContent(mp_alternate);
-
-            mp.addBodyPart(part);
-
-        }
+        mp.addBodyPart(part);
 
         for (Attachment att : msg.getAttachments()) {
-            MimeBodyPart part = new MimeBodyPart();
-            part.setDisposition(BodyPart.ATTACHMENT);
-            Path fileName = dumpAttachment(att);
-            part.attachFile(fileName.toFile());
-            part.setFileName(MimeUtility.encodeText(fileName.getFileName().toString(), "UTF-8", null));
-            mp.addBodyPart(part);
+            mp.addBodyPart(createPart(att));
         }
 
         addHeaders(msg, jmsg);
@@ -92,29 +71,40 @@ public class MBoxWriterViaJavaMail {
         jmsg.writeTo(out);
     }
 
-    private Path dumpAttachment(Attachment att) throws Exception {
-        if (att instanceof FileAttachment)
-            return dumpFileAttachment((FileAttachment) att);
-        if (att instanceof MsgAttachment)
-            return dumpMsgAttachment((MsgAttachment) att);
-        throw new IllegalArgumentException("Unknown attchment type: " + att.getClass());
+    private BodyPart createPart(Attachment att) throws Exception {
+        MimeBodyPart part = new MimeBodyPart();
+        part.setDisposition(BodyPart.ATTACHMENT);
+        dumpAttachment(att, part);
+        return part;
     }
 
-    private Path dumpFileAttachment(FileAttachment fatt) throws IOException {
+    private void dumpAttachment(Attachment att, MimeBodyPart part) throws Exception {
+        if (att instanceof FileAttachment)
+            dumpFileAttachment((FileAttachment) att, part);
+        else if (att instanceof MsgAttachment)
+            dumpMsgAttachment((MsgAttachment) att, part);
+        else
+            throw new IllegalArgumentException("Unknown attchment type: " + att.getClass());
+    }
+
+    private void dumpFileAttachment(FileAttachment fatt, MimeBodyPart part) throws IOException, MessagingException {
         Path content = attachmentRepository.getTempFile(fatt);
+        part.attachFile(content.toFile());
+        part.setFileName(MimeUtility.encodeText(content.getFileName().toString(), "UTF-8", null));
+        part.setContentID(fatt.getContentId());
 
         try (OutputStream fout = Files.newOutputStream(content)) {
             fout.write(fatt.getData());
         }
-
-        return content;
     }
 
-    private Path dumpMsgAttachment(MsgAttachment msgAtt) throws Exception {
-        Message attachedMessage = msgAtt.getMessage();
+    private void dumpMsgAttachment(MsgAttachment msgAtt, MimeBodyPart part) throws Exception {
         Path attachedMessagePath = attachmentRepository.getTempFile(msgAtt);
+        part.attachFile(attachedMessagePath.toFile());
+        part.setFileName(MimeUtility.encodeText(attachedMessagePath.getFileName().toString(), "UTF-8", null));
+
+        Message attachedMessage = msgAtt.getMessage();
         new MessageSaver(attachmentRepository, attachedMessage).saveMessage(withExtension(attachedMessagePath));
-        return attachedMessagePath;
     }
 
     private static void writeMBoxHeader(Message msg, OutputStream out) throws IOException {
@@ -125,6 +115,31 @@ public class MBoxWriterViaJavaMail {
                 date == null ? "" : DateHeader.date_format.format(date));
 
         out.write(sb.getBytes(StandardCharsets.US_ASCII));
+    }
+
+    private static void addHtmlPart(Message msg, MimeMultipart mp_alternate) throws MessagingException, IOException, ParseException {
+        String html = msg.getBodyHtml();
+        String rtf = msg.getBodyRTF();
+
+        if (isNotBlank(html)) {
+            addHtmlPart(mp_alternate, html);
+        } else if (isNotBlank(rtf)) {
+            addHtmlPart(mp_alternate, rtfToHtml(rtf));
+        }
+    }
+
+    private static void addHtmlPart(MimeMultipart mp_alternate, String html) throws MessagingException, IOException {
+        MimeBodyPart html_text = new MimeBodyPart();
+        html_text.setDataHandler(new DataHandler(new ByteArrayDataSource(html, "text/html;charset=UTF-8")));
+        mp_alternate.addBodyPart(html_text);
+    }
+
+    private static String rtfToHtml(String rtf) throws ParseException {
+        if (rtf.contains("\\fromhtml")) {
+            HtmlFromRtf rtf2html = new HtmlFromRtf(rtf);
+            return rtf2html.getHTML();
+        }
+        return rtf;
     }
 
     private static void addHeaders(Message msg, Part jmsg) throws MessagingException {

@@ -14,7 +14,6 @@ import java.net.URI;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,12 +22,10 @@ class MBoxWriterViaJavaMailTest {
     void testWrite() throws Exception {
         ModuleLauncher.BaseConfigureLogging();
 
-        URI uri = Objects.requireNonNull(MBoxWriterViaJavaMailTest.class.getResource("/danke.msg")).toURI();
-        Message msg = new MessageParser(Path.of(uri)).parseMessage();
-
         try (FileSystem fileSystem = Jimfs.newFileSystem()) {
             Path testOut = fileSystem.getPath("test_out.mbox");
             try (OutputStream outputStream = Files.newOutputStream(testOut)) {
+                Message msg = givenMessage("/danke.msg");
                 MBoxWriterViaJavaMail writer = new MBoxWriterViaJavaMail(null);
                 writer.write(msg, outputStream);
             }
@@ -40,18 +37,40 @@ class MBoxWriterViaJavaMailTest {
     void testIssue124() throws Exception {
         ModuleLauncher.BaseConfigureLogging();
 
-        URI uri = Objects.requireNonNull(MBoxWriterViaJavaMailTest.class.getResource("/issue124/testing.msg")).toURI();
-        Message msg = new MessageParser(Path.of(uri)).parseMessage();
-
         try (FileSystem fileSystem = Jimfs.newFileSystem()) {
             Path testOut = fileSystem.getPath("test_out.mbox");
             try (OutputStream outputStream = Files.newOutputStream(testOut)) {
-                Root root = new LocalRoot("test");
-                AttachmentRepository attachmentRepository = new AttachmentRepository(root);
-                MBoxWriterViaJavaMail writer = new MBoxWriterViaJavaMail(attachmentRepository);
+                Message msg = givenMessage("/issue124/testing.msg");
+                MBoxWriterViaJavaMail writer = givenWriter();
                 writer.write(msg, outputStream);
             }
             assertThat(Files.lines(testOut)).contains("\tfilename=\"Behinderungsanzeige_02 Baustellenfotos-1.pdf\"");
         }
+    }
+
+    @Test
+    void testIssue127() throws Exception {
+        ModuleLauncher.BaseConfigureLogging();
+
+        try (FileSystem fileSystem = Jimfs.newFileSystem()) {
+            Path testOut = fileSystem.getPath("test_out.mbox");
+            try (OutputStream outputStream = Files.newOutputStream(testOut)) {
+                Message msg = givenMessage("/issue127/test.msg");
+                MBoxWriterViaJavaMail writer = givenWriter();
+                writer.write(msg, outputStream);
+            }
+            assertThat(Files.lines(testOut)).contains("Content-ID: part1.HRgTI02d.mjRZp5Gh@neuf.fr");
+        }
+    }
+
+    private static Message givenMessage(String name) throws Exception {
+        URI uri = MBoxWriterViaJavaMailTest.class.getResource(name).toURI();
+        return new MessageParser(Path.of(uri)).parseMessage();
+    }
+
+    private static MBoxWriterViaJavaMail givenWriter() {
+        Root root = new LocalRoot("test");
+        AttachmentRepository attachmentRepository = new AttachmentRepository(root);
+        return new MBoxWriterViaJavaMail(attachmentRepository);
     }
 }
