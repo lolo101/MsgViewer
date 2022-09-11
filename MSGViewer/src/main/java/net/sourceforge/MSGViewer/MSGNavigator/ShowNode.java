@@ -15,7 +15,10 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Map;
 import java.util.regex.Pattern;
+
+import static java.util.Map.entry;
 
 public class ShowNode extends BaseDialog {
 
@@ -24,6 +27,24 @@ public class ShowNode extends BaseDialog {
     private static final int PROPATTR_MANDATORY = 0x00000001;
     private static final int PROPATTR_READABLE = 0x00000002;
     private static final int PROPATTR_WRITABLE = 0x00000004;
+    private static final Map<String, String> PROPERTY_SETS = Map.ofEntries(
+            entry("00020329-0000-0000-C000-000000000046", "PS_PUBLIC_STRINGS"),
+            entry("00062008-0000-0000-C000-000000000046", "PSETID_Common"),
+            entry("00062004-0000-0000-C000-000000000046", "PSETID_Address"),
+            entry("00020386-0000-0000-C000-000000000046", "PS_INTERNET_HEADERS"),
+            entry("00062002-0000-0000-C000-000000000046", "PSETID_Appointment"),
+            entry("6ED8DA90-450B-101B-98DA-00AA003F1305", "PSETID_Meeting"),
+            entry("0006200A-0000-0000-C000-000000000046", "PSETID_Log"),
+            entry("41F28F13-83F4-4114-A584-EEDB5A6B0BFF", "PSETID_Messaging"),
+            entry("0006200E-0000-0000-C000-000000000046", "PSETID_Note"),
+            entry("00062041-0000-0000-C000-000000000046", "PSETID_PostRss"),
+            entry("00062003-0000-0000-C000-000000000046", "PSETID_Task"),
+            entry("4442858E-A9E3-4E80-B900-317A210CC15B", "PSETID_UnifiedMessaging"),
+            entry("00020328-0000-0000-C000-000000000046", "PS_MAPI"),
+            entry("71035549-0739-4DCB-9163-00F0580DBBDF", "PSETID_AirSync"),
+            entry("00062040-0000-0000-C000-000000000046", "PSETID_Sharing"),
+            entry("23239608-685D-4732-9C55-4C95CB4E8E33", "PSETID_XmlExtractedEntities"),
+            entry("96357F7F-59E1-47D0-99A7-46515C183B54", "PSETID_Attachment"));
 
     private final int max_descr_lenght;
 
@@ -326,44 +347,7 @@ public class ShowNode extends BaseDialog {
      * [MS-OXPROPS] 1.3.2
      */
     private static String getPropertySetById(String id) {
-        switch (id) {
-            case "00020329-0000-0000-C000-000000000046":
-                return "PS_PUBLIC_STRINGS";
-            case "00062008-0000-0000-C000-000000000046":
-                return "PSETID_Common";
-            case "00062004-0000-0000-C000-000000000046":
-                return "PSETID_Address";
-            case "00020386-0000-0000-C000-000000000046":
-                return "PS_INTERNET_HEADERS";
-            case "00062002-0000-0000-C000-000000000046":
-                return "PSETID_Appointment";
-            case "6ED8DA90-450B-101B-98DA-00AA003F1305":
-                return "PSETID_Meeting";
-            case "0006200A-0000-0000-C000-000000000046":
-                return "PSETID_Log";
-            case "41F28F13-83F4-4114-A584-EEDB5A6B0BFF":
-                return "PSETID_Messaging";
-            case "0006200E-0000-0000-C000-000000000046":
-                return "PSETID_Note";
-            case "00062041-0000-0000-C000-000000000046":
-                return "PSETID_PostRss";
-            case "00062003-0000-0000-C000-000000000046":
-                return "PSETID_Task";
-            case "4442858E-A9E3-4E80-B900-317A210CC15B":
-                return "PSETID_UnifiedMessaging";
-            case "00020328-0000-0000-C000-000000000046":
-                return "PS_MAPI";
-            case "71035549-0739-4DCB-9163-00F0580DBBDF":
-                return "PSETID_AirSync";
-            case "00062040-0000-0000-C000-000000000046":
-                return "PSETID_Sharing";
-            case "23239608-685D-4732-9C55-4C95CB4E8E33":
-                return "PSETID_XmlExtractedEntities";
-            case "96357F7F-59E1-47D0-99A7-46515C183B54":
-                return "PSETID_Attachment";
-            default:
-                return "";
-        }
+        return PROPERTY_SETS.getOrDefault(id, "");
     }
 
     /**
