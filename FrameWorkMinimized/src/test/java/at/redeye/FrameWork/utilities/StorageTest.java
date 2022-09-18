@@ -2,16 +2,15 @@ package at.redeye.FrameWork.utilities;
 
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class TempDirTest {
+class StorageTest {
     @Test
-    void should_create_existing_directory() throws IOException {
-        Path tempDir = TempDir.getTempDir();
+    void should_create_directory() {
+        Path tempDir = Storage.getEphemeralStorage("prefix");
 
         assertTrue(Files.isDirectory(tempDir));
     }

@@ -1,18 +1,15 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.sourceforge.MSGViewer.factory.mbox;
 
-/**
- *
- * @author kingleo
- */
+import net.sourceforge.MSGViewer.AttachmentRepository;
+
 public class EMLWriterViaJavaMail extends MBoxWriterViaJavaMail {
- 
+
+    public EMLWriterViaJavaMail(AttachmentRepository attachmentRepository) {
+        super(attachmentRepository);
+    }
+
     @Override
-    public String getExtension()
-    {
-        return "eml";
+    protected String getExtension() {
+        return ".eml";
     }
 }

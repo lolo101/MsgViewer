@@ -133,11 +133,11 @@ public class SingleWin extends BaseWin {
     }//GEN-LAST:event_jMOptionsActionPerformed
 
     private void jFileOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFileOpenActionPerformed
-        filesRepository.chooseFilesToOpen().forEach(this::openFile);
+        fileChooser.chooseFilesToOpen().forEach(this::openFile);
     }//GEN-LAST:event_jFileOpenActionPerformed
 
     private void jMFileSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMFileSaveActionPerformed
-        filesRepository.chooseFilesToSave().ifPresent(file ->
+        fileChooser.chooseFilesToSave().ifPresent(file ->
                 new AutoMBox<>(this.getClass().getName(), () -> viewerPanel.exportFile(file.toPath())).run()
         );
     }//GEN-LAST:event_jMFileSaveActionPerformed

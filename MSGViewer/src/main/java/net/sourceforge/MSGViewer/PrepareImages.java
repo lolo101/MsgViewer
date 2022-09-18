@@ -20,12 +20,12 @@ public class PrepareImages {
     private static final String SRC_GROUP_NAME = "src";
     private static final Pattern SRC_PATTERN = Pattern.compile("src\\s*=\\s*\"(?<" + SRC_GROUP_NAME + ">[^\"]*)\"", Pattern.CASE_INSENSITIVE);
 
-    private final ViewerHelper fileRepository;
+    private final AttachmentRepository attachmentRepository;
     private final Map<String, FileAttachment> attachmentById = new HashMap<>();
     private final Map<String, FileAttachment> attachmentByLocation = new HashMap<>();
 
-    public PrepareImages(ViewerHelper fileRepository, Message message) {
-        this.fileRepository = fileRepository;
+    public PrepareImages(AttachmentRepository attachmentRepository, Message message) {
+        this.attachmentRepository = attachmentRepository;
 
         for (Attachment att : message.getAttachments()) {
             if (att instanceof FileAttachment) {
@@ -73,7 +73,7 @@ public class PrepareImages {
     private URI getImgsrc(String src) {
         URI imgsrc = URI.create(src);
         FileAttachment fatt = getFileAttachment(imgsrc);
-        return fatt == null ? imgsrc : fileRepository.getTempFile(fatt).toUri();
+        return fatt == null ? imgsrc : attachmentRepository.getTempFile(fatt).toUri();
     }
 
     private FileAttachment getFileAttachment(URI imgsrc) {

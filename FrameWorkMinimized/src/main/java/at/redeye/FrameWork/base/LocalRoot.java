@@ -3,10 +3,7 @@ package at.redeye.FrameWork.base;
 import at.redeye.FrameWork.Plugin.Plugin;
 import at.redeye.FrameWork.base.dll_cache.DLLCache;
 import at.redeye.FrameWork.base.dll_cache.DLLExtractor;
-import at.redeye.FrameWork.base.proxy.AutoProxyHandler;
 import at.redeye.FrameWork.base.translation.MLHelper;
-import at.redeye.FrameWork.utilities.calendar.CalendarFactory;
-import at.redeye.FrameWork.utilities.calendar.Holidays;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,47 +15,21 @@ public class LocalRoot extends Root {
     private static final Logger logger = LogManager.getLogger(LocalRoot.class);
     private final LocalSetup setup;
     private final DLLCache dll_cache;
-    private final Vector<BaseDialogBase> dialogs = new Vector<>();
-    protected DBConnection db_connection;
-    protected boolean appExitAllowed = true;
-    DelayedProxyLoader loader_proxy;
-    AutoProxyHandler proxy_handler;
-    final Map<String, Plugin> plugins = new HashMap<>();
-    Holidays holidays = CalendarFactory.getDefaultHolidays();
-    MLHelper ml_helper;
-
-    public class DelayedProxyLoader extends Thread {
-        DelayedProxyLoader() {
-            this.setName(DelayedProxyLoader.class.getCanonicalName());
-        }
-
-        @Override
-        public void run() {
-            long start = System.currentTimeMillis();
-            proxy_handler = new AutoProxyHandler(LocalRoot.this);
-
-            logger.trace(" proxy laoding: " + (System.currentTimeMillis() - start));
-        }
-    }
+    private final Collection<BaseDialogBase> dialogs = new Vector<>();
+    private DBConnection db_connection;
+    private boolean appExitAllowed = true;
+    private final Map<String, Plugin> plugins = new HashMap<>();
+    private MLHelper ml_helper;
 
     public LocalRoot(String app_name) {
-        this(app_name, app_name, true);
+        this(app_name, app_name);
     }
 
     public LocalRoot(String app_name, String title) {
-        this(app_name, title, true);
-    }
-
-    public LocalRoot(String app_name, String title, boolean enable_proxy_loading) {
         super(app_name, title);
 
         dll_cache = new DLLCache(this);
         setup = new LocalSetup(this, this.app_name);
-
-        if (enable_proxy_loading) {
-            loader_proxy = new DelayedProxyLoader();
-            loader_proxy.start();
-        }
     }
 
     @Override
@@ -91,7 +62,7 @@ public class LocalRoot extends Root {
         return db_connection;
     }
 
-    public void closeDBConnection() {
+    private void closeDBConnection() {
         setDBConnection(null);
     }
 
@@ -162,16 +133,6 @@ public class LocalRoot extends Root {
     public Plugin getPlugin(String name) {
         Plugin plugin = plugins.get(name);
         return plugin != null && plugin.isAvailable() ? plugin : null;
-    }
-
-    @Override
-    public Holidays getHolidays() {
-        return holidays;
-    }
-
-    @Override
-    public void setHolidays(Holidays holidays) {
-        this.holidays = holidays;
     }
 
     @Override

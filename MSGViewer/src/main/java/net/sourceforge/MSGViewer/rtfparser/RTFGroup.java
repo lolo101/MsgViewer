@@ -1,25 +1,26 @@
 package net.sourceforge.MSGViewer.rtfparser;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RTFGroup {
 
     private final StringBuilder htmlContent;
     private final Charset characterSet;
-    private String destination = "";
-    private String command = "";
+    private final List<String> commands = new ArrayList<>();
 
-    public RTFGroup(Charset characterSet, StringBuilder htmlContent) {
+    public RTFGroup(Charset characterSet, StringBuilder htmlContent, RTFGroup parent) {
         this.characterSet = characterSet;
         this.htmlContent = htmlContent;
+        if (parent != null) this.commands.addAll(parent.commands);
     }
 
     public void handleCommand(String command) {
-        this.command = command;
+        this.commands.add(command);
     }
 
     public void destination(String destination) {
-        this.destination = destination;
     }
 
     public String getTextContent() {
@@ -39,12 +40,25 @@ public class RTFGroup {
     }
 
     public void addTextContent(String text) {
-        if (destination.startsWith("\\htmltag") || command.equals("\\htmlrtf0"))
+        if (shouldPrint())
             htmlContent.append(text);
     }
 
     private void addCharacterContent(char character) {
-        if (destination.startsWith("\\htmltag") || command.equals("\\htmlrtf0"))
+        if (shouldPrint())
             htmlContent.append(character);
+    }
+
+    private boolean shouldPrint() {
+        return htmlRtfDisabled() && !plainTextBullet();
+    }
+
+    private boolean htmlRtfDisabled() {
+        return commands.lastIndexOf("\\htmlrtf0") > commands.lastIndexOf("\\htmlrtf")
+                && commands.lastIndexOf("\\htmlrtf0") > commands.lastIndexOf("\\htmlrtf1");
+    }
+
+    private boolean plainTextBullet() {
+        return commands.contains("\\pntext");
     }
 }

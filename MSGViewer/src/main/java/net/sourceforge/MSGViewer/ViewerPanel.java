@@ -64,7 +64,8 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
     private BaseDialog parent;
 
     private final ExecutorService thread_pool = Executors.newCachedThreadPool();
-    private int wating_thread_pool_counter = 0;
+    private int wating_thread_pool_counter;
+    private AttachmentRepository attachmentRepository;
 
     public ViewerPanel() {
         initComponents();
@@ -76,6 +77,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         this.parent = parent;
         this.root = root;
         helper = new ViewerHelper(root);
+        attachmentRepository = new AttachmentRepository(root);
 
         boolean rtfFormat = StringUtils.isYes(root.getSetup().getLocalConfig("RTFFormat", "yes"));
         jRRTF.setSelected(rtfFormat);
@@ -344,7 +346,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
             return new Content("text/rtf", message.getBodyRTF());
         }
         if (message.getBodyHtml() != null) {
-            PrepareImages prep_images = new PrepareImages(helper, message);
+            PrepareImages prep_images = new PrepareImages(attachmentRepository, message);
             return new Content("text/html", prep_images.prepareImages(ViewerHelper.stripMetaTags(message.getBodyHtml())));
         }
         return new Content("text/plain", message.getBodyText());
@@ -358,7 +360,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         }).run();
     }
 
-    public void openUrl(URL url) throws IOException {
+    private void openUrl(URL url) throws IOException {
         logger.info(url);
 
         final String protocol = url.getProtocol();
@@ -445,13 +447,13 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         logger.info("Message From:" + message.getFromName() + "\n To:" + message.getToName() + "\n Email: " + message.getFromEmail());
     }
 
-    private void updateHeader() throws MimeTypeParseException, IOException {
+    private void updateHeader() throws MimeTypeParseException {
         header.setContentType("text/html");
         header.setText(headerHtml());
         header.setCaretPosition(0);
     }
 
-    private String headerHtml() throws MimeTypeParseException, IOException {
+    private String headerHtml() throws MimeTypeParseException {
         return "<html><body>" + "<b>" + printSubject() + "</b><br/>"
                 + printLine("From: ", printFrom())
                 + printLine("Date: ", printDate())
@@ -492,7 +494,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         return isBlank(recipientsTo) ? "" : recipientsTo;
     }
 
-    private String printAttachments() throws MimeTypeParseException, IOException {
+    private String printAttachments() throws MimeTypeParseException {
         StringBuilder sb = new StringBuilder();
         for (Attachment att : message.getAttachments()) {
             sb.append(printAttachment(att));
@@ -500,7 +502,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         return sb.toString();
     }
 
-    private String printAttachment(Attachment att) throws MimeTypeParseException, IOException {
+    private String printAttachment(Attachment att) throws MimeTypeParseException {
         if (att instanceof FileAttachment) {
             return printFileAttachment((FileAttachment) att);
         }
@@ -511,8 +513,8 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         return "";
     }
 
-    private String printFileAttachment(FileAttachment att) throws MimeTypeParseException, IOException {
-        Path content = helper.getTempFile(att);
+    private String printFileAttachment(FileAttachment att) throws MimeTypeParseException {
+        Path content = attachmentRepository.getTempFile(att);
 
         StringBuilder sb = new StringBuilder();
         sb.append("<a href=\"");
@@ -523,9 +525,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
 
         logger.info("<a href=\"" + content.toUri() + "\"> " + mime_type);
 
-        if (mime_type != null
-                && ViewerHelper.is_image_mime_type(new MimeType(mime_type))
-                && att.getSize() < 1024 * 1024 * 2) {
+        if (mime_type != null && ViewerHelper.is_image_mime_type(new MimeType(mime_type))) {
             File thumbnailFile = new File(content.toAbsolutePath() + "-small.jpg");
             if (!Files.exists(content)) {
                 write(content, att.getData());
@@ -540,7 +540,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
                 write(content, att.getData());
             }
 
-            sb.append(helper.printMailIconHtml());
+            sb.append(ViewerHelper.printMailIconHtml());
         }
 
         sb.append(att);
@@ -548,14 +548,14 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         return sb.toString();
     }
 
-    private String printMsgAttachment(MsgAttachment att) throws IOException {
+    private String printMsgAttachment(MsgAttachment att) {
         final Message msg = att.getMessage();
 
-        Path sub_file = helper.getTempFile(att);
+        Path sub_file = attachmentRepository.getTempFile(att);
 
-        async(() -> new AutoMBox<>(file_name, () -> new MessageSaver(msg).saveMessage(sub_file)).run());
+        async(() -> new AutoMBox<>(file_name, () -> new MessageSaver(attachmentRepository, msg).saveMessage(sub_file)).run());
 
-        return "<a href=\"" + sub_file.toUri() + "\">" + helper.printMailIconHtml() + msg.getSubject() + "</a>&nbsp;";
+        return "<a href=\"" + sub_file.toUri() + "\">" + ViewerHelper.printMailIconHtml() + msg.getSubject() + "</a>&nbsp;";
     }
 
     private void printThumbnail(FileAttachment att, File thumbnailFile) {
@@ -599,8 +599,6 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         root.getSetup().setLocalConfig("RTFFormat", jRRTF.isSelected() ? "yes" : "no");
         root.getSetup().setLocalConfig("FixedFont", JCBfix.isSelected() ? "yes" : "no");
         root.getSetup().setLocalConfig("DividerLocation", String.valueOf(jSplitPane.getDividerLocation()));
-
-        helper.dispose();
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -624,7 +622,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
                     root.MlM("Error"),
                     JOptionPane.ERROR_MESSAGE);
         }
-        new MessageSaver(message).saveMessage(export_file);
+        new MessageSaver(attachmentRepository, message).saveMessage(export_file);
     }
 
     public String getFileName() {

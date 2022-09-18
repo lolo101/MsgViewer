@@ -15,12 +15,13 @@ public class MsgWriter {
     }
 
     public void write(OutputStream out) throws IOException {
-        POIFSFileSystem fs = new POIFSFileSystem();
-        DirectoryNode root = fs.getRoot();
+        try (POIFSFileSystem fs = new POIFSFileSystem()) {
+            DirectoryNode root = fs.getRoot();
 
-        MsgContainer cont = new MsgContainer(msg);
-        cont.write(root);
+            MsgContainer cont = new MsgContainer(msg);
+            cont.write(root);
 
-        fs.writeFilesystem(out);
+            fs.writeFilesystem(out);
+        }
     }
 }

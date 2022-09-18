@@ -26,11 +26,11 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 public class MsgContainer {
-    public static final String PROPERTY_STREAM = "__properties_version1.0";
-    public static final String NAMED_PROPERTY = "__nameid_version1.0";
+    private static final String PROPERTY_STREAM = "__properties_version1.0";
+    private static final String NAMED_PROPERTY = "__nameid_version1.0";
 
-    private final List<PropType> properties = new ArrayList<>();
-    private final List<SubStorageEntry> substg_streams = new ArrayList<>();
+    private final Collection<PropType> properties = new ArrayList<>();
+    private final Collection<SubStorageEntry> substg_streams = new ArrayList<>();
 
     private final List<RecipientEntry> recipients = new ArrayList<>();
     private final List<Attachment> attachments = new ArrayList<>();
@@ -218,7 +218,7 @@ public class MsgContainer {
             entry.createEntry(rec_dir);
         }
 
-        List<PropType> props = new ArrayList<>();
+        Collection<PropType> props = new ArrayList<>();
         props.add(new PropPtypInteger32(PidTagRowid, id));
         props.add(new PropPtypInteger32(PidTagRecipientType, rec.getType().getValue()));
         for (SubStorageEntry entry : entries) {
@@ -246,7 +246,8 @@ public class MsgContainer {
                 new StringUTF16SubstgEntry(PidTagAttachExtension, attachment.getExtension()),
                 new StringUTF16SubstgEntry(PidTagAttachFilename, attachment.getFilename()),
                 new StringUTF16SubstgEntry(PidTagAttachLongFilename, attachment.getLongFilename()),
-                new StringUTF16SubstgEntry(PidTagAttachMimeTag, attachment.getMimeTag())
+                new StringUTF16SubstgEntry(PidTagAttachMimeTag, attachment.getMimeTag()),
+                new StringUTF16SubstgEntry(PidTagAttachContentId, attachment.getContentId())
         );
 
         for (SubStorageEntry entry : entries) {

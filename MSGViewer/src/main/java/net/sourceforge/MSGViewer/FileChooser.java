@@ -12,13 +12,13 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class FilesRepository {
-    private static final Logger logger = LogManager.getLogger(FilesRepository.class);
+public class FileChooser {
+    private static final Logger logger = LogManager.getLogger(FileChooser.class);
     private static final String LAST_PATH_KEY = "LastPath";
     private final BaseWin parent;
     private final Setup setup;
 
-    public FilesRepository(BaseWin parent) {
+    public FileChooser(BaseWin parent) {
         this.parent = parent;
         setup = parent.root.getSetup();
     }

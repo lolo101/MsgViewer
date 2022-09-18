@@ -25,16 +25,14 @@ public abstract class CLIFileConverter {
 	private final ModuleLauncher module_launcher;
 	private final String sourceType;
 	private final String targetType;
-	private boolean convertToTemp = false;
-	private boolean openAfterConvert = false;
+	private boolean convertToTemp;
+	private boolean openAfterConvert;
 
 	/**
-	 * @param sourceType
-	 *            the source file type (i.e. ending) without a leading dot. E.g.
-	 *            "msg"
-	 * @param targetType
-	 *            the target file type (i.e. ending) without a leading dot. E.g.
-	 *            "mbox"
+	 * @param sourceType the source file type (i.e. ending) without a leading dot. E.g.
+	 *                   "msg"
+	 * @param targetType the target file type (i.e. ending) without a leading dot. E.g.
+	 *                   "mbox"
 	 */
 	CLIFileConverter(ModuleLauncher module_launcher, String sourceType,
 					 String targetType) {
@@ -91,19 +89,20 @@ public abstract class CLIFileConverter {
         int idx = fileName.lastIndexOf('.');
         String baseFileName = fileName.substring(0, idx);
         try {
-            Path targetFile = convertToTemp
-                    ? Files.createTempFile(baseFileName, String.format(".%s", targetType))
-                    : sourceFile.getParent().resolve(String.format("%s.%s", baseFileName, targetType));
+			Path targetFile = convertToTemp
+					? Files.createTempFile(baseFileName, String.format(".%s", targetType))
+					: sourceFile.getParent().resolve(String.format("%s.%s", baseFileName, targetType));
 
-            LOGGER.info("conversion source file: " + sourceFile);
-            Message msg = new MessageParser(sourceFile).parseMessage();
+			LOGGER.info("conversion source file: " + sourceFile);
+			Message msg = new MessageParser(sourceFile).parseMessage();
 
-            LOGGER.info("conversion target file: " + targetFile);
-            new MessageSaver(msg).saveMessage(targetFile);
+			LOGGER.info("conversion target file: " + targetFile);
+			AttachmentRepository attachmentRepository = new AttachmentRepository(module_launcher.root);
+			new MessageSaver(attachmentRepository, msg).saveMessage(targetFile);
 
-            if (openAfterConvert) {
-                openFile(targetFile);
-            }
+			if (openAfterConvert) {
+				openFile(targetFile);
+			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

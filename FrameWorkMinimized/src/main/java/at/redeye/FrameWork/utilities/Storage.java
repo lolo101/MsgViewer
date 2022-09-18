@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class TempDir {
+public class Storage {
 
     /**
      * creates a temporary directory. The directory and it's
@@ -12,10 +12,17 @@ public class TempDir {
      *
      * @return the path to the directory
      */
-    public static Path getTempDir() throws IOException {
-        Path tmpfile = Files.createTempDirectory("msgviewer-");
+    public static Path getEphemeralStorage(String prefix) {
+        Path tmpfile = getTempPath(prefix);
         tmpfile.toFile().deleteOnExit();
         return tmpfile;
     }
 
+    private static Path getTempPath(String prefix) {
+        try {
+            return Files.createTempDirectory(prefix + "-");
+        } catch (IOException e) {
+            return Path.of(System.getProperty("java.io.tmpdir"), prefix);
+        }
+    }
 }
