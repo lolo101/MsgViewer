@@ -20,7 +20,7 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <poi.version>5.2.2</poi.version>
+        <poi.version>5.2.3</poi.version>
         <log4j.version>2.19.0</log4j.version>
         <commons-validator.version>1.7</commons-validator.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
