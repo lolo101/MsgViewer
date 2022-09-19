@@ -1,7 +1,6 @@
 package at.redeye.FrameWork.base;
 
 import at.redeye.FrameWork.utilities.ParseJNLP;
-import at.redeye.FrameWork.utilities.StringUtils;
 import at.redeye.FrameWork.widgets.StartupWindow;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -142,7 +141,8 @@ public abstract class BaseModuleLauncher {
     public abstract String getVersion();
 
     public boolean splashEnabled() {
-        return !StringUtils.isYes(getNoSplash());
+        String noSplash = getNoSplash();
+        return !(noSplash != null && !noSplash.isEmpty());
     }
 
     public void closeSplash() {
