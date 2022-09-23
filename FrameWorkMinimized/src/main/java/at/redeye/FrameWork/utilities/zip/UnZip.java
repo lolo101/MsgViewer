@@ -28,7 +28,10 @@ public class UnZip
 
         while( (entry = z.getNextEntry()) != null )
         {
-            File file = new File( target_dir + File.separator + entry.getName() );
+            File file = new File(target_dir, entry.getName());
+            if (!file.toPath().normalize().startsWith(target_dir.toPath().normalize())) {
+                throw new IOException("Bad zip entry");
+            }
 
             File parent = file.getParentFile();
 
