@@ -29,9 +29,16 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -49,6 +56,8 @@ import static org.apache.poi.util.StringUtil.getFromUnicodeLE;
 public class Message {
     private static final Logger LOGGER = LogManager.getLogger(Message.class);
     private static final Pattern PREFIX_PATTERN = Pattern.compile("^[^:\\s\\d]{1,3}:\\s+");
+    private static final String DATE_HEADER_KEY = "date:";
+    public static final DateTimeFormatter DATE_TIME_FORMATTER = new DateTimeFormatterBuilder().appendPattern("[EEE, ]d MMM y HH:mm[:ss] Z").toFormatter(Locale.US);
 
     /**
      * The message class as defined in the .msg file.
@@ -107,7 +116,7 @@ public class Message {
     /**
      * Email Date
      */
-    private Date date;
+    private ZonedDateTime date;
 
     /**
      * A list of all attachments (both {@link FileAttachment} and
@@ -192,7 +201,7 @@ public class Message {
                 String headers = (String) property.getValue();
                 this.setHeaders(headers);
                 // try to parse the date from the headers
-                Date date = Message.getDateFromHeaders(headers);
+                ZonedDateTime date = Message.getDateFromHeaders(headers);
                 if (date != null) {
                     this.setDate(date);
                 }
@@ -476,38 +485,38 @@ public class Message {
      * @param headers The headers in a single String object
      * @return The Date object or null, if no valid Date: has been found
      */
-    private static Date getDateFromHeaders(String headers) {
+    private static ZonedDateTime getDateFromHeaders(String headers) {
         if (headers == null) {
             return null;
         }
-        String[] headerLines = headers.split("\n");
-        for (String headerLine : headerLines) {
-            if (headerLine.toLowerCase().startsWith("date:")) {
-                String dateValue = headerLine.substring("Date:".length()).trim();
-                SimpleDateFormat formatter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss z", Locale.ENGLISH);
-                try {
-                    return formatter.parse(dateValue);
-                } catch (Exception e) {
-                    LOGGER.info("Could not parse date " + dateValue, e);
-                }
-                // there is only one Date: header; we can exit the loop here
-                break;
-            }
+        return Stream.of(headers.split("\n"))
+                .filter(headerLine -> headerLine.toLowerCase().startsWith(DATE_HEADER_KEY))
+                .findFirst()
+                .map(headerLine -> headerLine.substring(DATE_HEADER_KEY.length()).trim())
+                .map(Message::toDate)
+                .orElse(null);
+    }
+
+    private static ZonedDateTime toDate(String dateValue) {
+        try {
+            return ZonedDateTime.from(DATE_TIME_FORMATTER.parse(dateValue));
+        } catch (Exception e) {
+            LOGGER.info("Could not parse date " + dateValue, e);
+            return null;
         }
-        return null;
     }
 
     /**
      * @return the date
      */
-    public Date getDate() {
+    public ZonedDateTime getDate() {
         return date;
     }
 
     /**
      * @param date the date to set
      */
-    public void setDate(Date date) {
+    public void setDate(ZonedDateTime date) {
         this.date = date;
     }
 

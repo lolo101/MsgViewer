@@ -6,7 +6,6 @@ import com.auxilii.msgparser.attachment.FileAttachment;
 import com.auxilii.msgparser.attachment.MsgAttachment;
 import net.sourceforge.MSGViewer.AttachmentRepository;
 import net.sourceforge.MSGViewer.factory.MessageSaver;
-import net.sourceforge.MSGViewer.factory.mbox.headers.DateHeader;
 
 import javax.activation.DataHandler;
 import javax.mail.BodyPart;
@@ -23,7 +22,7 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 import static java.util.Objects.requireNonNullElse;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -100,11 +99,11 @@ public class MBoxWriterViaJavaMail {
     }
 
     private static void writeMBoxHeader(Message msg, OutputStream out) throws IOException {
-        Date date = msg.getDate();
+        ZonedDateTime date = msg.getDate();
 
         String sb = String.format("From %s %s\r\n",
                 msg.getFromEmail(),
-                date == null ? "" : DateHeader.date_format.format(date));
+                date == null ? "" : date.format(Message.DATE_TIME_FORMATTER));
 
         out.write(sb.getBytes(StandardCharsets.US_ASCII));
     }

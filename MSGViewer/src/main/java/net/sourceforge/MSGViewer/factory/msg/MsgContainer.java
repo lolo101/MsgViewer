@@ -72,7 +72,7 @@ public class MsgContainer {
 
         // PidTagClientSubmitTime
         if (msg.getDate() != null) {
-            addProperty(new PropPtypTime(PidTagClientSubmitTime, msg.getDate().getTime()));
+            addProperty(new PropPtypTime(PidTagClientSubmitTime, msg.getDate().toEpochSecond() * 1000));
         }
 
         if (isNotBlank(msg.getMessageId())) {
