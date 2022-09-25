@@ -18,8 +18,8 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
 
     private static final long serialVersionUID = 1L;
 
-    public final BaseDialogBaseHelper helper;
-    JRootPane myrootPane;
+    private final BaseDialogBaseHelper helper;
+    private JRootPane myrootPane;
     public static Logger logger = LogManager.getLogger(BaseDialog.class);
     public final Root root;
 
@@ -49,14 +49,14 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
      *
      * @param runnable This runnable should open the Help Window
      */
-    public final void registerHelpWin(Runnable runnable) {
+    protected final void registerHelpWin(Runnable runnable) {
         helper.registerHelpWin(runnable);
     }
 
     /**
      * opens the registerd Help win by Hand
      */
-    public void callHelpWin() {
+    protected void callHelpWin() {
         helper.callHelpWin();
     }
 
@@ -224,26 +224,8 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
      * Little helper function that sets the frame visible and push it to front,
      * by useing the wait cursor.
      */
-    @Override
-    public void invokeDialog(JFrame frame) {
-        helper.invokeDialog(frame);
-    }
-
-    /**
-     * Little helper function that sets the frame visible and push it to front,
-     * by useing the wait cursor.
-     */
-    @Override
-    public void invokeDialog(BaseDialogBase dlg) {
+    protected void invokeDialog(BaseDialogBase dlg) {
         helper.invokeDialog(dlg);
-    }
-
-    /**
-     * Little helper function that sets the frame visible and push it to front,
-     * by useing the wait cursor.
-     */
-    public void invokeDialog(BaseDialog dlg) {
-        helper.invokeDialog((BaseDialogBase) dlg);
     }
 
     @Override
@@ -298,15 +280,6 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
         helper.setBaseLanguage(language);
     }
 
-    /**
-     * @return language the dialog is programmed in if not set, the settings
-     * from Root.getBaseLangague() are used
-     */
-    @Override
-    public String getBaseLanguage() {
-        return helper.getBaseLanguage();
-    }
-
     @Override
     public void doLayout() {
         helper.doLayout();
@@ -320,11 +293,6 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
     @Override
     public final String MlM(String message) {
         return helper.MlM(message);
-    }
-
-    @Override
-    public void invokeMainDialog(BaseDialogBase dialog) {
-        helper.invokeMainDialog(dialog);
     }
 
 }

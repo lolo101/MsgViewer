@@ -119,19 +119,13 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 
         Point mouse_point = MouseInfo.getPointerInfo().getLocation();
 
-        if (x < mouse_point.x && mouse_point.x < x + w) {
-            // alter Wert is super, den lassen wir so
-        } else if (Math.abs(x + w - mouse_point.x) < w) {
-            // alter Wert is super, den lassen wir so
-        } else {
+        if ((mouse_point.x <= x || x + w <= mouse_point.x)
+                && Math.abs(x + w - mouse_point.x) >= w) {
             x = mouse_point.x - 100;
         }
 
-        if (y < mouse_point.y && y + h > mouse_point.y) {
-            // alter Wert is super, den lassen wir so
-        } else if (Math.abs(y + h - mouse_point.y) < h) {
-            // alter Wert is super, den lassen wir so
-        } else {
+        if ((mouse_point.y <= y || y + h <= mouse_point.y)
+                && Math.abs(y + h - mouse_point.y) >= h) {
             y = mouse_point.y - 100;
         }
 
@@ -271,7 +265,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
         }
     }
 
-    private void adjustScrollingSpeed(JScrollBar ScrollBar, DBConfig config) {
+    private void adjustScrollingSpeed(JScrollBar scrollBar, DBConfig config) {
         String value = root.getSetup().getLocalConfig(config);
 
         int i = Integer.parseInt(value);
@@ -282,18 +276,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
             i = Integer.parseInt(config.getConfigValue());
         }
 
-        ScrollBar.setUnitIncrement(i);
-    }
-
-    /**
-     * Little helper function that sets the frame visible and push it to front,
-     * by useing the wait cursor.
-     */
-    public void invokeDialog(JFrame frame) {
-        setWaitCursor();
-        frame.setVisible(true);
-        frame.toFront();
-        setNormalCursor();
+        scrollBar.setUnitIncrement(i);
     }
 
     /**
@@ -308,13 +291,6 @@ public class BaseDialogBaseHelper implements BindVarInterface {
         if (parent.closeSubdialogsOnClose())
             close_subdialog_helper.closeSubDialog(dlg);
 
-        setNormalCursor();
-    }
-
-    void invokeMainDialog(BaseDialogBase dialog) {
-        setWaitCursor();
-        dialog.setVisible(true);
-        dialog.toFront();
         setNormalCursor();
     }
 

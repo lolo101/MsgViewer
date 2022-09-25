@@ -17,10 +17,10 @@ public interface BaseDialogBase
 
     /**
      * @return a Dialog identifier for saving some data, eg:
-     * width an height of the dialog.
+     * width and height of the dialog.
      * The default behavior is retuning the dialog title.
      * This function should be overloaded if some instances of dialogs
-     * should all have the same eg size but it's no possible, because
+     * should all have the same e.g. size, but it's not possible, because
      * each one has a different title.
      */
 
@@ -55,17 +55,7 @@ public interface BaseDialogBase
 
     void toFront();
 
-    void invokeDialog(JFrame frame);
-
-    void invokeDialog(BaseDialogBase dlg);
-
     void invokeDialogUnique(BaseDialogBase dialog);
-
-    /**
-     * opens the dialog as a new main Dialog. So if the source Dialog
-     * is closed, the subdialog won't be closed, because it's a new main dialog.
-     */
-    void invokeMainDialog(BaseDialogBase dialog);
 
     void registerOnCloseListener(Runnable runnable);
 
@@ -77,7 +67,7 @@ public interface BaseDialogBase
 
     /**
      * @return The Transaction object for this dialog
-     * This Transaction object will be automatically closed, on closing this this
+     * This Transaction object will be automatically closed, on closing this
      * dialog. The Transaction object will be only created once in the lifetime
      * of the dialog. So caching the Transaction object is not required.
      * <b>Can return null, in case of no database connection.</b>
@@ -97,12 +87,6 @@ public interface BaseDialogBase
     * if not set, the settings from Root.getBaseLangague() are used
     */
     void setBaseLanguage(String language);
-
-    /**
-    * @return language the dialog is programmed in
-    * if not set, the settings from Root.getBaseLangague() are used
-    */
-    String getBaseLanguage();
 
     /**
      * @param message native langauge message

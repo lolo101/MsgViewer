@@ -20,7 +20,6 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 
 	protected final Root root;
 	private final BaseDialogBaseHelper helper;
-	private JRootPane myrootPane;
 
 	public BaseDialogDialog(Root root, String title) {
 		this(null, root, title, false);
@@ -35,12 +34,12 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 		super(owner);
 		this.root = root;
 
-		helper = new BaseDialogBaseHelper(this, root, title, myrootPane,
+		helper = new BaseDialogBaseHelper(this, root, title, null,
 				do_not_inform_root);
 	}
 
 	/**
-	 * Overload this method, if the window shouldn't open with with the last
+	 * Overload this method, if the window shouldn't open with the last
 	 * stored with and height.
 	 *
 	 * @return true if the size of the dialog should be stored
@@ -64,14 +63,12 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 
 	@Override
 	protected JRootPane createRootPane() {
-		myrootPane = super.createRootPane();
-
-		return myrootPane;
+		return super.createRootPane();
 	}
 
 	/**
 	 * @return The Transaction object for this dialog This Transaction object
-	 *         will be automatically closed, on closing this this dialog. The
+	 *         will be automatically closed, on closing this dialog. The
 	 *         Transaction object will be only created once in the lifetime of
 	 *         the dialog. So caching the Transaction object is not required.
 	 *         <b>Can return null, in case of no database connection.</b>
@@ -110,10 +107,6 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 		helper.setEdited();
 	}
 
-	public boolean isEdited() {
-		return helper.isEdited();
-	}
-
 	public void setEdited(boolean val) {
 		helper.setEdited(val);
 	}
@@ -125,7 +118,6 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	 *            das Textfeld
 	 * @param var
 	 *            der StringBuffer
-	 *
 	 *            Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
 	 *            dann der demenstprechende Inhalt entweder vom GUI zu
 	 *            Variablen, oder umgekehrt übertragen.
@@ -141,7 +133,6 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	 *            das Textfeld
 	 * @param var
 	 *            die Datenbankvariable
-	 *
 	 *            Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
 	 *            dann der demenstprechende Inhalt entweder vom GUI zu
 	 *            Variablen, oder umgekehrt übertragen.
@@ -157,7 +148,6 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	 *            die Textbox
 	 * @param var
 	 *            die Datebanvariable
-	 *
 	 *            Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
 	 *            dann der demenstprechende Inhalt entweder vom GUI zu
 	 *            Variablen, oder umgekehrt übertragen.
@@ -174,7 +164,6 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	 *            die Combo-box
 	 * @param var
 	 *            die Datebanvariable
-	 *
 	 *            Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
 	 *            dann der demenstprechende Inhalt entweder vom GUI zu
 	 *            Variablen, oder umgekehrt übertragen.
@@ -192,7 +181,6 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	 *            die DateTime-Komponente
 	 * @param dateTime
 	 *            die Datebanvariable
-	 *
 	 *            Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
 	 *            dann der demenstprechende Inhalt entweder vom GUI zu
 	 *            Variablen, oder umgekehrt übertragen.
@@ -209,7 +197,6 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	 *            das Textfeld
 	 * @param var
 	 *            der StringBuffer
-	 *
 	 *            Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
 	 *            dann der demenstprechende Inhalt entweder vom GUI zu
 	 *            Variablen, oder umgekehrt übertragen.
@@ -226,7 +213,6 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	 *            das Textfeld
 	 * @param var
 	 *            der DBValue
-	 *
 	 *            Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
 	 *            dann der demenstprechende Inhalt entweder vom GUI zu
 	 *            Variablen, oder umgekehrt übertragen.
@@ -275,22 +261,6 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 		helper.adjustScrollingSpeed(scroll_panel);
 	}
 
-	/**
-	 * Little helper function that sets the frame visible and push it to front,
-	 * by useing the wait cursor.
-	 */
-	public void invokeDialog(JFrame frame) {
-		helper.invokeDialog(frame);
-	}
-
-	/**
-	 * Little helper function that sets the frame visible and push it to front,
-	 * by useing the wait cursor.
-	 */
-	public void invokeDialog(BaseDialogBase dlg) {
-		helper.invokeDialog(dlg);
-	}
-
 	public void invokeDialogUnique(BaseDialogBase dialog) {
 		helper.invokeDialogUnique(dialog);
 	}
@@ -316,10 +286,10 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	}
 
 	/**
-	 * @return a Dialog identifier for saving some data, eg: width an height of
+	 * @return a Dialog identifier for saving some data, eg: width and height of
 	 * the dialog. The default behavior is retuning the dialog title.
 	 * This function should be overloaded if some instances of dialogs
-	 * should all have the same eg size but it's no possible, because
+	 * should all have the same e.g. size, but it's not possible, because
 	 * each one has a different title.
 	 */
 
@@ -333,14 +303,6 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	 */
 	public void setBaseLanguage(String language) {
 		helper.setBaseLanguage(language);
-	}
-
-	/**
-	 * @return language the dialog is programmed in if not set, the settings
-	 *         from Root.getBaseLangague() are used
-	 */
-	public String getBaseLanguage() {
-		return helper.getBaseLanguage();
 	}
 
 	@Override
@@ -357,11 +319,6 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	@Override
 	public String MlM(String message) {
 		return helper.MlM(message);
-	}
-
-	@Override
-	public void invokeMainDialog(BaseDialogBase dialog) {
-		helper.invokeMainDialog(dialog);
 	}
 
 }
