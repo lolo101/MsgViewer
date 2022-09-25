@@ -1,61 +1,32 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.widgets;
 
-import java.awt.Color;
-import java.awt.Container;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
+import java.awt.*;
 
-/**
- *
- * @author martin
- */
-public class NoticeIfChangedTextField extends AutoCompleteTextField implements IKnowNextFocus
-{        
-    boolean changed = false;
-    Container next_on_focus = null;
-    Container prev_on_focus = null;
-    Color defaultBackgroundColor = null;
-    Color editedBackgroundColor = Color.yellow;
-    String orig_text = null;
+public class NoticeIfChangedTextField extends AutoCompleteTextField implements IKnowNextFocus {
+    private boolean changed;
+    private Container next_on_focus;
+    private Container prev_on_focus;
+    private final Color defaultBackgroundColor;
+    private final Color editedBackgroundColor = Color.yellow;
+    private String orig_text;
 
-    public NoticeIfChangedTextField()
-    {
-        super();
+    public NoticeIfChangedTextField() {
         defaultBackgroundColor = getBackground();
     }
 
     @Override
-    public void setText( String text )
-    {
+    public void setText(String text) {
         String old_text = getText();
 
-        if( text.isEmpty() && old_text.isEmpty() )
-        {
-            //setChanged(false);
-        }
-        else if( text.equals(old_text) )
-        {
-            // setChanged(false);
-        }
-        else
-        {            
+        if (!text.equals(old_text)) {
             super.setText(text);
-            
-            // wir machen das, weil vielleicht is ja noch ein
-            // Document rumnudler dazwischen
-            if( !old_text.equals(getText()) )
-            {
-                setChanged(true);
-            }
 
-            if( orig_text != null && orig_text.equals(getText()) )
-            {
+            setChanged(true);
+
+            if (orig_text != null && orig_text.equals(getText())) {
                 setChanged(false);
             }
         }
@@ -76,33 +47,17 @@ public class NoticeIfChangedTextField extends AutoCompleteTextField implements I
         }
     }
 
-    public void setDefaultBackgroundColor( Color color )
-    {
-        defaultBackgroundColor = color;
-    }
-
-    public void setEditedBackgroundColor( Color color )
-    {
-        editedBackgroundColor = color;
-    }
-
     private void checkIfChanged()
     {
        if( orig_text == null )
             return;
 
-        java.awt.EventQueue.invokeLater(new Runnable() {
+        java.awt.EventQueue.invokeLater(() -> {
 
-            public void run() {
-
-             if( orig_text == null )
+            if (orig_text == null)
                 return;
 
-                if( orig_text.equals(getText()) )
-                    setChanged(false);
-                else
-                    setChanged(true);
-            }
+            setChanged(!orig_text.equals(getText()));
         });
     }
 
@@ -125,13 +80,13 @@ public class NoticeIfChangedTextField extends AutoCompleteTextField implements I
                 @Override
                 public void removeUpdate(DocumentEvent e) {
 
-                     checkIfChanged();
+                    checkIfChanged();
 
                     if( orig_text == null )
                         setChanged(true);
                     else
                         checkIfChanged();
-                    
+
                 }
 
                 @Override

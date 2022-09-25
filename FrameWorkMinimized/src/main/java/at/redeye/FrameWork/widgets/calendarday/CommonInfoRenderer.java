@@ -1,16 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.widgets.calendarday;
 
 import java.time.LocalDate;
 
-/**
- *
- * @author martin
- */
 public class CommonInfoRenderer implements InfoRenderer
 {
     protected StringBuilder info = new StringBuilder();
@@ -32,7 +23,7 @@ public class CommonInfoRenderer implements InfoRenderer
 
     @Override
     public String render() {
-        return "<html><body><font size=\"2\">" + info.toString() + "</font></body></html>";
+        return "<html><body><font size=\"2\">" + info + "</font></body></html>";
     }
 
     @Override

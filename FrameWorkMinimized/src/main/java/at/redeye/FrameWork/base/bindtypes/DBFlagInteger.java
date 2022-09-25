@@ -1,21 +1,12 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.base.bindtypes;
 
 import java.util.Vector;
 
-/**
- *
- * @author martin
- */
 public class DBFlagInteger extends DBEnumAsInteger
 {
     public static class FlagIntegerHandler extends EnumAsIntegerHandler
     {
-        Integer value = 0;
+        private Integer value = 0;
 
         @Override
         public int getMaxSize() {
@@ -34,11 +25,7 @@ public class DBFlagInteger extends DBEnumAsInteger
 
         @Override
         public boolean setValue(Integer val) {
-            if( val > 0 )
-                value = 1;
-            else
-                val = 0;
-
+            value = val > 0 ? 1 : 0;
             return true;
         }
 
@@ -49,10 +36,7 @@ public class DBFlagInteger extends DBEnumAsInteger
 
         @Override
         public String getValueAsString() {
-            if( value > 0 )
-                return "X";
-            else
-                return " ";
+            return value > 0 ? "X" : " ";
         }
 
         @Override
@@ -77,14 +61,8 @@ public class DBFlagInteger extends DBEnumAsInteger
 
     }
 
-    public DBFlagInteger( String name )
-    {
-        super( name, name, new FlagIntegerHandler() );
-    }
-
-    public DBFlagInteger( String name, String title )
-    {
-        super( name, title, new FlagIntegerHandler() );
+    private DBFlagInteger(String name, String title) {
+        super(name, title, new FlagIntegerHandler());
     }
 
     public DBFlagInteger getNewOne()
