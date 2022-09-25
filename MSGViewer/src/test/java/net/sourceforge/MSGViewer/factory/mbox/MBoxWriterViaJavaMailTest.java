@@ -63,6 +63,21 @@ class MBoxWriterViaJavaMailTest {
         }
     }
 
+    @Test
+    void testIssue133() throws Exception {
+        ModuleLauncher.BaseConfigureLogging();
+
+        try (FileSystem fileSystem = Jimfs.newFileSystem()) {
+            Path testOut = fileSystem.getPath("test_out.eml");
+            try (OutputStream outputStream = Files.newOutputStream(testOut)) {
+                Message msg = givenMessage("/issue133/test.msg");
+                MBoxWriterViaJavaMail writer = givenWriter();
+                writer.write(msg, outputStream);
+            }
+            assertThat(Files.lines(testOut)).contains("Content-Type: text/rtf;charset=UTF-8");
+        }
+    }
+
     private static Message givenMessage(String name) throws Exception {
         URI uri = MBoxWriterViaJavaMailTest.class.getResource(name).toURI();
         return new MessageParser(Path.of(uri)).parseMessage();

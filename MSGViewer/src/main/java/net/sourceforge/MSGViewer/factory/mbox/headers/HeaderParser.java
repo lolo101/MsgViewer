@@ -16,5 +16,5 @@ public abstract class HeaderParser
             return header;
         }
 
-    public abstract void parse(Message message, String line) throws Exception;
+    public abstract void parse(Message message, String line);
 }

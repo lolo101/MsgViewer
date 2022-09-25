@@ -41,8 +41,9 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.DateFormat;
-import java.util.Date;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -482,8 +483,8 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
     }
 
     private String printDate() {
-        Date date = message.getDate();
-        return date == null ? "" : DateFormat.getDateTimeInstance().format(date);
+        ZonedDateTime date = message.getDate();
+        return date == null ? "" : date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
     }
 
     private String printRecipients(RecipientType to) {

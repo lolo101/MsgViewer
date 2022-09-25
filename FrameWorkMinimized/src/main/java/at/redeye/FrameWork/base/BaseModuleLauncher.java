@@ -1,6 +1,7 @@
 package at.redeye.FrameWork.base;
 
 import at.redeye.FrameWork.utilities.ParseJNLP;
+import at.redeye.FrameWork.utilities.StringUtils;
 import at.redeye.FrameWork.widgets.StartupWindow;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -17,12 +18,12 @@ import java.util.Properties;
 import java.util.stream.Stream;
 
 public abstract class BaseModuleLauncher {
-    public StartupWindow splash;
+    protected StartupWindow splash;
     public static final Logger logger = LogManager.getRootLogger();
     public Root root;
     public final String[] args;
 
-    public BaseModuleLauncher(String[] args) {
+    public BaseModuleLauncher(String... args) {
 
         this.args = args;
         BaseConfigureLogging();
@@ -31,6 +32,7 @@ public abstract class BaseModuleLauncher {
     private String getNoSplash() {
         return Stream.of(args)
                 .filter("-nosplash"::equalsIgnoreCase)
+                .map(s->"yes")
                 .findFirst()
                 .orElseGet(this::getNoSplashProperty);
     }
@@ -93,7 +95,7 @@ public abstract class BaseModuleLauncher {
         loggerConfig.addAppender(consoleAppender, null, null);
     }
 
-    public final void configureLogging() {
+    protected final void configureLogging() {
 
         PatternLayout layout = PatternLayout.newBuilder()
                 .withPattern("%d{ISO8601} %-5p (%F:%L): %m%n")
@@ -140,12 +142,11 @@ public abstract class BaseModuleLauncher {
 
     public abstract String getVersion();
 
-    public boolean splashEnabled() {
-        String noSplash = getNoSplash();
-        return !(noSplash != null && !noSplash.isEmpty());
+    protected final boolean splashEnabled() {
+        return !StringUtils.isYes(getNoSplash());
     }
 
-    public void closeSplash() {
+    protected final void closeSplash() {
         if (splash != null)
             splash.close();
     }
@@ -155,7 +156,7 @@ public abstract class BaseModuleLauncher {
      * be called after the PrmInit was done, but it has to be done before the UI
      * starts.
      */
-    public void setLookAndFeel() {
+    protected final void setLookAndFeel() {
 
         String config = root.getSetup().getLocalConfig(
                 FrameWorkConfigDefinitions.LookAndFeel);

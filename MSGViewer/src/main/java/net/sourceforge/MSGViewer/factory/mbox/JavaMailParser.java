@@ -19,12 +19,14 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.regex.Pattern;
 
+import static java.util.stream.Collectors.joining;
+
 public class JavaMailParser {
     private static final Logger LOGGER = LogManager.getLogger(JavaMailParser.class);
-
     private static final RecipientHeader FROM_PARSER = new FromHeader();
     private static final RecipientHeader TO_PARSER = new ToHeader();
     private static final RecipientHeader CC_PARSER = new CcHeader();
@@ -47,7 +49,6 @@ public class JavaMailParser {
         CC_PARSER.parse(msg, getAddresses(jmsg.getRecipients(RecipientType.CC)) );
         BCC_PARSER.parse(msg, getAddresses(jmsg.getRecipients(RecipientType.BCC)) );
         msg.setSubject(jmsg.getSubject());
-
 
         msg.setHeaders(getHeaders(jmsg.getAllHeaders()));
         DATE_PARSER.parse(msg, getFirstHeader(jmsg.getHeader("Date")) );
@@ -187,23 +188,14 @@ public class JavaMailParser {
         return headers[0];
     }
 
-    private static String getAddresses(Address[] addresses)
-    {
-        if( addresses == null ) {
+    private static String getAddresses(Address[] addresses) {
+        if (addresses == null) {
             return "";
         }
 
-        StringBuilder sb = new StringBuilder();
-
-        for( Address addr : addresses ) {
-            if( sb.length() > 0 ) {
-                sb.append(",");
-            }
-
-            sb.append(addr.toString());
-        }
-
-        return sb.toString();
+        return Arrays.stream(addresses)
+                .map(Address::toString)
+                .collect(joining(","));
     }
 
     private static String getHeaders(Enumeration<Header> allHeaders)
