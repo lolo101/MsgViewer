@@ -24,29 +24,29 @@ import java.util.*;
 
 public class BaseDialogBaseHelper implements BindVarInterface {
     protected final Root root;
-    private Transaction transaction = null;
+    private Transaction transaction;
 
     protected final String title;
-    private DBConnection con = null;
+    private DBConnection con;
 
     protected static Logger logger = LogManager.getLogger(BaseDialogBaseHelper.class);
-    public Timer autoRefreshTimer = null;
-    public TimerTask autoRefreshTask = null;
+    private Timer autoRefreshTimer;
+    private TimerTask autoRefreshTask;
 
-    boolean edited = false;
-    public BindVarInterface bind_vars;
-    protected List<Runnable> onCloseListeners;
-    protected final CloseSubDialogHelper close_subdialog_helper;
+    private boolean edited;
+    private BindVarInterface bind_vars;
+    private List<Runnable> onCloseListeners;
+    private final CloseSubDialogHelper close_subdialog_helper;
 
     /**
      * All keys ESC, or F1, F2 listeners are registered in this container
      */
-    protected final Map<KeyStroke, Vector<Runnable>> listen_key_events = new HashMap<>();
+    private final Map<KeyStroke, Vector<Runnable>> listen_key_events = new HashMap<>();
     private final JRootPane myrootPane;
-    protected Runnable HelpWinRunnable;
-    protected final UniqueDialogHelper unique_dialog_helper = new UniqueDialogHelper();
-    protected TranslationHelper translation_helper;
-    protected boolean autoswitch_trans_first_run = true;
+    private Runnable HelpWinRunnable;
+    private final UniqueDialogHelper unique_dialog_helper = new UniqueDialogHelper();
+    private TranslationHelper translation_helper;
+    private boolean autoswitch_trans_first_run = true;
 
     private static int default_pos_x = 300;
     private static int default_pos_y = 300;
@@ -57,9 +57,9 @@ public class BaseDialogBaseHelper implements BindVarInterface {
     private String base_language;
 
     private class ActionKeyListener implements ActionListener {
-        KeyStroke key;
+        private final KeyStroke key;
 
-        public ActionKeyListener(KeyStroke key) {
+        private ActionKeyListener(KeyStroke key) {
             this.key = key;
         }
 
@@ -68,7 +68,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
         }
     }
 
-    final BaseDialogBase parent;
+    private final BaseDialogBase parent;
 
     public BaseDialogBaseHelper(final BaseDialogBase parent, Root root,
                                 String title, JRootPane myrootPane, boolean do_not_inform_root) {
@@ -81,7 +81,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
         initCommon(do_not_inform_root);
     }
 
-    protected final void initCommon(boolean do_not_inform_root) {
+    private void initCommon(boolean do_not_inform_root) {
         translation_helper = new TranslationHelper(root, parent, this);
         parent.setTitle(MlM(title));
 
@@ -115,10 +115,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
         int h = Integer.parseInt(root.getSetup().getLocalConfig(
                 id.concat(Setup.WindowHeight), "0"));
 
-        // Dimension dim = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         Dimension dim = getVirtualScreenSize();
-        //java.awt.Toolkit.getDefaultToolkit()
-        // java.awt.GraphicsDevice
 
         Point mouse_point = MouseInfo.getPointerInfo().getLocation();
 
@@ -206,7 +203,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
     /**
      * returns the virtual screensize in a multimonitor system
      */
-    public static Dimension getVirtualScreenSize() {
+    private static Dimension getVirtualScreenSize() {
         Rectangle virtualBounds = new Rectangle();
         GraphicsEnvironment ge = GraphicsEnvironment
                 .getLocalGraphicsEnvironment();
@@ -274,7 +271,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
         }
     }
 
-    protected void adjustScrollingSpeed(JScrollBar ScrollBar, DBConfig config) {
+    private void adjustScrollingSpeed(JScrollBar ScrollBar, DBConfig config) {
         String value = root.getSetup().getLocalConfig(config);
 
         int i = Integer.parseInt(value);
@@ -357,7 +354,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
         edited = val;
 
         if (!edited) {
-            setBindVarsChanged(false);
+            setBindVarsChanged();
         }
     }
 
@@ -366,7 +363,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
      * sould be done (save it, don't save it, or cancel current operation
      *
      * @param tm TableManipulator object
-     * @return 1 when the data should by saved <br/>
+     * @return 1 when the data should be saved <br/>
      * 0 on saving should be done <br/>
      * -1 cancel current operation <br/>
      */
@@ -375,17 +372,8 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 
         if (tm.getEditedRows().isEmpty() && !edited) {
             return 0;
-        } else {
-            int ret = checkSave();
-
-            if (ret == -1) {
-                return -1;
-            } else if (ret == 0) {
-                return 0;
-            } else {
-                return 1;
-            }
         }
+        return checkSave();
     }
 
     /**
@@ -418,7 +406,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 
     /**
      * @return The Transaction object for this dialog This Transaction object
-     * will be automatically closed, on closing this this dialog. The
+     * will be automatically closed, on closing this dialog. The
      * Transaction object will be only created once in the lifetime of
      * the dialog. So caching the Transaction object is not required.
      * <b>Can return null, in case of no database connection.</b>
@@ -498,7 +486,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
         parent.dispose();
     }
 
-    public void registerActionKeyListenerOnRootPane(KeyStroke key) {
+    private void registerActionKeyListenerOnRootPane(KeyStroke key) {
         if (myrootPane == null)
             return;
 
@@ -673,7 +661,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
         bind_vars.gui_to_var();
     }
 
-    public void setBindVarsChanged(boolean state) {
+    private void setBindVarsChanged() {
 
         if (bind_vars == null)
             return;
@@ -683,7 +671,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
                 NoticeIfChangedTextField text_field = (NoticeIfChangedTextField) pair
                         .get_first();
 
-                text_field.setChanged(state);
+                text_field.setChanged(false);
             }
         }
     }
@@ -703,7 +691,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
         bind_vars.addBindVarPair(pair);
     }
 
-    protected void checkBindVars() {
+    private void checkBindVars() {
         if (bind_vars == null)
             bind_vars = new BindVarBase();
     }
@@ -727,7 +715,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
         return base_language;
     }
 
-    public void autoSwitchToCurrentLocale() {
+    private void autoSwitchToCurrentLocale() {
         translation_helper.autoSwitchToCurrentLocale();
     }
 
@@ -746,7 +734,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
         return translation_helper.MlM(message);
     }
 
-    public void cancelAutoRefreshTimer() {
+    private void cancelAutoRefreshTimer() {
 
         if (autoRefreshTask != null) {
             autoRefreshTask.cancel();

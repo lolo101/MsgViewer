@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.utilities.calendar;
 
 import java.time.LocalDate;
@@ -11,7 +6,7 @@ import java.util.Vector;
 
 public class AustrianHolidays extends BaseHolidays implements Holidays {
 
-    static String myCountryCode = "AT";
+    private static final String myCountryCode = "AT";
 
     public AustrianHolidays()
     {
@@ -26,7 +21,7 @@ public class AustrianHolidays extends BaseHolidays implements Holidays {
 
         // siehe http://de.wikipedia.org/wiki/Feiertage_in_Österreich
 
-        Vector<HolidayInfo> res = new Vector<>();
+        Collection<HolidayInfo> res = new Vector<>();
 
         res.add( create( year, 1, 1, false, true, "Neujahrstag" ) );
         res.add( create( year, 1, 6, false, true, "Dreikönigstag" ) );

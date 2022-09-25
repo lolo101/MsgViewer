@@ -33,12 +33,7 @@ public class AutoLogger<R> {
     }
 
     public Optional<R> result() {
-        try {
-            return Optional.ofNullable(callable.call());
-        } catch (Exception ex) {
-            logger.error("Exception: " + ex, ex);
-            return Optional.empty();
-        }
+        return Optional.ofNullable(resultOrElse(null));
     }
 
     public void run() {

@@ -9,8 +9,6 @@ public interface DBConnection {
 
     boolean closeTransaction(Transaction trans);
 
-    Transaction getDefaultTransaction();
-
     Transaction getNewTransaction();
 
     boolean open(ConnectionDefinition definition);

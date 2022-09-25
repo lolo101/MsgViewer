@@ -195,19 +195,9 @@ public class TopLevelPropertyStream
             {
                 String tagtype = tagname.toString().toLowerCase().substring(4);
 
-                int voffset = offset + 8;
-
-                // FIXME those two alternatives are identical:
-                if (tagtype.equals("001f")) {
-                    // PStringType
-                    // length of the String UTF16-LE Coded + 2
-                    String lenght_str  = String.format("%08x", entry.getSize()+2);
-                    insert(lenght_str, voffset);
-
-                } else if (tagtype.equals("0102")) {
-                    // Binary
-                    String lenght_str  = String.format("%08x", entry.getSize()+2);
-                    insert(lenght_str, voffset);
+                if (tagtype.equals("001f") || tagtype.equals("0102")) {
+                    String lenght_str = String.format("%08x", entry.getSize() + 2);
+                    insert(lenght_str, offset + 8);
                 }
 
                 absent = false;

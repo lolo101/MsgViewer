@@ -38,13 +38,11 @@ public class DBDateTime extends DBValue {
     public DBDateTime getCopy() {
         DBDateTime datetime = new DBDateTime(name);
         datetime.value = value;
-
         return datetime;
     }
 
     @Override
     public DBDataType getDBType() {
-        // TODO Auto-generated method stub
         return DBDataType.DB_TYPE_DATETIME;
     }
 
@@ -60,21 +58,16 @@ public class DBDateTime extends DBValue {
 
     @Override
     public void loadFromDB(Object obj) {
-
         value = (Date) obj;
-
     }
 
     @Override
     public void loadFromString(String s) {
-
         try {
             value = SDF_4_STD_STRING.parse(s);
         } catch (ParseException e) {
-
             e.printStackTrace();
         }
-
     }
 
     @Override
@@ -83,7 +76,6 @@ public class DBDateTime extends DBValue {
     }
 
     public static String getStdString(Date date) {
-
         return SDF_4_STD_STRING.format(date);
     }
 
