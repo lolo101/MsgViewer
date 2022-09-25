@@ -30,7 +30,7 @@ public class UnZip
         {
             File file = new File(target_dir, entry.getName());
             if (!file.toPath().normalize().startsWith(target_dir.toPath().normalize())) {
-                throw new IOException("Bad zip entry");
+                throw new IOException("Zip entry outside of target directory. Zip Slip Vulnerability");
             }
 
             File parent = file.getParentFile();
