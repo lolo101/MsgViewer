@@ -32,6 +32,7 @@ public abstract class BaseModuleLauncher {
     private String getNoSplash() {
         return Stream.of(args)
                 .filter("-nosplash"::equalsIgnoreCase)
+                .map(s->"yes")
                 .findFirst()
                 .orElseGet(this::getNoSplashProperty);
     }
