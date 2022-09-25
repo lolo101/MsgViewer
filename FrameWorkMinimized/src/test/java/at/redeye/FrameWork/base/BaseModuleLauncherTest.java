@@ -21,7 +21,7 @@ class BaseModuleLauncherTest {
 
         @ParameterizedTest
         @ValueSource(strings = {"No way !", "false"})
-        void should_enable_Splah(String propertyValue) {
+        void should_enable_Splash(String propertyValue) {
             System.setProperty("NOSPLASH", propertyValue);
             assertTrue(sut.splashEnabled());
         }
@@ -35,15 +35,15 @@ class BaseModuleLauncherTest {
                 "x",
                 "+"
         })
-        void should_disable_Splah(String propertyValue) {
+        void should_disable_Splash(String propertyValue) {
             System.setProperty("NOSPLASH", propertyValue);
             assertFalse(sut.splashEnabled());
         }
     }
 
     @Nested
-    class GivenNoSplahArg {
-        private final BaseModuleLauncher sut = new BaseModuleLauncher("-nospash") {
+    class GivenNoSplashArg {
+        private final BaseModuleLauncher sut = new BaseModuleLauncher("-nosplash") {
             @Override
             public String getVersion() {
                 return null;
@@ -51,7 +51,7 @@ class BaseModuleLauncherTest {
         };
 
         @Test
-        void should_disable_splash() {
+        void should_disable_Splash() {
             assertFalse(sut.splashEnabled());
         }
     }
