@@ -2,14 +2,13 @@ package net.sourceforge.MSGViewer.rtfparser;
 
 import at.redeye.FrameWork.base.BaseModuleLauncher;
 import at.redeye.FrameWork.base.LocalRoot;
-import at.redeye.FrameWork.utilities.ReadFile;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 
 public class testRTF2HTML extends BaseModuleLauncher {
-    public testRTF2HTML(String[] args) {
+    private testRTF2HTML(String[] args) {
         super(args);
 
         root = new LocalRoot("MSGViewer", "MSGViewer");
@@ -17,7 +16,7 @@ public class testRTF2HTML extends BaseModuleLauncher {
         configureLogging();
     }
 
-    public void run() throws Exception {
+    private void run() throws Exception {
         for (String arg : args) {
             if (arg.toLowerCase().endsWith(".rtf")) {
                 final File file = new File(arg);
@@ -47,10 +46,8 @@ public class testRTF2HTML extends BaseModuleLauncher {
 
                     String file_name = "writehtml";
 
-                    if (file_name != null) {
-                        try (FileWriter fout = new FileWriter(file_name)) {
-                            fout.write(htmlContent);
-                        }
+                    try (FileWriter fout = new FileWriter(file_name)) {
+                        fout.write(htmlContent);
                     }
 
                 } catch (Error ex) {
@@ -66,8 +63,8 @@ public class testRTF2HTML extends BaseModuleLauncher {
                     int start_col = message.indexOf("column ");
 
                     if (start >= 0) {
-                        int end = message.indexOf(",", start);
-                        int end_col = message.indexOf(".", start_col);
+                        int end = message.indexOf(',', start);
+                        int end_col = message.indexOf('.', start_col);
 
                         if (end >= 0) {
                             System.out.println(message);
@@ -102,9 +99,8 @@ public class testRTF2HTML extends BaseModuleLauncher {
                 if (err != null || exc != null) {
                     if (err != null) {
                         throw err;
-                    } else {
-                        throw exc;
                     }
+                    throw exc;
                 }
             }
         }
