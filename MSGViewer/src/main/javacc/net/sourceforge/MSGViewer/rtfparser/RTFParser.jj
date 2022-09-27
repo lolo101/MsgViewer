@@ -131,7 +131,7 @@ void unicode_char() :
 }
 {
     code = <C_UNICODE>
-    <STRING>
+    (<STRING> | <C_ESC_STRING>)
     {
         current_group.addUnicodeChar( code.image );
     }
