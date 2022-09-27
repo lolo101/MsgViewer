@@ -51,7 +51,7 @@ public class HelpFileLoader {
 		return -1;
 	}
 
-	public String replace_src(String s) {
+	private String replace_src(String s) {
 
 		List<String> res = StringUtils.split_str(s, "=");
 
@@ -93,10 +93,10 @@ public class HelpFileLoader {
 		return ret.toString();
 	}
 
-	public String prepareImages(String s) {
+	private String prepareImages(String s) {
 		StringBuilder res = new StringBuilder(s);
 		for (int start = findImgTag(s); start >= 0; ) {
-			int end = s.indexOf(">", start);
+			int end = s.indexOf('>', start);
 
 			if (end < 0)
 				break;
@@ -133,18 +133,6 @@ public class HelpFileLoader {
 				String res = reader.lines().collect(Collectors.joining());
 				return prepareImages(res);
 			}
-		}
-	}
-
-	public static void main(String[] argv) {
-		HelpFileLoader hfl = new HelpFileLoader();
-
-		try {
-			System.out.println(hfl.loadHelp(
-					"/at/redeye/Application/resources/Help/", "MainWin"));
-		} catch (IOException ex) {
-			System.out.println(ex);
-			ex.printStackTrace();
 		}
 	}
 }

@@ -1,32 +1,11 @@
 package at.redeye.FrameWork.utilities.zip;
 
 import java.io.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class Zip
 {
-    public static void zip(File temp_db_dir, String target_file_name, ProgressListener listener) throws IOException {
-        zip(temp_db_dir, new File(target_file_name), listener);
-    }
-
-    public static void zip(File temp_db_dir, String target_file_name) throws IOException {
-        zip(temp_db_dir, new File(target_file_name));
-    }
-
-    public static void zip(File file_or_dir) throws IOException {
-        zip(file_or_dir, (ProgressListener) null);
-    }
-
-    public static void zip(File file_or_dir, ProgressListener listener) throws IOException {
-        zip(file_or_dir, new File(file_or_dir.getName() + ".zip"), listener);
-    }
-
-    public static void zip(File file_or_dir, File zip_name) throws IOException {
-        zip(file_or_dir, zip_name, (ProgressContainer) null);
-    }
 
     public static void zip(File file_or_dir, File zip_name, ProgressListener listener) throws IOException {
         ProgressContainer container = null;
@@ -88,14 +67,5 @@ public class Zip
 
         if( progress_container != null )
             progress_container.incProgress(0, 1);
-    }
-
-    public static void main(String[] argv)
-    {
-        try {
-            zip(new File("/home/martin/Dropbox"), new File( "/home/martin/ooo3.zip"));
-        } catch (IOException ex) {
-            Logger.getLogger(Zip.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 }

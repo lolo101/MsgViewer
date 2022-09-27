@@ -8,10 +8,10 @@ public class TestFrame extends javax.swing.JFrame implements DayEventListener {
 
     private final CalendarComponent month = new CalendarComponent();
 
-    public TestFrame() {
+    private TestFrame() {
         initComponents();
 
-        setContentPane( month );
+        setContentPane(month);
 
         month.setHolidays(new AustrianHolidays());
         month.setMonth(6, 2009);
