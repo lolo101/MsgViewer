@@ -5,10 +5,8 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 import java.awt.*;
 
-public class NoticeIfChangedTextField extends AutoCompleteTextField implements IKnowNextFocus {
+public class NoticeIfChangedTextField extends AutoCompleteTextField {
     private boolean changed;
-    private Container next_on_focus;
-    private Container prev_on_focus;
     private final Color defaultBackgroundColor;
     private final Color editedBackgroundColor = Color.yellow;
     private String orig_text;
@@ -108,23 +106,4 @@ public class NoticeIfChangedTextField extends AutoCompleteTextField implements I
         return changed;
     }
 
-    @Override
-    public Container get_next_on_focus() {
-        return next_on_focus;
-    }
-
-    @Override
-    public Container get_prev_on_focus() {
-        return prev_on_focus;
-    }
-
-    @Override
-    public void set_next_on_focus(Container next) {
-        next_on_focus = next;
-    }
-
-    @Override
-    public void set_prev_on_focus(Container prev) {
-        prev_on_focus = prev;
-    }
 }

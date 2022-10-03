@@ -3,23 +3,18 @@ package at.redeye.FrameWork.widgets;
 import java.awt.*;
 
 // Grid Layout which allows components of differrent sizes
-public class GridLayout2 extends GridLayout 
-{
-  public GridLayout2() {
-    this(1, 0, 0, 0);
-  }
+public class GridLayout2 extends GridLayout {
 
   public GridLayout2(int rows, int cols) {
     this(rows, cols, 0, 0);
   }
 
-  public GridLayout2(int rows, int cols, int hgap, int vgap) {
+  private GridLayout2(int rows, int cols, int hgap, int vgap) {
     super(rows, cols, hgap, vgap);
   }
 
   @Override
   public Dimension preferredLayoutSize(Container parent) {
-	//System.err.println("preferredLayoutSize");
     synchronized (parent.getTreeLock()) {
       Insets insets = parent.getInsets();
       int ncomponents = parent.getComponentCount();
@@ -27,7 +22,7 @@ public class GridLayout2 extends GridLayout
       int ncols = getColumns();
       if (nrows > 0) {
         ncols = (ncomponents + nrows - 1) / nrows;
-      } 
+      }
       else {
         nrows = (ncomponents + ncols - 1) / ncols;
       }
@@ -53,8 +48,8 @@ public class GridLayout2 extends GridLayout
       for (int i = 0; i < nrows; i ++) {
         nh += h[i];
       }
-      return new Dimension(insets.left + insets.right + nw + (ncols-1)*getHgap(), 
-          insets.top + insets.bottom + nh + (nrows-1)*getVgap());
+      return new Dimension(insets.left + insets.right + nw + (ncols - 1) * getHgap(),
+              insets.top + insets.bottom + nh + (nrows - 1) * getVgap());
     }
   }
 
@@ -68,7 +63,7 @@ public class GridLayout2 extends GridLayout
       int ncols = getColumns();
       if (nrows > 0) {
         ncols = (ncomponents + nrows - 1) / nrows;
-      } 
+      }
       else {
         nrows = (ncomponents + ncols - 1) / ncols;
       }
@@ -94,8 +89,8 @@ public class GridLayout2 extends GridLayout
       for (int i = 0; i < nrows; i ++) {
         nh += h[i];
       }
-      return new Dimension(insets.left + insets.right + nw + (ncols-1)*getHgap(), 
-          insets.top + insets.bottom + nh + (nrows-1)*getVgap());
+      return new Dimension(insets.left + insets.right + nw + (ncols - 1) * getHgap(),
+              insets.top + insets.bottom + nh + (nrows - 1) * getVgap());
     }
   }
 
@@ -111,13 +106,13 @@ public class GridLayout2 extends GridLayout
       }
       if (nrows > 0) {
         ncols = (ncomponents + nrows - 1) / nrows;
-      } 
+      }
       else {
         nrows = (ncomponents + ncols - 1) / ncols;
       }
       int hgap = getHgap();
       int vgap = getVgap();
-	  // scaling factors      
+      // scaling factors
       Dimension pd = preferredLayoutSize(parent);
       double sw = (1.0 * parent.getWidth()) / pd.width;
       double sh = (1.0 * parent.getHeight()) / pd.height;
@@ -149,5 +144,5 @@ public class GridLayout2 extends GridLayout
         x += w[c] + hgap;
       }
     }
-  }  
+  }
 }
