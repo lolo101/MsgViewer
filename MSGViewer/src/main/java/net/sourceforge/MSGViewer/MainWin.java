@@ -18,7 +18,6 @@ public class MainWin extends BaseWin {
         super(root);
         initComponents();
 
-        viewerPanel.setRoot(root, this);
         viewerPanel.setOpenNewMailInterface(this::openMail);
 
         registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_V, 0), () -> {
@@ -38,7 +37,7 @@ public class MainWin extends BaseWin {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        viewerPanel = new net.sourceforge.MSGViewer.ViewerPanel();
+        viewerPanel = new ViewerPanel(this);
         printerJob.setPrintable(viewerPanel);
         menubar = new javax.swing.JMenuBar();
         javax.swing.JMenu jMenuProgram = new javax.swing.JMenu();

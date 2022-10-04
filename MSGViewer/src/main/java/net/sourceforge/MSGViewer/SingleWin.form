@@ -180,6 +180,9 @@
       <Events>
         <EventHandler event="propertyChange" listener="java.beans.PropertyChangeListener" parameters="java.beans.PropertyChangeEvent" handler="viewerPanelPropertyChange"/>
       </Events>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new ViewerPanel(this);"/>
+      </AuxValues>
     </Component>
   </SubComponents>
 </Form>

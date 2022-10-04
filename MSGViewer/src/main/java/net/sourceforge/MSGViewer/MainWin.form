@@ -196,6 +196,7 @@
         <EventHandler event="propertyChange" listener="java.beans.PropertyChangeListener" parameters="java.beans.PropertyChangeEvent" handler="viewerPanelPropertyChange"/>
       </Events>
       <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new ViewerPanel(this);"/>
         <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="printerJob.setPrintable(viewerPanel);"/>
       </AuxValues>
     </Component>
