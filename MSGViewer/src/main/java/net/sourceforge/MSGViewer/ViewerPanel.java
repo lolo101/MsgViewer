@@ -52,6 +52,7 @@ import java.util.regex.Pattern;
 import static at.redeye.FrameWork.base.BaseDialog.logger;
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 public class ViewerPanel extends JPanel implements Printable, MessageView {
 
@@ -332,7 +333,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
     }
 
     private Content bodyText() {
-        if (jRRTF.isSelected() && message.getBodyRTF() != null && !message.getBodyRTF().isEmpty()) {
+        if (jRRTF.isSelected() && isNotEmpty(message.getBodyRTF())) {
             if (message.getBodyRTF().contains("\\fromhtml")) {
                 return new AutoMBox<>(MainWin.class.getName(), () -> {
                     logger.info("extracting HTML data from RTF Code");

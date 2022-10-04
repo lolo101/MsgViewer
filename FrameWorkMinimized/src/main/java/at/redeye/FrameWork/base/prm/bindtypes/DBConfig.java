@@ -11,26 +11,24 @@ import at.redeye.FrameWork.base.prm.impl.PrmActionEvent;
 
 import java.util.Vector;
 
-public class DBConfig extends DBStrukt implements PrmAttachInterface
-{
-    public static String TABLENAME = "CONFIG";
+public class DBConfig extends DBStrukt implements PrmAttachInterface {
+    private static final String TABLENAME = "CONFIG";
 
-    private final Vector <PrmListener> prmListeners = new Vector<>();
+    private final Vector<PrmListener> prmListeners = new Vector<>();
     private String oldValue = "";
-    private String [] possibleValues = {};
+    private String[] possibleValues = {};
 
-    private PrmCustomChecksInterface customChecks = null;
-    private PrmDefaultChecksInterface defaultChecks = null;
+    private PrmCustomChecksInterface customChecks;
+    private PrmDefaultChecksInterface defaultChecks;
 
-    public DBString  name  = new DBString("name", "Name", 100 );
-    public DBString  value = new DBString( "value", "Wert", 100 );
-    public DBString  descr  = new DBString( "description", "Beschreibung", 250 );
-    public DBHistory hist  = new DBHistory("hist");
+    public DBString name = new DBString("name", "Name", 100);
+    public DBString value = new DBString("value", "Wert", 100);
+    public DBString descr = new DBString("description", "Beschreibung", 250);
+    public DBHistory hist = new DBHistory("hist");
 
-    protected boolean changed = false;
+    private boolean changed;
 
-    public DBConfig()
-    {
+    public DBConfig() {
         super(TABLENAME);
 
         register();
@@ -105,10 +103,6 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface
         this.defaultChecks = checks;
         this.possibleValues = possibleValues;
         this.customChecks = specialChecks;
-    }
-
-    public boolean differs(DBConfig c_db) {
-        return !(getConfigName().equals(c_db.getConfigName()) && getConfigValue().equals(c_db.getConfigValue()));
     }
 
     private void register()

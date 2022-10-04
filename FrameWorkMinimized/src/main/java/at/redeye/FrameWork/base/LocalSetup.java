@@ -114,22 +114,17 @@ public class LocalSetup extends Setup {
 
         List<DBStrukt> all = trans.fetchTable(new DBConfig());
 
+        if (global_config == null) {
+            global_config = new HashMap<>();
+        }
+
         for (DBStrukt dbStrukt : all) {
             DBConfig c = (DBConfig) dbStrukt;
-
-            if (global_config == null) {
-                global_config = new HashMap<>();
-            }
 
             global_config.put(c.getConfigName(), c);
         }
 
         conn.closeTransaction(trans);
-
-        if (global_config == null) {
-            // Noch kein Eintrag in der DB vorhanden...
-            global_config = new HashMap<>();
-        }
 
         return true;
     }
