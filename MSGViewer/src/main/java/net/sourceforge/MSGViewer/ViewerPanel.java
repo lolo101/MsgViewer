@@ -48,9 +48,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import static at.redeye.FrameWork.base.BaseDialog.logger;
 import static java.util.stream.Collectors.joining;
+import static net.sourceforge.MSGViewer.CLIHelpMSGViewer.CLI_STARTUP_TEXT_VIEW;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
@@ -80,7 +82,9 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         new DropTarget(header, DnDConstants.ACTION_COPY_OR_MOVE, new EditorDropTarget(this), true, null);
         new DropTarget(body, DnDConstants.ACTION_COPY_OR_MOVE, new EditorDropTarget(this), true, null);
 
-        boolean rtfFormat = StringUtils.isYes(root.getSetup().getLocalConfig("RTFFormat", "yes"));
+        boolean rtfFormat = StringUtils.isYes(root.getSetup().getLocalConfig("RTFFormat", "yes"))
+                && Stream.of(root.getStartupArgs()).noneMatch(s -> s.equals(CLI_STARTUP_TEXT_VIEW));
+
         jRRTF.setSelected(rtfFormat);
         jRText.setSelected(!rtfFormat);
 
