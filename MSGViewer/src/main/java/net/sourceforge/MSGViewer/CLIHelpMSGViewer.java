@@ -14,6 +14,7 @@ public class CLIHelpMSGViewer extends CLIHelp
     public static final String CLI_VERSION = "-v";
     public static final String CLI_CONVERT_TEMP = "-t";
     public static final String CLI_CONVERT_OPEN = "-o";
+    public static final String CLI_STARTUP_TEXT_VIEW = "-starttextview";
 
     public CLIHelpMSGViewer( BaseModuleLauncher module_launcher )
     {
@@ -47,6 +48,10 @@ public class CLIHelpMSGViewer extends CLIHelp
 
         add(new CLIOption(CLI_NOSPLASH, "Do not show Splash screen.",
                 ""));
+
+        add(new CLIOption(CLI_STARTUP_TEXT_VIEW, "Start with text view.",
+                "Normally MSGViewer starts with the RTF view of the mail. This parameter" +
+                " makes ist start with the text view."));
     }
 
 }
