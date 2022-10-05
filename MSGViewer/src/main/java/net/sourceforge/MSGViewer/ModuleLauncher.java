@@ -18,6 +18,7 @@ public class ModuleLauncher extends BaseModuleLauncher {
         BaseConfigureLogging(Level.ERROR);
 
         root = new LocalRoot("MSGViewer");
+        root.setStartupArgs(args);
         root.setBaseLanguage("en");
         root.setDefaultLanguage("en");
         root.setLanguageTranslationResourcePath("/net/sourceforge/MSGViewer/resources/translations");
