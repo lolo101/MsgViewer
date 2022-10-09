@@ -9,11 +9,6 @@ public class DBFlagInteger extends DBEnumAsInteger
         private Integer value = 0;
 
         @Override
-        public int getMaxSize() {
-            return 1;
-        }
-
-        @Override
         public boolean setValue(String val) {
             if( val.equals("1") || val.equalsIgnoreCase("X") )
                 value = 1;
@@ -24,9 +19,8 @@ public class DBFlagInteger extends DBEnumAsInteger
         }
 
         @Override
-        public boolean setValue(Integer val) {
+        public void setValue(Integer val) {
             value = val > 0 ? 1 : 0;
-            return true;
         }
 
         @Override
@@ -53,20 +47,9 @@ public class DBFlagInteger extends DBEnumAsInteger
 
            return res;
         }
-
-        @Override
-        public void refresh() {
-            // nothing to do
-        }
-
     }
 
     private DBFlagInteger(String name, String title) {
         super(name, title, new FlagIntegerHandler());
-    }
-
-    public DBFlagInteger getNewOne()
-    {
-        return new DBFlagInteger(name, title);
     }
 }

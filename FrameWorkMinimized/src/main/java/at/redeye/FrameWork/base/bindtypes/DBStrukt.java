@@ -1,7 +1,5 @@
 package at.redeye.FrameWork.base.bindtypes;
 
-import at.redeye.SqlDBInterface.SqlDBIO.impl.ColumnAttribute;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,7 +8,7 @@ import java.util.Map;
 public abstract class DBStrukt {
 
 	protected final String strukt_name;
-	protected String title;
+	protected final String title;
 	private final Map<String, DBValue> element_by_name = new HashMap<>();
 	private final ArrayList<DBStrukt> sub_strukts = new ArrayList<>();
 	protected Integer version;
@@ -55,37 +53,6 @@ public abstract class DBStrukt {
 
 	public DBValue getValue(String name) {
 		return getValueByName(name);
-	}
-
-	public Map<String, ColumnAttribute> getColumns() {
-		return getColumns("", null);
-	}
-
-	private boolean VersionExists(DBValue val, Integer Version) {
-		return elements_with_version.getOrDefault(val.getName(), List.of())
-				.contains(Version);
-	}
-
-	private Map<String, ColumnAttribute> getColumns(String prefix,
-													Integer Version) {
-		Map<String, ColumnAttribute> colls = new HashMap<>();
-
-		for (DBValue val : element_by_name.values()) {
-
-			if (Version == null || VersionExists(val, Version)) {
-				ColumnAttribute attr = new ColumnAttribute(val);
-				colls.put(prefix + val.getName(), attr);
-			}
-		}
-
-		for (DBStrukt strukt : sub_strukts) {
-			Map<String, ColumnAttribute> sub_colls = strukt.getColumns(
-					prefix + strukt.getName() + "_", Version);
-
-			colls.putAll(sub_colls);
-		}
-
-		return colls;
 	}
 
 	public List<DBValue> getAllValues() {
@@ -143,14 +110,6 @@ public abstract class DBStrukt {
 		}
 	}
 
-	public DBStrukt getCopy() {
-		DBStrukt s = getNewOne();
-
-		s.loadFromCopy(this);
-
-		return s;
-	}
-
 	public void setVersion(Integer version) {
 		this.version = version;
 	}
@@ -158,9 +117,4 @@ public abstract class DBStrukt {
 	public Integer getVersion() {
 		return version == null ? 1 : version;
 	}
-
-	public void setTitle(String title) {
-		this.title = title;
-        }
-
 }

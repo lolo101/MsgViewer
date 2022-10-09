@@ -136,10 +136,12 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface {
         return new DBConfig();
     }
 
+    @Override
     public void addPrmListener(PrmListener listener) {
         prmListeners.add(listener);
     }
 
+    @Override
     public void removePrmListener(PrmListener listener) {
         prmListeners.remove(listener);
     }

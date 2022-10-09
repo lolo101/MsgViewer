@@ -4,7 +4,6 @@ import at.redeye.FrameWork.base.Root;
 import at.redeye.SqlDBInterface.SqlDBIO.impl.DBDataType;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -21,14 +20,7 @@ public class DBEnum<T extends Enum<T>> extends DBValue {
 
         public abstract EnumHandler<T> getNewOne();
 
-        public int getMaxSize() {
-            return Arrays.stream(type.getEnumConstants())
-                    .mapToInt(val -> val.toString().length())
-                    .max()
-                    .orElse(0);
-        }
-
-        public boolean setValue(String val) {
+        private boolean setValue(String val) {
             try {
                 value = Enum.valueOf(type, val);
                 return true;
@@ -41,7 +33,7 @@ public class DBEnum<T extends Enum<T>> extends DBValue {
             return value.toString();
         }
 
-        public List<String> getPossibleValues() {
+        private List<String> getPossibleValues() {
             List<String> res = new ArrayList<>();
 
             for (T t : type.getEnumConstants())
@@ -53,13 +45,8 @@ public class DBEnum<T extends Enum<T>> extends DBValue {
 
     public EnumHandler<T> handler;
 
-    public DBEnum(String name, EnumHandler<T> enumval) {
+    private DBEnum(String name, EnumHandler<T> enumval) {
         super(name);
-        handler = enumval;
-    }
-
-    public DBEnum(String name, String title, EnumHandler<T> enumval) {
-        super(name, title);
         handler = enumval;
     }
 
@@ -101,20 +88,10 @@ public class DBEnum<T extends Enum<T>> extends DBValue {
         return copy;
     }
 
-    public int getMaxLen()
-    {
-        return handler.getMaxSize();
-    }
-
     @Override
     public String toString()
     {
         return handler.getValue();
-    }
-
-    public List<String> getPossibleValues()
-    {
-        return handler.getPossibleValues();
     }
 
     /**
@@ -125,11 +102,8 @@ public class DBEnum<T extends Enum<T>> extends DBValue {
     private HashMap<String,String> localized_values_map;
     private List<String> localized_values;
 
-    public List<String> getLocalizedPossibleValues(Root root)
-    {
-        if( localized_values_map == null )
-        {
-            initLocalization( root );
+    private List<String> getLocalizedPossibleValues(Root root) {
+        if (localized_values_map == null) {
             localized_values_map = new HashMap<>();
             localized_values = new ArrayList<>();
 
@@ -149,33 +123,23 @@ public class DBEnum<T extends Enum<T>> extends DBValue {
         return getLocalizedPossibleValues(Root.getLastRoot());
     }
 
-    public String delocalize( String message )
-    {
-        if( localized_values == null )
+    private String delocalize(String message) {
+        if (localized_values == null)
             getLocalizedPossibleValues();
 
         String res = localized_values_map.get(message);
 
-        if( res != null )
+        if (res != null)
             return res;
 
         return message;
     }
 
-    /**
-     * call here root.loadMlM4Class(root, language);
-     */
-    public void initLocalization(Root root)
-    {
-
-    }
-
-    public String getLocalizedString(Root root)
-    {
-        if( localized_values == null )
+    private String getLocalizedString(Root root) {
+        if (localized_values == null)
             getLocalizedPossibleValues();
 
-       return root.MlM(handler.getValue());
+        return root.MlM(handler.getValue());
     }
 
     public String getLocalizedString()

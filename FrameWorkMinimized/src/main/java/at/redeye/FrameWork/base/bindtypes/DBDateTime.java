@@ -6,23 +6,16 @@ import at.redeye.SqlDBInterface.SqlDBIO.impl.DBDataType;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.regex.Pattern;
 
 public class DBDateTime extends DBValue {
 
     private static final SimpleDateFormat SDF_4_STD_STRING = new SimpleDateFormat(StmtExecInterface.SQLIF_STD_DATE_FORMAT + " "
             + StmtExecInterface.SQLIF_STD_TIME_FORMAT);
 
-    private static final Pattern TIME_PATTERN = Pattern.compile("(([0-1][0-9])|(2[0-3])):[0-5][0-9]:[0-5][0-9]");
-
     protected Date value = new Date(0);
 
     public DBDateTime(String name) {
         super(name);
-    }
-
-    public DBDateTime(String name, String title) {
-        super(name, title);
     }
 
     public DBDateTime(String name, String title, boolean name_is_already_lowercase) {
@@ -77,18 +70,5 @@ public class DBDateTime extends DBValue {
 
     public static String getStdString(Date date) {
         return SDF_4_STD_STRING.format(date);
-    }
-
-
-    public boolean loadTimePart(String time) {
-        if (!TIME_PATTERN.matcher(time).matches())
-            return false;
-
-        String time_str = toString();
-        String completet = time_str.substring(0, 10) + " " + time;
-
-        loadFromString(completet);
-
-        return completet.equalsIgnoreCase(toString());
     }
 }

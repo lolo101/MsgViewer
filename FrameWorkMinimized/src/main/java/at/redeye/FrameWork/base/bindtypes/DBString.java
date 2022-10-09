@@ -1,19 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.base.bindtypes;
 
 import at.redeye.SqlDBInterface.SqlDBIO.impl.DBDataType;
 
-/**
- *
- * @author martin
- */
 public class DBString extends DBValue {
     protected String value = "";
-    protected int max_len;
+    private final int max_len;
 
     public DBString( String name, int max_len )
     {

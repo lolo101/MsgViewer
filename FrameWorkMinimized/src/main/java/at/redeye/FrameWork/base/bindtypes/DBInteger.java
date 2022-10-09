@@ -1,28 +1,14 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.base.bindtypes;
 
 import at.redeye.SqlDBInterface.SqlDBIO.impl.DBDataType;
 
-/**
- *
- * @author martin
- */
 public class DBInteger extends DBValue {
 
-    Integer value = 0;
+    private int value;
 
     public DBInteger( String name )
     {
         super( name );
-    }
-
-    public DBInteger( String name, String title )
-    {
-        super( name, title );
     }
 
     @Override
@@ -43,7 +29,7 @@ public class DBInteger extends DBValue {
     @Override
     public String toString()
     {
-        return value.toString();
+        return String.valueOf(value);
     }
 
     @Override
@@ -66,13 +52,12 @@ public class DBInteger extends DBValue {
     @Override
     public DBInteger getCopy() {
         DBInteger i = new DBInteger(name);
-        i.value = Integer.valueOf(value);
+        i.value = value;
         return i;
     }
 
     @Override
     public void loadFromCopy(Object obj) {
-        value = Integer.valueOf((Integer) obj);
+        value = (Integer) obj;
     }
-
 }
