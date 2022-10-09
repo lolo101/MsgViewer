@@ -69,13 +69,11 @@ public class PrmDefaultCheckSuite implements PrmDefaultChecksInterface {
 
 		String[] validStr = { "ja", "nein", "true", "false", "yes", "no" };
 
-		for (int idx = 0; idx < validStr.length; idx++) {
-
+		for (String s : validStr) {
 			if (event.getNewPrmValue().toString().equalsIgnoreCase(
-					validStr[idx])) {
+					s)) {
 				return true;
 			}
-
 		}
 		logger.warn(event.getParameterName().toString()
 				+ ": Not a Yes/No (True/False) !");
@@ -86,10 +84,10 @@ public class PrmDefaultCheckSuite implements PrmDefaultChecksInterface {
 	private boolean passesHasAValueEqual(PrmActionEvent event) {
 
 		String[] values = event.getPossibleVals();
-		for (int idx = 0; idx < values.length; idx++) {
-			logger.trace("Checking " + values[idx] + " / "
+		for (String value : values) {
+			logger.trace("Checking " + value + " / "
 					+ event.getNewPrmValue().toString());
-			if (values[idx].equals(event.getNewPrmValue().toString())) {
+			if (value.equals(event.getNewPrmValue().toString())) {
 				return true;
 			}
 		}
@@ -117,13 +115,11 @@ public class PrmDefaultCheckSuite implements PrmDefaultChecksInterface {
 
 		String[] validStr = { "metal", "system", "motif", "nimbus" };
 
-		for (int idx = 0; idx < validStr.length; idx++) {
-
+		for (String s : validStr) {
 			if (event.getNewPrmValue().toString().equalsIgnoreCase(
-					validStr[idx])) {
+					s)) {
 				return true;
 			}
-
 		}
 		logger.warn(event.getParameterName().toString()
 				+ ": Not a valid LookAndFeel value !");
@@ -197,9 +193,7 @@ public class PrmDefaultCheckSuite implements PrmDefaultChecksInterface {
 		}
 
 		if ((checks2Execute & PRM_IS_LOOKANDFEEL) != 0) {
-			if (!passesLookAndFeel(event)) {
-				return false;
-			}
+			return passesLookAndFeel(event);
 		}
 		return true;
 	}

@@ -50,7 +50,7 @@ public abstract class Root {
 
     private static Root static_root;
     private final Path storage;
-    protected String[] startupArgs;
+    private String[] startupArgs;
 
     public Root(String app_name, String app_title) {
         this.app_name = app_name;

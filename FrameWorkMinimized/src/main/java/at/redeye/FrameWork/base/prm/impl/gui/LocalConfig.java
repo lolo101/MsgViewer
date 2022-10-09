@@ -25,8 +25,8 @@ import java.util.Vector;
 public class LocalConfig extends BaseDialog implements Saveable, PrmListener {
 
     private static final long serialVersionUID = 1L;
-    final Vector<DBStrukt> values = new Vector<>();
-    final TableManipulator tm;
+    private final Vector<DBStrukt> values = new Vector<>();
+    private final TableManipulator tm;
 
     /**
      * Creates new form Config

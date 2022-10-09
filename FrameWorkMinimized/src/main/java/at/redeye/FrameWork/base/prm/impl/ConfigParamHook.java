@@ -16,26 +16,24 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
-public class ConfigParamHook implements HelpWinHook
-{
-    String keyword;
-    Root root;
-    boolean global;
-    Map<String, DBConfig> config;
-    Collection<String> search_path;
+public class ConfigParamHook implements HelpWinHook {
     private static final Logger logger = LogManager.getLogger(ConfigParamHook.class);
-    String color_even;
-    String color_odd;
-    String color_title;
+    private final String keyword;
+    private final Root root;
+    private final boolean global;
+    private final Map<String, DBConfig> config;
+    private final Collection<String> search_path;
+    private final String color_even;
+    private final String color_odd;
+    private final String color_title;
 
-    public ConfigParamHook( Root root, String keyword, boolean global, Collection<String> search_path )
-    {
+    public ConfigParamHook(Root root, String keyword, boolean global, Collection<String> search_path) {
         this.keyword = keyword;
         this.root = root;
         this.global = global;
         this.search_path = search_path;
 
-        if( global ) {
+        if (global) {
             config = GlobalConfigDefinitions.entries;
             root.loadMlM4ClassName(GlobalConfig.class.getName(), "de");
         } else {

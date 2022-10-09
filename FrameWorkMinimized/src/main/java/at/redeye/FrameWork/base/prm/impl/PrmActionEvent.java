@@ -12,8 +12,8 @@ import at.redeye.FrameWork.base.bindtypes.DBString;
  */
 public class PrmActionEvent {
 
-    private DBString oldPrmValue = new DBString ("oldPrmValue", 100);
-    private DBString newPrmValue = new DBString ("newPrmValue", 100);
+    private final DBString oldPrmValue = new DBString("oldPrmValue", 100);
+    private DBString newPrmValue = new DBString("newPrmValue", 100);
     private DBString  parameterName = new DBString ("Parameter Name", 100);
     private String [] possibleVals = {};
 
@@ -41,10 +41,6 @@ public class PrmActionEvent {
         return oldPrmValue;
     }
 
-    public void setOldPrmValue(DBString oldPrmValue) {
-        this.oldPrmValue = oldPrmValue;
-    }
-
     public void setOldPrmValue(String oldPrmValue) {
         this.oldPrmValue.loadFromString(oldPrmValue);
     }
@@ -61,5 +57,5 @@ public class PrmActionEvent {
         this.parameterName = parameterName;
     }
 
-    
+
 }

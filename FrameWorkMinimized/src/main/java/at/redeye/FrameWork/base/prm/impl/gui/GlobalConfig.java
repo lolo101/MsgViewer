@@ -22,9 +22,8 @@ public class GlobalConfig extends BaseDialog implements Saveable,
         PrmListener {
 
     private static final long serialVersionUID = 1L;
-    final Vector<DBStrukt> values = new Vector<>();
-    final TableManipulator tm;
-    final GlobalConfig myself;
+    private final Vector<DBStrukt> values = new Vector<>();
+    private final TableManipulator tm;
 
     /**
      * Creates new form Config
@@ -67,8 +66,6 @@ public class GlobalConfig extends BaseDialog implements Saveable,
                 logger.warn("PRM " + key + " not found in LocalSetup!");
             }
         }
-        myself = this;
-
     }
 
     public final void feed_table(boolean autombox) {
@@ -186,7 +183,7 @@ public class GlobalConfig extends BaseDialog implements Saveable,
 
         java.awt.EventQueue.invokeLater(new Runnable() {
 
-            final HelpWinHook hook = new ConfigParamHook(root, "GLOBALSETTINGSHOOOK",
+            private final HelpWinHook hook = new ConfigParamHook(root, "GLOBALSETTINGSHOOOK",
                     true, GlobalConfigDefinitions.help_search_path);
 
             public void run() {
@@ -226,7 +223,7 @@ public class GlobalConfig extends BaseDialog implements Saveable,
                 for (String key : keys) {
                     DBConfig c = root.getSetup().getConfig(key);
                     if (c != null) {
-                        c.removePrmListener(myself);
+                        c.removePrmListener(this);
                     }
                 }
                 close();
