@@ -1,21 +1,17 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package at.redeye.FrameWork.base.prm.impl;
 
 import at.redeye.FrameWork.base.bindtypes.DBString;
 
-/**
- *
- * @author Mario
- */
 public class PrmActionEvent {
 
     private final DBString oldPrmValue = new DBString("oldPrmValue", 100);
-    private DBString newPrmValue = new DBString("newPrmValue", 100);
-    private DBString  parameterName = new DBString ("Parameter Name", 100);
-    private String [] possibleVals = {};
+    private final DBString newPrmValue = new DBString("newPrmValue", 100);
+    private final DBString parameterName = new DBString("Parameter Name", 100);
+    private String[] possibleVals = {};
+
+    public boolean valueHasChanged() {
+        return !newPrmValue.toString().equals(oldPrmValue.toString());
+    }
 
     public String[] getPossibleVals() {
         return possibleVals;
@@ -27,10 +23,6 @@ public class PrmActionEvent {
 
     public DBString getNewPrmValue() {
         return newPrmValue;
-    }
-
-    public void setNewPrmValue(DBString newPrmValue) {
-        this.newPrmValue = newPrmValue;
     }
 
     public void setNewPrmValue(String newPrmValue) {
@@ -52,10 +44,4 @@ public class PrmActionEvent {
     public void setParameterName(String parameterName) {
         this.parameterName.loadFromString(parameterName);
     }
-
-     public void setParameterName(DBString parameterName) {
-        this.parameterName = parameterName;
-    }
-
-
 }

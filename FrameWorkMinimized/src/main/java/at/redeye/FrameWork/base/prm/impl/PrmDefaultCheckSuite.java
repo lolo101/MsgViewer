@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package at.redeye.FrameWork.base.prm.impl;
 
 import at.redeye.FrameWork.base.prm.PrmDefaultChecksInterface;
@@ -12,10 +8,6 @@ import org.apache.logging.log4j.Logger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-/**
- *
- * @author mmattl
- */
 public class PrmDefaultCheckSuite implements PrmDefaultChecksInterface {
 
 	private final Logger logger = LogManager.getLogger(PrmDefaultCheckSuite.class);
@@ -97,18 +89,15 @@ public class PrmDefaultCheckSuite implements PrmDefaultChecksInterface {
 
 	}
 
-	private boolean passesDateTime(PrmActionEvent event, SimpleDateFormat sdf) {
-
+	private boolean invalidDateTime(PrmActionEvent event, SimpleDateFormat sdf) {
 		try {
 			sdf.parse(event.getNewPrmValue().toString());
+			return false;
 		} catch (ParseException pe) {
 			logger.warn(event.getParameterName().toString()
 					+ ": Date and/or Time is not valid!\n" + pe.getMessage());
-			return false;
+			return true;
 		}
-
-		return true;
-
 	}
 
 	private boolean passesLookAndFeel(PrmActionEvent event) {
@@ -162,7 +151,7 @@ public class PrmDefaultCheckSuite implements PrmDefaultChecksInterface {
 		if ((checks2Execute & PRM_IS_DATE) != 0) {
 			SimpleDateFormat sdf = new SimpleDateFormat(
 					StmtExecInterface.SQLIF_STD_DATE_FORMAT);
-			if (!passesDateTime(event, sdf)) {
+			if (invalidDateTime(event, sdf)) {
 				return false;
 			}
 		}
@@ -170,7 +159,7 @@ public class PrmDefaultCheckSuite implements PrmDefaultChecksInterface {
 		if ((checks2Execute & PRM_IS_TIME) != 0) {
 			SimpleDateFormat sdf = new SimpleDateFormat(
 					StmtExecInterface.SQLIF_STD_TIME_FORMAT);
-			if (!passesDateTime(event, sdf)) {
+			if (invalidDateTime(event, sdf)) {
 				return false;
 			}
 		}
@@ -178,7 +167,7 @@ public class PrmDefaultCheckSuite implements PrmDefaultChecksInterface {
 		if ((checks2Execute & PRM_IS_SHORTTIME) != 0) {
 			SimpleDateFormat sdf = new SimpleDateFormat(
 					StmtExecInterface.SQLIF_STD_SHORTTIME_FORMAT);
-			if (!passesDateTime(event, sdf)) {
+			if (invalidDateTime(event, sdf)) {
 				return false;
 			}
 		}
@@ -187,7 +176,7 @@ public class PrmDefaultCheckSuite implements PrmDefaultChecksInterface {
 			SimpleDateFormat sdf = new SimpleDateFormat(
 					StmtExecInterface.SQLIF_STD_DATE_FORMAT + " "
 							+ StmtExecInterface.SQLIF_STD_TIME_FORMAT);
-			if (!passesDateTime(event, sdf)) {
+			if (invalidDateTime(event, sdf)) {
 				return false;
 			}
 		}

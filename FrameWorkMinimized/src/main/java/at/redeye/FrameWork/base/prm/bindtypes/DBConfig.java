@@ -9,12 +9,13 @@ import at.redeye.FrameWork.base.prm.PrmDefaultChecksInterface;
 import at.redeye.FrameWork.base.prm.PrmListener;
 import at.redeye.FrameWork.base.prm.impl.PrmActionEvent;
 
+import java.util.Collection;
 import java.util.Vector;
 
 public class DBConfig extends DBStrukt implements PrmAttachInterface {
     private static final String TABLENAME = "CONFIG";
 
-    private final Vector<PrmListener> prmListeners = new Vector<>();
+    private final Collection<PrmListener> prmListeners = new Vector<>();
     private String[] possibleValues = {};
 
     private PrmCustomChecksInterface customChecks;
@@ -145,22 +146,21 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface {
     @Override
     public void updateListeners(PrmActionEvent prmActionEvent) {
 
-        System.out.println ("PRM " + name.toString()+
+        System.out.println("PRM " + name.toString() +
                 " has " + prmListeners.size() + " listener(s) registered!");
 
-        for (PrmListener currentListener : prmListeners) {
+        boolean valueHasChanged = prmActionEvent.valueHasChanged();
 
+        for (PrmListener currentListener : prmListeners) {
             if (defaultChecks != null) {
-                // Only send, if value has changed
-                if (!prmActionEvent.getNewPrmValue().toString().equals(prmActionEvent.getOldPrmValue().toString()))
+                if (valueHasChanged)
                     currentListener.onChange(defaultChecks, prmActionEvent);
             } else {
                 System.out.println("-> no default check");
             }
 
             if (customChecks != null) {
-                // Only send, if value has changed
-                if (!prmActionEvent.getNewPrmValue().toString().equals(prmActionEvent.getOldPrmValue().toString()))
+                if (valueHasChanged)
                     currentListener.onChange(customChecks, prmActionEvent);
             } else {
                 System.out.println("-> no custom check");
