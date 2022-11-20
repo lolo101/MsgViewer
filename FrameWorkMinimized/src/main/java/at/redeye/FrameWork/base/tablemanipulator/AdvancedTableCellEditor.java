@@ -17,11 +17,11 @@ import java.awt.*;
 public class AdvancedTableCellEditor extends AbstractCellEditor implements TableCellEditor {
 
     private static final long serialVersionUID = 1L;
-    AutoCompleteTextField component = new AutoCompleteTextField();
-    TableDesign tabledesign;
-    int last_row = 0;
-    int last_col = 0;
-    Object current_value;
+    private final AutoCompleteTextField component = new AutoCompleteTextField();
+    private final TableDesign tabledesign;
+    private int last_row;
+    private int last_col;
+    private Object current_value;
 
     public AdvancedTableCellEditor(TableDesign tabledesign) {
         this.tabledesign = tabledesign;
@@ -39,18 +39,15 @@ public class AdvancedTableCellEditor extends AbstractCellEditor implements Table
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
 
         last_row = TableDesign.getModelRow(table, row);
-        last_col =  TableDesign.getModelCol(table, column);
+        last_col = TableDesign.getModelCol(table, column);
         current_value = value;
 
         System.out.println("getTableCellEditorComponent col: " + last_col + " row: " + last_row + " Value " + (current_value != null ? current_value.toString() : "(null)"));
 
         component.enable_complete(false);
 
-        if( tabledesign.colls.get(last_col).getAutoCompleteForCollAtAll() )
-        {
-            component.set_items(tabledesign.getAllOfCollSorted(last_col));
-            component.enable_complete(true);
-        }
+        component.set_items(tabledesign.getAllOfCollSorted(last_col));
+        component.enable_complete(true);
 
         component.setBackground(Color.YELLOW);
 
@@ -64,17 +61,16 @@ public class AdvancedTableCellEditor extends AbstractCellEditor implements Table
                     component.setBorder(new LineBorder(Color.BLACK));
                     component.setText(sc);
                     return component;
-                } else {
-                    component.setBorder(new LineBorder(Color.RED));
-                    return component;
                 }
-            } else {
-
-                component.setText((String) value);
+                component.setBorder(new LineBorder(Color.RED));
                 return component;
             }
 
-        } else if (current_value instanceof DBValue) {
+            component.setText((String) value);
+            return component;
+
+        }
+        if (current_value instanceof DBValue) {
 
 
             if (current_value instanceof DBString) {
@@ -96,16 +92,14 @@ public class AdvancedTableCellEditor extends AbstractCellEditor implements Table
             if (!val.acceptString(String.valueOf(value))) {
                 component.setBorder(new LineBorder(Color.RED));
                 return component;
-            } else {
-                component.setBorder(new LineBorder(Color.BLACK));
-                component.setText(String.valueOf(value));
-                return component;
             }
-
-        } else {
-
+            component.setBorder(new LineBorder(Color.BLACK));
             component.setText(String.valueOf(value));
+            return component;
+
         }
+
+        component.setText(String.valueOf(value));
 
         if( value != null )
             System.out.println( "value:" + value.getClass().getName() );
@@ -119,7 +113,7 @@ public class AdvancedTableCellEditor extends AbstractCellEditor implements Table
         System.out.println("Advanced stopCellEditing");
 
         if (tabledesign.colls.get(last_col).validator != null) {
-            if (!tabledesign.colls.get(last_col).validator.acceptData(component.getText())) {
+            if (tabledesign.colls.get(last_col).validator.rejectData(component.getText())) {
                 component.setBorder(new LineBorder(Color.RED));
                 return false;
             }
@@ -146,9 +140,8 @@ public class AdvancedTableCellEditor extends AbstractCellEditor implements Table
                 if (!val.acceptString(s)) {
                     component.setBorder(new LineBorder(Color.RED));
                     return false;
-                } else {
-                    val.loadFromString(s);
                 }
+                val.loadFromString(s);
             }
         }
 

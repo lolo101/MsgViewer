@@ -13,11 +13,11 @@ import java.awt.*;
 public class AdvancedEnumTableCellEditor extends AbstractCellEditor implements TableCellEditor {
 
     private static final long serialVersionUID = 1L;
-    AutoCompleteCombo component = new AutoCompleteCombo();
-    TableDesign tabledesign;
-    int last_row = 0;
-    int last_col = 0;
-    Object current_value;
+    private final AutoCompleteCombo component = new AutoCompleteCombo();
+    private final TableDesign tabledesign;
+    private int last_row;
+    private int last_col;
+    private Object current_value;
 
     public AdvancedEnumTableCellEditor(TableDesign tabledesign, DBEnum<?> value) {
         this.tabledesign = tabledesign;
@@ -83,7 +83,7 @@ public class AdvancedEnumTableCellEditor extends AbstractCellEditor implements T
        component.hidePopup();
 
         if (tabledesign.colls.get(last_col).validator != null) {
-            if (!tabledesign.colls.get(last_col).validator.acceptData(component.getText())) {
+            if (tabledesign.colls.get(last_col).validator.rejectData(component.getText())) {
                 component.setBorder(new LineBorder(Color.RED));
                 return false;
             }
@@ -120,9 +120,8 @@ public class AdvancedEnumTableCellEditor extends AbstractCellEditor implements T
                 if (!val.acceptString(s)) {
                     component.setBorder(new LineBorder(Color.RED));
                     return false;
-                } else {
-                    val.loadFromString(s);
                 }
+                val.loadFromString(s);
             }
         }
 

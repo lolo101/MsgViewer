@@ -10,11 +10,9 @@ public class RowHeader
 {
     static class RowHeaderRenderer extends JLabel implements ListCellRenderer<Integer> {
 
-        final JTable table;
-        final Font font;
+        private final Font font;
 
-        RowHeaderRenderer(JTable table) {
-            this.table = table;
+        private RowHeaderRenderer(JTable table) {
             JTableHeader header = table.getTableHeader();
             setOpaque(true);
             setBorder(UIManager.getBorder("TableHeader.cellBorder"));
@@ -46,9 +44,9 @@ public class RowHeader
     }
 
     static class ListModel extends AbstractListModel<Integer> {
-        final JTable table;
+        private final JTable table;
 
-        public ListModel(JTable table) {
+        private ListModel(JTable table) {
             this.table = table;
         }
 
@@ -68,37 +66,28 @@ public class RowHeader
         }
     }
 
-    final JTable table;
-    RowHeaderRenderer header;
-    JList<Integer> list;
-    JScrollPane scroll;
-    boolean visible_state = true;
-    boolean vertical_scroll_bar_visible = false;
-    Runnable visible_state_listener;
+    private JList<Integer> list;
+    private JScrollPane scroll;
+    private boolean visible_state = true;
+    private boolean vertical_scroll_bar_visible;
 
-    public RowHeader( JTable table, final Runnable visible_state_listener )
-    {
-        this.table = table;
-        this.visible_state_listener = visible_state_listener;
+    public RowHeader(JTable table, final Runnable visible_state_listener) {
 
-         scroll = null;
+        scroll = null;
 
-        for( Container cont = table.getParent(); cont != null; cont = cont.getParent() )
-        {
-            if( cont instanceof JScrollPane )
-            {
+        for (Container cont = table.getParent(); cont != null; cont = cont.getParent()) {
+            if (cont instanceof JScrollPane) {
                 scroll = (JScrollPane) cont;
                 break;
             }
         }
 
-        if( scroll != null )
-        {
+        if (scroll != null) {
             list = new JList<>(new ListModel(table));
 
             list.setOpaque(false);
 
-            header = new RowHeaderRenderer(table);
+            ListCellRenderer<Integer> header = new RowHeaderRenderer(table);
 
             list.setCellRenderer(header);
 

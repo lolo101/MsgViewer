@@ -1,57 +1,47 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.base.tablemanipulator;
 
-/**
- *
- * @author martin
- */
-import java.awt.Component;
+import javax.swing.*;
+import javax.swing.table.TableCellEditor;
+import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import javax.swing.JTable;
-import javax.swing.table.TableCellEditor;
 
 /**
  * This class is a workaround for a bug in Java (4503845)
- *      see http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4503845
- * Although the state appears as fixed, it does not yet work on 1.5 
- *      (see the comments at the end on the previous page)
- *      
- * The bug refers to tables with editing cells. When the user interacts 
- *   with other UI element -or other cell in the table-, the editor component
- *   should receive a stopCellEditing call.
- *   This does not happen if the user selects a UI element outside the table.
- *   
+ * see <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4503845">http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4503845</a>
+ * Although the state appears as fixed, it does not yet work on 1.5
+ * (see the comments at the end on the previous page)
+ * <p>
+ * The bug refers to tables with editing cells. When the user interacts
+ * with other UI element -or other cell in the table-, the editor component
+ * should receive a stopCellEditing call.
+ * This does not happen if the user selects a UI element outside the table.
+ * <p>
  * For example:
- *   - A dialog contains a table and a Cancel button that, before closing, 
- *      verifies whether there are changes to save.
- *   -The user is modifying one cell and then presses the Cancel button
- *   -Then the cell editor does not receive an stopCellEditing call, so
- *      there seems to be no changes to save!
- *      
- * A basic solution for this last example would be to call to 
- *   table.getCellEditor().stopCellEditing() when reacting to events on the
- *   Cancel button, but this call should be made on every event handler for
- *   each UI element!
- *   
+ * - A dialog contains a table and a Cancel button that, before closing,
+ * verifies whether there are changes to save.
+ * -The user is modifying one cell and then presses the Cancel button
+ * -Then the cell editor does not receive an stopCellEditing call, so
+ * there seems to be no changes to save!
+ * <p>
+ * A basic solution for this last example would be to call to
+ * table.getCellEditor().stopCellEditing() when reacting to events on the
+ * Cancel button, but this call should be made on every event handler for
+ * each UI element!
+ * <p>
  * This class works by listening to focus events when a cell editor is selected.
  * If the focus is transfered to any place outside the table, it calls to
- *  stopCellEditing()
+ * stopCellEditing()
  * Why is it not enough to check the focus on just the editor component?
- *   => Because the TableCellEditor could be composed of multiple Components  
- *
+ * => Because the TableCellEditor could be composed of multiple Components
  */
 public class TableEditorStopper extends FocusAdapter implements PropertyChangeListener
 {
-    private boolean paused = false;
+    private boolean paused;
     private Component focused;
-    private JTable table;
+    private final JTable table;
 
     public TableEditorStopper(JTable table)
     {
@@ -68,15 +58,6 @@ public class TableEditorStopper extends FocusAdapter implements PropertyChangeLi
         paused = true;
     }
 
-    /**
-     * pause listening on property change event
-     * call this function before removing a row
-     */
-    public void doPause(boolean state)
-    {
-        paused = state;
-    }
-
     void doContinue() {
         paused = false;
     }
@@ -90,9 +71,10 @@ public class TableEditorStopper extends FocusAdapter implements PropertyChangeLi
         focused = table.getEditorComponent();
         if (focused!=null)
         {
-            focused.addFocusListener(this);            
+            focused.addFocusListener(this);
         }
     }
+
     @Override
     public void focusLost(FocusEvent e)
     {
@@ -103,16 +85,12 @@ public class TableEditorStopper extends FocusAdapter implements PropertyChangeLi
         {
             focused.removeFocusListener(this);
             focused = e.getOppositeComponent();
-            if (table==focused || table.isAncestorOf(focused))
-            {
-                focused.addFocusListener(this);                        
-            }
-            else
-            {
-                focused=null;
+            if (table == focused || table.isAncestorOf(focused)) {
+                focused.addFocusListener(this);
+            } else {
+                focused = null;
                 TableCellEditor editor = table.getCellEditor();
-                if (editor!=null)
-                {                    
+                if (editor != null) {
                     editor.stopCellEditing();
                 }
             }

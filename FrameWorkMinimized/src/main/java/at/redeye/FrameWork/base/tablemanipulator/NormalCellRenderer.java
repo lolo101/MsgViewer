@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package at.redeye.FrameWork.base.tablemanipulator;
 
 import at.redeye.FrameWork.base.FrameWorkConfigDefinitions;
@@ -11,16 +7,10 @@ import at.redeye.FrameWork.base.bindtypes.DBValue;
 import at.redeye.FrameWork.base.tablemanipulator.TableDesign.ColoredCell;
 import at.redeye.FrameWork.utilities.HTMLColor;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
-import javax.swing.JTable;
+import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
+import java.awt.*;
 
-/**
- *
- * @author martin
- */
 public class NormalCellRenderer extends DefaultTableCellRenderer {
 
     private static final long serialVersionUID = 1L;
@@ -36,27 +26,20 @@ public class NormalCellRenderer extends DefaultTableCellRenderer {
     /**
      * The current model_row being rendered
      */
-    protected int model_row;
+    private int model_row;
     /**
      * The current model_column being rendered
      */
-    protected int model_col;
+    private int model_col;
 
-    /**
-     * If this cell is part of the "selected" row
-     */
-    protected boolean isSelected;
-    /**
-     * If this cell is in focus (the one clicked upon)
-     */
-    protected boolean isFocused;
-    boolean hightlight = true;
-    Font font = null;
-    Color hColor = new Color(210, 235, 245);
-    Color heColor = new Color(245, 245, 255);
-    Color lColor = new Color(255, 255, 255);
-    Color leColor = new Color(220, 245, 235);
-    TableDesign tabledesign;
+    private boolean notSelected = true;
+    private boolean hightlight = true;
+    private Font font;
+    private Color hColor = new Color(210, 235, 245);
+    private Color heColor = new Color(245, 245, 255);
+    private Color lColor = new Color(255, 255, 255);
+    private Color leColor = new Color(220, 245, 235);
+    private final TableDesign tabledesign;
 
     public NormalCellRenderer(Root root, TableDesign tabledesign) {
         this.tabledesign = tabledesign;
@@ -64,18 +47,18 @@ public class NormalCellRenderer extends DefaultTableCellRenderer {
         Color c;
 
         c = HTMLColor.loadLocalColor(root, FrameWorkConfigDefinitions.SpreadSheetColorEven);
-        if( c != null )
-            hColor  = c;
+        if (c != null)
+            hColor = c;
 
-        c = HTMLColor.loadLocalColor(root, FrameWorkConfigDefinitions.SpreadSheetColorEvenEditable );
-        if( c != null )
-            heColor  = c;
+        c = HTMLColor.loadLocalColor(root, FrameWorkConfigDefinitions.SpreadSheetColorEvenEditable);
+        if (c != null)
+            heColor = c;
 
-        c  = HTMLColor.loadLocalColor(root, FrameWorkConfigDefinitions.SpreadSheetColorOdd );
-        if( c != null )
-            lColor  = c;
+        c = HTMLColor.loadLocalColor(root, FrameWorkConfigDefinitions.SpreadSheetColorOdd);
+        if (c != null)
+            lColor = c;
 
-        c = HTMLColor.loadLocalColor(root, FrameWorkConfigDefinitions.SpreadSheetColorOddEditable );
+        c = HTMLColor.loadLocalColor(root, FrameWorkConfigDefinitions.SpreadSheetColorOddEditable);
         if( c != null )
             leColor  = c;
     }
@@ -84,17 +67,12 @@ public class NormalCellRenderer extends DefaultTableCellRenderer {
     public Component getTableCellRendererComponent(JTable tbl, Object v, boolean isSelected, boolean isFocused, int row, int col) {
         //Store this info for later use
 
-        if (row % 2 != 0) {
-            hightlight = true;
-        } else {
-            hightlight = false;
-        }
+        hightlight = row % 2 != 0;
         this.row = row;
         this.col = col;
         this.model_col = TableDesign.getModelCol(tbl, col);
         this.model_row = TableDesign.getModelRow(tbl, row);
-        this.isSelected = isSelected;
-        this.isFocused = isFocused;
+        this.notSelected = !isSelected;
 
         if (font == null) {
             font = this.getFont();
@@ -105,9 +83,6 @@ public class NormalCellRenderer extends DefaultTableCellRenderer {
 
     @Override
     protected void setValue(Object v) {
-        // System.out.println("setValue: " + row + " " + " col " + col + " " + v.toString());
-
-        // System.out.println( tabledesign.colls.get(col).Title );
         if (tabledesign.colls.get(model_col).validator != null) {
             if (v instanceof DBValue) {
                 String res = tabledesign.colls.get(model_col).validator.formatData(v);
@@ -134,7 +109,7 @@ public class NormalCellRenderer extends DefaultTableCellRenderer {
 
                 if( db_value instanceof DBEnum )
                 {
-                    super.setValue( ((DBEnum)db_value).getLocalizedString() );
+                    super.setValue(((DBEnum<?>) db_value).getLocalizedString());
                 }
                 else
                 {
@@ -144,14 +119,14 @@ public class NormalCellRenderer extends DefaultTableCellRenderer {
 
 
                 if( v instanceof DBEnum )
-                    super.setValue( ((DBEnum)v).getLocalizedString() );
+                    super.setValue(((DBEnum<?>) v).getLocalizedString());
                 else
                     super.setValue(v);
             }
         }
 
         //Set colors dependant upon if the row is selected or not
-        if (!this.isSelected) {
+        if (this.notSelected) {
             if (hightlight) {
                 if (!tabledesign.colls.get(model_col).isEditable) {
                     this.setBackground(hColor);
@@ -169,9 +144,9 @@ public class NormalCellRenderer extends DefaultTableCellRenderer {
         }
 
         // User set color
-        if (!this.isSelected) {
+        if (this.notSelected) {
             ColoredCell ccell;
-            for (int ccellindex= 0; ccellindex < tabledesign.coloredCells.size(); ccellindex++) {
+            for (int ccellindex = 0; ccellindex < tabledesign.coloredCells.size(); ccellindex++) {
                 ccell = tabledesign.coloredCells.get(ccellindex);
                 if (ccell.col == model_col && ccell.row == model_row) {
                     this.setBackground(ccell.color);
@@ -180,18 +155,18 @@ public class NormalCellRenderer extends DefaultTableCellRenderer {
             }
         }
 
-        boolean found = false;
+        boolean missing = true;
 
         for (int ccellindex = 0; ccellindex < tabledesign.tooltipCells.size(); ccellindex++) {
             TableDesign.ToolTipCell cell = tabledesign.tooltipCells.get(ccellindex);
             if (cell.col == model_col && cell.row == model_row) {
                 this.setToolTipText(cell.tooltip);
-                found = true;
+                missing = false;
                 break;
             }
         }
 
-        if( !found )
+        if (missing)
             setToolTipText(null);
 
 

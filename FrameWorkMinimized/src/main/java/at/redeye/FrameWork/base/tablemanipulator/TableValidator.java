@@ -1,24 +1,17 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package at.redeye.FrameWork.base.tablemanipulator;
 
 import at.redeye.FrameWork.base.bindtypes.DBValue;
-import javax.swing.JComponent;
 
-/**
- *
- * @author martin
- */
+import javax.swing.*;
+
 public abstract class TableValidator {
 
     public String formatData(Object data) {
         return String.valueOf(data);
     }
 
-    public boolean acceptData(String data) {
-        return true;
+    public boolean rejectData(String data) {
+        return false;
     }
 
     public boolean loadToValue(DBValue val, String s, int row) {

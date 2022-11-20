@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package at.redeye.FrameWork.base.tablemanipulator;
 
 import org.apache.logging.log4j.LogManager;
@@ -12,33 +8,25 @@ import javax.swing.table.TableColumnModel;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-/**
- *
- * @author martin
- */
-public class ColumnOrder implements Comparator<Order>
-{
+public class ColumnOrder implements Comparator<Order> {
     private static final Logger logger = LogManager.getLogger(ColumnOrder.class);
 
-    JTable table;
-    ArrayList<Order> order_list;
+    private final JTable table;
+    private final ArrayList<Order> order_list;
 
-    public ColumnOrder( JTable table )
-    {
+    public ColumnOrder(JTable table) {
         this.table = table;
         this.order_list = new ArrayList<>();
     }
 
-    void addColumn( String name, int position_now, int position_wanted )
-    {
-        if( position_wanted >= table.getColumnCount() )
+    void addColumn(String name, int position_now, int position_wanted) {
+        if (position_wanted >= table.getColumnCount())
             position_wanted = -1;
 
-        order_list.add(new Order(name, position_now, position_wanted) );
+        order_list.add(new Order(name, position_now, position_wanted));
     }
 
-    private void sort()
-    {
+    private void sort() {
         order_list.sort(this);
 
         if (logger.isDebugEnabled())
@@ -70,17 +58,14 @@ public class ColumnOrder implements Comparator<Order>
             Order min_order = null;
 
             // suche jenen Eintrag der am weitesten nach vorne will
-            for( Order order : order_list )
-            {
-                if( min_order == null && !order.isOnWantedPosition() ) {
+            for( Order order : order_list ) {
+                if (min_order == null && order.isUnwantedPosition()) {
                     min_order = order;
                 }
 
-                if( min_order != null && !order.isOnWantedPosition() )
-                {
-                    if( min_order.position_wanted > order.position_wanted )
-                    {
-                        logger.debug(min_order.position_wanted +  " > " + order.position_wanted);
+                if (min_order != null && order.isUnwantedPosition()) {
+                    if (min_order.position_wanted > order.position_wanted) {
+                        logger.debug(min_order.position_wanted + " > " + order.position_wanted);
                         min_order = order;
                     }
                 }
@@ -93,7 +78,7 @@ public class ColumnOrder implements Comparator<Order>
                     // order = order_list.get(0);
                     // finde ersten unzufriedenen
                     for (Order o : order_list) {
-                        if (!o.isOnWantedPosition()) {
+                        if (o.isUnwantedPosition()) {
                             order = o;
                             break;
                         }
@@ -102,7 +87,7 @@ public class ColumnOrder implements Comparator<Order>
                     order = min_order;
                 }
 
-                if (order != null && !order.isOnWantedPosition()) {
+                if (order != null && order.isUnwantedPosition()) {
                     logger.debug(" => " + order);
                     model.moveColumn(order.position_now, order.position_wanted);
 
@@ -132,7 +117,7 @@ public class ColumnOrder implements Comparator<Order>
 
             for( Order order : order_list )
             {
-                if( !order.isOnWantedPosition() )
+                if (order.isUnwantedPosition())
                     needs_sorting = true;
             }
 
