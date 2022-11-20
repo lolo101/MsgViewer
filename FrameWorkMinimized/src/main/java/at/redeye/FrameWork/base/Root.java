@@ -1,23 +1,20 @@
 package at.redeye.FrameWork.base;
 
-import at.redeye.FrameWork.Plugin.Plugin;
-import at.redeye.FrameWork.base.dll_cache.DLLCache;
-import at.redeye.FrameWork.base.dll_cache.DLLExtractor;
 import at.redeye.FrameWork.base.translation.MLHelper;
 import at.redeye.FrameWork.utilities.Storage;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.nio.file.Path;
-import java.security.AccessControlException;
-import java.util.*;
+import java.util.Locale;
 
 public class Root {
-
-    protected static final Logger logger = LogManager.getLogger(Root.class);
-    protected final Map<String, Plugin> plugins = new HashMap<>();
+    private static Root static_root;
     private final String app_name;
     private final String app_title;
+    private final LocalSetup setup;
+    private final Plugins plugins;
+    private final Path storage;
+    private final Dialogs dialogs;
+    private final MLHelper ml_helper;
 
     /**
      * language most of the aplication is programmed in
@@ -54,13 +51,7 @@ public class Root {
      */
     private String display_language;
 
-    private static Root static_root;
     private String[] startupArgs;
-    protected final LocalSetup setup;
-    private final Path storage;
-    private final Dialogs dialogs;
-    private final MLHelper ml_helper;
-    private final DLLCache dll_cache;
 
     public Root(String app_name) {
         this(app_name, app_name);
@@ -71,10 +62,10 @@ public class Root {
         this.app_title = app_title;
         static_root = this;
         setup = new LocalSetup(app_name);
+        plugins = new Plugins(app_name);
         storage = Storage.getEphemeralStorage(this.app_name);
         dialogs = new Dialogs(this);
         ml_helper = new MLHelper(this);
-        dll_cache = new DLLCache(this);
     }
 
     public Setup getSetup() {
@@ -103,34 +94,8 @@ public class Root {
         return app_title;
     }
 
-    public void addDllExtractorToCache(DLLExtractor extractor) {
-        dll_cache.addDllExtractor(extractor);
-        dll_cache.initEnv();
-    }
-
-    public void registerPlugin(Plugin plugin) {
-        if (plugins.containsKey(plugin.getName()))
-            return;
-
-        if (plugin.isAvailable()) {
-            try {
-                plugin.initPlugin(this);
-                plugins.put(plugin.getName(), plugin);
-            } catch (AccessControlException ex) {
-                logger.error(ex, ex);
-            }
-        }
-    }
-
-    public List<Plugin> getRegisteredPlugins()
-    {
-        return new ArrayList<>(plugins.values());
-    }
-
-
-    public Plugin getPlugin(String name) {
-        Plugin plugin = plugins.get(name);
-        return plugin != null && plugin.isAvailable() ? plugin : null;
+    public Plugins getPlugins() {
+        return plugins;
     }
 
     /**
@@ -140,8 +105,7 @@ public class Root {
      * <p>
      * This is set to "en" by default.
      */
-    public void setBaseLanguage( String language )
-    {
+    public void setBaseLanguage(String language) {
         base_language = language;
     }
 

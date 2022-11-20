@@ -1,7 +1,7 @@
 package at.redeye.Plugins.ShellExec;
 
 import at.redeye.FrameWork.base.AutoMBox;
-import at.redeye.FrameWork.base.Root;
+import at.redeye.FrameWork.base.Plugins;
 import at.redeye.FrameWork.base.Setup;
 import at.redeye.FrameWork.widgets.helpwindow.HelpFileLoader;
 import at.redeye.FrameWork.widgets.helpwindow.HyperlinkExecuter;
@@ -22,9 +22,9 @@ public class Plugin implements at.redeye.FrameWork.Plugin.Plugin, OpenUrlInterfa
     }
 
     public void initPlugin(Object obj) {
-        if (obj instanceof Root) {
-            Root root = (Root) obj;
-            root.addDllExtractorToCache(new HSWChellExecDLL());
+        if (obj instanceof Plugins) {
+            Plugins plugins = (Plugins) obj;
+            plugins.addDllExtractorToCache(new HSWChellExecDLL());
             if (Setup.is_win_system()) {
                 HyperlinkExecuter.setOpenUrl(this);
             }

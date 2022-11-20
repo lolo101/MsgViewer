@@ -114,7 +114,7 @@ public class ModuleLauncher extends BaseModuleLauncher {
 
     private void registerPlugins() {
         if (Setup.is_win_system()) {
-            root.registerPlugin(new at.redeye.Plugins.ShellExec.Plugin());
+            root.getPlugins().register(new at.redeye.Plugins.ShellExec.Plugin());
         }
     }
 

@@ -4,6 +4,7 @@ import at.redeye.FrameWork.base.BaseDialog;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.widgets.helpwindow.HyperlinkExecuter;
 
+import javax.swing.event.HyperlinkListener;
 import java.awt.*;
 import java.util.List;
 
@@ -15,7 +16,7 @@ public class AboutPlugins extends BaseDialog {
 
         initComponents();
 
-        List<Plugin> plugins = root.getRegisteredPlugins();
+        List<Plugin> plugins = root.getPlugins().registered();
 
         jLPlugins.setListData(plugins.toArray(Plugin[]::new));
 
@@ -25,7 +26,7 @@ public class AboutPlugins extends BaseDialog {
             jLPluginsMouseClicked(null);
         }
 
-        HyperlinkExecuter executer = new HyperlinkExecuter(root);
+        HyperlinkListener executer = new HyperlinkExecuter(root);
 
         jTChangeLog.addHyperlinkListener(executer);
         jTLicenceText.addHyperlinkListener(executer);

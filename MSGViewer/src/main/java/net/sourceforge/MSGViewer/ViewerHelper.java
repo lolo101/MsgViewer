@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -96,7 +95,7 @@ public class ViewerHelper {
         return prep_images.prepareImages(html);
     }
 
-    public Path extractUrl(URL url, Message message) throws IOException {
+    public Path extractUrl(URI uri, Message message) throws IOException {
         List<Attachment> attachments = message.getAttachments();
 
         for (Attachment att : attachments) {
@@ -105,7 +104,7 @@ public class ViewerHelper {
 
                 Path content = attachmentRepository.getTempFile(fatt);
 
-                if (content.toUri().toURL().equals(url)) {
+                if (content.toUri().equals(uri)) {
                     logger.info("opening " + fatt);
 
                     if (!Files.exists(content)) {

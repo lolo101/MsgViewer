@@ -160,7 +160,7 @@ public class JavaMailParser {
     }
 
     private static byte[] getContent(Part mp) throws IOException, MessagingException {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(mp.getSize());
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try (InputStream in = mp.getInputStream()) {
             in.transferTo(bos);
         }

@@ -36,7 +36,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URL;
+import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -360,26 +360,26 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
     private void hyperlinkUpdate(final HyperlinkEvent e) {
         new AutoMBox<>(ViewerPanel.class.getName(), () -> {
             if (message != null && e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
-                openUrl(e.getURL());
+                openUrl(e.getURL().toURI());
             }
         }).run();
     }
 
-    private void openUrl(URL url) throws IOException {
-        logger.info(url);
+    private void openUrl(URI uri) throws IOException {
+        logger.info(uri);
 
-        final String protocol = url.getProtocol();
+        final String protocol = uri.getScheme();
 
         if (!protocol.equals("file")) {
-            open(url.toString());
+            open(uri.toString());
             return;
         }
 
-        Path content = helper.extractUrl(url, message);
+        Path content = helper.extractUrl(uri, message);
 
         if (content == null) {
             // maybe the url points to a local directory
-            content = Path.of(url.getFile());
+            content = Path.of(uri.getPath());
         }
 
         if (ViewerHelper.is_mail_message(content.toString())) {
@@ -394,7 +394,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
     }
 
     private void open(String path) throws IOException {
-        if (Setup.is_win_system() && root.getPlugin("ShellExec") != null) {
+        if (Setup.is_win_system() && root.getPlugins().getAvailable("ShellExec") != null) {
             logger.info("opening: " + path);
 
             ShellExec shell = new ShellExec();
