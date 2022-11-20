@@ -64,7 +64,7 @@ public class Setup {
             try (FileInputStream in = new FileInputStream(config_file)) {
                 oldProps.load(in);
             } catch (FileNotFoundException ex) {
-                logger.error("File " + config_file + " existiert noch nicht.");
+                logger.error(ex.toString());
             }
 
             Set<String> keys = oldProps.stringPropertyNames();
@@ -108,15 +108,7 @@ public class Setup {
     }
 
     public String getConfig(DBConfig config) {
-        config.getConfigName();
         return config.getConfigValue();
-    }
-
-    public DBConfig getConfig(String key) {
-        return null;
-    }
-
-    public void setConfig(String key, String value) {
     }
 
     public String getLocalConfig(DBConfig config) {

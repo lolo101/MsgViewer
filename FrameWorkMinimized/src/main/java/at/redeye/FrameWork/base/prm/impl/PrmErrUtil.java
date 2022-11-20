@@ -14,9 +14,7 @@ public class PrmErrUtil {
                 "Parameter ändern", JOptionPane.ERROR_MESSAGE);
     }
 
-    public static void restoreGlobalPrm(final GlobalConfig dlg, String name, String saveValue) {
-
-        dlg.getRoot().getSetup().setConfig(name, saveValue);
+    public static void restoreGlobalPrm(final GlobalConfig dlg) {
         SwingUtilities.invokeLater(() -> {
             dlg.getRoot().saveSetup();
             dlg.feed_table(true);

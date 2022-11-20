@@ -15,7 +15,6 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface {
     private static final String TABLENAME = "CONFIG";
 
     private final Vector<PrmListener> prmListeners = new Vector<>();
-    private String oldValue = "";
     private String[] possibleValues = {};
 
     private PrmCustomChecksInterface customChecks;
@@ -25,8 +24,6 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface {
     public DBString value = new DBString("value", "Wert", 100);
     public DBString descr = new DBString("description", "Beschreibung", 250);
     public DBHistory hist = new DBHistory("hist");
-
-    private boolean changed;
 
     public DBConfig() {
         super(TABLENAME);
@@ -127,7 +124,6 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface {
 
     public void setConfigValue( String val )
     {
-        oldValue = value.toString();
         value.loadFromString(val);
     }
 
@@ -144,11 +140,6 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface {
     @Override
     public void removePrmListener(PrmListener listener) {
         prmListeners.remove(listener);
-    }
-
-    public void addAllPrmListeners( DBConfig  other )
-    {
-        prmListeners.addAll(other.prmListeners);
     }
 
     @Override
@@ -177,46 +168,7 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface {
         }
     }
 
-    public String getOldValue() {
-        return oldValue;
-    }
-
     public String[] getPossibleValues() {
         return possibleValues;
-    }
-
-    public void setPossibleValues(String[] possibleValues) {
-        this.possibleValues = possibleValues;
-    }
-
-    public void setCustomChecks(PrmCustomChecksInterface customChecks) {
-        this.customChecks = customChecks;
-    }
-
-    public void setDefaultChecks(PrmDefaultChecksInterface defaultChecks) {
-        this.defaultChecks = defaultChecks;
-    }
-
-    public PrmCustomChecksInterface getCustomChecks() {
-        return customChecks;
-    }
-
-    public PrmDefaultChecksInterface getDefaultChecks() {
-        return defaultChecks;
-    }
-
-    public boolean hasChanged()
-    {
-        return changed;
-    }
-
-    public void setChanged()
-    {
-        changed = true;
-    }
-
-    public void setChanged( boolean state )
-    {
-        changed = state;
     }
 }

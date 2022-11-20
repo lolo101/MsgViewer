@@ -1,7 +1,6 @@
 package at.redeye.FrameWork.base.prm.impl.gui;
 
 import at.redeye.FrameWork.base.*;
-import at.redeye.FrameWork.base.bindtypes.DBStrukt;
 import at.redeye.FrameWork.base.prm.PrmCustomChecksInterface;
 import at.redeye.FrameWork.base.prm.PrmDefaultChecksInterface;
 import at.redeye.FrameWork.base.prm.PrmListener;
@@ -15,13 +14,14 @@ import at.redeye.FrameWork.widgets.helpwindow.HelpWin;
 import at.redeye.FrameWork.widgets.helpwindow.HelpWinHook;
 
 import java.awt.*;
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class GlobalConfig extends BaseDialog implements Saveable,
         PrmListener {
 
     private static final long serialVersionUID = 1L;
-    private final Vector<DBStrukt> values = new Vector<>();
     private final TableManipulator tm;
 
     /**
@@ -47,24 +47,6 @@ public class GlobalConfig extends BaseDialog implements Saveable,
         feed_table(false);
 
         tm.autoResize();
-
-        Set<String> keys = GlobalConfigDefinitions.entries.keySet();
-        for (String key : keys) {
-            DBConfig c = root.getSetup().getConfig(key);
-            if (c != null) {
-                c.addPrmListener(this);
-                // Set PRM properties : -> Ugly programm in LocalSetup
-                c.setCustomChecks(GlobalConfigDefinitions.get(key)
-                        .getCustomChecks());
-                c.setDefaultChecks(GlobalConfigDefinitions.get(key)
-                        .getDefaultChecks());
-                c.setPossibleValues(GlobalConfigDefinitions.get(key)
-                        .getPossibleValues());
-                c.addAllPrmListeners(GlobalConfigDefinitions.get(key));
-            } else {
-                logger.warn("PRM " + key + " not found in LocalSetup!");
-            }
-        }
     }
 
     public final void feed_table(boolean autombox) {
@@ -76,7 +58,6 @@ public class GlobalConfig extends BaseDialog implements Saveable,
     }
 
     private void feed_table() {
-        values.clear();
         tm.clear();
 
         Map<String, DBConfig> vals = new TreeMap<>(GlobalConfigDefinitions.entries);
@@ -86,7 +67,6 @@ public class GlobalConfig extends BaseDialog implements Saveable,
                 .map(c -> c.descr)
                 .forEach(descr -> descr.loadFromCopy(MlM(descr.getValue())));
 
-        values.addAll(configs);
         tm.addAll(configs);
     }
 
@@ -193,12 +173,6 @@ public class GlobalConfig extends BaseDialog implements Saveable,
     }
 
     public void saveData() {
-        for (Integer editedRow : tm.getEditedRows()) {
-            DBConfig entry = (DBConfig) values.get(editedRow);
-            root.getSetup().setConfig(entry.getConfigName(),
-                    entry.getConfigValue());
-        }
-
         root.saveSetup();
         feed_table(true);
     }
@@ -206,13 +180,6 @@ public class GlobalConfig extends BaseDialog implements Saveable,
     private void jBCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCloseActionPerformed
         new AutoMBox<>(getTitle(), () -> {
             if (canClose()) {
-                Set<String> keys = GlobalConfigDefinitions.entries.keySet();
-                for (String key : keys) {
-                    DBConfig c = root.getSetup().getConfig(key);
-                    if (c != null) {
-                        c.removePrmListener(this);
-                    }
-                }
                 close();
             }
         }).run();
@@ -227,8 +194,7 @@ public class GlobalConfig extends BaseDialog implements Saveable,
         if (!checks.doChecks(event)) {
             PrmErrUtil.displayPrmError(this, event.getParameterName()
                     .toString());
-            PrmErrUtil.restoreGlobalPrm(this, event.getParameterName()
-                    .toString(), event.getOldPrmValue().toString());
+            PrmErrUtil.restoreGlobalPrm(this);
 
         }
 
@@ -240,8 +206,7 @@ public class GlobalConfig extends BaseDialog implements Saveable,
         if (!customChecks.doCustomChecks(event)) {
             PrmErrUtil.displayPrmError(this, event.getParameterName()
                     .toString());
-            PrmErrUtil.restoreGlobalPrm(this, event.getParameterName()
-                    .toString(), event.getOldPrmValue().toString());
+            PrmErrUtil.restoreGlobalPrm(this);
         }
     }
 }
