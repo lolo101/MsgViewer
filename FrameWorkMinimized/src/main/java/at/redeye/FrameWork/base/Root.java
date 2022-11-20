@@ -10,7 +10,7 @@ public class Root {
     private static Root static_root;
     private final String app_name;
     private final String app_title;
-    private final LocalSetup setup;
+    private final Setup setup;
     private final Plugins plugins;
     private final Path storage;
     private final Dialogs dialogs;
@@ -61,7 +61,7 @@ public class Root {
         this.app_name = app_name;
         this.app_title = app_title;
         static_root = this;
-        setup = new LocalSetup(app_name);
+        setup = new Setup(app_name);
         plugins = new Plugins(app_name);
         storage = Storage.getEphemeralStorage(this.app_name);
         dialogs = new Dialogs(this);
