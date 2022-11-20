@@ -18,17 +18,17 @@ public class FrameWorkConfigDefinitions {
     public static DBConfig SpreadSheetMarginEditable = new DBConfig("SpreadSheetMarginEditable", "20", "Zusätzlicher Rand, um den die Tabellenspalten breiter gemacht werden um besseres Editieren zu ermöglichen. Dies gilt nur für editierbare Spalten.");
     public static DBConfig SpreadSheetMarginReadOnly = new DBConfig("SpreadSheetMarginReadOnly", "5", "Zusätzlicher Rand, um den die Tabellenspalten breiter gemacht werden. Dieser Wert gilt nur für nicht editierbare Spalten.");
     public static DBConfig DefaultAutoLineBreakWidth = new DBConfig("DefaultAutoLineBreakWidth", "40", "Breite eines automatisch umgebrochenen Textes.", new PrmDefaultCheckSuite(PrmDefaultChecksInterface.PRM_IS_LONG));
-    public static DBConfig ImagePreviewInFileOpen = new DBConfig("ImagePreviewinFileOpen", "false", "Soll im Datei öffnen Dialogen die Bildervorschau angezeigt werden?", new PrmDefaultCheckSuite(PrmDefaultChecksInterface.PRM_IS_TRUE_FALSE));
-    public static DBConfig AllowAutoLogin = new DBConfig("AllowAutoLogin", "false", "Ist eine automatische Anmeldung generell zulässig?", new PrmDefaultCheckSuite(PrmDefaultChecksInterface.PRM_IS_TRUE_FALSE));
-    public static DBConfig AutoLoginUser = new DBConfig("AutoLoginUser", "", "Legt den Login fest, mit dem die automatische Anmeldung durchgeführt wird.", new PrmDefaultCheckSuite(PrmDefaultChecksInterface.PRM_HAS_VALUE));
-    public static DBConfig LookAndFeel = new DBConfig ("LookAndFeel", "System", "Bestimmt das Aussehen der Benutzoberfläche. Mögliche Werte sind \"System\", \"Motif\", \"Nimbus\" oder \"Metal\"", new PrmDefaultCheckSuite(PrmDefaultChecksInterface.PRM_IS_LOOKANDFEEL));
+    private static final DBConfig ImagePreviewInFileOpen = new DBConfig("ImagePreviewinFileOpen", "false", "Soll im Datei öffnen Dialogen die Bildervorschau angezeigt werden?", new PrmDefaultCheckSuite(PrmDefaultChecksInterface.PRM_IS_TRUE_FALSE));
+    private static final DBConfig AllowAutoLogin = new DBConfig("AllowAutoLogin", "false", "Ist eine automatische Anmeldung generell zulässig?", new PrmDefaultCheckSuite(PrmDefaultChecksInterface.PRM_IS_TRUE_FALSE));
+    private static final DBConfig AutoLoginUser = new DBConfig("AutoLoginUser", "", "Legt den Login fest, mit dem die automatische Anmeldung durchgeführt wird.", new PrmDefaultCheckSuite(PrmDefaultChecksInterface.PRM_HAS_VALUE));
+    public static DBConfig LookAndFeel = new DBConfig("LookAndFeel", "System", "Bestimmt das Aussehen der Benutzoberfläche. Mögliche Werte sind \"System\", \"Motif\", \"Nimbus\" oder \"Metal\"", new PrmDefaultCheckSuite(PrmDefaultChecksInterface.PRM_IS_LOOKANDFEEL));
     public static DBConfig SpreadSheetRowHeaderLimit = new DBConfig("SpreadSheetRowHeaderLimit", "20", "Legt fest ab welcher Anzahl von Zeilen im Spreadsheet die Zeilennummer eingeblendet werden sollen.", new PrmDefaultCheckSuite(PrmDefaultChecksInterface.PRM_IS_LONG));
 
-    public static DBConfig ProxyAutoDetect = new DBConfig( "ProxyAutoDetect", "true", "Proxy Einstellungen automatisch finden", new PrmDefaultCheckSuite(PrmDefaultChecksInterface.PRM_IS_TRUE_FALSE));
-    public static DBConfig ProxyHost = new DBConfig( "ProxyHost", "" );
-    public static DBConfig ProxyPort = new DBConfig( "ProxyPort", "8080", "", new PrmDefaultCheckSuite(PrmDefaultChecksInterface.PRM_IS_LONG ));
-    public static DBConfig ProxyDisabledFor = new DBConfig( "ProxyDisbledFor", "", "Hostnamen, oder IP Addressen, für die der Proxy nicht verwendet werden soll");
-    public static DBConfig ProxyEnabled = new DBConfig( "ProxyEnabled", "true", "", new PrmDefaultCheckSuite(PrmDefaultChecksInterface.PRM_IS_TRUE_FALSE));
+    private static final DBConfig ProxyAutoDetect = new DBConfig("ProxyAutoDetect", "true", "Proxy Einstellungen automatisch finden", new PrmDefaultCheckSuite(PrmDefaultChecksInterface.PRM_IS_TRUE_FALSE));
+    private static final DBConfig ProxyHost = new DBConfig("ProxyHost", "");
+    private static final DBConfig ProxyPort = new DBConfig("ProxyPort", "8080", "", new PrmDefaultCheckSuite(PrmDefaultChecksInterface.PRM_IS_LONG));
+    private static final DBConfig ProxyDisabledFor = new DBConfig("ProxyDisbledFor", "", "Hostnamen, oder IP Addressen, für die der Proxy nicht verwendet werden soll");
+    private static final DBConfig ProxyEnabled = new DBConfig("ProxyEnabled", "true", "", new PrmDefaultCheckSuite(PrmDefaultChecksInterface.PRM_IS_TRUE_FALSE));
 
     public static DBConfig OpenCommand = new DBConfig("OpenCommand", "xdg-open", "Kommando für das öffnen einer Datei, oder eines Verzeichnisses");
 
@@ -66,16 +66,10 @@ public class FrameWorkConfigDefinitions {
 
         addLocal(OpenCommand);
 
-
-        add(AllowAutoLogin);
-
+        GlobalConfigDefinitions.add(AllowAutoLogin);
     }
 
-    static void add(DBConfig c) {
-        GlobalConfigDefinitions.add(c);
-    }
-
-    static void addLocal(DBConfig c) {
+    private static void addLocal(DBConfig c) {
         LocalConfigDefinitions.add(c);
     }
 }
