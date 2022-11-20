@@ -54,9 +54,8 @@ public class RowHeaderTest extends BaseDialog {
         }
 
         tm.prepareTable();
-
         tm.addAll(data);
-
+        tm.showRowHeader(jCShowRowHeader.isSelected());
         tm.autoResize();
     }
 
@@ -190,22 +189,14 @@ public class RowHeaderTest extends BaseDialog {
     private void changeStyle(final String className) {
         new AutoMBox<>(RowHeaderTest.class.getName(), () -> {
             UIManager.setLookAndFeel(className);
-            root.closeAllWindowsNoAppExit();
-            run();
+            SwingUtilities.updateComponentTreeUI(this);
         }).run();
     }
-
-    private static Root main_root;
 
     // FIXME make me a JUnit test
     public static void main(String[] args) {
 
-        main_root = new Root("TT");
-
-        run();
-    }
-
-    private static void run() {
+        Root main_root = new Root("TT");
         new RowHeaderTest(main_root).setVisible(true);
     }
 

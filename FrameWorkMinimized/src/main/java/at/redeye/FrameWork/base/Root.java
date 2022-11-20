@@ -15,11 +15,9 @@ import java.util.*;
 public class Root {
 
     protected static final Logger logger = LogManager.getLogger(Root.class);
-    private final Collection<BaseDialogBase> dialogs = new Vector<>();
     protected final Map<String, Plugin> plugins = new HashMap<>();
     private final String app_name;
     private final String app_title;
-    private boolean appExitAllowed = true;
 
     /**
      * language most of the aplication is programmed in
@@ -57,9 +55,10 @@ public class Root {
     private String display_language;
 
     private static Root static_root;
-    private final Path storage;
     private String[] startupArgs;
     protected final LocalSetup setup;
+    private final Path storage;
+    private final Dialogs dialogs;
     private final MLHelper ml_helper;
     private final DLLCache dll_cache;
 
@@ -73,6 +72,7 @@ public class Root {
         static_root = this;
         setup = new LocalSetup(app_name);
         storage = Storage.getEphemeralStorage(this.app_name);
+        dialogs = new Dialogs(this);
         ml_helper = new MLHelper(this);
         dll_cache = new DLLCache(this);
     }
@@ -86,32 +86,11 @@ public class Root {
         setup.saveProps();
     }
 
-    public void informWindowOpened(BaseDialogBase dlg) {
-        dialogs.add(dlg);
+    public Dialogs getDialogs() {
+        return dialogs;
     }
 
-    public void informWindowClosed(BaseDialogBase dlg) {
-        dialogs.remove(dlg);
-
-        if (dialogs.isEmpty() && appExitAllowed) {
-            System.out.println("All Windows closed, normal exit");
-            appExit();
-        }
-    }
-
-    private void closeAllWindowsExceptThisOne() {
-        List.copyOf(dialogs).stream()
-                .filter(Objects::nonNull)
-                .forEach(BaseDialogBase::closeNoAppExit);
-    }
-
-    public void closeAllWindowsNoAppExit() {
-        appExitAllowed = false;
-        closeAllWindowsExceptThisOne();
-        appExitAllowed = true;
-    }
-
-    private void appExit() {
+    void appExit() {
         saveSetup();
         System.exit(0);
     }

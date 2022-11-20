@@ -85,7 +85,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
         root.loadMlM4Class(this, "de");
 
         if (!do_not_inform_root)
-            root.informWindowOpened(parent);
+            root.getDialogs().informWindowOpened(parent);
 
         if (logger.isDebugEnabled()) {
             logger.debug(title);
@@ -406,7 +406,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
             onCloseListeners.clear();
         }
 
-        root.informWindowClosed(parent);
+        root.getDialogs().informWindowClosed(parent);
 
         parent.dispose();
     }

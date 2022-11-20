@@ -10,13 +10,13 @@ import java.awt.event.KeyEvent;
 import java.util.*;
 
 public class TranslationHelper {
-    final BaseDialogBase base_dlg;
-    final Root root;
-    ExtractStrings extract_strings;
-    Properties currentProps;
-    List<String> additional_strings;
-    boolean tried_autoloading_locale = false;
-    final BaseDialogBaseHelper helper;
+    private final BaseDialogBase base_dlg;
+    private final Root root;
+    private ExtractStrings extract_strings;
+    private Properties currentProps;
+    private List<String> additional_strings;
+    private boolean need_locale_autoload = true;
+    private final BaseDialogBaseHelper helper;
 
     class OpenTransDialog implements Runnable {
         public void run() {
@@ -41,9 +41,9 @@ public class TranslationHelper {
     }
 
     class SwitchTrans_DE_EN implements Runnable {
-        static final String lang_a = "";
-        static final String lang_b = "en";
-        String lang_current;
+        private static final String lang_a = "";
+        private static final String lang_b = "en";
+        private String lang_current;
 
         public void run() {
             if (lang_b.equals(lang_current)) {
@@ -91,12 +91,11 @@ public class TranslationHelper {
 
             Map<String, List<JComponent>> all = extract_strings.getComponents();
 
-            Set<String> keys = all.keySet();
-
-            for (String key : keys) {
+            for (Map.Entry<String, List<JComponent>> entry : all.entrySet()) {
+                String key = entry.getKey();
                 String value = props.getProperty(key);
 
-                for (JComponent comp : all.get(key)) {
+                for (JComponent comp : entry.getValue()) {
                     if (value != null && !value.isEmpty()) {
                         assign(comp, value);
                     } else {
@@ -147,8 +146,7 @@ public class TranslationHelper {
         }
     }
 
-    public void autoLoadCurrentLocale()
-    {
+    private void autoLoadCurrentLocale() {
         String locale = root.getDisplayLanguage();
 
         if (locale.equals(helper.getBaseLanguage())) {
@@ -182,10 +180,9 @@ public class TranslationHelper {
     {
         String res = null;
 
-        if( currentProps == null && !tried_autoloading_locale )
-        {
+        if (currentProps == null && need_locale_autoload) {
             autoLoadCurrentLocale();
-            tried_autoloading_locale = true;
+            need_locale_autoload = false;
         }
 
         if( currentProps != null )

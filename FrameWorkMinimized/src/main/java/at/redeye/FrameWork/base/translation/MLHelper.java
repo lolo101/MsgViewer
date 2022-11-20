@@ -4,19 +4,19 @@ import at.redeye.FrameWork.base.AutoLogger;
 import at.redeye.FrameWork.base.Root;
 
 import java.io.*;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Properties;
-import java.util.Set;
 
 public class MLHelper {
-    final Root root;
-    Properties props;
-    String current_lang;
-    final String locale;
-    Properties missing_props;
-    String missing_props_file_name;
+    private final Root root;
+    private Properties props;
+    private String current_lang;
+    private final String locale;
+    private Properties missing_props;
+    private String missing_props_file_name;
 
-    private final Set<String> loaded_object_files = new HashSet<>();
+    private final Collection<String> loaded_object_files = new HashSet<>();
 
     public MLHelper(Root root) {
         this.root = root;
@@ -24,7 +24,7 @@ public class MLHelper {
         autoLoadCurrentLocale();
     }
 
-    boolean loadPropsFile(String lang) throws IOException {
+    private boolean loadPropsFile(String lang) throws IOException {
         boolean loaded_something = false;
 
         String dir = TranslationDialog.getTranslationsDir(root);
@@ -67,7 +67,7 @@ public class MLHelper {
         return loaded_something;
     }
 
-    public boolean loadTrans(String trans) {
+    private boolean loadTrans(String trans) {
         try {
             return loadPropsFile(trans);
         } catch (IOException ex) {
