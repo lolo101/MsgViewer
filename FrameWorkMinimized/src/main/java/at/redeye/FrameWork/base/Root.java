@@ -1,17 +1,25 @@
 package at.redeye.FrameWork.base;
 
 import at.redeye.FrameWork.Plugin.Plugin;
+import at.redeye.FrameWork.base.dll_cache.DLLCache;
 import at.redeye.FrameWork.base.dll_cache.DLLExtractor;
+import at.redeye.FrameWork.base.translation.MLHelper;
 import at.redeye.FrameWork.utilities.Storage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Locale;
+import java.security.AccessControlException;
+import java.util.*;
 
-public abstract class Root {
+public class Root {
 
-    protected final String app_name;
+    protected static final Logger logger = LogManager.getLogger(Root.class);
+    private final Collection<BaseDialogBase> dialogs = new Vector<>();
+    protected final Map<String, Plugin> plugins = new HashMap<>();
+    private final String app_name;
     private final String app_title;
+    private boolean appExitAllowed = true;
 
     /**
      * language most of the aplication is programmed in
@@ -51,57 +59,99 @@ public abstract class Root {
     private static Root static_root;
     private final Path storage;
     private String[] startupArgs;
+    protected final LocalSetup setup;
+    private final MLHelper ml_helper;
+    private final DLLCache dll_cache;
+
+    public Root(String app_name) {
+        this(app_name, app_name);
+    }
 
     public Root(String app_name, String app_title) {
         this.app_name = app_name;
         this.app_title = app_title;
         static_root = this;
+        setup = new LocalSetup(app_name);
         storage = Storage.getEphemeralStorage(this.app_name);
+        ml_helper = new MLHelper(this);
+        dll_cache = new DLLCache(this);
     }
 
-    public abstract Setup getSetup();
+    public Setup getSetup() {
+        return setup;
+    }
 
-    public abstract boolean saveSetup();
+    public void saveSetup() {
+        ml_helper.saveMissingProps();
+        setup.saveProps();
+    }
 
-    public abstract void setDBConnection( DBConnection con );
-    public abstract DBConnection getDBConnection();
+    public void informWindowOpened(BaseDialogBase dlg) {
+        dialogs.add(dlg);
+    }
 
-    public void informWindowOpened( BaseDialogBase dlg ) {}
-    public void informWindowClosed( BaseDialogBase dlg ) {}
-    public void closeAllWindowsExceptThisOne( BaseDialogBase dlg ) {}
-    public void closeAllWindowsNoAppExit() {}
+    public void informWindowClosed(BaseDialogBase dlg) {
+        dialogs.remove(dlg);
 
-    public void appExit() {}
+        if (dialogs.isEmpty() && appExitAllowed) {
+            System.out.println("All Windows closed, normal exit");
+            appExit();
+        }
+    }
 
-    public String getAppName()
-    {
+    private void closeAllWindowsExceptThisOne() {
+        List.copyOf(dialogs).stream()
+                .filter(Objects::nonNull)
+                .forEach(BaseDialogBase::closeNoAppExit);
+    }
+
+    public void closeAllWindowsNoAppExit() {
+        appExitAllowed = false;
+        closeAllWindowsExceptThisOne();
+        appExitAllowed = true;
+    }
+
+    private void appExit() {
+        saveSetup();
+        System.exit(0);
+    }
+
+    public String getAppName() {
         return app_name;
     }
 
-    public String getAppTitle()
-    {
+    public String getAppTitle() {
         return app_title;
     }
 
-    public void addDllExtractorToCache( DLLExtractor extractor )
-    {
-
+    public void addDllExtractorToCache(DLLExtractor extractor) {
+        dll_cache.addDllExtractor(extractor);
+        dll_cache.initEnv();
     }
 
-    public void registerPlugin( Plugin plugin )
-    {
+    public void registerPlugin(Plugin plugin) {
+        if (plugins.containsKey(plugin.getName()))
+            return;
 
+        if (plugin.isAvailable()) {
+            try {
+                plugin.initPlugin(this);
+                plugins.put(plugin.getName(), plugin);
+            } catch (AccessControlException ex) {
+                logger.error(ex, ex);
+            }
+        }
     }
 
     public List<Plugin> getRegisteredPlugins()
     {
-        return List.of();
+        return new ArrayList<>(plugins.values());
     }
 
 
-    public Plugin getPlugin(String name)
-    {
-        return null;
+    public Plugin getPlugin(String name) {
+        Plugin plugin = plugins.get(name);
+        return plugin != null && plugin.isAvailable() ? plugin : null;
     }
 
     /**
@@ -175,6 +225,7 @@ public abstract class Root {
     public void setLanguageTranslationResourcePath( String path )
     {
         language_resource_path = path;
+        ml_helper.autoLoadCurrentLocale();
     }
 
     /**
@@ -210,24 +261,31 @@ public abstract class Root {
      * eg: /at/redeye/Zeiterfassung/resources/translations
      * or null if not set
      */
-    public String getLanguageTranslationResourcePath()
-    {
+    public String getLanguageTranslationResourcePath() {
         return language_resource_path;
     }
 
-    public abstract String MlM( String message );
+    public String MlM(String message) {
+        return ml_helper.MlM(message);
+    }
 
     /**
      * load a MlM file for a spacific class
+     *
      * @param impl_locale the locale the class was originaly implemented
-     * eg "de" for german
+     *                    eg "de" for german
      */
-    public abstract void loadMlM4Class( Object obj, String impl_locale );
+    public void loadMlM4Class(Object obj, String impl_locale) {
+        ml_helper.autoLoadFile4Class(obj, getDisplayLanguage(), impl_locale);
+    }
 
     /**
      * load a MlM file for a spacific class
      */
-    public abstract void loadMlM4ClassName(String name, String string);
+    public void loadMlM4ClassName(String name, String impl_locale) {
+        ml_helper.autoLoadFile4ClassName(name, getDisplayLanguage(), impl_locale);
+
+    }
 
     /**
      * only use this in case of emergency

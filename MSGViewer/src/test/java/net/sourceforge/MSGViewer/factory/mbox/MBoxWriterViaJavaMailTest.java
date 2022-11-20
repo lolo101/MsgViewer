@@ -1,6 +1,5 @@
 package net.sourceforge.MSGViewer.factory.mbox;
 
-import at.redeye.FrameWork.base.LocalRoot;
 import at.redeye.FrameWork.base.Root;
 import com.auxilii.msgparser.Message;
 import com.google.common.jimfs.Jimfs;
@@ -84,7 +83,7 @@ class MBoxWriterViaJavaMailTest {
     }
 
     private static MBoxWriterViaJavaMail givenWriter() {
-        Root root = new LocalRoot("test");
+        Root root = new Root("test");
         AttachmentRepository attachmentRepository = new AttachmentRepository(root);
         return new MBoxWriterViaJavaMail(attachmentRepository);
     }

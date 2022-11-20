@@ -10,7 +10,7 @@ import static org.mockito.Mockito.*;
 
 class UniqueDialogHelperTest {
 
-    public static final LocalRoot ROOT = new LocalRoot("test");
+    private static final Root ROOT = new Root("test");
 
     @Test
     void should_return_dialog_instance() {
@@ -35,7 +35,7 @@ class UniqueDialogHelperTest {
     @Nested
     class WhenDialogAlreadyInvoked {
 
-        public static final String IDENTIFIER = "identifier";
+        private static final String IDENTIFIER = "identifier";
         private final UniqueDialogHelper sut = new UniqueDialogHelper();
         private final BaseDialogBase dialog = new BaseDialogDialog(ROOT, IDENTIFIER);
 

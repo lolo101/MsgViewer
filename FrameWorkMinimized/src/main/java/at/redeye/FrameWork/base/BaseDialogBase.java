@@ -1,7 +1,5 @@
 package at.redeye.FrameWork.base;
 
-import at.redeye.FrameWork.base.transaction.Transaction;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowListener;
@@ -64,15 +62,6 @@ public interface BaseDialogBase
     void setEdited();
 
     void setEdited(boolean val);
-
-    /**
-     * @return The Transaction object for this dialog
-     * This Transaction object will be automatically closed, on closing this
-     * dialog. The Transaction object will be only created once in the lifetime
-     * of the dialog. So caching the Transaction object is not required.
-     * <b>Can return null, in case of no database connection.</b>
-     */
-    Transaction getTransaction();
 
     void dispose();
 

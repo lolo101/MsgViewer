@@ -5,7 +5,6 @@ import at.redeye.FrameWork.base.bindtypes.DBFlagInteger;
 import at.redeye.FrameWork.base.bindtypes.DBValue;
 import at.redeye.FrameWork.base.prm.bindtypes.DBConfig;
 import at.redeye.FrameWork.base.tablemanipulator.TableManipulator;
-import at.redeye.FrameWork.base.transaction.Transaction;
 import at.redeye.FrameWork.base.translation.TranslationHelper;
 import at.redeye.FrameWork.utilities.StringUtils;
 import at.redeye.FrameWork.widgets.NoticeIfChangedTextField;
@@ -24,10 +23,8 @@ import java.util.*;
 
 public class BaseDialogBaseHelper implements BindVarInterface {
     protected final Root root;
-    private Transaction transaction;
 
     protected final String title;
-    private DBConnection con;
 
     protected static Logger logger = LogManager.getLogger(BaseDialogBaseHelper.class);
     private Timer autoRefreshTimer;
@@ -265,7 +262,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
         }
     }
 
-    private void adjustScrollingSpeed(JScrollBar scrollBar, DBConfig config) {
+    private void adjustScrollingSpeed(Adjustable scrollBar, DBConfig config) {
         String value = root.getSetup().getLocalConfig(config);
 
         int i = Integer.parseInt(value);
@@ -381,49 +378,6 @@ public class BaseDialogBaseHelper implements BindVarInterface {
     }
 
     /**
-     * @return The Transaction object for this dialog This Transaction object
-     * will be automatically closed, on closing this dialog. The
-     * Transaction object will be only created once in the lifetime of
-     * the dialog. So caching the Transaction object is not required.
-     * <b>Can return null, in case of no database connection.</b>
-     */
-    public Transaction getTransaction() {
-        if (con == null) {
-            con = root.getDBConnection();
-        }
-        // Here we have to check -> NULL pointer exception if no connection
-        // exists, e.g. before inital Setup
-        if (con == null) {
-            return null;
-        }
-
-        if (con.hashCode() != root.getDBConnection().hashCode()) {
-            con = root.getDBConnection();
-            transaction = null;
-        }
-
-        if (transaction != null) {
-
-            if (!transaction.isOpen()) {
-                root.getDBConnection().closeTransaction(transaction);
-                transaction = null;
-            }
-        }
-
-        if (transaction != null) {
-            return transaction;
-        }
-
-        if (root.getDBConnection() == null) {
-            return null;
-        }
-
-        transaction = root.getDBConnection().getNewTransaction();
-
-        return transaction;
-    }
-
-    /**
      * closes the current dialog.
      */
     public void close() {
@@ -444,11 +398,6 @@ public class BaseDialogBaseHelper implements BindVarInterface {
                 Integer.toString(parent.getWidth()));
         root.getSetup().setLocalConfig(id_wh.concat(Setup.WindowHeight),
                 Integer.toString(parent.getHeight()));
-
-        if (transaction != null) {
-            transaction.rollback();
-            root.getDBConnection().closeTransaction(transaction);
-        }
 
         if (onCloseListeners != null) {
             for (Runnable run : onCloseListeners)

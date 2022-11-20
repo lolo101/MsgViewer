@@ -15,7 +15,6 @@ import at.redeye.FrameWork.widgets.helpwindow.HelpWin;
 import at.redeye.FrameWork.widgets.helpwindow.HelpWinHook;
 
 import java.awt.*;
-import java.util.List;
 import java.util.*;
 
 public class GlobalConfig extends BaseDialog implements Saveable,
@@ -81,17 +80,6 @@ public class GlobalConfig extends BaseDialog implements Saveable,
         tm.clear();
 
         Map<String, DBConfig> vals = new TreeMap<>(GlobalConfigDefinitions.entries);
-
-        // nun alle Einträge aus der DB dazumergen
-
-        List<DBStrukt> res = getTransaction()
-                .fetchTable(new DBConfig());
-
-        for (DBStrukt s : res) {
-            DBConfig c = (DBConfig) s;
-            vals.put(c.getConfigName(), c);
-        }
-
         Collection<DBConfig> configs = vals.values();
 
         configs.stream()
@@ -218,7 +206,6 @@ public class GlobalConfig extends BaseDialog implements Saveable,
     private void jBCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCloseActionPerformed
         new AutoMBox<>(getTitle(), () -> {
             if (canClose()) {
-                getTransaction().rollback();
                 Set<String> keys = GlobalConfigDefinitions.entries.keySet();
                 for (String key : keys) {
                     DBConfig c = root.getSetup().getConfig(key);

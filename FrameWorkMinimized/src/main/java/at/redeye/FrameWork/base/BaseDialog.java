@@ -4,7 +4,6 @@ import at.redeye.FrameWork.base.bindtypes.DBDateTime;
 import at.redeye.FrameWork.base.bindtypes.DBFlagInteger;
 import at.redeye.FrameWork.base.bindtypes.DBValue;
 import at.redeye.FrameWork.base.tablemanipulator.TableManipulator;
-import at.redeye.FrameWork.base.transaction.Transaction;
 import at.redeye.FrameWork.widgets.datetime.IDateTimeComponent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -77,18 +76,6 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
         myrootPane = super.createRootPane();
 
         return myrootPane;
-    }
-
-    /**
-     * @return The Transaction object for this dialog This Transaction object
-     * will be automatically closed, on closing this dialog. The
-     * Transaction object will be only created once in the lifetime of
-     * the dialog. So caching the Transaction object is not required.
-     * <b>Can return null, in case of no database connection.</b>
-     */
-    @Override
-    public Transaction getTransaction() {
-        return helper.getTransaction();
     }
 
     /**

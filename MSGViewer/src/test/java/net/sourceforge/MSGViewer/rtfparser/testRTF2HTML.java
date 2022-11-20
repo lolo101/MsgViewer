@@ -1,7 +1,7 @@
 package net.sourceforge.MSGViewer.rtfparser;
 
 import at.redeye.FrameWork.base.BaseModuleLauncher;
-import at.redeye.FrameWork.base.LocalRoot;
+import at.redeye.FrameWork.base.Root;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,7 +11,7 @@ public class testRTF2HTML extends BaseModuleLauncher {
     private testRTF2HTML(String[] args) {
         super(args);
 
-        root = new LocalRoot("MSGViewer", "MSGViewer");
+        root = new Root("MSGViewer");
 
         configureLogging();
     }
