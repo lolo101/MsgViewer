@@ -47,7 +47,7 @@ public class HyperlinkExecuter implements HyperlinkListener {
     }
 
     private String getOpenCommand() {
-        return root.getSetup().getLocalConfig(FrameWorkConfigDefinitions.OpenCommand);
+        return root.getSetup().getConfig(FrameWorkConfigDefinitions.OpenCommand);
     }
 
     public static void setOpenUrl(OpenUrlInterface open_url_) {

@@ -49,7 +49,7 @@ public class ViewerHelper {
         if (Setup.is_win_system())
             return "explorer";
 
-        return root.getSetup().getLocalConfig(FrameWorkConfigDefinitions.OpenCommand);
+        return root.getSetup().getConfig(FrameWorkConfigDefinitions.OpenCommand);
     }
 
     static public String stripMetaTags(String html) {

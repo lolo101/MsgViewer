@@ -103,12 +103,12 @@ public abstract class BaseModuleLauncher {
 
         ConsoleAppender consoleAppender = ConsoleAppender.createDefaultAppenderForLayout(layout);
 
-        String logFileDir = root.getSetup().getLocalConfig(
+        String logFileDir = root.getSetup().getConfig(
                 BaseAppConfigDefinitions.LoggingDir);
         logger.trace("logFileDir: " + logFileDir);
-        String logFileLevel = root.getSetup().getLocalConfig(
+        String logFileLevel = root.getSetup().getConfig(
                 BaseAppConfigDefinitions.LoggingLevel);
-        String loggingEnabled = root.getSetup().getLocalConfig(
+        String loggingEnabled = root.getSetup().getConfig(
                 BaseAppConfigDefinitions.DoLogging);
 
         if (logFileDir.equals("APPHOME"))
@@ -158,7 +158,7 @@ public abstract class BaseModuleLauncher {
      */
     protected final void setLookAndFeel() {
 
-        String config = root.getSetup().getLocalConfig(
+        String config = root.getSetup().getConfig(
                 FrameWorkConfigDefinitions.LookAndFeel);
 
         logger.debug("Found LookAndFeel PRM value: <" + config + ">");

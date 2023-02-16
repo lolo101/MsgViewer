@@ -111,15 +111,7 @@ public class Setup {
         return config.getConfigValue();
     }
 
-    public String getLocalConfig(DBConfig config) {
-        return getLocalConfig(config.getConfigName(), config.getConfigValue());
-    }
-
-    public DBConfig getLocalConfig(String key) {
-        return LocalConfigDefinitions.get(key);
-    }
-
-    public String getLocalConfig(String key, String default_value) {
+    public String getConfig(String key, String default_value) {
         check();
         return props.getProperty(key, default_value);
     }

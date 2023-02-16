@@ -82,16 +82,16 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         new DropTarget(header, DnDConstants.ACTION_COPY_OR_MOVE, new EditorDropTarget(this), true, null);
         new DropTarget(body, DnDConstants.ACTION_COPY_OR_MOVE, new EditorDropTarget(this), true, null);
 
-        boolean rtfFormat = StringUtils.isYes(root.getSetup().getLocalConfig("RTFFormat", "yes"))
+        boolean rtfFormat = StringUtils.isYes(root.getSetup().getConfig("RTFFormat", "yes"))
                 && Stream.of(root.getStartupArgs()).noneMatch(s -> s.equals(CLI_STARTUP_TEXT_VIEW));
 
         jRRTF.setSelected(rtfFormat);
         jRText.setSelected(!rtfFormat);
 
-        JCBfix.setSelected(StringUtils.isYes(root.getSetup().getLocalConfig("FixedFont", "no")));
+        JCBfix.setSelected(StringUtils.isYes(root.getSetup().getConfig("FixedFont", "no")));
         JCBfix.setEnabled(jRText.isSelected());
 
-        jSplitPane.setDividerLocation(Integer.parseInt(root.getSetup().getLocalConfig("DividerLocation", "150")));
+        jSplitPane.setDividerLocation(Integer.parseInt(root.getSetup().getConfig("DividerLocation", "150")));
         header.setText(parent.MlM("Drag a msg file into this window"));
     }
 
@@ -565,7 +565,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
 
     private void printThumbnail(FileAttachment att, File thumbnailFile) {
         try {
-            final int max_icon_size = Integer.parseInt(root.getSetup().getLocalConfig(AppConfigDefinitions.IconSize));
+            final int max_icon_size = Integer.parseInt(root.getSetup().getConfig(AppConfigDefinitions.IconSize));
             ImageIcon icon = ImageUtils.loadScaledImageIcon(att.getData(), att.toString(), max_icon_size, max_icon_size);
             BufferedImage bi = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_RGB);
             Graphics2D g2 = bi.createGraphics();

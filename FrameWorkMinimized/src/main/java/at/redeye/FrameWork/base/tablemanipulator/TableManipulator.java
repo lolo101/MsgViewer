@@ -89,8 +89,8 @@ public class TableManipulator {
     private void autoResizeColWidth(JTable table) {
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
-        String smargin_default = root.getSetup().getLocalConfig(FrameWorkConfigDefinitions.SpreadSheetMarginReadOnly);
-        String smargin_editable = root.getSetup().getLocalConfig(FrameWorkConfigDefinitions.SpreadSheetMarginEditable);
+        String smargin_default = root.getSetup().getConfig(FrameWorkConfigDefinitions.SpreadSheetMarginReadOnly);
+        String smargin_editable = root.getSetup().getConfig(FrameWorkConfigDefinitions.SpreadSheetMarginEditable);
 
         int margin_default = Integer.parseInt(smargin_default);
         int margin_editable = Integer.parseInt(smargin_editable);
@@ -482,7 +482,7 @@ public class TableManipulator {
     private void readShowHeaderLimit()
     {
         try {
-            auto_show_row_header = Integer.parseInt(root.getSetup().getLocalConfig(
+            auto_show_row_header = Integer.parseInt(root.getSetup().getConfig(
                     FrameWorkConfigDefinitions.SpreadSheetRowHeaderLimit));
 
         } catch ( NumberFormatException ex ) {
@@ -606,7 +606,7 @@ public class TableManipulator {
 
             String col_uid = uid + "_" + col.dbval.getName();
 
-            String val = setup.getLocalConfig(col_uid, "");
+            String val = setup.getConfig(col_uid, "");
 
             logger.debug(col_uid + "=" + val);
 

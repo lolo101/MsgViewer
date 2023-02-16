@@ -3,7 +3,7 @@ package net.sourceforge.MSGViewer;
 import at.redeye.FrameWork.Plugin.AboutPlugins;
 import at.redeye.FrameWork.base.AutoMBox;
 import at.redeye.FrameWork.base.Root;
-import at.redeye.FrameWork.base.prm.impl.gui.LocalConfig;
+import at.redeye.FrameWork.base.prm.impl.gui.Config;
 import net.sourceforge.MSGViewer.MSGNavigator.MSGNavigator;
 
 import javax.swing.*;
@@ -164,7 +164,7 @@ public class MainWin extends BaseWin {
 
     private void jMSettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMSettingsActionPerformed
 
-        invokeDialogUnique(new LocalConfig(root));
+        invokeDialogUnique(new Config(root));
 
     }//GEN-LAST:event_jMSettingsActionPerformed
 

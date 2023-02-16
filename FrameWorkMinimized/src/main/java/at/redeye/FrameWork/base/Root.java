@@ -187,7 +187,7 @@ public class Root {
                 return display_language;
             }
 
-            String lang = setup.getLocalConfig(BaseAppConfigDefinitions.DisplayLanguage);
+            String lang = setup.getConfig(BaseAppConfigDefinitions.DisplayLanguage);
 
             if (lang != null && lang.trim().isEmpty()) {
                 return display_language;

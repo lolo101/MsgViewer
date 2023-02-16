@@ -30,7 +30,7 @@ public class HTMLColor {
 
     public static Color loadLocalColor( Root root, DBConfig param )
     {
-        String colorString = root.getSetup().getLocalConfig(param);
+        String colorString = root.getSetup().getConfig(param);
 
         return HTMLCode2Color( colorString );
     }

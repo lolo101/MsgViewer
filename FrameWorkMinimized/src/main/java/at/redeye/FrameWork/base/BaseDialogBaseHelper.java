@@ -103,13 +103,13 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 
         String id = parent.getUniqueDialogIdentifier();
 
-        int x = Integer.parseInt(root.getSetup().getLocalConfig(
+        int x = Integer.parseInt(root.getSetup().getConfig(
                 id.concat(Setup.WindowX), String.valueOf(default_pos_x += 30)));
-        int y = Integer.parseInt(root.getSetup().getLocalConfig(
+        int y = Integer.parseInt(root.getSetup().getConfig(
                 id.concat(Setup.WindowY), String.valueOf(default_pos_y += 30)));
-        int w = Integer.parseInt(root.getSetup().getLocalConfig(
+        int w = Integer.parseInt(root.getSetup().getConfig(
                 id.concat(Setup.WindowWidth), "0"));
-        int h = Integer.parseInt(root.getSetup().getLocalConfig(
+        int h = Integer.parseInt(root.getSetup().getConfig(
                 id.concat(Setup.WindowHeight), "0"));
 
         Dimension dim = getVirtualScreenSize();
@@ -175,7 +175,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
     /* should be removed later */
     private void loadStuff() {
         StringUtils.set_defaultAutoLineLenght(Integer.parseInt(root.getSetup()
-                .getLocalConfig(
+                .getConfig(
                         FrameWorkConfigDefinitions.DefaultAutoLineBreakWidth)));
     }
 
@@ -263,7 +263,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
     }
 
     private void adjustScrollingSpeed(Adjustable scrollBar, DBConfig config) {
-        String value = root.getSetup().getLocalConfig(config);
+        String value = root.getSetup().getConfig(config);
 
         int i = Integer.parseInt(value);
 

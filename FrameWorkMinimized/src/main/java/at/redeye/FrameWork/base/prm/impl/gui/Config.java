@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.Vector;
 
-public class LocalConfig extends BaseDialog implements Saveable, PrmListener {
+public class Config extends BaseDialog implements Saveable, PrmListener {
 
     private static final long serialVersionUID = 1L;
     private final Vector<DBStrukt> values = new Vector<>();
@@ -31,8 +31,8 @@ public class LocalConfig extends BaseDialog implements Saveable, PrmListener {
     /**
      * Creates new form Config
      */
-    public LocalConfig(Root root) {
-        super(root, "Lokale Einstellungen");
+    public Config(Root root) {
+        super(root, "Einstellungen");
         setBaseLanguage("de");
         initComponents();
 
@@ -68,7 +68,7 @@ public class LocalConfig extends BaseDialog implements Saveable, PrmListener {
         Collection<DBConfig> configs = LocalConfigDefinitions.entries.values();
 
         for (DBConfig c : configs) {
-            String val = root.getSetup().getLocalConfig(c.getConfigName(), c.getConfigValue());
+            String val = root.getSetup().getConfig(c.getConfigName(), c.getConfigValue());
             c.descr.loadFromCopy(MlM(c.descr.getValue()));
             c.setConfigValue(val);
         }
@@ -91,7 +91,7 @@ public class LocalConfig extends BaseDialog implements Saveable, PrmListener {
 
         jLTitle.setFont(new java.awt.Font("Dialog", Font.BOLD, 18)); // NOI18N
         jLTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLTitle.setText("Lokale Einstellungen");
+        jLTitle.setText("Einstellungen");
 
         jBHelp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/at/redeye/FrameWork/base/resources/icons/help.png"))); // NOI18N
         jBHelp.addActionListener(this::jBHelpActionPerformed);
@@ -156,7 +156,7 @@ public class LocalConfig extends BaseDialog implements Saveable, PrmListener {
 
 private void jBHelpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBHelpActionPerformed
 
-    HelpWinHook hook = new ConfigParamHook(root, "LOCALSETTINGSHOOOK", false,
+    HelpWinHook hook = new ConfigParamHook(root, "LOCALSETTINGSHOOOK",
             LocalConfigDefinitions.help_search_path);
 
     invokeDialog(new HelpWin(root, "/at/redeye/FrameWork/base/resources/Help/", "LocalConfig", hook));

@@ -43,7 +43,7 @@ public class MSGNavigator extends BaseDialog {
 
     final void reload() {
 
-        setting_show_size = StringUtils.isYes(root.getSetup().getLocalConfig(SETTING_SHOW_SIZE, "true"));
+        setting_show_size = StringUtils.isYes(root.getSetup().getConfig(SETTING_SHOW_SIZE, "true"));
 
         EventQueue.invokeLater(() -> new AutoMBox<>(MSGNavigator.class.getName(), () -> parse()).run());
     }
@@ -205,7 +205,7 @@ public class MSGNavigator extends BaseDialog {
             cont.removeFromParent();
             tree.updateUI();
 
-            if (StringUtils.isYes(root.getSetup().getLocalConfig(SETTING_AUTOSAVE, "false"))) {
+            if (StringUtils.isYes(root.getSetup().getConfig(SETTING_AUTOSAVE, "false"))) {
                 save();
                 reload();
             }
@@ -259,7 +259,7 @@ public class MSGNavigator extends BaseDialog {
 
     void edited() throws IOException {
 
-        if (StringUtils.isYes(root.getSetup().getLocalConfig(SETTING_AUTOSAVE, "false"))) {
+        if (StringUtils.isYes(root.getSetup().getConfig(SETTING_AUTOSAVE, "false"))) {
             save();
             reload();
         }

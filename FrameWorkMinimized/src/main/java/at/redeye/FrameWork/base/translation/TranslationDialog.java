@@ -167,8 +167,8 @@ public class TranslationDialog extends BaseDialog {
 
         Locale def_locale = Locale.getDefault();
 
-        String last_language = root.getSetup().getLocalConfig(TRANS_LAST_LANGUAGE, def_locale.getLanguage());
-        String last_country = root.getSetup().getLocalConfig(TRANS_LAST_COUNTRY, def_locale.getCountry());
+        String last_language = root.getSetup().getConfig(TRANS_LAST_LANGUAGE, def_locale.getLanguage());
+        String last_country = root.getSetup().getConfig(TRANS_LAST_COUNTRY, def_locale.getCountry());
 
 
         language.removeAllItems();
@@ -205,8 +205,8 @@ public class TranslationDialog extends BaseDialog {
             }
         }
 
-        String last_col_left = root.getSetup().getLocalConfig(TRANS_LAST_LEFT_COLCOUNT, "40");
-        String last_col_right = root.getSetup().getLocalConfig(TRANS_LAST_RIGHT_COLCOUNT, "40");
+        String last_col_left = root.getSetup().getConfig(TRANS_LAST_LEFT_COLCOUNT, "40");
+        String last_col_right = root.getSetup().getConfig(TRANS_LAST_RIGHT_COLCOUNT, "40");
 
         int left = 40;
         int right = 40;

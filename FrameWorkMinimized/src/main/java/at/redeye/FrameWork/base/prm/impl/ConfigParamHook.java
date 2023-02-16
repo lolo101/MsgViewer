@@ -4,8 +4,7 @@ import at.redeye.FrameWork.base.FrameWorkConfigDefinitions;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.base.Setup;
 import at.redeye.FrameWork.base.prm.bindtypes.DBConfig;
-import at.redeye.FrameWork.base.prm.impl.gui.GlobalConfig;
-import at.redeye.FrameWork.base.prm.impl.gui.LocalConfig;
+import at.redeye.FrameWork.base.prm.impl.gui.Config;
 import at.redeye.FrameWork.base.translation.MLUtil;
 import at.redeye.FrameWork.widgets.helpwindow.HelpFileLoader;
 import at.redeye.FrameWork.widgets.helpwindow.HelpWinHook;
@@ -20,31 +19,24 @@ public class ConfigParamHook implements HelpWinHook {
     private static final Logger logger = LogManager.getLogger(ConfigParamHook.class);
     private final String keyword;
     private final Root root;
-    private final boolean global;
     private final Map<String, DBConfig> config;
     private final Collection<String> search_path;
     private final String color_even;
     private final String color_odd;
     private final String color_title;
 
-    public ConfigParamHook(Root root, String keyword, boolean global, Collection<String> search_path) {
+    public ConfigParamHook(Root root, String keyword, Collection<String> search_path) {
         this.keyword = keyword;
         this.root = root;
-        this.global = global;
         this.search_path = search_path;
 
-        if (global) {
-            config = GlobalConfigDefinitions.entries;
-            root.loadMlM4ClassName(GlobalConfig.class.getName(), "de");
-        } else {
-            config = LocalConfigDefinitions.entries;
-            root.loadMlM4ClassName(LocalConfig.class.getName(), "de");
-        }
+        config = LocalConfigDefinitions.entries;
+        root.loadMlM4ClassName(Config.class.getName(), "de");
 
         Setup setup = root.getSetup();
-        color_even = setup.getLocalConfig(FrameWorkConfigDefinitions.HelpParamColorEven);
-        color_odd = setup.getLocalConfig(FrameWorkConfigDefinitions.HelpParamColorOdd);
-        color_title = setup.getLocalConfig(FrameWorkConfigDefinitions.HelpParamColorTitle);
+        color_even = setup.getConfig(FrameWorkConfigDefinitions.HelpParamColorEven);
+        color_odd = setup.getConfig(FrameWorkConfigDefinitions.HelpParamColorOdd);
+        color_title = setup.getConfig(FrameWorkConfigDefinitions.HelpParamColorTitle);
     }
 
 
@@ -94,7 +86,7 @@ public class ConfigParamHook implements HelpWinHook {
 
             DBConfig c = config.get(key);
             Setup setup = root.getSetup();
-            res.append(global ? setup.getConfig(c) : setup.getLocalConfig(c));
+            res.append(setup.getConfig(c));
 
             res.append("</font>\n");
             res.append("</td>\n");

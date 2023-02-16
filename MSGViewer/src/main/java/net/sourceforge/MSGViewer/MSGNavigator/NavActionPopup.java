@@ -15,7 +15,7 @@ public class NavActionPopup extends JPopupMenu {
             // SETTINGS
             {
                 final JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(mainwin.MlM("View size"));
-                menuItem.setState(StringUtils.isYes(mainwin.getRoot().getSetup().getLocalConfig(MSGNavigator.SETTING_SHOW_SIZE, "true")));
+                menuItem.setState(StringUtils.isYes(mainwin.getRoot().getSetup().getConfig(MSGNavigator.SETTING_SHOW_SIZE, "true")));
                 menuItem.addActionListener(e -> {
                     mainwin.getRoot().getSetup().setLocalConfig(MSGNavigator.SETTING_SHOW_SIZE, String.valueOf(menuItem.getState()));
                     mainwin.reload();
@@ -27,7 +27,7 @@ public class NavActionPopup extends JPopupMenu {
             // AUTOSAVE
             {
                 final JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(mainwin.MlM("Autosave"));
-                menuItem.setState(StringUtils.isYes(mainwin.getRoot().getSetup().getLocalConfig(MSGNavigator.SETTING_AUTOSAVE, "false")));
+                menuItem.setState(StringUtils.isYes(mainwin.getRoot().getSetup().getConfig(MSGNavigator.SETTING_AUTOSAVE, "false")));
                 menuItem.addActionListener(e -> mainwin.getRoot().getSetup().setLocalConfig(MSGNavigator.SETTING_AUTOSAVE, String.valueOf(menuItem.getState())));
                 menu_settings.add(menuItem);
             }

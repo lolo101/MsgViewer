@@ -3,7 +3,7 @@ package net.sourceforge.MSGViewer;
 import at.redeye.FrameWork.Plugin.AboutPlugins;
 import at.redeye.FrameWork.base.AutoMBox;
 import at.redeye.FrameWork.base.Root;
-import at.redeye.FrameWork.base.prm.impl.gui.LocalConfig;
+import at.redeye.FrameWork.base.prm.impl.gui.Config;
 import net.sourceforge.MSGViewer.MSGNavigator.MSGNavigator;
 
 import javax.swing.*;
@@ -128,7 +128,7 @@ public class SingleWin extends BaseWin {
     }//GEN-LAST:event_jMQuitActionPerformed
 
     private void jMOptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMOptionsActionPerformed
-        invokeDialogUnique(new LocalConfig(root));
+        invokeDialogUnique(new Config(root));
     }//GEN-LAST:event_jMOptionsActionPerformed
 
     private void jFileOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFileOpenActionPerformed
