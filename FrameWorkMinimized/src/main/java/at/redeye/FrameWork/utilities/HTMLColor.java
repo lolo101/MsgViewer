@@ -1,6 +1,5 @@
 package at.redeye.FrameWork.utilities;
 
-import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.base.prm.bindtypes.DBConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,16 +21,15 @@ public class HTMLColor {
         }
 
         int r = Integer.parseInt(s_color.substring(0, 2), 16);
-        int b = Integer.parseInt(s_color.substring(2, 4),16);
-        int g = Integer.parseInt(s_color.substring(4, 6),16);
+        int b = Integer.parseInt(s_color.substring(2, 4), 16);
+        int g = Integer.parseInt(s_color.substring(4, 6), 16);
 
-        return new Color( r, b, g );
+        return new Color(r, b, g);
     }
 
-    public static Color loadLocalColor( Root root, DBConfig param )
-    {
-        String colorString = root.getSetup().getConfig(param);
+    public static Color loadLocalColor(DBConfig param) {
+        String colorString = param.getConfigValue();
 
-        return HTMLCode2Color( colorString );
+        return HTMLCode2Color(colorString);
     }
 }

@@ -169,14 +169,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
                         parent.close();
                     }
                 });
-        loadStuff();
-    }
-
-    /* should be removed later */
-    private void loadStuff() {
-        StringUtils.set_defaultAutoLineLenght(Integer.parseInt(root.getSetup()
-                .getConfig(
-                        FrameWorkConfigDefinitions.DefaultAutoLineBreakWidth)));
+        StringUtils.set_defaultAutoLineLenght(Integer.parseInt(FrameWorkConfigDefinitions.DefaultAutoLineBreakWidth.getConfigValue()));
     }
 
     /**
@@ -251,7 +244,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
      * Geschwindigkeit. Vom User über den Parameter VerticalScrollingSpeed
      * einstellbar.
      */
-    public void adjustScrollingSpeed(JScrollPane scroll_panel) {
+    public static void adjustScrollingSpeed(JScrollPane scroll_panel) {
         try {
             adjustScrollingSpeed(scroll_panel.getVerticalScrollBar(),
                     BaseAppConfigDefinitions.VerticalScrollingSpeed);
@@ -262,8 +255,8 @@ public class BaseDialogBaseHelper implements BindVarInterface {
         }
     }
 
-    private void adjustScrollingSpeed(Adjustable scrollBar, DBConfig config) {
-        String value = root.getSetup().getConfig(config);
+    private static void adjustScrollingSpeed(Adjustable scrollBar, DBConfig config) {
+        String value = config.getConfigValue();
 
         int i = Integer.parseInt(value);
 

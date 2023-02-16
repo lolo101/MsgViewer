@@ -29,7 +29,7 @@ public class Root {
      * fallback language if the target language is not
      * available.
      * Eg: Dialogs are programmed in german, transalations
-     * are available in english too. But on a french PC
+     * are available in english too. But on a French PC
      * we have no translatios. So whout should we do now?
      * Here you can define the default language which can be
      * diferrent from the language the dialog was translated
@@ -113,7 +113,7 @@ public class Root {
      * fallback language if the target language is not
      * available.
      * Eg: Dialogs are programmed in german, transalations
-     * are available in english too. But on a french PC
+     * are available in english too. But on a French PC
      * we have no translatios. So whout should we do now?
      * Here you can define the default language which can be
      * diferrent from the language the dialog was translated
@@ -130,7 +130,7 @@ public class Root {
      * fallback language if the target language is not
      * available.
      * Eg: Dialogs are programmed in german, transalations
-     * are available in english too. But on a french PC
+     * are available in english too. But on a French PC
      * we have no translatios. So whout should we do now?
      * Here you can define the default language which can be
      * diferrent from the language the dialog was translated
@@ -179,15 +179,9 @@ public class Root {
     {
         if (display_language == null)
         {
-            Setup setup = getSetup();
-
             display_language = Locale.getDefault().toString();
 
-            if (setup == null) {
-                return display_language;
-            }
-
-            String lang = setup.getConfig(BaseAppConfigDefinitions.DisplayLanguage);
+            String lang = BaseAppConfigDefinitions.DisplayLanguage.getConfigValue();
 
             if (lang != null && lang.trim().isEmpty()) {
                 return display_language;

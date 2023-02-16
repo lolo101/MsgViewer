@@ -66,18 +66,17 @@ public class TableManipulator {
         ArrayList<String> names = binddesc.getAllNames();
         List<DBValue> values = binddesc.getAllValues();
 
-        for( int i = 0; i < names.size(); i++ )
-        {
-            if( !isHidden(i) )
-                vec.add( new TableDesign.Coll( names.get(i), false, values.get(i) ) );
+        for (int i = 0; i < names.size(); i++) {
+            if (!isHidden(i))
+                vec.add(new TableDesign.Coll(names.get(i), false, values.get(i)));
         }
 
-        this.tabledesign = new TableDesign( vec );
+        this.tabledesign = new TableDesign(vec);
         this.table = table;
         this.model = new NormalTableModel(tabledesign);
         table.setModel(model);
-        table.setDefaultRenderer(Object.class, new NormalCellRenderer(root, this.tabledesign));
-        row_header = new RowHeader( table, this::checkRowHeaderLimit);
+        table.setDefaultRenderer(Object.class, new NormalCellRenderer(this.tabledesign));
+        row_header = new RowHeader(table, this::checkRowHeaderLimit);
     }
 
     public void autoResize()
@@ -89,8 +88,8 @@ public class TableManipulator {
     private void autoResizeColWidth(JTable table) {
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
-        String smargin_default = root.getSetup().getConfig(FrameWorkConfigDefinitions.SpreadSheetMarginReadOnly);
-        String smargin_editable = root.getSetup().getConfig(FrameWorkConfigDefinitions.SpreadSheetMarginEditable);
+        String smargin_default = FrameWorkConfigDefinitions.SpreadSheetMarginReadOnly.getConfigValue();
+        String smargin_editable = FrameWorkConfigDefinitions.SpreadSheetMarginEditable.getConfigValue();
 
         int margin_default = Integer.parseInt(smargin_default);
         int margin_editable = Integer.parseInt(smargin_editable);
@@ -482,8 +481,7 @@ public class TableManipulator {
     private void readShowHeaderLimit()
     {
         try {
-            auto_show_row_header = Integer.parseInt(root.getSetup().getConfig(
-                    FrameWorkConfigDefinitions.SpreadSheetRowHeaderLimit));
+            auto_show_row_header = Integer.parseInt(FrameWorkConfigDefinitions.SpreadSheetRowHeaderLimit.getConfigValue());
 
         } catch ( NumberFormatException ex ) {
             logger.error(StringUtils.exceptionToString(ex));

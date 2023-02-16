@@ -103,13 +103,10 @@ public abstract class BaseModuleLauncher {
 
         ConsoleAppender consoleAppender = ConsoleAppender.createDefaultAppenderForLayout(layout);
 
-        String logFileDir = root.getSetup().getConfig(
-                BaseAppConfigDefinitions.LoggingDir);
+        String logFileDir = BaseAppConfigDefinitions.LoggingDir.getConfigValue();
         logger.trace("logFileDir: " + logFileDir);
-        String logFileLevel = root.getSetup().getConfig(
-                BaseAppConfigDefinitions.LoggingLevel);
-        String loggingEnabled = root.getSetup().getConfig(
-                BaseAppConfigDefinitions.DoLogging);
+        String logFileLevel = BaseAppConfigDefinitions.LoggingLevel.getConfigValue();
+        String loggingEnabled = BaseAppConfigDefinitions.DoLogging.getConfigValue();
 
         if (logFileDir.equals("APPHOME"))
             logFileDir = Setup.getAppConfigDir(root.getAppName() + "/log");
@@ -156,10 +153,9 @@ public abstract class BaseModuleLauncher {
      * be called after the PrmInit was done, but it has to be done before the UI
      * starts.
      */
-    protected final void setLookAndFeel() {
+    protected static void setLookAndFeel() {
 
-        String config = root.getSetup().getConfig(
-                FrameWorkConfigDefinitions.LookAndFeel);
+        String config = FrameWorkConfigDefinitions.LookAndFeel.getConfigValue();
 
         logger.debug("Found LookAndFeel PRM value: <" + config + ">");
 

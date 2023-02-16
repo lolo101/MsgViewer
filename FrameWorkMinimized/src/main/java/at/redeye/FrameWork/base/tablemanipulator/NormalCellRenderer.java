@@ -1,7 +1,6 @@
 package at.redeye.FrameWork.base.tablemanipulator;
 
 import at.redeye.FrameWork.base.FrameWorkConfigDefinitions;
-import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.base.bindtypes.DBEnum;
 import at.redeye.FrameWork.base.bindtypes.DBValue;
 import at.redeye.FrameWork.base.tablemanipulator.TableDesign.ColoredCell;
@@ -41,24 +40,24 @@ public class NormalCellRenderer extends DefaultTableCellRenderer {
     private Color leColor = new Color(220, 245, 235);
     private final TableDesign tabledesign;
 
-    public NormalCellRenderer(Root root, TableDesign tabledesign) {
+    public NormalCellRenderer(TableDesign tabledesign) {
         this.tabledesign = tabledesign;
 
         Color c;
 
-        c = HTMLColor.loadLocalColor(root, FrameWorkConfigDefinitions.SpreadSheetColorEven);
+        c = HTMLColor.loadLocalColor(FrameWorkConfigDefinitions.SpreadSheetColorEven);
         if (c != null)
             hColor = c;
 
-        c = HTMLColor.loadLocalColor(root, FrameWorkConfigDefinitions.SpreadSheetColorEvenEditable);
+        c = HTMLColor.loadLocalColor(FrameWorkConfigDefinitions.SpreadSheetColorEvenEditable);
         if (c != null)
             heColor = c;
 
-        c = HTMLColor.loadLocalColor(root, FrameWorkConfigDefinitions.SpreadSheetColorOdd);
+        c = HTMLColor.loadLocalColor(FrameWorkConfigDefinitions.SpreadSheetColorOdd);
         if (c != null)
             lColor = c;
 
-        c = HTMLColor.loadLocalColor(root, FrameWorkConfigDefinitions.SpreadSheetColorOddEditable);
+        c = HTMLColor.loadLocalColor(FrameWorkConfigDefinitions.SpreadSheetColorOddEditable);
         if( c != null )
             leColor  = c;
     }

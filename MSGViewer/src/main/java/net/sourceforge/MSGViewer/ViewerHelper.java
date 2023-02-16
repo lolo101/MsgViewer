@@ -28,11 +28,9 @@ import static at.redeye.FrameWork.base.BaseDialog.logger;
 public class ViewerHelper {
 
     private static final Pattern META_PATTERN = Pattern.compile("<meta\\s.*>", Pattern.CASE_INSENSITIVE);
-    private final Root root;
     private final AttachmentRepository attachmentRepository;
 
     public ViewerHelper(Root root) {
-        this.root = root;
         attachmentRepository = new AttachmentRepository(root);
     }
 
@@ -45,11 +43,11 @@ public class ViewerHelper {
                 || file_name.toLowerCase().endsWith(".msg");
     }
 
-    public String getOpenCommand() {
+    public static String getOpenCommand() {
         if (Setup.is_win_system())
             return "explorer";
 
-        return root.getSetup().getConfig(FrameWorkConfigDefinitions.OpenCommand);
+        return FrameWorkConfigDefinitions.OpenCommand.getConfigValue();
     }
 
     static public String stripMetaTags(String html) {

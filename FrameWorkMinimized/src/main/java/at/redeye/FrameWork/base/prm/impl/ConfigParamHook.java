@@ -2,7 +2,6 @@ package at.redeye.FrameWork.base.prm.impl;
 
 import at.redeye.FrameWork.base.FrameWorkConfigDefinitions;
 import at.redeye.FrameWork.base.Root;
-import at.redeye.FrameWork.base.Setup;
 import at.redeye.FrameWork.base.prm.bindtypes.DBConfig;
 import at.redeye.FrameWork.base.prm.impl.gui.Config;
 import at.redeye.FrameWork.base.translation.MLUtil;
@@ -33,10 +32,9 @@ public class ConfigParamHook implements HelpWinHook {
         config = LocalConfigDefinitions.entries;
         root.loadMlM4ClassName(Config.class.getName(), "de");
 
-        Setup setup = root.getSetup();
-        color_even = setup.getConfig(FrameWorkConfigDefinitions.HelpParamColorEven);
-        color_odd = setup.getConfig(FrameWorkConfigDefinitions.HelpParamColorOdd);
-        color_title = setup.getConfig(FrameWorkConfigDefinitions.HelpParamColorTitle);
+        color_even = FrameWorkConfigDefinitions.HelpParamColorEven.getConfigValue();
+        color_odd = FrameWorkConfigDefinitions.HelpParamColorOdd.getConfigValue();
+        color_title = FrameWorkConfigDefinitions.HelpParamColorTitle.getConfigValue();
     }
 
 
@@ -85,8 +83,7 @@ public class ConfigParamHook implements HelpWinHook {
             res.append("<font face=\"Verdana\">\n");
 
             DBConfig c = config.get(key);
-            Setup setup = root.getSetup();
-            res.append(setup.getConfig(c));
+            res.append(c.getConfigValue());
 
             res.append("</font>\n");
             res.append("</td>\n");

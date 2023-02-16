@@ -107,10 +107,6 @@ public class Setup {
         return name;
     }
 
-    public String getConfig(DBConfig config) {
-        return config.getConfigValue();
-    }
-
     public String getConfig(String key, String default_value) {
         check();
         return props.getProperty(key, default_value);

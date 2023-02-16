@@ -26,7 +26,7 @@ public class AboutPlugins extends BaseDialog {
             jLPluginsMouseClicked(null);
         }
 
-        HyperlinkListener executer = new HyperlinkExecuter(root);
+        HyperlinkListener executer = new HyperlinkExecuter();
 
         jTChangeLog.addHyperlinkListener(executer);
         jTLicenceText.addHyperlinkListener(executer);

@@ -9,8 +9,8 @@ public class HelpWin extends BaseDialog {
 
     private static final long serialVersionUID = 1L;
 
-    final String base;
-    final HelpWinHook hook;
+    private final String base;
+    private final HelpWinHook hook;
 
     public HelpWin(Root root, String Base, String ModuleName) {
         this(root, Base, ModuleName, null);
@@ -24,7 +24,7 @@ public class HelpWin extends BaseDialog {
 
         initComponents();
 
-        jHelp.addHyperlinkListener(new HyperlinkExecuter(root));
+        jHelp.addHyperlinkListener(new HyperlinkExecuter());
 
         loadHelp(ModuleName);
     }
@@ -80,7 +80,7 @@ public class HelpWin extends BaseDialog {
     private javax.swing.JEditorPane jHelp;
     // End of variables declaration//GEN-END:variables
 
-    protected final void loadHelp(final String ModuleName) {
+    private void loadHelp(final String ModuleName) {
         new AutoMBox<>(ModuleName, () -> {
 
             String module_name = getModuleName(ModuleName);
@@ -103,18 +103,18 @@ public class HelpWin extends BaseDialog {
 
         if (haveResource(HelpFileLoader.getResourceName(base, ModuleName + "_" + locale))) {
             return ModuleName + "_" + locale;
-        } else if (haveResource(HelpFileLoader.getResourceName(base, ModuleName + "_" + MLUtil.getLanguageOnly(locale)))) {
-            return ModuleName + "_" + MLUtil.getLanguageOnly(locale);
-        } else {
-            if (!MLUtil.compareLanguagesOnly(root.getBaseLanguage(), root.getDisplayLanguage())
-                    && haveResource(HelpFileLoader.getResourceName(base, ModuleName + "_" + MLUtil.getLanguageOnly(root.getDefaultLanguage()))))
-                return ModuleName + "_" + MLUtil.getLanguageOnly(root.getDefaultLanguage());
         }
+        if (haveResource(HelpFileLoader.getResourceName(base, ModuleName + "_" + MLUtil.getLanguageOnly(locale)))) {
+            return ModuleName + "_" + MLUtil.getLanguageOnly(locale);
+        }
+        if (!MLUtil.compareLanguagesOnly(root.getBaseLanguage(), root.getDisplayLanguage())
+                && haveResource(HelpFileLoader.getResourceName(base, ModuleName + "_" + MLUtil.getLanguageOnly(root.getDefaultLanguage()))))
+            return ModuleName + "_" + MLUtil.getLanguageOnly(root.getDefaultLanguage());
 
         return ModuleName;
     }
 
-    static boolean haveResource(String resource_name) {
+    private static boolean haveResource(String resource_name) {
         boolean result = MLUtil.haveResource(resource_name);
 
         if (logger.isDebugEnabled()) {
