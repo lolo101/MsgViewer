@@ -1,7 +1,7 @@
 package at.redeye.FrameWork.base;
 
 import at.redeye.FrameWork.base.prm.bindtypes.DBConfig;
-import at.redeye.FrameWork.base.prm.impl.LocalConfigDefinitions;
+import at.redeye.FrameWork.base.prm.impl.ConfigDefinitions;
 import at.redeye.FrameWork.base.prm.impl.PrmActionEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -70,7 +70,7 @@ public class Setup {
             Set<String> keys = oldProps.stringPropertyNames();
 
             for (String currKey : keys) {
-                DBConfig c = LocalConfigDefinitions.get(currKey);
+                DBConfig c = ConfigDefinitions.get(currKey);
                 if (c != null) {
                     PrmActionEvent event = new PrmActionEvent();
                     event.setOldPrmValue(oldProps.getProperty(currKey, ""));

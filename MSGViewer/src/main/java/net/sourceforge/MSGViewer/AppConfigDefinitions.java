@@ -3,7 +3,7 @@ package net.sourceforge.MSGViewer;
 import at.redeye.FrameWork.base.BaseAppConfigDefinitions;
 import at.redeye.FrameWork.base.prm.PrmDefaultChecksInterface;
 import at.redeye.FrameWork.base.prm.bindtypes.DBConfig;
-import at.redeye.FrameWork.base.prm.impl.LocalConfigDefinitions;
+import at.redeye.FrameWork.base.prm.impl.ConfigDefinitions;
 import at.redeye.FrameWork.base.prm.impl.PrmDefaultCheckSuite;
 
 public class AppConfigDefinitions extends BaseAppConfigDefinitions {
@@ -17,6 +17,6 @@ public class AppConfigDefinitions extends BaseAppConfigDefinitions {
 
         addLocal(IconSize);
 
-        LocalConfigDefinitions.add_help_path("/net/souceforge/MSGViewer/resources/Help/Params/");
+        ConfigDefinitions.add_help_path("/net/souceforge/MSGViewer/resources/Help/Params/");
     }
 }

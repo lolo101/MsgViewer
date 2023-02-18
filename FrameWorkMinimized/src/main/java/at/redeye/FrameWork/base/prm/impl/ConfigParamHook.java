@@ -29,7 +29,7 @@ public class ConfigParamHook implements HelpWinHook {
         this.root = root;
         this.search_path = search_path;
 
-        config = LocalConfigDefinitions.entries;
+        config = ConfigDefinitions.entries;
         root.loadMlM4ClassName(Config.class.getName(), "de");
 
         color_even = FrameWorkConfigDefinitions.HelpParamColorEven.getConfigValue();
@@ -60,18 +60,13 @@ public class ConfigParamHook implements HelpWinHook {
         res.append(root.MlM("Beschreibung"));
         res.append("</b></td></tr>\n");
 
-        int count = 1;
+        int rowIndex = 1;
 
-        for (String key : config.keySet()) {
-            String color;
+        for (Map.Entry<String, DBConfig> entry : config.entrySet()) {
+            String key = entry.getKey();
 
-            if (count % 2 == 1) {
-                color = color_even;
-            } else {
-                color = color_odd;
-            }
-
-            count++;
+            String color = rowColor(rowIndex);
+            rowIndex++;
 
             res.append("<tr bgcolor=\"").append(color).append("\">\n");
 
@@ -82,7 +77,7 @@ public class ConfigParamHook implements HelpWinHook {
             res.append("<td>\n");
             res.append("<font face=\"Verdana\">\n");
 
-            DBConfig c = config.get(key);
+            DBConfig c = entry.getValue();
             res.append(c.getConfigValue());
 
             res.append("</font>\n");
@@ -116,6 +111,10 @@ public class ConfigParamHook implements HelpWinHook {
         res.append("</table>");
 
         return res.toString();
+    }
+
+    private String rowColor(int rowIndex) {
+        return rowIndex % 2 == 0 ? color_even : color_odd;
     }
 
     private String findFirstHelp(String key) {

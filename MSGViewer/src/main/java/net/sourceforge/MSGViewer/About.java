@@ -2,6 +2,7 @@ package net.sourceforge.MSGViewer;
 
 import at.redeye.FrameWork.base.BaseDialog;
 import at.redeye.FrameWork.base.Root;
+import at.redeye.FrameWork.widgets.helpwindow.HelpWin;
 
 import java.awt.*;
 
@@ -102,7 +103,7 @@ private void jBCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
 
 private void jBLicenceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBLicenceActionPerformed
 
-    invokeDialogUnique(new LocalHelpWin(root, "Licence"));
+    invokeDialogUnique(new HelpWin(root, "Licence"));
 
 }//GEN-LAST:event_jBLicenceActionPerformed
 

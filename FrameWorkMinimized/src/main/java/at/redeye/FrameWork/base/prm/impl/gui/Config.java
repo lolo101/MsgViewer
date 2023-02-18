@@ -9,8 +9,8 @@ import at.redeye.FrameWork.base.prm.PrmCustomChecksInterface;
 import at.redeye.FrameWork.base.prm.PrmDefaultChecksInterface;
 import at.redeye.FrameWork.base.prm.PrmListener;
 import at.redeye.FrameWork.base.prm.bindtypes.DBConfig;
+import at.redeye.FrameWork.base.prm.impl.ConfigDefinitions;
 import at.redeye.FrameWork.base.prm.impl.ConfigParamHook;
-import at.redeye.FrameWork.base.prm.impl.LocalConfigDefinitions;
 import at.redeye.FrameWork.base.prm.impl.PrmActionEvent;
 import at.redeye.FrameWork.base.prm.impl.PrmErrUtil;
 import at.redeye.FrameWork.base.tablemanipulator.TableManipulator;
@@ -57,7 +57,7 @@ public class Config extends BaseDialog implements Saveable, PrmListener {
         tm.autoResize();
 
         // Register all local PRM
-        LocalConfigDefinitions.entries.values().forEach(c -> c.addPrmListener(this));
+        ConfigDefinitions.entries.values().forEach(c -> c.addPrmListener(this));
     }
 
     private void feed_table() {
@@ -65,7 +65,7 @@ public class Config extends BaseDialog implements Saveable, PrmListener {
         values.clear();
         tm.clear();
 
-        Collection<DBConfig> configs = LocalConfigDefinitions.entries.values();
+        Collection<DBConfig> configs = ConfigDefinitions.entries.values();
 
         for (DBConfig c : configs) {
             String val = root.getSetup().getConfig(c.getConfigName(), c.getConfigValue());
@@ -157,7 +157,7 @@ public class Config extends BaseDialog implements Saveable, PrmListener {
 private void jBHelpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBHelpActionPerformed
 
     HelpWinHook hook = new ConfigParamHook(root, "LOCALSETTINGSHOOOK",
-            LocalConfigDefinitions.help_search_path);
+            ConfigDefinitions.help_search_path);
 
     invokeDialog(new HelpWin(root, "/at/redeye/FrameWork/base/resources/Help/", "LocalConfig", hook));
 
@@ -171,10 +171,10 @@ private void jBSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:
 private void jBCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCancelActionPerformed
 
     if (canClose()) {
-        Set<String> keys = LocalConfigDefinitions.entries.keySet();
+        Set<String> keys = ConfigDefinitions.entries.keySet();
 
         for (String key : keys) {
-            LocalConfigDefinitions.get(key).removePrmListener(this);
+            ConfigDefinitions.get(key).removePrmListener(this);
         }
         close();
     }

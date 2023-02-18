@@ -12,6 +12,10 @@ public class HelpWin extends BaseDialog {
     private final String base;
     private final HelpWinHook hook;
 
+    public HelpWin(Root root, String ModuleName) {
+        this(root, "/Help", ModuleName);
+    }
+
     public HelpWin(Root root, String Base, String ModuleName) {
         this(root, Base, ModuleName, null);
     }

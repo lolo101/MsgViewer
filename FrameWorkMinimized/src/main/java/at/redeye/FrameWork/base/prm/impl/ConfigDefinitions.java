@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.Vector;
 
-public class LocalConfigDefinitions {
+public class ConfigDefinitions {
 
     public static Map<String, DBConfig> entries = new TreeMap<>();
     public static Collection<String> help_search_path = new Vector<>();

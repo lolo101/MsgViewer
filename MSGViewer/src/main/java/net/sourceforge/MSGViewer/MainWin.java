@@ -4,6 +4,7 @@ import at.redeye.FrameWork.Plugin.AboutPlugins;
 import at.redeye.FrameWork.base.AutoMBox;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.base.prm.impl.gui.Config;
+import at.redeye.FrameWork.widgets.helpwindow.HelpWin;
 import net.sourceforge.MSGViewer.MSGNavigator.MSGNavigator;
 
 import javax.swing.*;
@@ -136,7 +137,7 @@ public class MainWin extends BaseWin {
 
     private void jMChangeLogActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMChangeLogActionPerformed
 
-        invokeDialogUnique(new LocalHelpWin(root, "ChangeLog"));
+        invokeDialogUnique(new HelpWin(root, "ChangeLog"));
     }//GEN-LAST:event_jMChangeLogActionPerformed
 
     private void jMPluginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMPluginActionPerformed

@@ -2,7 +2,7 @@ package at.redeye.FrameWork.base;
 
 import at.redeye.FrameWork.base.prm.PrmDefaultChecksInterface;
 import at.redeye.FrameWork.base.prm.bindtypes.DBConfig;
-import at.redeye.FrameWork.base.prm.impl.LocalConfigDefinitions;
+import at.redeye.FrameWork.base.prm.impl.ConfigDefinitions;
 import at.redeye.FrameWork.base.prm.impl.PrmDefaultCheckSuite;
 import org.apache.logging.log4j.Level;
 
@@ -30,6 +30,6 @@ public class BaseAppConfigDefinitions
     }
 
     protected static void addLocal(DBConfig c) {
-        LocalConfigDefinitions.add(c);
+        ConfigDefinitions.add(c);
     }
 }

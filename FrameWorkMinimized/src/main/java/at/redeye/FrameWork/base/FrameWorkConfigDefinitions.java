@@ -2,7 +2,7 @@ package at.redeye.FrameWork.base;
 
 import at.redeye.FrameWork.base.prm.PrmDefaultChecksInterface;
 import at.redeye.FrameWork.base.prm.bindtypes.DBConfig;
-import at.redeye.FrameWork.base.prm.impl.LocalConfigDefinitions;
+import at.redeye.FrameWork.base.prm.impl.ConfigDefinitions;
 import at.redeye.FrameWork.base.prm.impl.PrmDefaultCheckSuite;
 
 public class FrameWorkConfigDefinitions {
@@ -31,7 +31,7 @@ public class FrameWorkConfigDefinitions {
     public static DBConfig OpenCommand = new DBConfig("OpenCommand", "xdg-open", "Kommando für das öffnen einer Datei, oder eines Verzeichnisses");
 
     public static void registerDefinitions() {
-        LocalConfigDefinitions.add_help_path("/at/redeye/FrameWork/base/resources/Help/Params/");
+        ConfigDefinitions.add_help_path("/at/redeye/FrameWork/base/resources/Help/Params/");
 
         addLocal(HelpParamColorEven);
         addLocal(HelpParamColorOdd);
@@ -65,6 +65,6 @@ public class FrameWorkConfigDefinitions {
     }
 
     private static void addLocal(DBConfig c) {
-        LocalConfigDefinitions.add(c);
+        ConfigDefinitions.add(c);
     }
 }
