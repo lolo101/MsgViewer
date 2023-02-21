@@ -86,10 +86,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
                 && Stream.of(root.getStartupArgs()).noneMatch(s -> s.equals(CLI_STARTUP_TEXT_VIEW));
 
         jRRTF.setSelected(rtfFormat);
-        jRText.setSelected(!rtfFormat);
-
-        JCBfix.setSelected(StringUtils.isYes(root.getSetup().getConfig("FixedFont", "no")));
-        JCBfix.setEnabled(jRText.isSelected());
+        jRHTML.setSelected(!rtfFormat);
 
         jSplitPane.setDividerLocation(Integer.parseInt(root.getSetup().getConfig("DividerLocation", "150")));
         header.setText(parent.MlM("Drag a msg file into this window"));
@@ -160,6 +157,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        javax.swing.ButtonGroup buttonGroup = new javax.swing.ButtonGroup();
         jSplitPane = new javax.swing.JSplitPane();
         javax.swing.JScrollPane headerScrollPane = new javax.swing.JScrollPane();
         header = new javax.swing.JEditorPane();
@@ -170,8 +168,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         body.addPropertyChangeListener("paintingForPrint", new PrintListener());
         javax.swing.JPanel buttonsPanel = new javax.swing.JPanel();
         jRRTF = new javax.swing.JRadioButton();
-        jRText = new javax.swing.JRadioButton();
-        JCBfix = new javax.swing.JCheckBox();
+        jRHTML = new javax.swing.JRadioButton();
         jSFontSize = new javax.swing.JSlider();
         javax.swing.JLabel fontSizeLabel = new javax.swing.JLabel();
 
@@ -187,15 +184,13 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         body.addHyperlinkListener(this::bodyHyperlinkUpdate);
         bodyScrollPane.setViewportView(body);
 
+        buttonGroup.add(jRRTF);
         jRRTF.setText("RTF");
         jRRTF.addActionListener(this::jRRTFActionPerformed);
 
-        jRText.setText("Text");
-        jRText.addActionListener(this::jRTextActionPerformed);
-
-        JCBfix.setText("Fixed Font");
-        JCBfix.setEnabled(jRText.isSelected());
-        JCBfix.addActionListener(this::JCBfixActionPerformed);
+        buttonGroup.add(jRHTML);
+        jRHTML.setText("HTML");
+        jRHTML.addActionListener(this::jRHTMLActionPerformed);
 
         jSFontSize.addChangeListener(this::jSFontSizeStateChanged);
 
@@ -208,14 +203,12 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
                         .addGroup(buttonsPanelLayout.createSequentialGroup()
                                 .addComponent(jRRTF)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jRText)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(JCBfix)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jRHTML)
+                                .addGap(108, 108, 108)
                                 .addComponent(jSFontSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(fontSizeLabel)
-                                .addGap(0, 95, Short.MAX_VALUE))
+                                .addGap(0, 84, Short.MAX_VALUE))
         );
         buttonsPanelLayout.setVerticalGroup(
                 buttonsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -224,8 +217,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
                                 .addGroup(buttonsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, buttonsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                                 .addComponent(jRRTF)
-                                                .addComponent(jRText)
-                                                .addComponent(JCBfix))
+                                                .addComponent(jRHTML))
                                         .addComponent(jSFontSize, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addComponent(fontSizeLabel, javax.swing.GroupLayout.Alignment.TRAILING)))
         );
@@ -298,21 +290,13 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
 
     private void jRRTFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRRTFActionPerformed
 
-        jRText.setSelected(!jRRTF.isSelected());
-        JCBfix.setEnabled(jRText.isSelected());
         updateBody();
     }//GEN-LAST:event_jRRTFActionPerformed
 
-    private void jRTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRTextActionPerformed
+    private void jRHTMLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRHTMLActionPerformed
 
-        jRRTF.setSelected(!jRText.isSelected());
-        JCBfix.setEnabled(jRText.isSelected());
         updateBody();
-    }//GEN-LAST:event_jRTextActionPerformed
-
-    private void JCBfixActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JCBfixActionPerformed
-        updateBody();
-    }//GEN-LAST:event_JCBfixActionPerformed
+    }//GEN-LAST:event_jRHTMLActionPerformed
 
     private void bodyHyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {//GEN-FIRST:event_bodyHyperlinkUpdate
         hyperlinkUpdate(evt);
@@ -602,16 +586,14 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
 
     public void dispose() {
         root.getSetup().setLocalConfig("RTFFormat", jRRTF.isSelected() ? "yes" : "no");
-        root.getSetup().setLocalConfig("FixedFont", JCBfix.isSelected() ? "yes" : "no");
         root.getSetup().setLocalConfig("DividerLocation", String.valueOf(jSplitPane.getDividerLocation()));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JCheckBox JCBfix;
     private javax.swing.JEditorPane body;
     private javax.swing.JEditorPane header;
+    private javax.swing.JRadioButton jRHTML;
     private javax.swing.JRadioButton jRRTF;
-    private javax.swing.JRadioButton jRText;
     private javax.swing.JSlider jSFontSize;
     private javax.swing.JSplitPane jSplitPane;
     // End of variables declaration//GEN-END:variables
