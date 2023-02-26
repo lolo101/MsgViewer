@@ -82,46 +82,24 @@ public class NormalCellRenderer extends DefaultTableCellRenderer {
 
     @Override
     protected void setValue(Object v) {
-        if (tabledesign.colls.get(model_col).validator != null) {
-            if (v instanceof DBValue) {
-                String res = tabledesign.colls.get(model_col).validator.formatData(v);
-                super.setValue(res);
-            } else {
-                Object val = tabledesign.rows.get(model_row).get(model_col);
+        Object val = tabledesign.rows.get(model_row).get(model_col);
+        if (v instanceof String && val instanceof DBValue) {
+            DBValue db_value = (DBValue) val;
+            String s = (String) v;
+            if (db_value.acceptString(s)) {
+                db_value.loadFromString(s);
+            }
 
-                if (val instanceof DBValue && v instanceof String) {
-                    tabledesign.colls.get(model_col).validator.loadToValue((DBValue) val, (String) v,model_row);
-                    String res = tabledesign.colls.get(model_col).validator.formatData(val);
-                    super.setValue(res);
-                } else {
-                    super.setValue(v);
-                }
+            if (db_value instanceof DBEnum) {
+                super.setValue(((DBEnum<?>) db_value).getLocalizedString());
+            } else {
+                super.setValue(db_value);
             }
         } else {
-            Object val = tabledesign.rows.get(model_row).get(model_col);
-            if (v instanceof String && val instanceof DBValue) {
-                DBValue db_value = (DBValue) val;
-                String s = (String) v;
-                if (db_value.acceptString(s)) {
-                    db_value.loadFromString(s);
-                }
-
-                if( db_value instanceof DBEnum )
-                {
-                    super.setValue(((DBEnum<?>) db_value).getLocalizedString());
-                }
-                else
-                {
-                    super.setValue(db_value);
-                }
-            } else {
-
-
-                if( v instanceof DBEnum )
-                    super.setValue(((DBEnum<?>) v).getLocalizedString());
-                else
-                    super.setValue(v);
-            }
+            if (v instanceof DBEnum)
+                super.setValue(((DBEnum<?>) v).getLocalizedString());
+            else
+                super.setValue(v);
         }
 
         //Set colors dependant upon if the row is selected or not
@@ -167,7 +145,6 @@ public class NormalCellRenderer extends DefaultTableCellRenderer {
 
         if (missing)
             setToolTipText(null);
-
 
         if (tabledesign.edited_rows.contains(model_row) &&
                 tabledesign.edited_cols.contains(model_col)) {

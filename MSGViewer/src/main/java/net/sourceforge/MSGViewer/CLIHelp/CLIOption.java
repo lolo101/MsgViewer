@@ -1,32 +1,24 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.sourceforge.MSGViewer.CLIHelp;
 
 import at.redeye.FrameWork.utilities.StringUtils;
-import java.util.ArrayList;
 
-/**
- *
- * @author martin
- */
-public class CLIOption
-{
-    private String name;
-    private String short_description;
-    private String long_description = null;
+import java.util.Arrays;
+import java.util.List;
 
-    public CLIOption( String name, String short_description, String long_description )
-    {
+import static java.util.stream.Collectors.toList;
+
+public class CLIOption {
+    private final String name;
+    private final String short_description;
+    private String long_description;
+
+    public CLIOption(String name, String short_description, String long_description) {
         this.name = name;
         this.short_description = short_description;
         this.long_description = long_description;
     }
 
-    public CLIOption( String name, String short_description )
-    {
+    public CLIOption(String name, String short_description) {
         this.name = name;
         this.short_description = short_description;
     }
@@ -35,19 +27,11 @@ public class CLIOption
         return name;
     }
 
-    public String getShortDescription() {
-        return short_description;
-    }
-
-    public String getLongDescription() {
-        return long_description;
-    }
-
     public void buildShortHelpText( StringBuilder sb, int fill_len_to_short_description, int max_line_len )
     {
         addWithFillSpacesTrailing( sb, name, fill_len_to_short_description );
 
-        ArrayList<String> text = splitTextForMaximumLen( short_description, fill_len_to_short_description, max_line_len );
+        List<String> text = splitTextForMaximumLen(short_description, fill_len_to_short_description, max_line_len);
 
         for( int i = 0; i < text.size(); i++ )
         {
@@ -70,7 +54,7 @@ public class CLIOption
         if( long_description == null )
             return;
 
-        ArrayList<String> text = splitTextForMaximumLen( long_description, fill_len_to_short_description, max_line_len );
+        List<String> text = splitTextForMaximumLen(long_description, fill_len_to_short_description, max_line_len);
 
         for (String s : text)
         {
@@ -80,40 +64,30 @@ public class CLIOption
 
     }
 
-    public static void addWithFillSpacesTrailing( StringBuilder sb, String value, int len )
-    {
+    private static void addWithFillSpacesTrailing(StringBuilder sb, String value, int len) {
         sb.append(value);
         sb.append(" ".repeat(Math.max(0, len - value.length())));
     }
 
-    public static void addWithFillSpacesLeading( StringBuilder sb, String value, int len )
-    {
-        sb.append(" ".repeat(Math.max(0, len - value.length())));
-        sb.append(value);
+    private static void addWithFillSpacesLeading(StringBuilder sb, int len) {
+        sb.append(" ".repeat(Math.max(0, len - "".length())));
     }
 
-    public static String addWithFillSpacesLeading( String value, int len )
-    {
+    private static String addWithFillSpacesLeading(int len) {
         StringBuilder sb = new StringBuilder();
-        addWithFillSpacesLeading( sb, value, len );
+        addWithFillSpacesLeading(sb, len);
         return sb.toString();
     }
 
-    public static ArrayList<String> splitTextForMaximumLen( String descr, int fill_len_to_short_description, int max_line_len )
-    {
+    private static List<String> splitTextForMaximumLen(String descr, int fill_len_to_short_description, int max_line_len) {
         int max_len = max_line_len - fill_len_to_short_description;
 
         String breaked_text = StringUtils.autoLineBreak(descr, max_len);
 
         String[] breaked_array = breaked_text.split("\n");
 
-        ArrayList<String> ret = new ArrayList<>();
-
-        for( String s : breaked_array )
-        {
-            ret.add(addWithFillSpacesLeading( "", fill_len_to_short_description) + s);
-        }
-
-        return ret;
+        return Arrays.stream(breaked_array)
+                .map(s -> addWithFillSpacesLeading(fill_len_to_short_description) + s)
+                .collect(toList());
     }
 }

@@ -7,6 +7,9 @@ import java.awt.*;
 import java.util.List;
 import java.util.*;
 
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
+
 public class TableDesign {
 
     public static class ColoredCell {
@@ -31,7 +34,6 @@ public class TableDesign {
 
         public final String title;
         public boolean isEditable;
-        public TableValidator validator;
         DBValue dbval;
         private boolean doAutocompleteForAllOfThisColl = true;
 
@@ -64,35 +66,21 @@ public class TableDesign {
     }
 
     public List<String> getAllOfCollSorted(int col) {
-        List<String> all = new Vector<>();
-
-        TableValidator validator = null;
         Coll coll = null;
 
         if (col >= 0 && col < colls.size()) {
             coll = colls.get(col);
-            validator = coll.validator;
         }
 
         if (coll == null || !coll.getDoAutocompleteForAllOfThisColl())
-            return all;
+            return emptyList();
 
-        for (List<Object> row : rows) {
-            if (row.size() > col && col > 0) {
-                Object obj = row.get(col);
-
-
-                if (validator != null) {
-                    all.add(validator.formatData(obj));
-                } else {
-                    all.add(obj.toString());
-                }
-            }
-        }
-
-        Collections.sort(all);
-
-        return all;
+        return rows.stream()
+                .filter(row -> row.size() > col && col > 0)
+                .map(row -> row.get(col))
+                .map(Object::toString)
+                .sorted()
+                .collect(toList());
     }
 
 

@@ -4,7 +4,6 @@ import at.redeye.FrameWork.base.bindtypes.DBHistory;
 import at.redeye.FrameWork.base.bindtypes.DBString;
 import at.redeye.FrameWork.base.bindtypes.DBStrukt;
 import at.redeye.FrameWork.base.prm.PrmAttachInterface;
-import at.redeye.FrameWork.base.prm.PrmCustomChecksInterface;
 import at.redeye.FrameWork.base.prm.PrmDefaultChecksInterface;
 import at.redeye.FrameWork.base.prm.PrmListener;
 import at.redeye.FrameWork.base.prm.impl.PrmActionEvent;
@@ -18,7 +17,6 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface {
     private final Collection<PrmListener> prmListeners = new Vector<>();
     private String[] possibleValues = {};
 
-    private PrmCustomChecksInterface customChecks;
     private PrmDefaultChecksInterface defaultChecks;
 
     public DBString name = new DBString("name", "Name", 100);
@@ -78,31 +76,6 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface {
         this.possibleValues = possibleValues;
     }
 
-    public DBConfig( String name, String value, PrmDefaultChecksInterface checks, String [] possibleValues )
-    {
-        super(TABLENAME);
-
-        register();
-
-        this.name.loadFromString(name);
-        this.value.loadFromString(value);
-        this.defaultChecks = checks;
-        this.possibleValues = possibleValues;
-    }
-
-    public DBConfig( String name, String value, PrmDefaultChecksInterface checks, String [] possibleValues, PrmCustomChecksInterface specialChecks )
-    {
-        super(TABLENAME);
-
-        register();
-
-        this.name.loadFromString(name);
-        this.value.loadFromString(value);
-        this.defaultChecks = checks;
-        this.possibleValues = possibleValues;
-        this.customChecks = specialChecks;
-    }
-
     private void register()
     {
         add( name );
@@ -159,12 +132,7 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface {
                 System.out.println("-> no default check");
             }
 
-            if (customChecks != null) {
-                if (valueHasChanged)
-                    currentListener.onChange(customChecks, prmActionEvent);
-            } else {
-                System.out.println("-> no custom check");
-            }
+            System.out.println("-> no custom check");
         }
     }
 

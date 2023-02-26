@@ -1,108 +1,73 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.base.translation;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.TreeSet;
+import java.util.*;
 
-/**
- *
- * @author martin
- */
-public class ExtractStrings
-{
-    static private class TabTitleWrapper extends JComponent
-    {
-        JTabbedPane parent;
-        int index;
+public class ExtractStrings {
+    static private class TabTitleWrapper extends JComponent {
+        private final JTabbedPane parent;
+        private final int index;
 
-        public TabTitleWrapper( JTabbedPane parent, int index )
-        {
+        private TabTitleWrapper(JTabbedPane parent, int index) {
             this.index = index;
             this.parent = parent;
         }
 
-        public String getText()
-        {
+        private String getText() {
             return parent.getTitleAt(index);
         }
 
-        public void setText( String text)
-        {
+        private void setText(String text) {
             parent.setTitleAt(index, text);
         }
     }
 
     static private class ToolTipWrapper extends JComponent
     {
-        JComponent parent;
+        private final JComponent parent;
 
-        public ToolTipWrapper( JComponent parent )
-        {
+        private ToolTipWrapper(JComponent parent) {
             this.parent = parent;
         }
 
-        public String getText()
-        {
-            return parent.getToolTipText();
-        }
-
-        public void setText( String text)
-        {
+        private void setText(String text) {
             parent.setToolTipText(text);
         }
     }
 
-    static private class FrameTitleWrapper extends JComponent
-    {
-        TitledBorder border;
+    static private class FrameTitleWrapper extends JComponent {
+        private TitledBorder border;
 
-        public FrameTitleWrapper( JComponent parent )
-        {
-            if( parent.getBorder() instanceof TitledBorder )
-            {
+        private FrameTitleWrapper(JComponent parent) {
+            if (parent.getBorder() instanceof TitledBorder) {
                 border = (TitledBorder) parent.getBorder();
             }
         }
 
-        public String getText()
-        {
-            return border.getTitle();
-        }
-
-        public void setText( String text)
-        {
-           border.setTitle(text);
+        private void setText(String text) {
+            border.setTitle(text);
         }
     }
 
-    TreeSet<String> strings;
-    HashMap<String,List<JComponent>> components;
+    Set<String> strings;
+    private final Map<String, List<JComponent>> components;
 
-    public ExtractStrings( Container cont )
-    {
+    public ExtractStrings(Container cont) {
         strings = new TreeSet<>();
         components = new HashMap<>();
 
         extractStrings(cont);
     }
 
-    public TreeSet<String> getStrings()
-    {
+    public Set<String> getStrings() {
         return strings;
     }
 
-    public HashMap<String,List<JComponent>>  getComponents()
-    {
+    public Map<String, List<JComponent>> getComponents() {
         return components;
     }
 
@@ -148,10 +113,6 @@ public class ExtractStrings
                 addString((JMenu)comp);
             else if( comp instanceof JMenuItem )
                 addString((JMenuItem)comp);
-            else if( comp instanceof JRadioButtonMenuItem )
-                addString((JRadioButtonMenuItem)comp);
-            else if( comp instanceof JCheckBoxMenuItem )
-                addString((JCheckBoxMenuItem)comp);
             else if( comp instanceof JCheckBox )
                 addString((JCheckBox)comp);
             else if( comp instanceof JRadioButton )
@@ -162,14 +123,14 @@ public class ExtractStrings
 
                 try {
                     extractStrings((Container) comp);
-                } catch (Exception ex) {
+                } catch (Exception ignored) {
                 }
             }
             else
             {
                 try {
                     extractStrings((Container) comp);
-                } catch (Exception ex) {
+                } catch (Exception ignored) {
                 }
             }
         }
@@ -177,7 +138,7 @@ public class ExtractStrings
 
     private void addComp( String text, JComponent comp )
     {
-        List<JComponent> vcomp = components.computeIfAbsent(text, k -> new ArrayList<JComponent>());
+        List<JComponent> vcomp = components.computeIfAbsent(text, k -> new ArrayList<>());
 
         vcomp.add(comp);
     }
@@ -243,8 +204,6 @@ public class ExtractStrings
             ((JLabel)comp).setText(value);
         else if( comp instanceof JMenuItem )
             ((JMenuItem)comp).setText(value);
-        else if( comp instanceof JMenu )
-            ((JMenu)comp).setText(value);
         else if( comp instanceof JRadioButton )
             ((JRadioButton)comp).setText(value);
         else if( comp instanceof JCheckBox )

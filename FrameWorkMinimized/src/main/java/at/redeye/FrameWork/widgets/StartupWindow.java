@@ -1,28 +1,12 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.widgets;
 
-import java.awt.BorderLayout;
-import java.awt.DisplayMode;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
+import javax.swing.*;
+import java.awt.*;
 import java.net.URL;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.Popup;
-import javax.swing.PopupFactory;
 
-/**
- *
- * @author martin
- */
 public class StartupWindow
 {
-    protected Popup popup = null;
+    private Popup popup;
 
     public StartupWindow(String icon_path)
     {
@@ -33,7 +17,7 @@ public class StartupWindow
             return;
         }
 
-        ImageIcon icon = new javax.swing.ImageIcon(url);
+        Icon icon = new javax.swing.ImageIcon(url);
 
         JLabel label = new JLabel();
         label.setIcon(icon);
@@ -51,8 +35,8 @@ public class StartupWindow
         int screenWidth = 100;
         int screenHeight = 100;
 
-        for (int i = 0; i < gs.length; i++) {
-            DisplayMode dm = gs[i].getDisplayMode();
+        for (GraphicsDevice g : gs) {
+            DisplayMode dm = g.getDisplayMode();
             screenWidth = dm.getWidth();
             screenHeight = dm.getHeight();
             break;

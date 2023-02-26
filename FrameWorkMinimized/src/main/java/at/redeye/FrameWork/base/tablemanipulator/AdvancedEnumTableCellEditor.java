@@ -64,10 +64,6 @@ public class AdvancedEnumTableCellEditor extends AbstractCellEditor implements T
 
         component.setBorder(new LineBorder(Color.BLACK));
 
-        if (tabledesign.colls.get(last_col).validator != null) {
-            tabledesign.colls.get(last_col).validator.updateComponentBeforeEdit(component, value, tabledesign, last_row, last_col);
-        }
-
         if (value instanceof DBEnum)
             component.setSelectedItem(((DBEnum<?>) value).getLocalizedString());
         else
@@ -82,13 +78,6 @@ public class AdvancedEnumTableCellEditor extends AbstractCellEditor implements T
        System.out.println("Advanced stopCellEditing");
        component.hidePopup();
 
-        if (tabledesign.colls.get(last_col).validator != null) {
-            if (tabledesign.colls.get(last_col).validator.rejectData(component.getText())) {
-                component.setBorder(new LineBorder(Color.RED));
-                return false;
-            }
-        }
-
        DBValue val = null;
 
         if (current_value instanceof DBValue) {
@@ -101,29 +90,14 @@ public class AdvancedEnumTableCellEditor extends AbstractCellEditor implements T
 
        if( val != null )
        {
-            String s = component.getText();
+           String s = component.getText();
 
-            boolean do_self = true;
-
-            if (tabledesign.colls.get(last_col).validator != null) {
-                if (tabledesign.colls.get(last_col).validator.wantDoLoadSelf()) {
-                    do_self = false;
-
-                    if (!tabledesign.colls.get(last_col).validator.loadToValue(val, s, last_row)) {
-                        component.setBorder(new LineBorder(Color.RED));
-                        return false;
-                    }
-                }
-            }
-
-            if (do_self) {
-                if (!val.acceptString(s)) {
-                    component.setBorder(new LineBorder(Color.RED));
-                    return false;
-                }
-                val.loadFromString(s);
-            }
-        }
+           if (!val.acceptString(s)) {
+               component.setBorder(new LineBorder(Color.RED));
+               return false;
+           }
+           val.loadFromString(s);
+       }
 
         component.setBackground(Color.WHITE);
 

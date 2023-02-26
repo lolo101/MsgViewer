@@ -1,81 +1,52 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.widgets;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.event.MouseWheelListener;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.List;
 import java.util.Vector;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
-/**
- *
- * @author martin
- */
 public class AutoComboPopup extends JPanel
-        implements MouseWheelListener
-{
-    JList list;
-    JScrollPane scroll;
-    List items;
-    boolean self_triggert = false;
+        implements MouseWheelListener {
+    private final JList<String> list;
+    private List<String> items;
+    private boolean self_triggert;
 
-    public AutoComboPopup( List items, final JTextField textField )
-    {
+    public AutoComboPopup(List<String> items, final JTextField textField) {
         this.items = items;
         setLayout(new BorderLayout());
 
-        scroll = new JScrollPane();
+        JScrollPane scroll = new JScrollPane();
 
-        list = new JList();
+        list = new JList<>();
 
         list.addMouseWheelListener(this);
 
         scroll.setViewportView(list);
 
         add(scroll, BorderLayout.NORTH);
-        list.setListData(new Vector(items));
+        list.setListData(new Vector<>(items));
 
-        list.addListSelectionListener(new ListSelectionListener() {
-
-            public void valueChanged(ListSelectionEvent e) {
-
-                if( !self_triggert )
-                {
-                    Object o = list.getSelectedValue();
-                    textField.setText(o.toString());
-                }
+        list.addListSelectionListener(e -> {
+            if (!self_triggert) {
+                Object o = list.getSelectedValue();
+                textField.setText(o.toString());
             }
         });
 
         this.setBackground(Color.red);
-        
+
         Dimension prefSize = getPreferredSize();
 
-        int width = Math.max(prefSize.width, textField.getWidth() );
+        int width = Math.max(prefSize.width, textField.getWidth());
         int height = prefSize.height;
 
         if( height < 20 || height <= textField.getHeight() )
             height = items.size() * textField.getHeight();
 
-        //System.out.println( "heigth: " + height + " items: " + items.size() );
-        
         setPreferredSize(new Dimension(width, height));
-        //list.setPreferredSize(new Dimension(width, height));
         scroll.setPreferredSize(new Dimension(width, height));
-        //this.setSize(new Dimension(width, height));
-
     }
 
     public void setText( String text, boolean trigger_text_field )
@@ -137,22 +108,13 @@ public class AutoComboPopup extends JPanel
         list.ensureIndexIsVisible(i);
     }
 
-    Object getSelectedItem()
-    {
-        return list.getSelectedValue();
-    }
-
     void setSelectedItem(Object value) {
         list.setSelectedValue(value, true);
     }
 
-    void refresh() {
-        list.setListData(new Vector(items));
-    }
-
-    void refresh(List items) {
+    void refresh(List<String> items) {
         this.items = items;
-        list.setListData(new Vector(items));
+        list.setListData(new Vector<>(items));
     }
 
     public void mouseWheelMoved(MouseWheelEvent e)
@@ -168,6 +130,6 @@ public class AutoComboPopup extends JPanel
         {
             for( int i = 0; i < notches; i++ )
                 incSelectItem();
-        }      
+        }
     }
 }

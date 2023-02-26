@@ -25,7 +25,7 @@ public class DesEncrypt {
         this(password, false);
     }
 
-    public DesEncrypt(String password, boolean decode_only) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException, InvalidKeyException, InvalidAlgorithmParameterException {
+    private DesEncrypt(String password, boolean decode_only) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException, InvalidKeyException, InvalidAlgorithmParameterException {
         KeySpec keySpec = new PBEKeySpec(password.toCharArray(), salt, 19);
         SecretKey key = SecretKeyFactory.getInstance("PBEWithMD5AndDES").generateSecret(keySpec);
         AlgorithmParameterSpec paramSpec = new PBEParameterSpec(salt, 19);
