@@ -15,7 +15,7 @@ class UniqueDialogHelperTest {
     @Test
     void should_return_dialog_instance() {
         UniqueDialogHelper sut = new UniqueDialogHelper();
-        BaseDialogBase dialog = new BaseDialogDialog(ROOT, "title");
+        BaseDialogBase dialog = new BaseDialogDialog(null, ROOT, "title");
 
         BaseDialogBase returned = sut.invokeUniqueDialog(dialog);
 
@@ -37,7 +37,7 @@ class UniqueDialogHelperTest {
 
         private static final String IDENTIFIER = "identifier";
         private final UniqueDialogHelper sut = new UniqueDialogHelper();
-        private final BaseDialogBase dialog = new BaseDialogDialog(ROOT, IDENTIFIER);
+        private final BaseDialogBase dialog = new BaseDialogDialog(null, ROOT, IDENTIFIER);
 
         @BeforeEach
         void before() {

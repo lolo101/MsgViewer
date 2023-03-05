@@ -1,7 +1,6 @@
 package at.redeye.FrameWork.base.bindtypes;
 
 import at.redeye.SqlDBInterface.SqlDBIO.StmtExecInterface;
-import at.redeye.SqlDBInterface.SqlDBIO.impl.DBDataType;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -14,10 +13,6 @@ public class DBDateTime extends DBValue {
 
     protected Date value = new Date(0);
 
-    public DBDateTime(String name) {
-        super(name);
-    }
-
     public DBDateTime(String name, String title, boolean name_is_already_lowercase) {
         super(name, title, name_is_already_lowercase);
     }
@@ -28,18 +23,6 @@ public class DBDateTime extends DBValue {
     }
 
     @Override
-    public DBDateTime getCopy() {
-        DBDateTime datetime = new DBDateTime(name);
-        datetime.value = value;
-        return datetime;
-    }
-
-    @Override
-    public DBDataType getDBType() {
-        return DBDataType.DB_TYPE_DATETIME;
-    }
-
-    @Override
     public Date getValue() {
         return value;
     }
@@ -47,11 +30,6 @@ public class DBDateTime extends DBValue {
     @Override
     public void loadFromCopy(Object obj) {
         value = (Date) ((Date) obj).clone();
-    }
-
-    @Override
-    public void loadFromDB(Object obj) {
-        value = (Date) obj;
     }
 
     @Override

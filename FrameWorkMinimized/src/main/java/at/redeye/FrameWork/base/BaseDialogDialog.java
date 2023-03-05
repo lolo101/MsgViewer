@@ -20,16 +20,12 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	protected final Root root;
 	private final BaseDialogBaseHelper helper;
 
-	public BaseDialogDialog(Root root, String title) {
-		this(null, root, title, false);
-	}
-
 	public BaseDialogDialog(JFrame owner, Root root, String title) {
 		this(owner, root, title, false);
 	}
 
-	public BaseDialogDialog(JFrame owner, Root root, String title,
-			boolean do_not_inform_root) {
+	private BaseDialogDialog(JFrame owner, Root root, String title,
+							 boolean do_not_inform_root) {
 		super(owner);
 		this.root = root;
 
@@ -50,13 +46,11 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	/**
 	 * Registers a listener for a F1, ESC, or something global keypressed Event
 	 *
-	 * @param to_listen_Key
-	 *            Keyboard Key
-	 * @param runnable
-	 *            Method to call
+	 * @param to_listen_Key Keyboard Key
+	 * @param runnable      Method to call
 	 */
 	public void registerActionKeyListener(KeyStroke to_listen_Key,
-			Runnable runnable) {
+										  Runnable runnable) {
 		helper.registerActionKeyListener(to_listen_Key, runnable);
 	}
 
@@ -189,7 +183,7 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	 *            dann der demenstprechende Inhalt entweder vom GUI zu
 	 *            Variablen, oder umgekehrt übertragen.
 	 */
-        @Override
+	@Override
 	public void bindVar(JTextArea jtext, StringBuffer var) {
 		helper.bindVar(jtext, var);
 	}
@@ -205,7 +199,7 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	 *            dann der demenstprechende Inhalt entweder vom GUI zu
 	 *            Variablen, oder umgekehrt übertragen.
 	 */
-        @Override
+	@Override
 	public void bindVar(JTextArea jtext, DBValue var) {
 		helper.bindVar(jtext, var);
 	}
@@ -246,7 +240,7 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	}
 
 	public void adjustScrollingSpeed(JScrollPane scroll_panel) {
-		helper.adjustScrollingSpeed(scroll_panel);
+		BaseDialogBaseHelper.adjustScrollingSpeed(scroll_panel);
 	}
 
 	public void invokeDialogUnique(BaseDialogBase dialog) {

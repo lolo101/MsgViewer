@@ -1,12 +1,10 @@
 package at.redeye.FrameWork.base.tablemanipulator;
 
 import at.redeye.FrameWork.base.bindtypes.DBDateTime;
-import at.redeye.FrameWork.base.bindtypes.DBInteger;
 import at.redeye.FrameWork.base.bindtypes.DBString;
 import at.redeye.FrameWork.base.bindtypes.DBValue;
 import at.redeye.FrameWork.widgets.AutoCompleteTextField;
 import at.redeye.FrameWork.widgets.documentfields.DocumentFieldDateTime;
-import at.redeye.FrameWork.widgets.documentfields.DocumentFieldInteger;
 import at.redeye.FrameWork.widgets.documentfields.DocumentFieldLimit;
 
 import javax.swing.*;
@@ -57,11 +55,6 @@ public class AdvancedTableCellEditor extends AbstractCellEditor implements Table
             if (current_value instanceof DBString) {
                 DBString s = (DBString) current_value;
                 component.setDocument(new DocumentFieldLimit(s.getMaxLen()));
-
-            } else if (current_value instanceof DBInteger) {
-
-                component.setDocument(new DocumentFieldInteger());
-
             } else if (current_value instanceof DBDateTime) {
 
                 component.setDocument(new DocumentFieldDateTime());

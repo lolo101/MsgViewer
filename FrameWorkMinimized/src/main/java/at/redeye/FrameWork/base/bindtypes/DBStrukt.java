@@ -7,7 +7,7 @@ import java.util.Map;
 
 public abstract class DBStrukt {
 
-	protected final String strukt_name;
+	private final String strukt_name;
 	protected final String title;
 	private final Map<String, DBValue> element_by_name = new HashMap<>();
 	private final ArrayList<DBStrukt> sub_strukts = new ArrayList<>();
@@ -23,7 +23,7 @@ public abstract class DBStrukt {
 		this.title = title;
 	}
 
-	public void add(DBValue value) {
+	public final void add(DBValue value) {
 		add(value, 1);
 	}
 
@@ -89,8 +89,6 @@ public abstract class DBStrukt {
 
 		return values;
 	}
-
-	public abstract DBStrukt getNewOne();
 
 	public String getTitle() {
 		return title;

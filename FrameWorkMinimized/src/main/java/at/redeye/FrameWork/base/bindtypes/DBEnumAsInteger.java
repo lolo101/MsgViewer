@@ -1,7 +1,6 @@
 package at.redeye.FrameWork.base.bindtypes;
 
 import at.redeye.FrameWork.base.Root;
-import at.redeye.SqlDBInterface.SqlDBIO.impl.DBDataType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,24 +24,10 @@ public class DBEnumAsInteger extends DBValue {
 
     public EnumAsIntegerHandler handler;
 
-    private DBEnumAsInteger(String name, EnumAsIntegerHandler enumval) {
-        this(name, "", enumval);
-    }
-
     public DBEnumAsInteger( String name, String title, EnumAsIntegerHandler enumval )
     {
         super( name, title );
         handler = enumval;
-    }
-
-    @Override
-    public DBDataType getDBType() {
-        return DBDataType.DB_TYPE_INTEGER;
-    }
-
-    @Override
-    public void loadFromDB(Object obj) {
-        handler.setValue((Integer)obj);
     }
 
     @Override
@@ -64,13 +49,6 @@ public class DBEnumAsInteger extends DBValue {
     @Override
     public Integer getValue() {
         return handler.getValue();
-    }
-
-    @Override
-    public DBValue getCopy() {
-        DBEnumAsInteger copy = new DBEnumAsInteger(name, handler.getNewOne() );
-        copy.handler.setValue(handler.getValue());
-        return copy;
     }
 
     @Override

@@ -1,13 +1,10 @@
 package at.redeye.FrameWork.base.bindtypes;
 
-import at.redeye.SqlDBInterface.SqlDBIO.impl.DBDataType;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 class DBStringTest {
 
@@ -15,17 +12,11 @@ class DBStringTest {
     private static final String NORMAL_STRING = "12345";
     private static final String LONG_STRING = "12345678901234567890";
 
-    @Test
-    void testGetDBType() {
-        DBString instance = new DBString("name", MAX_LEN);
-        assertEquals(DBDataType.DB_TYPE_STRING, instance.getDBType());
-    }
-
     @ParameterizedTest
     @ValueSource(strings = {"a", "value of any length", ""})
     void testGetValue(String value) {
         DBString instance = new DBString("name", MAX_LEN);
-        instance.loadFromDB(value);
+        instance.loadFromString(value);
         assertEquals(value, instance.getValue());
     }
 
@@ -33,7 +24,7 @@ class DBStringTest {
     @ValueSource(strings = {"a", "value of any length", ""})
     void testToString(String value) {
         DBString instance = new DBString("name", MAX_LEN);
-        instance.loadFromDB(value);
+        instance.loadFromString(value);
         assertEquals(value, instance.toString());
     }
 
@@ -54,15 +45,6 @@ class DBStringTest {
         assertEquals(accept, instance.acceptString(value));
     }
 
-    @Test
-    void testGetCopy() {
-        DBString instance = new DBString("name", MAX_LEN);
-        instance.acceptString("value");
-        DBString result = instance.getCopy();
-        assertNotSame(result, instance);
-        assertEquals(result.value, instance.value);
-    }
-
     @ParameterizedTest
     @ValueSource(strings = {"a", "value", "that is loaded event when size is longer than max_len"})
     void testLoadFromCopy(String value) {
@@ -75,7 +57,7 @@ class DBStringTest {
     @ValueSource(strings = {"a", "value", "that is loaded event when size is longer than max_len"})
     void testLoadFromDB(String value) {
         DBString instance = new DBString("name", MAX_LEN);
-        instance.loadFromDB(value);
+        instance.loadFromString(value);
         assertEquals(value, instance.value);
     }
 

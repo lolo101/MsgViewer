@@ -1,7 +1,5 @@
 package at.redeye.FrameWork.base.bindtypes;
 
-import at.redeye.SqlDBInterface.SqlDBIO.impl.DBDataType;
-
 public class DBString extends DBValue {
     protected String value = "";
     private final int max_len;
@@ -25,16 +23,6 @@ public class DBString extends DBValue {
     }
 
     @Override
-    public DBDataType getDBType() {
-        return DBDataType.DB_TYPE_STRING;
-    }
-
-    @Override
-    public void loadFromDB(Object obj) {
-        value = (String)obj;
-    }
-
-    @Override
     public String getValue() {
         return value;
     }
@@ -53,13 +41,6 @@ public class DBString extends DBValue {
     @Override
     public boolean acceptString(String s) {
         return s.length() <= max_len;
-    }
-
-    @Override
-    public DBString getCopy() {
-        DBString s = new DBString( name, title, max_len );
-        s.value = value;
-        return s;
     }
 
     @Override

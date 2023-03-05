@@ -1,7 +1,5 @@
 package at.redeye.FrameWork.base.bindtypes;
 
-import at.redeye.SqlDBInterface.SqlDBIO.impl.DBDataType;
-
 public abstract class DBValue {
 
     protected String name;
@@ -19,10 +17,6 @@ public abstract class DBValue {
         this.name = name_is_already_lowercase ? name : name.toLowerCase();
         this.title = title;
     }
-
-    public abstract DBDataType getDBType();
-
-    public abstract void loadFromDB(Object obj);
 
     public abstract void loadFromString(String s);
 
@@ -47,8 +41,6 @@ public abstract class DBValue {
     }
 
     public abstract Object getValue();
-
-    public abstract DBValue getCopy();
 
     public void setAsPrimaryKey()
     {

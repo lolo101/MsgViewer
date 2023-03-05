@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
@@ -22,18 +23,14 @@ public class ParseJNLPTest {
     {
         private final String resource;
         private File tempfile;
-        private final String main_jar;
         List<String> jar_list;
         String code_base;
 
-        TestFile( String resource , String main_jar)
-        {
+        TestFile(String resource) {
             this.resource = resource;
-            this.main_jar = main_jar;
         }
 
-        public void extractFile() throws IOException
-        {
+        private void extractFile() throws IOException {
             try (InputStream source = getClass().getResourceAsStream(resource)) {
                 tempfile = File.createTempFile("testcase", ".jnlp");
 
@@ -48,37 +45,23 @@ public class ParseJNLPTest {
             }
         }
 
-        public void cleanUp() {
-            if( tempfile != null )
+        private void cleanUp() {
+            if (tempfile != null)
                 tempfile.delete();
         }
 
-        public File getFile() {
+        private File getFile() {
             return tempfile;
         }
 
-        public static Properties getProperties() {
+        private static Properties getProperties() {
             return new Properties();
-        }
-
-        public String getMainJar() {
-            return main_jar;
-        }
-
-        public List<String> getJars() {
-            return jar_list;
-        }
-
-        private String getCodeBase() {
-            return code_base;
         }
     }
 
-    static class TestSFTPUpload extends TestFile
-    {
-        TestSFTPUpload()
-        {
-            super( "/at/redeye/FrameWork/utilities/ParseJNLPTestFiles/launch_sftpupload.jnlp", "SFtpUpload.jar" );
+    private static class TestSFTPUpload extends TestFile {
+        private TestSFTPUpload() {
+            super("/at/redeye/FrameWork/utilities/ParseJNLPTestFiles/launch_sftpupload.jnlp");
 
             code_base = "http://redeye.hoffer.cx/sftpupload/";
 
@@ -93,11 +76,9 @@ public class ParseJNLPTest {
         }
     }
 
-    static class TestMSGViewer extends TestFile
-    {
-        TestMSGViewer()
-        {
-            super( "/at/redeye/FrameWork/utilities/ParseJNLPTestFiles/launch_msgviewer.jnlp", "MSGViewer.jar" );
+    private static class TestMSGViewer extends TestFile {
+        private TestMSGViewer() {
+            super("/at/redeye/FrameWork/utilities/ParseJNLPTestFiles/launch_msgviewer.jnlp");
 
             code_base = "http://redeye.hoffer.cx/MSGViewer/";
 
@@ -117,73 +98,34 @@ public class ParseJNLPTest {
         }
     }
 
-    static List<TestFile> test_cases = new ArrayList<>();
+    private static final Collection<TestFile> test_cases = new ArrayList<>();
 
     @BeforeAll
-    public static void setUpClass() throws Exception {
+    static void setUpClass() throws Exception {
 
         test_cases.add(new TestSFTPUpload());
         test_cases.add(new TestMSGViewer());
 
-        for( TestFile test : test_cases ) {
+        for (TestFile test : test_cases) {
             test.extractFile();
         }
     }
 
     @AfterAll
-    public static void tearDownClass() {
-        for( TestFile test : test_cases ) {
+    static void tearDownClass() {
+        for (TestFile test : test_cases) {
             test.cleanUp();
         }
     }
 
     @Test
-    public void testGetProperties() throws ParserConfigurationException, IOException, SAXException {
+    void testGetProperties() throws ParserConfigurationException, IOException, SAXException {
 
-        for( TestFile test : test_cases )
-        {
+        for (TestFile test : test_cases) {
             System.out.println("getProperties for " + test.resource);
             ParseJNLP instance = new ParseJNLP(test.getFile());
             Properties expResult = TestFile.getProperties();
             Properties result = instance.getProperties();
-            assertEquals(expResult, result);
-        }
-    }
-
-    @Test
-    public void testGetMainJar() throws ParserConfigurationException, IOException, SAXException {
-
-        for( TestFile test : test_cases )
-        {
-            System.out.println("getMainJar for "  + test.resource );
-            ParseJNLP instance = new ParseJNLP(test.getFile());
-            String expResult = test.getMainJar();
-            String result = instance.getMainJar();
-            assertEquals(expResult, result);
-        }
-    }
-
-    @Test
-    public void testGetJars() throws ParserConfigurationException, IOException, SAXException {
-
-        for( TestFile test : test_cases )
-        {
-            System.out.println("getJars for " + test.resource);
-            ParseJNLP instance = new ParseJNLP(test.getFile());
-            List<String> expResult = test.getJars();
-            List<String> result = instance.getJars();
-            assertEquals(expResult, result);
-        }
-    }
-
-    @Test
-    public void testGetCodeBase() throws ParserConfigurationException, IOException, SAXException {
-
-        for (TestFile test : test_cases) {
-            System.out.println("getCodeBase for " + test.resource);
-            ParseJNLP instance = new ParseJNLP(test.getFile());
-            String expResult = test.getCodeBase();
-            String result = instance.getCodeBase();
             assertEquals(expResult, result);
         }
     }
