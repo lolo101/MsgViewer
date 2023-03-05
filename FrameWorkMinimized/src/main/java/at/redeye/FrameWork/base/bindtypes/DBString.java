@@ -22,7 +22,6 @@ public class DBString extends DBValue {
         this.max_len = max_len;
     }
 
-    @Override
     public String getValue() {
         return value;
     }
@@ -43,7 +42,6 @@ public class DBString extends DBValue {
         return s.length() <= max_len;
     }
 
-    @Override
     public void loadFromCopy(Object obj) {
         value = (String)obj;
     }
@@ -51,14 +49,5 @@ public class DBString extends DBValue {
     public int getMaxLen()
     {
         return max_len;
-    }
-
-    public boolean isEmpty()
-    {
-        return value.isEmpty();
-    }
-
-    public boolean isEmptyTrimmed() {
-        return value.trim().isEmpty();
     }
 }

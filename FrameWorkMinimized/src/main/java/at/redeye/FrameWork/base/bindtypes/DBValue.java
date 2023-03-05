@@ -22,8 +22,6 @@ public abstract class DBValue {
 
     public abstract boolean acceptString(String s);
 
-    public abstract void loadFromCopy(Object obj);
-
     /**
      * @return the name of this value in lower case letters.
      */
@@ -38,11 +36,5 @@ public abstract class DBValue {
     public String getTitle()
     {
         return title;
-    }
-
-    public abstract Object getValue();
-
-    public void setAsPrimaryKey()
-    {
     }
 }

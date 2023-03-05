@@ -22,12 +22,10 @@ public class DBDateTime extends DBValue {
         return false;
     }
 
-    @Override
     public Date getValue() {
         return value;
     }
 
-    @Override
     public void loadFromCopy(Object obj) {
         value = (Date) ((Date) obj).clone();
     }

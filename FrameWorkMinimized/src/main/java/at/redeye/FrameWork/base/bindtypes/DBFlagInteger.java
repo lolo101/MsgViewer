@@ -34,11 +34,6 @@ public class DBFlagInteger extends DBEnumAsInteger
         }
 
         @Override
-        public EnumAsIntegerHandler getNewOne() {
-            return new FlagIntegerHandler();
-        }
-
-        @Override
         public Vector<String> getPossibleValues() {
            Vector<String> res = new Vector<>();
 

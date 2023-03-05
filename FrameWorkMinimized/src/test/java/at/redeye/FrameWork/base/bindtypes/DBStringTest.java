@@ -67,26 +67,4 @@ class DBStringTest {
         DBString instance = new DBString("name", max_len);
         assertEquals(max_len, instance.getMaxLen());
     }
-
-    @ParameterizedTest
-    @CsvSource({
-            "test, false",
-            "'    ', false",
-            "'', true"})
-    void testIsEmpty(String value, boolean expResult) {
-        DBString instance = new DBString("name", MAX_LEN);
-        instance.loadFromString(value);
-        assertEquals(expResult, instance.isEmpty());
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-            "test, false",
-            "'    ', true",
-            "'', true"})
-    void testIsEmptyTrimmed(String value, boolean expResult) {
-        DBString instance = new DBString("name", MAX_LEN);
-        instance.loadFromString(value);
-        assertEquals(expResult, instance.isEmptyTrimmed());
-    }
 }

@@ -17,8 +17,6 @@ public class DBEnum<T extends Enum<T>> extends DBValue {
             this.value = value;
         }
 
-        public abstract EnumHandler<T> getNewOne();
-
         private boolean setValue(String val) {
             try {
                 value = Enum.valueOf(type, val);
@@ -57,17 +55,6 @@ public class DBEnum<T extends Enum<T>> extends DBValue {
     @Override
     public boolean acceptString(String s) {
        return handler.setValue(delocalize(s));
-    }
-
-    @Override
-    public void loadFromCopy(Object obj) {
-       handler = handler.getNewOne();
-       handler.setValue(delocalize((String)obj));
-    }
-
-    @Override
-    public String getValue() {
-        return handler.getValue();
     }
 
     @Override

@@ -1,16 +1,13 @@
 package at.redeye.FrameWork.base.bindtypes;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class DBStrukt {
 
 	private final String strukt_name;
 	protected final String title;
 	private final Map<String, DBValue> element_by_name = new HashMap<>();
-	private final ArrayList<DBStrukt> sub_strukts = new ArrayList<>();
+	private final Collection<DBStrukt> sub_strukts = new ArrayList<>();
 	protected Integer version;
 	private final Map<String, List<Integer>> elements_with_version = new HashMap<>();
 
@@ -96,16 +93,6 @@ public abstract class DBStrukt {
 
 	private DBValue getValueByName(String key) {
 		return element_by_name.get(key.toLowerCase());
-	}
-
-	public void loadFromCopy(DBStrukt s) {
-		for (DBValue val : element_by_name.values()) {
-			val.loadFromCopy(val.getValue());
-		}
-
-		for (int i = 0; i < s.sub_strukts.size(); i++) {
-			sub_strukts.get(i).loadFromCopy(s.sub_strukts.get(i));
-		}
 	}
 
 	public void setVersion(Integer version) {

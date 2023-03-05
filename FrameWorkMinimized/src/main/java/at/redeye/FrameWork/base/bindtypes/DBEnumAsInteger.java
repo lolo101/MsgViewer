@@ -17,8 +17,6 @@ public class DBEnumAsInteger extends DBValue {
         public abstract Integer getValue();
         public abstract String getValueAsString();
 
-        public abstract EnumAsIntegerHandler getNewOne();
-
         public abstract Iterable<String> getPossibleValues();
     }
 
@@ -40,13 +38,6 @@ public class DBEnumAsInteger extends DBValue {
        return handler.setValue(delocalize(s));
     }
 
-    @Override
-    public void loadFromCopy(Object obj) {
-       handler = handler.getNewOne();
-       handler.setValue((Integer)obj);
-    }
-
-    @Override
     public Integer getValue() {
         return handler.getValue();
     }

@@ -82,8 +82,6 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface {
         add( value );
         add( descr );
         add( hist );
-
-        name.setAsPrimaryKey();
     }
 
     public String getConfigName()
