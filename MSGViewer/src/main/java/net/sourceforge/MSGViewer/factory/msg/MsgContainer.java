@@ -64,13 +64,10 @@ public class MsgContainer {
         // PidTagStoreSupportMask data is encoded in unicode
         addProperty(new PropPtypInteger32(PidTagStoreSupportMask, 0x00040000));
 
-        // PidTagCreationTime
         addProperty(new PropPtypTime(PidTagCreationTime, System.currentTimeMillis()));
 
-        // PidTagLastModificationTime
         addProperty(new PropPtypTime(PidTagLastModificationTime, System.currentTimeMillis()));
 
-        // PidTagClientSubmitTime
         if (msg.getDate() != null) {
             addProperty(new PropPtypTime(PidTagClientSubmitTime, msg.getDate().toEpochSecond() * 1000));
         }

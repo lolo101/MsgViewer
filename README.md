@@ -16,15 +16,15 @@ In order to build this project, make sure to have JDK 11+ installed, then clone 
 
 `git clone https://github.com/lolo101/MsgViewer.git`
 
-cd to the sources directory:
+cd to the project directory:
 
 `cd MsgViewer`
 
-At last, run the Maven build:
+then run the Maven build:
 
 `./mvnw package`
 
-The build will generate a number of files. The main file is a 'uber-jar' placed under **MSGViewer/target** directory.
+Building will generate a number of files. The main file is an 'uber-jar' placed under **MSGViewer/target** directory.
 
 ## GUI
 

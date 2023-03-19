@@ -93,16 +93,14 @@ public class JavaMailParser {
                 byte[] bytes = getContent(part);
 
                 String body = new String(bytes, getCharset(part.getContentType()));
+                LOGGER.debug(body);
 
                 if ( part.isMimeType("text/html") ) {
                     msg.setBodyHtml(body);
-                    LOGGER.debug(msg.getBodyHtml());
                 } else if ( part.isMimeType("text/rtf") ) {
                     msg.setBodyRTF(body);
-                    LOGGER.debug(msg.getBodyRTF());
                 } else {
                     msg.setBodyText(body);
-                    LOGGER.debug(msg.getBodyText());
                 }
             } else if (disp == null || disp.equalsIgnoreCase(Part.ATTACHMENT) || disp.equalsIgnoreCase(Part.INLINE)) {
                 // many mailers don't include a Content-Disposition
