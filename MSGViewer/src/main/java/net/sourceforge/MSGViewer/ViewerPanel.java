@@ -329,14 +329,13 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
                         logger.trace("\n" + StringUtils.addLineNumbers(message.getBodyRTF()));
                     }
 
-                    return new Content("text/html", helper.extractHTMLFromRTF(message.getBodyRTF(), message));
+                    return new Content("text/html", helper.extractHTMLFromRTF(message, message.getBodyRTF()));
                 }).resultOrElse(new Content("text/rtf", message.getBodyRTF()));
             }
             return new Content("text/rtf", message.getBodyRTF());
         }
         if (message.getBodyHtml() != null) {
-            PrepareImages prep_images = new PrepareImages(attachmentRepository, message);
-            return new Content("text/html", prep_images.prepareImages(ViewerHelper.stripMetaTags(message.getBodyHtml())));
+            return new Content("text/html", helper.prepareImages(message, message.getBodyHtml()));
         }
         return new Content("text/plain", message.getBodyText());
     }

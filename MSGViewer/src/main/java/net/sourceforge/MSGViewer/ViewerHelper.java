@@ -11,6 +11,7 @@ import net.htmlparser.jericho.Attributes;
 import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.StartTag;
 import net.sourceforge.MSGViewer.rtfparser.ParseException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 
 import javax.activation.MimeType;
@@ -50,47 +51,15 @@ public class ViewerHelper {
         return FrameWorkConfigDefinitions.OpenCommand.getConfigValue();
     }
 
-    static public String stripMetaTags(String html) {
-        html = META_PATTERN.matcher(html).replaceAll("");
-
-        StringBuilder body_text = new StringBuilder(html);
-        Source source = new Source(html);
-        source.fullSequentialParse();
-
-        for (StartTag tag : source.getAllStartTags("font")) {
-            // remove size="x"
-            Attributes atts = tag.getAttributes();
-            if (atts == null)
-                continue;
-
-            Attribute att = atts.get("size");
-
-            if (att != null) {
-                int start = att.getBegin();
-                int end = att.getEnd();
-
-                for (int i = start; i < end + 1; i++) {
-                    body_text.setCharAt(i, ' ');
-                }
-            }
-        }
-
-        System.out.println(body_text);
-
-        return body_text.toString();
+    public String extractHTMLFromRTF(Message message, String rtf) throws ParseException {
+        HtmlFromRtf rtf2html = new HtmlFromRtf(rtf);
+        String html = rtf2html.getHTML();
+        return prepareImages(message, html);
     }
 
-
-    public String extractHTMLFromRTF(String bodyText, Message message) throws ParseException {
-        HtmlFromRtf rtf2html = new HtmlFromRtf(bodyText);
-
-        String html = rtf2html.getHTML();
-
-        html = ViewerHelper.stripMetaTags(html);
-
+    public String prepareImages(Message message, String html) {
         PrepareImages prep_images = new PrepareImages(attachmentRepository, message);
-
-        return prep_images.prepareImages(html);
+        return prep_images.prepareImages(stripMetaTags(html));
     }
 
     public Path extractUrl(URI uri, Message message) throws IOException {
@@ -126,6 +95,31 @@ public class ViewerHelper {
 
     public static String printMailIconHtml() {
         return "<img border=0 align=\"baseline\" src=\"" + getMailIconFile() + "\"/>";
+    }
+
+    private static String stripMetaTags(String html) {
+        String htmlWithoutMetaTags = META_PATTERN.matcher(html).replaceAll("");
+
+        StringBuilder mutableHtml = new StringBuilder(htmlWithoutMetaTags);
+        Source source = new Source(htmlWithoutMetaTags);
+
+        source.getAllStartTags("font").forEach(tag -> removeSizeAttribute(mutableHtml, tag));
+
+        System.out.println(mutableHtml);
+
+        return mutableHtml.toString();
+    }
+
+    private static void removeSizeAttribute(StringBuilder body_text, StartTag tag) {
+        Attributes atts = tag.getAttributes();
+        if (atts == null) return;
+
+        Attribute att = atts.get("size");
+        if (att == null) return;
+
+        int start = att.getBegin();
+        int end = att.getEnd();
+        body_text.replace(start, end, StringUtils.repeat(' ', end - start));
     }
 
     private static URI getMailIconFile() {
