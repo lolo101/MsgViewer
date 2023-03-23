@@ -28,7 +28,6 @@ import org.apache.poi.hmef.CompressedRTF;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -235,8 +234,7 @@ public class Message {
             sb.append("Bcc: ").append(bccEmail).append('\n');
         }
         if (this.date != null) {
-            SimpleDateFormat formatter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss z", Locale.ENGLISH);
-            sb.append("Date: ").append(formatter.format(this.date)).append('\n');
+            sb.append("Date: ").append(this.date.format(DateTimeFormatter.RFC_1123_DATE_TIME)).append('\n');
         }
         if (this.subject != null) {
             sb.append("Subject: ").append(this.subject).append('\n');
