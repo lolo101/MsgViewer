@@ -144,7 +144,7 @@ void set_codepage() :
 {
     codepage = <C_CODEPAGE>
     {
-        characterSet = Charset.forName("CP" + codepage.image.substring(8));
+        characterSet = Charset.forName(codepage.image.replace("\\ansicpg", "CP"));
     }
 }
 
