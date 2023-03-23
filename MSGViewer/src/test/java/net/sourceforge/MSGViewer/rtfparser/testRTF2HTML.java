@@ -5,7 +5,8 @@ import at.redeye.FrameWork.base.Root;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 
 public class testRTF2HTML extends BaseModuleLauncher {
     private testRTF2HTML(String[] args) {
@@ -41,13 +42,8 @@ public class testRTF2HTML extends BaseModuleLauncher {
                     parser.parse();
                     logger.info("done parsing " + file);
 
-                    String htmlContent = parser.getHTML();
-                    System.out.print(htmlContent);
-
-                    String file_name = "writehtml";
-
-                    try (FileWriter fout = new FileWriter(file_name)) {
-                        fout.write(htmlContent);
+                    try (OutputStream fout = new FileOutputStream("writehtml")) {
+                        fout.write(parser.getHTML());
                     }
 
                 } catch (Error ex) {

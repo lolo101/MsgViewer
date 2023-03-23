@@ -49,7 +49,7 @@ public class MsgContainer {
             addVarEntry(new BodyTextEntry(msg.getBodyText()));
         }
 
-        if (isNotEmpty(msg.getBodyHtml())) {
+        if (msg.getBodyHtml() != null) {
             addVarEntry(new BodyHtmlEntry(msg.getBodyHtml()));
         }
 

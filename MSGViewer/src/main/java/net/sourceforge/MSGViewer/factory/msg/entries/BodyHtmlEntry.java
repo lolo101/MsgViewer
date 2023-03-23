@@ -1,10 +1,10 @@
 package net.sourceforge.MSGViewer.factory.msg.entries;
 
-import static com.auxilii.msgparser.Pid.PidTagBodyHtml;
+import static com.auxilii.msgparser.Pid.PidTagHtml;
 
-public class BodyHtmlEntry extends StringUTF16SubstgEntry {
-    public BodyHtmlEntry(String text) {
-        super(PidTagBodyHtml, text);
+public class BodyHtmlEntry extends BinaryEntry {
+    public BodyHtmlEntry(byte[] html) {
+        super(PidTagHtml, html);
     }
 
 }

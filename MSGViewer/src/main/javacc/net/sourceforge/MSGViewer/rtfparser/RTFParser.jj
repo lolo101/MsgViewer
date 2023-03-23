@@ -21,9 +21,9 @@ public class RTFParser {
     private RTFGroup current_group;
     private Charset characterSet;
 
-    public String getHTML()
+    public byte[] getHTML()
     {
-        return htmlContent.toString();
+        return htmlContent.toString().getBytes(characterSet);
     }
 
     public void pushGroup()

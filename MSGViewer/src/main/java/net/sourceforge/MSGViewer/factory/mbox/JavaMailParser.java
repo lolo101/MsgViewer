@@ -96,7 +96,7 @@ public class JavaMailParser {
                 LOGGER.debug(body);
 
                 if ( part.isMimeType("text/html") ) {
-                    msg.setBodyHtml(body);
+                    msg.setBodyHtml(bytes);
                 } else if ( part.isMimeType("text/rtf") ) {
                     msg.setBodyRTF(body);
                 } else {

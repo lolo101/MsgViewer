@@ -6,29 +6,23 @@ import at.redeye.FrameWork.base.Setup;
 import com.auxilii.msgparser.Message;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
-import net.htmlparser.jericho.Attribute;
-import net.htmlparser.jericho.Attributes;
-import net.htmlparser.jericho.Source;
-import net.htmlparser.jericho.StartTag;
+import net.htmlparser.jericho.*;
 import net.sourceforge.MSGViewer.rtfparser.ParseException;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 
 import javax.activation.MimeType;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import static at.redeye.FrameWork.base.BaseDialog.logger;
+import static org.apache.commons.lang3.StringUtils.repeat;
 
 public class ViewerHelper {
 
-    private static final Pattern META_PATTERN = Pattern.compile("<meta\\s.*>", Pattern.CASE_INSENSITIVE);
     private final AttachmentRepository attachmentRepository;
 
     public ViewerHelper(Root root) {
@@ -53,13 +47,15 @@ public class ViewerHelper {
 
     public String extractHTMLFromRTF(Message message, String rtf) throws ParseException {
         HtmlFromRtf rtf2html = new HtmlFromRtf(rtf);
-        String html = rtf2html.getHTML();
-        return prepareImages(message, html);
+        return prepareImages(message, rtf2html.getHTML());
     }
 
-    public String prepareImages(Message message, String html) {
-        PrepareImages prep_images = new PrepareImages(attachmentRepository, message);
-        return prep_images.prepareImages(stripMetaTags(html));
+    public String prepareImages(Message message, byte[] bodyHtml) {
+        try (InputStream stream = new ByteArrayInputStream(bodyHtml)) {
+            return prepareImages(message, new Source(stream));
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     public Path extractUrl(URI uri, Message message) throws IOException {
@@ -97,29 +93,35 @@ public class ViewerHelper {
         return "<img border=0 align=\"baseline\" src=\"" + getMailIconFile() + "\"/>";
     }
 
-    private static String stripMetaTags(String html) {
-        String htmlWithoutMetaTags = META_PATTERN.matcher(html).replaceAll("");
+    private String prepareImages(Message message, Source html) {
+        PrepareImages prep_images = new PrepareImages(attachmentRepository, message);
+        return prep_images.prepareImages(stripMetaTags(html));
+    }
 
-        StringBuilder mutableHtml = new StringBuilder(htmlWithoutMetaTags);
-        Source source = new Source(htmlWithoutMetaTags);
+    private static String stripMetaTags(Source html) {
+        StringBuilder mutableHtml = new StringBuilder(html);
 
-        source.getAllStartTags("font").forEach(tag -> removeSizeAttribute(mutableHtml, tag));
+        html.getAllElements("meta").forEach(element -> removeSegment(mutableHtml, element));
+        html.getAllStartTags("font").forEach(tag -> removeSizeAttribute(mutableHtml, tag));
 
         System.out.println(mutableHtml);
-
         return mutableHtml.toString();
     }
 
-    private static void removeSizeAttribute(StringBuilder body_text, StartTag tag) {
+    private static void removeSizeAttribute(StringBuilder mutableHtml, StartTag tag) {
         Attributes atts = tag.getAttributes();
         if (atts == null) return;
 
         Attribute att = atts.get("size");
         if (att == null) return;
 
-        int start = att.getBegin();
-        int end = att.getEnd();
-        body_text.replace(start, end, StringUtils.repeat(' ', end - start));
+        removeSegment(mutableHtml, att);
+    }
+
+    private static void removeSegment(StringBuilder mutableHtml, Segment segment) {
+        int start = segment.getBegin();
+        int end = segment.getEnd();
+        mutableHtml.replace(start, end, repeat(' ', end - start));
     }
 
     private static URI getMailIconFile() {

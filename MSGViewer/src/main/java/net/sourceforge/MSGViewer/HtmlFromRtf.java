@@ -1,22 +1,29 @@
 package net.sourceforge.MSGViewer;
 
+import net.htmlparser.jericho.Source;
 import net.sourceforge.MSGViewer.rtfparser.ParseException;
 import net.sourceforge.MSGViewer.rtfparser.RTFParser;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.StringReader;
+import java.io.UncheckedIOException;
 
 public class HtmlFromRtf
 {
-    private final String htmlText;
+    private final byte[] htmlText;
 
     public HtmlFromRtf(String bodyText) throws ParseException
     {
         htmlText = extractHtml(bodyText);
     }
 
-    public String getHTML()
-    {
-        return htmlText;
+    public Source getHTML() {
+        try {
+            return new Source(new ByteArrayInputStream(htmlText));
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     /*
@@ -43,7 +50,7 @@ public class HtmlFromRtf
      *  So we will try to remove all leading { and } and removing all \htmltag and hoping the best
      */
 
-    private static String extractHtml(String rtf) throws ParseException {
+    private static byte[] extractHtml(String rtf) throws ParseException {
         RTFParser parser = new RTFParser(new StringReader(rtf));
 
         parser.parse();

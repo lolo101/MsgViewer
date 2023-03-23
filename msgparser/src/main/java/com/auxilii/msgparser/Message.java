@@ -106,7 +106,7 @@ public class Message {
 
     private String bodyRTF;
 
-    private String bodyHtml;
+    private byte[] bodyHtml;
 
     /**
      * Email headers (if available)
@@ -188,10 +188,10 @@ public class Message {
                 this.setBodyText((String) property.getValue());
                 break;
             case PidTagBodyHtml:
-                this.setBodyHtml((String) property.getValue());
+                this.setBodyHtml(((String) property.getValue()).getBytes(StandardCharsets.UTF_8));
                 break;
             case PidTagHtml:
-                this.setBodyHtml(new String((byte[]) property.getValue(), StandardCharsets.UTF_8));
+                this.setBodyHtml((byte[]) property.getValue());
                 break;
             case PidTagRtfCompressed:
                 this.setCompressedRTF((byte[]) property.getValue());
@@ -457,11 +457,11 @@ public class Message {
         this.bodyRTF = bodyRTF;
     }
 
-    public String getBodyHtml() {
+    public byte[] getBodyHtml() {
         return bodyHtml;
     }
 
-    public void setBodyHtml(String bodyHtml) {
+    public void setBodyHtml(byte[] bodyHtml) {
         this.bodyHtml = bodyHtml;
     }
 

@@ -126,12 +126,12 @@ public class MBoxWriterViaJavaMail {
         }
     }
 
-    private static void addHtmlPart(Message msg, MimeMultipart mp_alternate) throws MessagingException, IOException {
-        String html = msg.getBodyHtml();
+    private static void addHtmlPart(Message msg, MimeMultipart mp_alternate) throws MessagingException {
+        byte[] html = msg.getBodyHtml();
 
-        if (isNotBlank(html)) {
+        if (html != null) {
             MimeBodyPart html_text = new MimeBodyPart();
-            html_text.setDataHandler(new DataHandler(new ByteArrayDataSource(html, "text/html;charset=UTF-8")));
+            html_text.setDataHandler(new DataHandler(new ByteArrayDataSource(html, "text/html")));
             mp_alternate.addBodyPart(html_text);
         }
     }
