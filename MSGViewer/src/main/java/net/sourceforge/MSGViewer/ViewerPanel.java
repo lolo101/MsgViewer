@@ -320,22 +320,25 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
     }
 
     private Content bodyText() {
-        if (jRRTF.isSelected() && isNotEmpty(message.getBodyRTF())) {
-            if (message.getBodyRTF().contains("\\fromhtml")) {
+        String bodyRTF = message.getBodyRTF();
+        if (jRRTF.isSelected() && isNotEmpty(bodyRTF)) {
+            if (bodyRTF.contains("\\fromhtml")) {
                 return new AutoMBox<>(MainWin.class.getName(), () -> {
                     logger.info("extracting HTML data from RTF Code");
 
                     if (logger.isTraceEnabled()) {
-                        logger.trace("\n" + StringUtils.addLineNumbers(message.getBodyRTF()));
+                        logger.trace("\n" + StringUtils.addLineNumbers(bodyRTF));
                     }
 
-                    return new Content("text/html", helper.extractHTMLFromRTF(message, message.getBodyRTF()));
-                }).resultOrElse(new Content("text/rtf", message.getBodyRTF()));
+                    Source source = ViewerHelper.extractHTMLFromRTF(bodyRTF);
+                    return new Content("text/html", helper.prepareImages(message, source));
+                }).resultOrElse(new Content("text/rtf", bodyRTF));
             }
-            return new Content("text/rtf", message.getBodyRTF());
+            return new Content("text/rtf", bodyRTF);
         }
         if (message.getBodyHtml() != null) {
-            return new Content("text/html", helper.prepareImages(message, message.getBodyHtml()));
+            Source source = ViewerHelper.toHtmlSource(message.getBodyHtml());
+            return new Content("text/html", helper.prepareImages(message, source));
         }
         return new Content("text/plain", message.getBodyText());
     }

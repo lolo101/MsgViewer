@@ -45,17 +45,22 @@ public class ViewerHelper {
         return FrameWorkConfigDefinitions.OpenCommand.getConfigValue();
     }
 
-    public String extractHTMLFromRTF(Message message, String rtf) throws ParseException {
-        HtmlFromRtf rtf2html = new HtmlFromRtf(rtf);
-        return prepareImages(message, rtf2html.getHTML());
+    public static Source extractHTMLFromRTF(String rtf) throws ParseException {
+        byte[] htmlBytes = new HtmlFromRtf(rtf).extractHtml();
+        return toHtmlSource(htmlBytes);
     }
 
-    public String prepareImages(Message message, byte[] bodyHtml) {
-        try (InputStream stream = new ByteArrayInputStream(bodyHtml)) {
-            return prepareImages(message, new Source(stream));
+    public static Source toHtmlSource(byte[] htmlBytes) {
+        try (InputStream stream = new ByteArrayInputStream(htmlBytes)) {
+            return new Source(stream);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
+
+    public String prepareImages(Message message, Source html) {
+        PrepareImages prep_images = new PrepareImages(attachmentRepository, message);
+        return prep_images.prepareImages(stripMetaTags(html));
     }
 
     public Path extractUrl(URI uri, Message message) throws IOException {
@@ -91,11 +96,6 @@ public class ViewerHelper {
 
     public static String printMailIconHtml() {
         return "<img border=0 align=\"baseline\" src=\"" + getMailIconFile() + "\"/>";
-    }
-
-    private String prepareImages(Message message, Source html) {
-        PrepareImages prep_images = new PrepareImages(attachmentRepository, message);
-        return prep_images.prepareImages(stripMetaTags(html));
     }
 
     private static String stripMetaTags(Source html) {
