@@ -13,9 +13,8 @@ public class HtmlFromRtf
 {
     private final byte[] htmlText;
 
-    public HtmlFromRtf(String bodyText) throws ParseException
-    {
-        htmlText = extractHtml(bodyText);
+    public HtmlFromRtf(String rtf) throws ParseException {
+        htmlText = extractHtml(rtf);
     }
 
     public Source getHTML() {

@@ -128,9 +128,9 @@ public class Internals extends BaseDialog {
     private javax.swing.JTextArea jTRTF;
     // End of variables declaration//GEN-END:variables
 
-    private static Source extractHTMLFromRTF(String bodyText) throws ParseException {
+    private static Source extractHTMLFromRTF(String rtf) throws ParseException {
 
-        HtmlFromRtf rtf2html = new HtmlFromRtf(bodyText);
+        HtmlFromRtf rtf2html = new HtmlFromRtf(rtf);
 
         return rtf2html.getHTML();
     }
