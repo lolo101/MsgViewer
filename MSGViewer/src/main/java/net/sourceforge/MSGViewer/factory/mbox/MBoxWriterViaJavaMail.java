@@ -4,7 +4,9 @@ import com.auxilii.msgparser.Message;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
 import com.auxilii.msgparser.attachment.MsgAttachment;
+import net.htmlparser.jericho.Source;
 import net.sourceforge.MSGViewer.AttachmentRepository;
+import net.sourceforge.MSGViewer.ViewerHelper;
 import net.sourceforge.MSGViewer.factory.MessageSaver;
 
 import javax.activation.DataHandler;
@@ -111,18 +113,18 @@ public class MBoxWriterViaJavaMail {
     private static void addTextPart(Message msg, MimeMultipart mp_alternate) throws MessagingException {
         String plain_text_string = msg.getBodyText();
 
-        MimeBodyPart plain_text = new MimeBodyPart();
-        plain_text.setText(requireNonNullElse(plain_text_string, ""));
-        mp_alternate.addBodyPart(plain_text);
+        MimeBodyPart textPart = new MimeBodyPart();
+        textPart.setText(requireNonNullElse(plain_text_string, ""));
+        mp_alternate.addBodyPart(textPart);
     }
 
     private static void addRtfPart(Message msg, MimeMultipart mp_alternate) throws MessagingException, IOException {
         String rtf = msg.getBodyRTF();
 
         if (isNotBlank(rtf)) {
-            MimeBodyPart rtf_text = new MimeBodyPart();
-            rtf_text.setDataHandler(new DataHandler(new ByteArrayDataSource(rtf, "text/rtf;charset=UTF-8")));
-            mp_alternate.addBodyPart(rtf_text);
+            MimeBodyPart rtfPart = new MimeBodyPart();
+            rtfPart.setDataHandler(new DataHandler(new ByteArrayDataSource(rtf, "text/rtf;charset=UTF-8")));
+            mp_alternate.addBodyPart(rtfPart);
         }
     }
 
@@ -130,9 +132,10 @@ public class MBoxWriterViaJavaMail {
         byte[] html = msg.getBodyHtml();
 
         if (html != null) {
-            MimeBodyPart html_text = new MimeBodyPart();
-            html_text.setDataHandler(new DataHandler(new ByteArrayDataSource(html, "text/html")));
-            mp_alternate.addBodyPart(html_text);
+            MimeBodyPart htmlPart = new MimeBodyPart();
+            Source source = ViewerHelper.toHtmlSource(html);
+            htmlPart.setContent(source.toString(), "text/html;charset=" + source.getEncoding());
+            mp_alternate.addBodyPart(htmlPart);
         }
     }
 
