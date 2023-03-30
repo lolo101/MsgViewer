@@ -25,11 +25,16 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.regex.Pattern;
 
 import static java.util.Objects.requireNonNullElse;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class MBoxWriterViaJavaMail {
+    private static final Pattern START_WITH_BLANK = Pattern.compile("^\\s");
     private final Session session = Session.getInstance(System.getProperties());
     private final AttachmentRepository attachmentRepository;
 
@@ -62,6 +67,10 @@ public class MBoxWriterViaJavaMail {
         jmsg.setContent(mp);
 
         jmsg.writeTo(out);
+    }
+
+    protected String getExtension() {
+        return ".mbox";
     }
 
     private BodyPart createPart(Attachment att) throws Exception {
@@ -145,35 +154,14 @@ public class MBoxWriterViaJavaMail {
         }
 
         String[] headers = msg.getHeaders().split("\n");
+        Deque<String> lines = new ArrayDeque<>(Arrays.asList(headers));
 
-        StringBuilder sb = new StringBuilder();
-
-        for (String hl : headers) {
-            String header_line = hl.trim();
-
-            if (header_line.startsWith(" ")) {
-                sb.append("\n");
-                sb.append(header_line);
-            } else {
-                sb.append(header_line);
-
-                String h = sb.toString();
-
-                int idx = h.indexOf(':');
-
-                if (idx > 0) {
-                    String name = h.substring(0, idx);
-                    String value = h.substring(idx + 1);
-
-                    if (name.startsWith("From ")) {
-                        sb.setLength(0);
-                        continue;
-                    }
-                    jmsg.addHeader(name, value);
-                }
-
-                sb.setLength(0);
-            }
+        while (!lines.isEmpty()) {
+            String headerLine = lines.remove();
+            int separatorIndex = headerLine.indexOf(':');
+            String name = headerLine.substring(0, separatorIndex);
+            String value = accumulateValue(lines, headerLine.substring(separatorIndex + 1));
+            jmsg.addHeader(name, value);
         }
     }
 
@@ -185,7 +173,16 @@ public class MBoxWriterViaJavaMail {
         return parent.resolve(fileNameWithoutExtension + getExtension());
     }
 
-    protected String getExtension() {
-        return ".mbox";
+    private static String accumulateValue(Deque<String> lines, String value) {
+        StringBuilder buffer = new StringBuilder(value.trim());
+        while (!lines.isEmpty()) {
+            String valueContinuation = lines.peek();
+            if (START_WITH_BLANK.matcher(valueContinuation).find()) {
+                buffer.append(' ').append(valueContinuation.trim());
+                lines.remove();
+            } else break;
+        }
+        return buffer.toString();
     }
+
 }
