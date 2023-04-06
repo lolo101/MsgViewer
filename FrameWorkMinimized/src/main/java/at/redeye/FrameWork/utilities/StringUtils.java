@@ -1,41 +1,33 @@
 package at.redeye.FrameWork.utilities;
 
-import org.apache.logging.log4j.Logger;
-
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import static java.util.stream.Collectors.joining;
+
+import java.io.*;
+import java.util.Arrays;
+import org.apache.logging.log4j.Logger;
 
 public class StringUtils {
 
 	private static int defaultAutoLineLength = 40;
 
-	static boolean contains(char c, String what) {
+	private static boolean contains(char c, String what) {
 		return what.indexOf(c) >= 0;
 	}
 
-	static int skip_char(String s, String what, int pos) {
-		while (pos <= (s.length() - 1)) {
-			char c;
+	private static int skip_char(String s, String what) {
+		for (int pos = 0; pos < s.length(); ++pos) {
 
-			c = s.charAt(pos);
+			char c = s.charAt(pos);
 
-			if (contains(c, what)) {
-				pos++;
-				continue;
+			if (!contains(c, what)) {
+				return pos;
 			}
-
-			break;
 		}
 
-		return pos;
+		return s.length();
 	}
 
-	static int skip_char_reverse(String s, String what, int pos) {
+	private static int skip_char_reverse(String s, String what, int pos) {
 		while (pos > 0) {
 			char c;
 
@@ -52,35 +44,8 @@ public class StringUtils {
 		return pos;
 	}
 
-	public static int skip_spaces_reverse(String s, int pos) {
-		return skip_char_reverse(s, " \t\n\r", pos);
-	}
-
-	public static int skip_spaces(String s, int pos) {
-		return skip_char(s, " \t\n\r", pos);
-	}
-
-	public static boolean is_space(char c) {
-		return c == ' ' || c == '\t' || c == '\n' || c == '\r';
-	}
-
-	public static List<String> split_str(String s, String c) {
-
-		List<String> res = new ArrayList<>();
-		for (int pos, start = 0; true; start = pos + 1) {
-			pos = s.indexOf(c, start);
-
-			if (pos < 0) {
-				res.add(s.substring(start));
-				return res;
-			}
-
-			res.add(s.substring(start, pos));
-		}
-	}
-
 	public static String strip(String s, String what) {
-		int start = skip_char(s, what, 0);
+		int start = skip_char(s, what);
 		int end = skip_char_reverse(s, what, s.length() - 1);
 
 		if (start > end)
@@ -99,20 +64,8 @@ public class StringUtils {
 		defaultAutoLineLength = length;
 	}
 
-	public static int get_defaultAutoLineLenght() {
-		return defaultAutoLineLength;
-	}
-
 	public static String autoLineBreak(String what) {
 		return autoLineBreak(what, defaultAutoLineLength);
-	}
-
-	public static String autoLineBreak(StringBuilder what, int length) {
-		return autoLineBreak(what.toString(), length);
-	}
-
-	public static String autoLineBreak(StringBuilder what) {
-		return autoLineBreak(what.toString(), defaultAutoLineLength);
 	}
 
 	public static String autoLineBreak(String what, int length) {
@@ -145,11 +98,6 @@ public class StringUtils {
 			}
 
 			if (walker % length == 0) {
-
-				// System.out.println("Want to break at: " +
-				// in[walker - 2] + in[walker - 1] + ">" +
-				// in[walker] + "<" + in[walker + 1] + in[walker + 2]);
-
 				// try to find a sign in search window
 				boolean found = false;
 				for (char myPreferedSign : myPreferedSigns) {
@@ -257,43 +205,6 @@ public class StringUtils {
 	}
 
 	/**
-	 * converts a double into a string, by removing useless zeros from the end
-	 * of the string eg:
-	 * <ul>
-	 * <li>12.2340000 => 12.234</li>
-	 * <li>0.03 => 0.03</li>
-	 * <li>12.000 => 12</li>
-	 * </ul>
-	 *
-	 * @param rounding
-	 *            precision
-	 */
-	public static String formatDouble(double d, int rounding) {
-		return formatDouble(Rounding.rndDouble(d, rounding));
-	}
-
-	/**
-	 * converts a double into a string, by removing useless zeros from the end
-	 * of the string eg:
-	 * <ul>
-	 * <li>12.2340000 => 12.234</li>
-	 * <li>0.03 => 0.03</li>
-	 * <li>12.000 => 12</li>
-	 * </ul>
-	 *
-	 * @param d
-	 *            the number
-	 */
-	public static String formatDouble(double d) {
-		String s = String.format("%f", d);
-		s = strip_post(s, "0");
-		s = strip_post(s, ".");
-		s = strip_post(s, ",");
-
-		return s;
-	}
-
-	/**
 	 * Finds out, if the given string has the meaning of 'Yes'
 	 *
 	 * @return true, false
@@ -322,59 +233,6 @@ public class StringUtils {
 		s.flush();
 
 		return bos.toString();
-	}
-
-	/**
-	 * The method cuts off the requested number of lines from source string.<br>
-	 * Processed are the indicaters is <b>\n<\b>
-	 *
-	 * @param sourceString
-	 *            The string that shall be processed.
-	 * @param lines
-	 *            That number of lines those shall be skipped.
-	 * @return The rest of string afer the line cut off.
-	 */
-	public static String skipLeadingLines(String sourceString, int lines) {
-
-		if (lines <= 0)
-			return sourceString;
-
-		String truncatedString;
-		int lbCounter = 0;
-
-		char[] arr = sourceString.toCharArray();
-
-		int idx;
-		for (idx = 0; idx < arr.length; idx++) {
-			if (lbCounter == lines) {
-				break;
-			}
-			if (arr[idx] == '\n') {
-				lbCounter++;
-			}
-		}
-
-		truncatedString = String.valueOf(arr, idx, (arr.length - idx));
-		return truncatedString;
-	}
-
-	/**
-	 * Converts a byte array into its corresponding ASCII string
-	 *
-	 * @param data
-	 *            Input data
-	 * @return the converted ASCII string
-	 */
-	public static String byteArrayToString(byte[] data) {
-
-		if (data == null) {
-			return "";
-		}
-		StringBuilder str = new StringBuilder();
-		for (byte datum : data) {
-			str.append((char) datum);
-		}
-		return str.toString();
 	}
 
 	/**

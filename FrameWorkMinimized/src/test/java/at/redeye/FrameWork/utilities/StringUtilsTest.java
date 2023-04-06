@@ -1,112 +1,10 @@
 package at.redeye.FrameWork.utilities;
 
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.api.Test;
+
 public class StringUtilsTest {
-
-    @Test
-    public void testContains() {
-        System.out.println("contains");
-
-        assertFalse(StringUtils.contains(' ', ""));
-        assertTrue(StringUtils.contains('x', "xxxx"));
-        assertTrue(StringUtils.contains('x', "xyz"));
-        assertFalse(StringUtils.contains('x', "yyyyyyyyyyyy"));
-
-        assertThrows(NullPointerException.class, () -> StringUtils.contains('x', null));
-    }
-
-    @Test
-    public void testSkip_char() {
-        System.out.println("skip_char");
-
-        assertEquals(12, StringUtils.skip_char("das ist     ein Text", " ", 7));
-        assertEquals(2, StringUtils.skip_char("das ist     ein Text", " ", 2));
-        assertEquals(4, StringUtils.skip_char("das ist     ein Text", " ", 4));
-        assertEquals(4, StringUtils.skip_char("das ist     ein Text", " ", 3));
-
-        assertThrows(NullPointerException.class, () -> StringUtils.skip_char(null, null, 0));
-        assertThrows(NullPointerException.class, () -> StringUtils.skip_char("x", null, 0));
-        assertThrows(NullPointerException.class, () -> StringUtils.skip_char(null, " ", 0));
-    }
-
-    @Test
-    public void testSkip_char_reverse() {
-        System.out.println("skip_char_reverse");
-
-        assertEquals(15, StringUtils.skip_char_reverse("das ist ein    Test", " ", 15));
-        assertEquals(10, StringUtils.skip_char_reverse("das ist ein    Test", " ", 14));
-        assertEquals(10, StringUtils.skip_char_reverse("das ist ein    Test", " ", 10));
-
-        assertEquals(0, StringUtils.skip_char_reverse(null, null, 0));
-        assertEquals(0, StringUtils.skip_char_reverse("x", null, 0));
-        assertEquals(0, StringUtils.skip_char_reverse(null, " ", 0));
-
-        assertThrows(NullPointerException.class, () -> StringUtils.skip_char_reverse(null, null, 10));
-        assertThrows(NullPointerException.class, () -> StringUtils.skip_char_reverse("xyz", null, 1));
-        assertThrows(NullPointerException.class, () -> StringUtils.skip_char_reverse(null, " ", 1));
-    }
-
-    @Test
-    public void testSkip_spaces_reverse() {
-        System.out.println("skip_spaces_reverse");
-
-        assertEquals(15, StringUtils.skip_spaces_reverse("das ist ein    Test", 15));
-        assertEquals(10, StringUtils.skip_spaces_reverse("das ist ein \t   Test", 14));
-        assertEquals(10, StringUtils.skip_spaces_reverse("das ist ein    Test", 10));
-
-        assertThrows(NullPointerException.class, () -> StringUtils.skip_spaces_reverse(null, 1));
-    }
-
-    @Test
-    public void testSkip_spaces() {
-        System.out.println("skip_spaces");
-
-        assertEquals(12, StringUtils.skip_spaces("das ist     ein Text", 7));
-        assertEquals(2, StringUtils.skip_spaces("das ist     ein Text", 2));
-        assertEquals(4, StringUtils.skip_spaces("das ist     ein Text", 4));
-        assertEquals(4, StringUtils.skip_spaces("das ist     ein Text", 3));
-
-        assertThrows(NullPointerException.class, () -> StringUtils.skip_spaces(null, 1));
-    }
-
-    @Test
-    public void testIs_space() {
-        System.out.println("is_space");
-
-        assertTrue(StringUtils.is_space(' '));
-        assertTrue(StringUtils.is_space('\t'));
-        assertTrue(StringUtils.is_space('\r'));
-        assertTrue(StringUtils.is_space('\n'));
-        assertFalse(StringUtils.is_space('\0'));
-        assertFalse(StringUtils.is_space('x'));
-    }
-
-    @Test
-    public void testSplit_str() {
-        System.out.println("split_str");
-
-        String[] testArr = { "hallo", "das", "ist", "", "ein", "" , "", "test", "" };
-
-        String joined_string = String.join("|", testArr);
-
-        List<String> split_str = StringUtils.split_str(joined_string, "|");
-
-        assertEquals(testArr.length, split_str.size());
-
-        for( int i = 0; i < testArr.length; i++ )
-        {
-            if( !testArr[i].equals(split_str.get(i)) ) {
-                fail( String.format("Target: '%s' Index %d '%s' != '%s'",
-                        joined_string, i, testArr[i],split_str.get(i) ) );
-            }
-        }
-
-    }
 
     @Test
     public void testStrip_StringBuilder_String() {
@@ -180,22 +78,7 @@ public class StringUtilsTest {
         assertEquals("xy z", StringUtils.strip("  xy z\t ", " \t"));
         assertEquals("xy z", StringUtils.strip("  xy z\t \t", " \t"));
         assertEquals("xy z", StringUtils.strip("  xy z\t \n", " \t\n"));
-    }
-
-    @Test
-    public void testSet_defaultAutoLineLenght() {
-        System.out.println("set_defaultAutoLineLenght");
-
-        StringUtils.set_defaultAutoLineLenght(10);
-        assertEquals(10, StringUtils.get_defaultAutoLineLenght());
-    }
-
-    @Test
-    public void testGet_defaultAutoLineLenght() {
-        System.out.println("get_defaultAutoLineLenght");
-
-        StringUtils.set_defaultAutoLineLenght(10);
-        assertEquals(10, StringUtils.get_defaultAutoLineLenght());
+        assertEquals("", StringUtils.strip("   ", " "));
     }
 
     String testTextA = "Bla ist eine Kleinstadt im Süden von Mali. Sie liegt etwa 85 Kilometer südlich von Ségou";
@@ -350,83 +233,6 @@ public class StringUtilsTest {
     }
 
     @Test
-    public void testAutoLineBreak_StringBuilder_int() {
-        System.out.println("autoLineBreak");
-
-        String res;
-
-        res = StringUtils.autoLineBreak(new StringBuilder(testTextA),10);
-        System.out.println("=== RES ===\n" +  res + "\n============\n");
-        assertText(testTextA10, res);
-
-        res = StringUtils.autoLineBreak(new StringBuilder(testTextA),20);
-        System.out.println("=== RES ===\n" +  res + "\n============\n");
-        assertText(testTextA20, res);
-
-        res = StringUtils.autoLineBreak(new StringBuilder(testTextA),30);
-        System.out.println("=== RES ===\n" +  res + "\n============\n");
-        assertText(testTextA30, res);
-
-        res = StringUtils.autoLineBreak(new StringBuilder(testTextA),40);
-        System.out.println("=== RES ===\n" +  res + "\n============\n");
-        assertText(testTextA40, res);
-
-        res = StringUtils.autoLineBreak(new StringBuilder(testTextA),50);
-        System.out.println("=== RES ===\n" +  res + "\n============\n");
-        assertText(testTextA50, res);
-
-        res = StringUtils.autoLineBreak(new StringBuilder(testTextB),50);
-        System.out.println("=== RES ===\n" +  res + "\n============\n");
-        assertText(testTextB50, res);
-
-        res = StringUtils.autoLineBreak(new StringBuilder(testTextC),50);
-        System.out.println("=== RES ===\n" +  res + "\n============\n");
-        assertText(testTextC50, res);
-    }
-
-    @Test
-    public void testAutoLineBreak_StringBuilder() {
-        System.out.println("autoLineBreak");
-
-        String res;
-
-        StringUtils.set_defaultAutoLineLenght(10);
-        res = StringUtils.autoLineBreak(new StringBuilder(testTextA));
-        System.out.println("=== RES ===\n" +  res + "\n============\n");
-        assertText(testTextA10, res);
-
-        StringUtils.set_defaultAutoLineLenght(20);
-        res = StringUtils.autoLineBreak(new StringBuilder(testTextA));
-        System.out.println("=== RES ===\n" +  res + "\n============\n");
-        assertText(testTextA20, res);
-
-        StringUtils.set_defaultAutoLineLenght(30);
-        res = StringUtils.autoLineBreak(new StringBuilder(testTextA));
-        System.out.println("=== RES ===\n" +  res + "\n============\n");
-        assertText(testTextA30, res);
-
-        StringUtils.set_defaultAutoLineLenght(40);
-        res = StringUtils.autoLineBreak(new StringBuilder(testTextA));
-        System.out.println("=== RES ===\n" +  res + "\n============\n");
-        assertText(testTextA40, res);
-
-        StringUtils.set_defaultAutoLineLenght(50);
-        res = StringUtils.autoLineBreak(new StringBuilder(testTextA));
-        System.out.println("=== RES ===\n" +  res + "\n============\n");
-        assertText(testTextA50, res);
-
-        StringUtils.set_defaultAutoLineLenght(50);
-        res = StringUtils.autoLineBreak(new StringBuilder(testTextB));
-        System.out.println("=== RES ===\n" +  res + "\n============\n");
-        assertText(testTextB50, res);
-
-        StringUtils.set_defaultAutoLineLenght(50);
-        res = StringUtils.autoLineBreak(new StringBuilder(testTextC));
-        System.out.println("=== RES ===\n" +  res + "\n============\n");
-        assertText(testTextC50, res);
-    }
-
-    @Test
     public void testAutoLineBreak_String_int() {
         System.out.println("autoLineBreak");
 
@@ -462,26 +268,6 @@ public class StringUtilsTest {
     }
 
     @Test
-    public void testFormatDouble_double_int() {
-        System.out.println("formatDouble");
-
-        assertEquals(String.format("%.3f", 12.234), StringUtils.formatDouble(12.2340000, 3) );
-        assertEquals(String.format("%.2f", 0.03), StringUtils.formatDouble(0.03, 3) );
-        assertEquals("12", StringUtils.formatDouble(12.0000, 3) );
-
-    }
-
-    @Test
-    public void testFormatDouble_double() {
-        System.out.println("formatDouble");
-
-        assertEquals(String.format("%.3f", 12.234), StringUtils.formatDouble(12.2340000) );
-        assertEquals(String.format("%.2f", 0.03), StringUtils.formatDouble(0.03) );
-        assertEquals("12", StringUtils.formatDouble(12.0000) );
-
-    }
-
-    @Test
     public void testIsYes() {
         System.out.println("isYes");
 
@@ -513,35 +299,6 @@ public class StringUtilsTest {
         }
 
 
-    }
-
-    @Test
-    public void testSkipLeadingLines() {
-        System.out.println("skipLeadingLines");
-
-        String testTest =
-                "ONE\n" +
-                "TWO\r\n" +
-                "THREE\n" +
-                "FOUR\n" +
-                "\r\n" +
-                "\r\n" +
-                "FIVE\n";
-
-        assertEquals(testTest.substring(4), StringUtils.skipLeadingLines(testTest, 1));
-        assertEquals(testTest, StringUtils.skipLeadingLines(testTest, 0));
-        assertEquals(testTest, StringUtils.skipLeadingLines(testTest, -1));
-        assertEquals(testTest.substring(9), StringUtils.skipLeadingLines(testTest, 2));
-        assertEquals("", StringUtils.skipLeadingLines(testTest, 100));
-    }
-
-    @Test
-    public void testByteArrayToString() {
-        System.out.println("byteArrayToString");
-
-        byte[] bytes = {72,97,108,108,111};
-
-        assertEquals("Hallo",StringUtils.byteArrayToString(bytes));
     }
 
 }
