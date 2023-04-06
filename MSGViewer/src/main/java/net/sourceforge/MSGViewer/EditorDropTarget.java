@@ -1,20 +1,12 @@
 package net.sourceforge.MSGViewer;
 
-import at.redeye.FrameWork.utilities.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import javax.swing.text.JTextComponent;
 import java.awt.*;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.datatransfer.*;
 import java.awt.dnd.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.util.List;
+import javax.swing.text.JTextComponent;
+import org.apache.logging.log4j.*;
 
 public class EditorDropTarget implements DropTargetListener {
     private static final Logger logger = LogManager.getLogger(EditorDropTarget.class);
@@ -218,7 +210,7 @@ public class EditorDropTarget implements DropTargetListener {
             }
             return false;
         } catch (Exception e) {
-            logger.error(StringUtils.exceptionToString(e));
+            logger.error(e.getLocalizedMessage(), e);
             return false;
         }
     }

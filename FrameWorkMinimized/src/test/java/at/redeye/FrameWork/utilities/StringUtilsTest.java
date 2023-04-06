@@ -284,25 +284,4 @@ public class StringUtilsTest {
         assertTrue(StringUtils.isYes("1"));
         assertFalse(StringUtils.isYes("hugo"));
     }
-
-    @Test
-    public void testExceptionToString() {
-        System.out.println("exceptionToString");
-
-        try {
-            Integer.parseInt("asdfasdf");
-        } catch( NumberFormatException ex ) {
-
-            String res = StringUtils.exceptionToString(ex);
-
-            if( res.length() < 100 )
-            {
-                System.out.println(res);
-                fail( "something wrong with that exception to String function");
-            }
-        }
-
-
-    }
-
 }

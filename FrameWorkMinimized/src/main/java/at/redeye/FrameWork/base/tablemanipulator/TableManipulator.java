@@ -1,20 +1,14 @@
 package at.redeye.FrameWork.base.tablemanipulator;
 
 import at.redeye.FrameWork.base.*;
-import at.redeye.FrameWork.base.bindtypes.DBEnum;
-import at.redeye.FrameWork.base.bindtypes.DBEnumAsInteger;
-import at.redeye.FrameWork.base.bindtypes.DBStrukt;
-import at.redeye.FrameWork.base.bindtypes.DBValue;
-import at.redeye.FrameWork.utilities.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import javax.swing.*;
-import javax.swing.table.*;
+import at.redeye.FrameWork.base.bindtypes.*;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
 import java.util.Map.Entry;
+import javax.swing.*;
+import javax.swing.table.*;
+import org.apache.logging.log4j.*;
 
 public class TableManipulator {
 
@@ -484,7 +478,7 @@ public class TableManipulator {
             auto_show_row_header = Integer.parseInt(FrameWorkConfigDefinitions.SpreadSheetRowHeaderLimit.getConfigValue());
 
         } catch ( NumberFormatException ex ) {
-            logger.error(StringUtils.exceptionToString(ex));
+            logger.error(ex.getLocalizedMessage(), ex);
         }
     }
 
@@ -621,7 +615,7 @@ public class TableManipulator {
                     positions.add(new AbstractMap.SimpleEntry<>(col_uid, Integer.parseInt(values[1])));
 
             } catch( NumberFormatException ex ) {
-                logger.error(StringUtils.exceptionToString(ex));
+                logger.error(ex.getLocalizedMessage(), ex);
                 positions.add(new AbstractMap.SimpleEntry<>(col_uid, -1));
             }
 

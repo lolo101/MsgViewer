@@ -2,9 +2,7 @@ package at.redeye.FrameWork.utilities;
 
 import static java.util.stream.Collectors.joining;
 
-import java.io.*;
 import java.util.Arrays;
-import org.apache.logging.log4j.Logger;
 
 public class StringUtils {
 
@@ -216,23 +214,6 @@ public class StringUtils {
 				|| "1".equalsIgnoreCase(maybe_a_yes_value)
 				|| "x".equalsIgnoreCase(maybe_a_yes_value)
 				|| "+".equalsIgnoreCase(maybe_a_yes_value);
-	}
-
-	/**
-	 * Converts the complete Backtrace of an Exception into a String
-	 *
-	 * @return Backtrace of the Exception
-	 * @deprecated Use {@link Logger#error(Object, Throwable)} instead
-	 */
-	@Deprecated
-	public static String exceptionToString(Exception ex) {
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-		PrintStream s = new PrintStream(bos);
-		ex.printStackTrace(s);
-		s.flush();
-
-		return bos.toString();
 	}
 
 	/**
