@@ -265,6 +265,10 @@ public class StringUtilsTest {
         res = StringUtils.autoLineBreak(testTextC,50);
         System.out.println("=== RES ===\n" +  res + "\n============\n");
         assertText(testTextC50, res);
+
+        res = StringUtils.autoLineBreak("short",50);
+        System.out.println("=== RES ===\n" +  res + "\n============\n");
+        assertText("short", res);
     }
 
     @Test

@@ -80,10 +80,10 @@ public class StringUtils {
 		final char[] myPreferedSigns = { ';', '.', ',', '!', '?', '>', '-' };
 		final char[] mySpaceSigns = { ' ', '\t' };
 
-		final int searchWindowLengthPreferedSigns = 20;
+		final int searchWindowLengthPreferedSigns = 10;
 		final int searchWindowLengthSpaceSigns = 50;
 
-		if (searchWindowLengthPreferedSigns / 2 > length || length >= what.length()) {
+		if (searchWindowLengthPreferedSigns > length || length >= what.length()) {
 			// Doesn't make sense
 			return what;
 		}
@@ -93,7 +93,7 @@ public class StringUtils {
 
 		for (int walker = 1; walker < in.length; walker++) {
 
-			if (in.length <= searchWindowLengthPreferedSigns / 2) {
+			if (in.length <= searchWindowLengthPreferedSigns) {
 				break;
 			}
 
@@ -103,7 +103,7 @@ public class StringUtils {
 				for (char myPreferedSign : myPreferedSigns) {
 
 					// try with preferred signs
-					for (int index = 1; index <= (searchWindowLengthPreferedSigns / 2); index++) {
+					for (int index = 1; index <= searchWindowLengthPreferedSigns; index++) {
 
 						if ((walker + index + 1) >= in.length
 								|| (walker - index) <= 0) {
