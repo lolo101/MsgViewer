@@ -8,19 +8,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MLUtil {
 
-    static Pattern number_pattern = Pattern.compile("^[0-9 \t\\n,.]+$");
+    private static final Pattern number_pattern = Pattern.compile("^[0-9 \t\\n,.]+$");
 
-    public static String getAltResourcePath(String resourceName, String subdir)
-    {
+    private static String getAltResourcePath(String resourceName, String subdir) {
         int index = resourceName.lastIndexOf('/');
 
-        return resourceName.substring(0,index) + '/' + subdir + resourceName.substring(index);
+        return resourceName.substring(0, index) + '/' + subdir + resourceName.substring(index);
     }
 
     /**
@@ -28,11 +26,9 @@ public class MLUtil {
      */
     public static void addAllProps( Properties a , Properties b )
     {
-        Set<Object> keys = b.keySet();
-
-        for (Object o : keys) {
+        for (Object o : b.keySet()) {
             String key = (String) o;
-            String val = (String) b.get(key);
+            String val = b.getProperty(key);
 
             if (!val.isEmpty()) {
                 a.setProperty(key, val);
@@ -42,8 +38,6 @@ public class MLUtil {
 
     public static boolean haveResource( String name )
     {
-        //System.out.println("testing: " + name);
-
         Root root = Root.getLastRoot();
 
         URL url;
@@ -53,8 +47,6 @@ public class MLUtil {
         else
             url = name.getClass().getResource(name); // dieser Weg funkt mit Webstart nicht
 
-        // System.out.println("testing: " + name  + (url != null ? " found" : " not found"));
-
         return url != null;
     }
 
@@ -63,11 +55,10 @@ public class MLUtil {
         return autoLoadFile4ClassName( root, object.getClass().getName(), locale, no_default );
     }
 
-    public static Properties autoLoadFile4ClassName(Root root, String name, String locale, boolean no_default)
-    {
+    private static Properties autoLoadFile4ClassName(Root root, String name, String locale, boolean no_default) {
         try {
             return loadFile4ClassName(root, name, locale, no_default);
-        } catch( IOException ex ) {
+        } catch (IOException ex) {
             return null;
         }
     }
@@ -145,11 +136,6 @@ public class MLUtil {
         }
 
          return local_props;
-    }
-
-    public static Properties autoLoadFile4Class(Root root, Object object, String locale, String impl_language)
-    {
-        return autoLoadFile4ClassName( root, object.getClass().getName(), locale, impl_language);
     }
 
     public static Properties autoLoadFile4ClassName(Root root, String name, String locale, String impl_language)
