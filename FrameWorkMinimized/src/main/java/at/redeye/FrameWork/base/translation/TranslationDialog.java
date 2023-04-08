@@ -19,24 +19,24 @@ import java.util.*;
 
 public class TranslationDialog extends BaseDialog {
 
-    public static String TRANS_LAST_LANGUAGE = "last_language";
-    public static String TRANS_LAST_COUNTRY = "last_country";
-    public static String TRANS_LAST_LEFT_COLCOUNT = "trans_last_right_colcount";
-    public static String TRANS_LAST_RIGHT_COLCOUNT = "trans_last_left_colcount";
+    private static final String TRANS_LAST_LANGUAGE = "last_language";
+    private static final String TRANS_LAST_COUNTRY = "last_country";
+    private static final String TRANS_LAST_LEFT_COLCOUNT = "trans_last_right_colcount";
+    private static final String TRANS_LAST_RIGHT_COLCOUNT = "trans_last_left_colcount";
 
-    Vector<SimpleEntry<String, StringBuffer>> data = new Vector<>();
-    Vector<NoticeIfChangedTextField> fields = new Vector<>();
+    private final Collection<SimpleEntry<String, StringBuffer>> data = new Vector<>();
+    private final Vector<NoticeIfChangedTextField> fields = new Vector<>();
 
-    String ClassName;
+    private final String ClassName;
 
-    int prev_lang_index = -1;
-    int prev_country_index = -1;
+    private int prev_lang_index = -1;
+    private int prev_country_index = -1;
 
-    boolean force_undo_country = false;
-    boolean force_undo_language = false;
+    private boolean force_undo_country;
+    private boolean force_undo_language;
 
-    Vector<JTextField> left_cols = new Vector<>();
-    Vector<JTextField> right_cols = new Vector<>();
+    private final Vector<JTextField> left_cols = new Vector<>();
+    private final Vector<JTextField> right_cols = new Vector<>();
 
     public TranslationDialog(final Root root, Container frame, String name, ExtractStrings es) {
         super(root, name);
@@ -173,7 +173,7 @@ public class TranslationDialog extends BaseDialog {
 
         language.removeAllItems();
 
-        Set<String> languages = new TreeSet<>();
+        Collection<String> languages = new TreeSet<>();
 
         for (Locale l : Locale.getAvailableLocales()) {
             languages.add(l.getLanguage());
@@ -190,7 +190,7 @@ public class TranslationDialog extends BaseDialog {
 
         country.removeAllItems();
 
-        Set<String> countries = new TreeSet<>();
+        Collection<String> countries = new TreeSet<>();
 
 
         for (Locale l : Locale.getAvailableLocales()) {
