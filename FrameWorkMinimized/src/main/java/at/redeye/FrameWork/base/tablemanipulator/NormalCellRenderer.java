@@ -1,7 +1,6 @@
 package at.redeye.FrameWork.base.tablemanipulator;
 
 import at.redeye.FrameWork.base.FrameWorkConfigDefinitions;
-import at.redeye.FrameWork.base.bindtypes.DBEnum;
 import at.redeye.FrameWork.base.bindtypes.DBValue;
 import at.redeye.FrameWork.base.tablemanipulator.TableDesign.ColoredCell;
 import at.redeye.FrameWork.utilities.HTMLColor;
@@ -90,16 +89,9 @@ public class NormalCellRenderer extends DefaultTableCellRenderer {
                 db_value.loadFromString(s);
             }
 
-            if (db_value instanceof DBEnum) {
-                super.setValue(((DBEnum<?>) db_value).getLocalizedString());
-            } else {
-                super.setValue(db_value);
-            }
+            super.setValue(db_value);
         } else {
-            if (v instanceof DBEnum)
-                super.setValue(((DBEnum<?>) v).getLocalizedString());
-            else
-                super.setValue(v);
+            super.setValue(v);
         }
 
         //Set colors dependant upon if the row is selected or not

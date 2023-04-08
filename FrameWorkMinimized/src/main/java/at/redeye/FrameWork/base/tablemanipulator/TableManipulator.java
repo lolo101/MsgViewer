@@ -1,14 +1,18 @@
 package at.redeye.FrameWork.base.tablemanipulator;
 
 import at.redeye.FrameWork.base.*;
-import at.redeye.FrameWork.base.bindtypes.*;
+import at.redeye.FrameWork.base.bindtypes.DBEnumAsInteger;
+import at.redeye.FrameWork.base.bindtypes.DBStrukt;
+import at.redeye.FrameWork.base.bindtypes.DBValue;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import javax.swing.*;
+import javax.swing.table.*;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
 import java.util.Map.Entry;
-import javax.swing.*;
-import javax.swing.table.*;
-import org.apache.logging.log4j.*;
 
 public class TableManipulator {
 
@@ -229,9 +233,7 @@ public class TableManipulator {
 
             TableDesign.Coll tcoll = tabledesign.colls.get(i);
 
-            if (tcoll.dbval instanceof DBEnum) {
-                col.setCellEditor(new AdvancedEnumTableCellEditor(tabledesign, (DBEnum<?>) tcoll.dbval));
-            } else if (tcoll.dbval instanceof DBEnumAsInteger) {
+            if (tcoll.dbval instanceof DBEnumAsInteger) {
                 col.setCellEditor(new AdvancedEnumTableCellEditor(tabledesign, (DBEnumAsInteger) tcoll.dbval));
             } else {
                 col.setCellEditor(new AdvancedTableCellEditor(tabledesign));

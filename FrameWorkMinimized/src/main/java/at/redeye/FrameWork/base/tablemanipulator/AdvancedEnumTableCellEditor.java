@@ -1,6 +1,5 @@
 package at.redeye.FrameWork.base.tablemanipulator;
 
-import at.redeye.FrameWork.base.bindtypes.DBEnum;
 import at.redeye.FrameWork.base.bindtypes.DBEnumAsInteger;
 import at.redeye.FrameWork.base.bindtypes.DBValue;
 import at.redeye.FrameWork.widgets.AutoCompleteCombo;
@@ -18,16 +17,6 @@ public class AdvancedEnumTableCellEditor extends AbstractCellEditor implements T
     private int last_row;
     private int last_col;
     private Object current_value;
-
-    public AdvancedEnumTableCellEditor(TableDesign tabledesign, DBEnum<?> value) {
-        this.tabledesign = tabledesign;
-
-        for (String s : value.getLocalizedPossibleValues()) {
-            component.addItem(s);
-        }
-
-        component.setEditable(true);
-    }
 
     public AdvancedEnumTableCellEditor(TableDesign tabledesign, DBEnumAsInteger value) {
         this.tabledesign = tabledesign;
@@ -64,10 +53,7 @@ public class AdvancedEnumTableCellEditor extends AbstractCellEditor implements T
 
         component.setBorder(new LineBorder(Color.BLACK));
 
-        if (value instanceof DBEnum)
-            component.setSelectedItem(((DBEnum<?>) value).getLocalizedString());
-        else
-            component.setSelectedItem(value);
+        component.setSelectedItem(value);
 
         return component;
     }
