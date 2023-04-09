@@ -1,6 +1,7 @@
 package at.redeye.FrameWork.utilities;
 
 import java.util.Arrays;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.joining;
 
@@ -200,12 +201,8 @@ public class StringUtils {
 	 * @return true, false
 	 */
 	public static boolean isYes(String maybe_a_yes_value) {
-		return "ja".equalsIgnoreCase(maybe_a_yes_value)
-				|| "yes".equalsIgnoreCase(maybe_a_yes_value)
-				|| "true".equalsIgnoreCase(maybe_a_yes_value)
-				|| "1".equalsIgnoreCase(maybe_a_yes_value)
-				|| "x".equalsIgnoreCase(maybe_a_yes_value)
-				|| "+".equalsIgnoreCase(maybe_a_yes_value);
+		return Stream.of("ja", "yes", "true", "1", "x", "+")
+				.anyMatch(anotherString -> anotherString.equalsIgnoreCase(maybe_a_yes_value));
 	}
 
 	/**
