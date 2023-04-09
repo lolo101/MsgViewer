@@ -37,20 +37,17 @@ public class MsgParser {
     /**
      * Parses a .msg file provided by an input stream.
      *
-     * @param msgFileStream The .msg file as a InputStream.
+     * @param msgFileStream The .msg file as an InputStream.
      * @return A {@link Message} object representing the .msg file.
      * @throws IOException Thrown if the file could not be loaded or parsed.
      */
     private static Message parseMsg(InputStream msgFileStream) throws IOException {
-        // the .msg file, like a file system, contains directories
-        // and documents within these directories
-        // we now gain access to the root node
-        // and recursively go through the complete 'filesystem'.
-        POIFSFileSystem fs = new POIFSFileSystem(msgFileStream);
-        DirectoryEntry dir = fs.getRoot();
-        Message msg = new Message();
-        parseMsg(dir, msg);
-        return msg;
+        try (POIFSFileSystem fs = new POIFSFileSystem(msgFileStream)) {
+            DirectoryEntry dir = fs.getRoot();
+            Message msg = new Message();
+            parseMsg(dir, msg);
+            return msg;
+        }
     }
 
     private static void parseMsg(DirectoryEntry dir, Message msg) throws IOException {
