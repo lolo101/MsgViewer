@@ -43,14 +43,12 @@ public class MsgParser {
      */
     private static Message parseMsg(InputStream msgFileStream) throws IOException {
         try (POIFSFileSystem fs = new POIFSFileSystem(msgFileStream)) {
-            DirectoryEntry dir = fs.getRoot();
-            Message msg = new Message();
-            parseMsg(dir, msg);
-            return msg;
+            return parseMsg(fs.getRoot());
         }
     }
 
-    private static void parseMsg(DirectoryEntry dir, Message msg) throws IOException {
+    private static Message parseMsg(DirectoryEntry dir) throws IOException {
+        Message msg = new Message();
         DocumentEntry propertiesEntry = (DocumentEntry) dir.getEntry(PROPERTIES_ENTRY);
         try (DocumentInputStream propertyStream = new DocumentInputStream(propertiesEntry)) {
             propertyStream.skip(8);
@@ -75,6 +73,7 @@ public class MsgParser {
                 msg.setProperty(new Property(propertyStream, dir));
             }
         }
+        return msg;
     }
 
     /**
@@ -124,12 +123,8 @@ public class MsgParser {
 
     private static void parseEmbeddedMessage(DirectoryEntry dir, Message msg) throws IOException {
         DirectoryEntry entry = (DirectoryEntry) dir.getEntry(Ptyp.SUBSTORAGE_PREFIX + "3701000D");
-        Message attachmentMsg = new Message();
-        MsgAttachment msgAttachment = new MsgAttachment();
-        msgAttachment.setMessage(attachmentMsg);
 
-        parseMsg(entry, attachmentMsg);
-
+        Attachment msgAttachment = new MsgAttachment(parseMsg(entry));
         msg.addAttachment(msgAttachment);
     }
 
