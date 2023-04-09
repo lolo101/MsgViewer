@@ -1,8 +1,8 @@
 package at.redeye.FrameWork.utilities;
 
-import static java.util.stream.Collectors.joining;
-
 import java.util.Arrays;
+
+import static java.util.stream.Collectors.joining;
 
 public class StringUtils {
 
@@ -90,22 +90,16 @@ public class StringUtils {
 		StringBuilder str = new StringBuilder();
 
 		for (int walker = 1; walker < in.length; walker++) {
-
-			if (in.length <= searchWindowLengthPreferedSigns) {
-				break;
-			}
-
 			if (walker % length == 0) {
-				// try to find a sign in search window
+				// try to find a sign in a search window
 				boolean found = false;
 				for (char myPreferedSign : myPreferedSigns) {
-
 					// try with preferred signs
 					for (int index = 1; index <= searchWindowLengthPreferedSigns; index++) {
 
 						if ((walker + index + 1) >= in.length
 								|| (walker - index) <= 0) {
-							break; // not enough left
+							break; // not enough lefts
 						}
 
 						if (in[walker + index] == myPreferedSign) {
@@ -127,7 +121,8 @@ public class StringUtils {
 							walker = 0;
 							found = true;
 							break;
-						} else if (in[walker - index] == myPreferedSign) {
+						}
+						if (in[walker - index] == myPreferedSign) {
 							str.append(new String(in, 0, walker - index + 1));
 							str.append("\n");
 
@@ -160,7 +155,7 @@ public class StringUtils {
 
 						if ((walker + index + 1) >= in.length
 								|| (walker - index) <= 0) {
-							break; // not enough left
+							break; // not enough lefts
 						}
 
 						if (in[walker + index] == mySpaceSign) {
@@ -174,7 +169,8 @@ public class StringUtils {
 							walker = 0;
 							found = true;
 							break;
-						} else if (in[walker - index] == mySpaceSign) {
+						}
+						if (in[walker - index] == mySpaceSign) {
 
 							str.append(new String(in, 0, walker - index + 1));
 							str.append("\n");
@@ -186,24 +182,20 @@ public class StringUtils {
 							found = true;
 							break;
 						}
-
 					}
 
 					if (found) {
 						break;
 					}
-
 				}
-
 			}
-
 		}
 		str.append(in); // rest
 		return str.toString();
 	}
 
 	/**
-	 * Finds out, if the given string has the meaning of 'Yes'
+	 * Finds out if the given string has the meaning of 'Yes'
 	 *
 	 * @return true, false
 	 */
