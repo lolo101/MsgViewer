@@ -33,20 +33,17 @@ public class MsgAttachment implements Attachment {
 	/**
 	 * The encapsulated (attached) message.
 	 */
-	private Message message = null;
+	private final Message message;
+
+	public MsgAttachment(Message message) {
+		this.message = message;
+	}
 
 	/**
 	 * @return the message
 	 */
 	public Message getMessage() {
 		return message;
-	}
-
-	/**
-	 * @param message the message to set
-	 */
-	public void setMessage(Message message) {
-		this.message = message;
 	}
 
 	/**
