@@ -253,12 +253,8 @@ public class TranslationDialog extends BaseDialog {
 
     @Override
     public boolean canClose() {
-        for (NoticeIfChangedTextField field : fields) {
-            if (field.hasChanged()) {
-                setEdited();
-                break;
-            }
-        }
+        if (fields.stream().anyMatch(NoticeIfChangedTextField::hasChanged))
+            setEdited();
 
         if (isEdited()) {
             int ret = checkSave();
@@ -478,9 +474,7 @@ public class TranslationDialog extends BaseDialog {
                 props.store(out, "nix");
             }
 
-            fields.forEach(field -> field.setChanged(false));
-
-            setEdited(false);
+            resetEdited();
         }).run();
     }//GEN-LAST:event_jBSaveActionPerformed
 
@@ -600,8 +594,11 @@ public class TranslationDialog extends BaseDialog {
 
         var_to_gui();
 
-        fields.forEach(field -> field.setChanged(false));
+        resetEdited();
+    }
 
+    private void resetEdited() {
+        fields.forEach(field -> field.setChanged(false));
         setEdited(false);
     }
 
