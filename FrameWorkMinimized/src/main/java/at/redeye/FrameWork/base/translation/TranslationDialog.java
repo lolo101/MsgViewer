@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.*;
 
 public class TranslationDialog extends BaseDialog {
@@ -24,7 +23,7 @@ public class TranslationDialog extends BaseDialog {
     private static final String TRANS_LAST_LEFT_COLCOUNT = "trans_last_right_colcount";
     private static final String TRANS_LAST_RIGHT_COLCOUNT = "trans_last_left_colcount";
 
-    private final Collection<SimpleEntry<String, StringBuffer>> data = new Vector<>();
+    private final Map<String, StringBuffer> data = new HashMap<>();
     private final Vector<NoticeIfChangedTextField> fields = new Vector<>();
 
     private final String ClassName;
@@ -155,13 +154,13 @@ public class TranslationDialog extends BaseDialog {
 
                 panel.add(editField);
 
-                SimpleEntry<String, StringBuffer> pair = new SimpleEntry<>(s, new StringBuffer());
+                StringBuffer value = new StringBuffer();
 
-                this.bindVar(editField, pair.getValue());
+                this.bindVar(editField, value);
 
                 fields.add(editField);
 
-                data.add(pair);
+                data.put(s, value);
             }
         }
 
@@ -464,7 +463,7 @@ public class TranslationDialog extends BaseDialog {
 
             Properties props = new Properties();
 
-            for (SimpleEntry<String, StringBuffer> pair : data) {
+            for (Map.Entry<String, StringBuffer> pair : data.entrySet()) {
                 if (pair.getValue().length() > 0) {
                     props.setProperty(pair.getKey(), pair.getValue().toString());
                 }
@@ -581,12 +580,12 @@ public class TranslationDialog extends BaseDialog {
             }
         }
 
-        for (SimpleEntry<String, StringBuffer> p : data) {
-            String trans = props.getProperty(p.getKey());
+        for (Map.Entry<String, StringBuffer> p : data.entrySet()) {
 
             StringBuffer buf = p.getValue();
             buf.setLength(0);
 
+            String trans = props.getProperty(p.getKey());
             if (trans != null) {
                 buf.append(trans);
             }
