@@ -5,7 +5,6 @@ import at.redeye.FrameWork.base.DefaultCanClose;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.base.Saveable;
 import at.redeye.FrameWork.base.bindtypes.DBStrukt;
-import at.redeye.FrameWork.base.prm.PrmCustomChecksInterface;
 import at.redeye.FrameWork.base.prm.PrmDefaultChecksInterface;
 import at.redeye.FrameWork.base.prm.PrmListener;
 import at.redeye.FrameWork.base.prm.bindtypes.DBConfig;
@@ -208,12 +207,5 @@ private void jBCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
       }
     }
 
-    public void onChange(PrmCustomChecksInterface customChecks, PrmActionEvent event) {
-        if(!customChecks.doCustomChecks(event)) {
-          PrmErrUtil.displayPrmError(this, event.getParameterName().toString());
-          root.getSetup().setLocalConfig(event.getParameterName().toString(), event.getOldPrmValue().toString());
-
-      }
-    }
 }
 

@@ -7,6 +7,4 @@ public interface PrmListener {
     void onChange(PrmDefaultChecksInterface defaultChecks,
                   PrmActionEvent prmActionEvent) ;
 
-    void onChange(PrmCustomChecksInterface customChecks, PrmActionEvent event);
-
 }
