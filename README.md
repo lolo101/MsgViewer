@@ -1,3 +1,4 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/59c69ec3190d43d7bc6590d6a8dac238)](https://app.codacy.com/gh/lolo101/MsgViewer?utm_source=github.com&utm_medium=referral&utm_content=lolo101/MsgViewer&utm_campaign=Badge_Grade)
 [![CircleCI](https://circleci.com/gh/lolo101/MsgViewer.svg?style=shield)](https://app.circleci.com/pipelines/github/lolo101/MsgViewer)
 [![Build Status](https://travis-ci.com/lolo101/MsgViewer.svg?branch=master)](https://travis-ci.com/lolo101/MsgViewer)
 [![CodeScene general](https://codescene.io/images/analyzed-by-codescene-badge.svg)](https://codescene.io/projects/2821)
