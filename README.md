@@ -24,6 +24,17 @@ then run the Maven build:
 
 Building will generate a number of files. The main file is an 'uber-jar' placed under **MSGViewer/target** directory.
 
+## Command Line
+
+The application may be used on the command line. Just type :
+
+```
+cd MSGViewer/target
+java -jar msgviewer.jar -h
+```
+
+to display command line help.
+
 ## GUI
 
 You can run the application's Graphic User Interface by calling :
@@ -33,13 +44,17 @@ cd MSGViewer/target
 java -jar msgviewer.jar
 ```
 
-## Command Line
+In the GUI, you may open a message with the 'Open File' menu item or by dropping a message file in the window.
 
-The application may also be used on the command line. Just type :
+You may also open multiple messages at once by dropping a list of message files,
+a flat file with paths to message files or a selection of paths.
 
-```
-cd MSGViewer/target
-java -jar msgviewer.jar -h
-```
+### Locale
 
-to display command line help.
+Translation files are located under `~/.MSGViewer/translations/`
+
+Display Language may be configured in the Options. The default value is the platform locale.
+
+`F11` will switch between English and current Display Language.
+
+`F12` will show Translation Dialog to edit a locale.

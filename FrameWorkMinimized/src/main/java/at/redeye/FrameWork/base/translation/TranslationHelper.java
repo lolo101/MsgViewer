@@ -40,10 +40,16 @@ public class TranslationHelper {
         }
     }
 
-    class SwitchTrans_DE_EN implements Runnable {
-        private static final String lang_a = "";
-        private static final String lang_b = "en";
+    class SwitchTranslation implements Runnable {
+        private final String lang_a;
+        private final String lang_b;
         private String lang_current;
+
+        private SwitchTranslation() {
+            lang_a = root.getDisplayLanguage();
+            lang_b = root.getDefaultLanguage();
+            lang_current = root.getDisplayLanguage();
+        }
 
         public void run() {
             if (lang_b.equals(lang_current)) {
@@ -62,8 +68,8 @@ public class TranslationHelper {
         this.base_dlg = base_dlg;
         this.helper = helper;
 
-        helper.registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_F12, 0), new OpenTransDialog() );
-        helper.registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_F11, 0), new SwitchTrans_DE_EN() );
+        helper.registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_F12, 0), new OpenTransDialog());
+        helper.registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_F11, 0), new SwitchTranslation());
     }
 
     private boolean loadTranslation(String new_trans) {
