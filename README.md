@@ -1,5 +1,6 @@
 [![CircleCI](https://circleci.com/gh/lolo101/MsgViewer.svg?style=shield)](https://app.circleci.com/pipelines/github/lolo101/MsgViewer)
 [![Build Status](https://travis-ci.com/lolo101/MsgViewer.svg?branch=master)](https://travis-ci.com/lolo101/MsgViewer)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/05a7f752a0a24f76b6daf837b4aed525)](https://app.codacy.com/gh/lolo101/MsgViewer/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![CodeScene general](https://codescene.io/images/analyzed-by-codescene-badge.svg)](https://codescene.io/projects/2821)
 
 # msgviewer
