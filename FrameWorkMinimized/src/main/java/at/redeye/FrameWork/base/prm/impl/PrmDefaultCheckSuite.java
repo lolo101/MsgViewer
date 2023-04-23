@@ -1,12 +1,16 @@
 package at.redeye.FrameWork.base.prm.impl;
 
+import at.redeye.FrameWork.base.bindtypes.DBString;
 import at.redeye.FrameWork.base.prm.PrmDefaultChecksInterface;
 import at.redeye.SqlDBInterface.SqlDBIO.DateTimeFormat;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.swing.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.function.Predicate;
 
 public class PrmDefaultCheckSuite implements PrmDefaultChecksInterface {
 
@@ -102,17 +106,16 @@ public class PrmDefaultCheckSuite implements PrmDefaultChecksInterface {
 
 	private boolean passesLookAndFeel(PrmActionEvent event) {
 
-		String[] validStr = { "metal", "system", "motif", "nimbus" };
+		DBString newPrmValue = event.getNewPrmValue();
+		boolean valid = Arrays.stream(UIManager.getInstalledLookAndFeels())
+				.map(UIManager.LookAndFeelInfo::getName)
+				.anyMatch(Predicate.isEqual(newPrmValue.toString()));
 
-		for (String s : validStr) {
-			if (event.getNewPrmValue().toString().equalsIgnoreCase(
-					s)) {
-				return true;
-			}
+		if (!valid) {
+			logger.warn(newPrmValue
+					+ ": Not a valid LookAndFeel value !");
 		}
-		logger.warn(event.getParameterName().toString()
-				+ ": Not a valid LookAndFeel value !");
-		return false;
+		return valid;
 
 	}
 

@@ -158,17 +158,9 @@ public abstract class BaseModuleLauncher {
         logger.debug("Found LookAndFeel PRM value: <" + config + ">");
 
         try {
-            UIManager.setLookAndFeel(getLookAndFeelStrByName(config));
-        } catch (ReflectiveOperationException | UnsupportedLookAndFeelException e) {
-            logger.error(e.getMessage());
+            UIManager.setLookAndFeel(UIManager.createLookAndFeel(config));
+        } catch (UnsupportedLookAndFeelException e) {
+            logger.error(e.getMessage(), e);
         }
-    }
-
-    private static String getLookAndFeelStrByName(String name) {
-
-        if (name.equalsIgnoreCase("motif")) return "com.sun.java.swing.plaf.motif.MotifLookAndFeel";
-        if (name.equalsIgnoreCase("metal")) return "javax.swing.plaf.metal.MetalLookAndFeel";
-        if (name.equalsIgnoreCase("nimbus")) return "com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel";
-        return UIManager.getSystemLookAndFeelClassName();
     }
 }
