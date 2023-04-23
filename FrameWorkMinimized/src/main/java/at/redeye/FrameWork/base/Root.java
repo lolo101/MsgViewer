@@ -1,9 +1,12 @@
 package at.redeye.FrameWork.base;
 
+import at.redeye.FrameWork.base.prm.bindtypes.DBConfig;
+import at.redeye.FrameWork.base.prm.impl.ConfigDefinitions;
 import at.redeye.FrameWork.base.translation.MLHelper;
 import at.redeye.FrameWork.utilities.Storage;
 
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Locale;
 
 public class Root {
@@ -243,5 +246,17 @@ public class Root {
 
     public String[] getStartupArgs() {
         return startupArgs;
+    }
+
+    public Collection<DBConfig> loadConfig() {
+        Collection<DBConfig> configs = ConfigDefinitions.entries.values();
+
+        for (DBConfig c : configs) {
+            String val = setup.getConfig(c.getConfigName(), c.getConfigValue());
+            c.descr.loadFromCopy(MlM(c.descr.getValue()));
+            c.setConfigValue(val);
+        }
+
+        return configs;
     }
 }

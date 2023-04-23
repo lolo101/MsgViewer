@@ -16,12 +16,15 @@ public class ModuleLauncher extends BaseModuleLauncher {
         super(args);
 
         BaseConfigureLogging(Level.ERROR);
+        AppConfigDefinitions.registerDefinitions();
+        FrameWorkConfigDefinitions.registerDefinitions();
 
         root = new Root("MSGViewer");
         root.setStartupArgs(args);
         root.setBaseLanguage("en");
         root.setDefaultLanguage("en");
         root.setLanguageTranslationResourcePath("/net/sourceforge/MSGViewer/resources/translations");
+        root.loadConfig();
     }
 
     public static void main(String[] args) {
@@ -85,9 +88,6 @@ public class ModuleLauncher extends BaseModuleLauncher {
             splash = new StartupWindow(
                     "/at/redeye/FrameWork/base/resources/pictures/redeye.png");
         }
-
-        AppConfigDefinitions.registerDefinitions();
-        FrameWorkConfigDefinitions.registerDefinitions();
 
         registerPlugins();
 

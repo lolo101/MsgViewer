@@ -50,7 +50,7 @@ public class Config extends BaseDialog implements Saveable, PrmListener {
 
         tm.prepareTable();
 
-        feed_table();
+        reloadConfig();
 
         tm.autoResize();
 
@@ -58,18 +58,12 @@ public class Config extends BaseDialog implements Saveable, PrmListener {
         ConfigDefinitions.entries.values().forEach(c -> c.addPrmListener(this));
     }
 
-    private void feed_table() {
+    private void reloadConfig() {
 
         values.clear();
         tm.clear();
 
-        Collection<DBConfig> configs = ConfigDefinitions.entries.values();
-
-        for (DBConfig c : configs) {
-            String val = root.getSetup().getConfig(c.getConfigName(), c.getConfigValue());
-            c.descr.loadFromCopy(MlM(c.descr.getValue()));
-            c.setConfigValue(val);
-        }
+        Collection<DBConfig> configs = root.loadConfig();
 
         tm.addAll(configs);
         values.addAll(configs);
@@ -197,7 +191,7 @@ private void jBCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
         }
 
         root.saveSetup();
-        feed_table();
+        reloadConfig();
 
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
