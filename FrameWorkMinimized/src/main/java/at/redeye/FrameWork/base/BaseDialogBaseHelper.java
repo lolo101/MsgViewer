@@ -1,14 +1,10 @@
 package at.redeye.FrameWork.base;
 
-import at.redeye.FrameWork.base.bindtypes.DBDateTime;
-import at.redeye.FrameWork.base.bindtypes.DBFlagInteger;
-import at.redeye.FrameWork.base.bindtypes.DBValue;
 import at.redeye.FrameWork.base.prm.bindtypes.DBConfig;
 import at.redeye.FrameWork.base.tablemanipulator.TableManipulator;
 import at.redeye.FrameWork.base.translation.TranslationHelper;
 import at.redeye.FrameWork.utilities.StringUtils;
 import at.redeye.FrameWork.widgets.NoticeIfChangedTextField;
-import at.redeye.FrameWork.widgets.datetime.IDateTimeComponent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -322,7 +318,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 
     /**
      * If data within the table have been change, asks the user what
-     * sould be done (save it, don't save it, or cancel current operation
+     * sould be done (save it, don't save it, or cancel the current operation
      *
      * @param tm TableManipulator object
      * @return 1 when the data should be saved <br/>
@@ -447,110 +443,6 @@ public class BaseDialogBaseHelper implements BindVarInterface {
     }
 
     /**
-     * in jTextArea an eine StringBuffer anbinden
-     *
-     * @param jtext das Textfeld
-     * @param var   der StringBuffer
-     *              <p>
-     *              Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird dann der
-     *              demenstprechende Inhalt entweder vom GUI zu Variablen, oder umgekehrt
-     *              übertragen.
-     */
-    @Override
-    public void bindVar(JTextArea jtext, StringBuffer var) {
-        checkBindVars();
-        bind_vars.bindVar(jtext, var);
-    }
-
-    /**
-     * in jTextArea an eine DBValue anbinden
-     *
-     * @param jtext das Textfeld
-     * @param var   der DBValue
-     *              <p>
-     *              Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird dann der
-     *              demenstprechende Inhalt entweder vom GUI zu Variablen, oder umgekehrt
-     *              übertragen.
-     */
-    @Override
-    public void bindVar(JTextArea jtext, DBValue var) {
-        checkBindVars();
-        bind_vars.bindVar(jtext, var);
-    }
-
-    /**
-     * Ein jTextField an eine DBValue anbinden
-     *
-     * @param jtext das Textfeld
-     * @param var   die Datenbankvariable
-     *              <p>
-     *              Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
-     *              dann der demenstprechende Inhalt entweder vom GUI zu
-     *              Variablen, oder umgekehrt übertragen.
-     */
-    @Override
-    public void bindVar(JTextField jtext, DBValue var) {
-
-        checkBindVars();
-
-        bind_vars.bindVar(jtext, var);
-    }
-
-    /**
-     * Eine {@link JComboBox} an eine {@link DBValue} anbinden
-     *
-     * @param jcombo das Textfeld
-     * @param var    die Datenbankvariable
-     *               <p>
-     *               Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
-     *               dann der demenstprechende Inhalt entweder vom GUI zu
-     *               Variablen, oder umgekehrt übertragen.
-     */
-    @Override
-    public void bindVar(JComboBox<?> jcombo, DBValue var) {
-
-        checkBindVars();
-
-        bind_vars.bindVar(jcombo, var);
-    }
-
-    /**
-     * Eine {@link IDateTimeComponent} an eine {@link DBDateTime} Variable
-     * anbinden
-     *
-     * @param comp     die DateTime Komponente
-     * @param dateTime die Datenbankvariable
-     *                 <p>
-     *                 Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
-     *                 dann der demenstprechende Inhalt entweder vom GUI zu
-     *                 Variablen, oder umgekehrt übertragen.
-     */
-    public void bindVar(IDateTimeComponent comp, DBDateTime dateTime) {
-
-        checkBindVars();
-
-        bind_vars.bindVar(comp, dateTime);
-    }
-
-    /**
-     * Eine JCheckBox an eine DBFlagInteger Variable anbinden
-     *
-     * @param jtext die Textbox
-     * @param var   die Datebanvariable
-     *              <p>
-     *              Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
-     *              dann der demenstprechende Inhalt entweder vom GUI zu
-     *              Variablen, oder umgekehrt übertragen.
-     */
-    @Override
-    public void bindVar(JCheckBox jtext, DBFlagInteger var) {
-
-        checkBindVars();
-
-        bind_vars.bindVar(jtext, var);
-    }
-
-    /**
      * Alle Werte der angebunden Variablen in die entsprechenden GUI Komponenten
      * übertragen
      */
@@ -596,13 +488,6 @@ public class BaseDialogBaseHelper implements BindVarInterface {
         checkBindVars();
 
         return bind_vars.getBindVarPairs();
-    }
-
-    @Override
-    public void addBindVarPair(Pair pair) {
-        checkBindVars();
-
-        bind_vars.addBindVarPair(pair);
     }
 
     private void checkBindVars() {

@@ -22,10 +22,6 @@ public class DBDateTime extends DBValue {
         return false;
     }
 
-    public Date getValue() {
-        return value;
-    }
-
     public void loadFromCopy(Object obj) {
         value = (Date) ((Date) obj).clone();
     }
@@ -44,7 +40,7 @@ public class DBDateTime extends DBValue {
         return getStdString(value);
     }
 
-    public static String getStdString(Date date) {
+    private static String getStdString(Date date) {
         return SDF_4_STD_STRING.format(date);
     }
 }

@@ -1,10 +1,6 @@
 package at.redeye.FrameWork.base;
 
-import at.redeye.FrameWork.base.bindtypes.DBDateTime;
-import at.redeye.FrameWork.base.bindtypes.DBFlagInteger;
-import at.redeye.FrameWork.base.bindtypes.DBValue;
 import at.redeye.FrameWork.base.tablemanipulator.TableManipulator;
-import at.redeye.FrameWork.widgets.datetime.IDateTimeComponent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -135,36 +131,6 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
     }
 
     @Override
-    public void bindVar(JTextArea jtext, StringBuffer var) {
-        helper.bindVar(jtext, var);
-    }
-
-    @Override
-    public void bindVar(JTextArea jtext, DBValue var) {
-        helper.bindVar(jtext, var);
-    }
-
-    @Override
-    public void bindVar(JTextField jtext, DBValue var) {
-        helper.bindVar(jtext, var);
-    }
-
-    @Override
-    public void bindVar(JCheckBox jtext, DBFlagInteger var) {
-        helper.bindVar(jtext, var);
-    }
-
-    @Override
-    public void bindVar(JComboBox<?> jComboBox, DBValue var) {
-        helper.bindVar(jComboBox, var);
-    }
-
-    @Override
-    public void bindVar(IDateTimeComponent comp, DBDateTime dateTime) {
-        helper.bindVar(comp, dateTime);
-    }
-
-    @Override
     public void var_to_gui() {
         helper.var_to_gui();
     }
@@ -217,11 +183,6 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
     @Override
     public Collection<Pair> getBindVarPairs() {
         return helper.getBindVarPairs();
-    }
-
-    @Override
-    public void addBindVarPair(Pair pair) {
-        helper.addBindVarPair(pair);
     }
 
     /**

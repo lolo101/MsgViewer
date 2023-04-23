@@ -38,10 +38,6 @@ public class DBEnumAsInteger extends DBValue {
        return handler.setValue(delocalize(s));
     }
 
-    public Integer getValue() {
-        return handler.getValue();
-    }
-
     @Override
     public String toString()
     {

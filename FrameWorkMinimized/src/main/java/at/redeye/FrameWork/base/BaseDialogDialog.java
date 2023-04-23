@@ -1,10 +1,5 @@
 package at.redeye.FrameWork.base;
 
-import at.redeye.FrameWork.base.bindtypes.DBDateTime;
-import at.redeye.FrameWork.base.bindtypes.DBFlagInteger;
-import at.redeye.FrameWork.base.bindtypes.DBValue;
-import at.redeye.FrameWork.widgets.datetime.IDateTimeComponent;
-
 import javax.swing.*;
 import java.awt.*;
 import java.util.Collection;
@@ -75,102 +70,6 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
     }
 
     /**
-     * Ein jTextField an eine DBValue anbinden
-     *
-     * @param jtext
-     *            das Textfeld
-     * @param var
-     *            die Datenbankvariable
-     *            Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
-     *            dann der demenstprechende Inhalt entweder vom GUI zu
-     *            Variablen, oder umgekehrt übertragen.
-     */
-    public void bindVar(JTextField jtext, DBValue var) {
-        helper.bindVar(jtext, var);
-    }
-
-    /**
-     * Eine JCheckBox an eine DBFlagInteger Variable anbinden
-     *
-     * @param jtext
-     *            die Textbox
-     * @param var
-     *            die Datebanvariable
-     *            Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
-     *            dann der demenstprechende Inhalt entweder vom GUI zu
-     *            Variablen, oder umgekehrt übertragen.
-     */
-    @Override
-    public void bindVar(JCheckBox jtext, DBFlagInteger var) {
-        helper.bindVar(jtext, var);
-    }
-
-    /**
-     * Eine JComboBox an eine {@link DBValue} Variable anbinden
-     *
-     * @param jComboBox
-     *            die Combo-box
-     * @param var
-     *            die Datebanvariable
-     *            Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
-     *            dann der demenstprechende Inhalt entweder vom GUI zu
-     *            Variablen, oder umgekehrt übertragen.
-     */
-    @Override
-    public void bindVar(JComboBox<?> jComboBox, DBValue var) {
-        helper.bindVar(jComboBox, var);
-    }
-
-    /**
-     * Eine {@link IDateTimeComponent} an eine {@link DBDateTime} Variable
-     * anbinden
-     *
-     * @param comp
-     *            die DateTime-Komponente
-     * @param dateTime
-     *            die Datebanvariable
-     *            Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
-     *            dann der demenstprechende Inhalt entweder vom GUI zu
-     *            Variablen, oder umgekehrt übertragen.
-     */
-    @Override
-    public void bindVar(IDateTimeComponent comp, DBDateTime dateTime) {
-        helper.bindVar(comp, dateTime);
-    }
-
-    /**
-     * in jTextArea an eine StringBuffer anbinden
-     *
-     * @param jtext
-     *            das Textfeld
-     * @param var
-     *            der StringBuffer
-     *            Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
-     *            dann der demenstprechende Inhalt entweder vom GUI zu
-     *            Variablen, oder umgekehrt übertragen.
-     */
-    @Override
-    public void bindVar(JTextArea jtext, StringBuffer var) {
-        helper.bindVar(jtext, var);
-    }
-
-    /**
-     * in jTextArea an eine DBValue anbinden
-     *
-     * @param jtext
-     *            das Textfeld
-     * @param var
-     *            der DBValue
-     *            Bei einem Aufruf von var_to_gui(), oder gui_to_var(), wird
-     *            dann der demenstprechende Inhalt entweder vom GUI zu
-     *            Variablen, oder umgekehrt übertragen.
-     */
-    @Override
-    public void bindVar(JTextArea jtext, DBValue var) {
-        helper.bindVar(jtext, var);
-    }
-
-    /**
      * Alle Werte der angebunden Variablen in die entsprechenden GUI Komponenten
      * übertragen
      */
@@ -205,10 +104,6 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 
     public Collection<Pair> getBindVarPairs() {
         return helper.getBindVarPairs();
-    }
-
-    public void addBindVarPair(Pair pair) {
-        helper.addBindVarPair(pair);
     }
 
     /**
