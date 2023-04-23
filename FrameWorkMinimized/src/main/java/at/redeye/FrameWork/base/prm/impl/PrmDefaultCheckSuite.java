@@ -1,7 +1,7 @@
 package at.redeye.FrameWork.base.prm.impl;
 
 import at.redeye.FrameWork.base.prm.PrmDefaultChecksInterface;
-import at.redeye.SqlDBInterface.SqlDBIO.StmtExecInterface;
+import at.redeye.SqlDBInterface.SqlDBIO.DateTimeFormat;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -149,33 +149,28 @@ public class PrmDefaultCheckSuite implements PrmDefaultChecksInterface {
 		}
 
 		if ((checks2Execute & PRM_IS_DATE) != 0) {
-			SimpleDateFormat sdf = new SimpleDateFormat(
-					StmtExecInterface.SQLIF_STD_DATE_FORMAT);
+			SimpleDateFormat sdf = DateTimeFormat.SQLIF_STD_DATE_FORMAT.formatter();
 			if (invalidDateTime(event, sdf)) {
 				return false;
 			}
 		}
 
 		if ((checks2Execute & PRM_IS_TIME) != 0) {
-			SimpleDateFormat sdf = new SimpleDateFormat(
-					StmtExecInterface.SQLIF_STD_TIME_FORMAT);
+			SimpleDateFormat sdf = DateTimeFormat.SQLIF_STD_TIME_FORMAT.formatter();
 			if (invalidDateTime(event, sdf)) {
 				return false;
 			}
 		}
 
 		if ((checks2Execute & PRM_IS_SHORTTIME) != 0) {
-			SimpleDateFormat sdf = new SimpleDateFormat(
-					StmtExecInterface.SQLIF_STD_SHORTTIME_FORMAT);
+			SimpleDateFormat sdf = DateTimeFormat.SQLIF_STD_SHORTTIME_FORMAT.formatter();
 			if (invalidDateTime(event, sdf)) {
 				return false;
 			}
 		}
 
 		if ((checks2Execute & PRM_IS_DATETIME) != 0) {
-			SimpleDateFormat sdf = new SimpleDateFormat(
-					StmtExecInterface.SQLIF_STD_DATE_FORMAT + " "
-							+ StmtExecInterface.SQLIF_STD_TIME_FORMAT);
+			SimpleDateFormat sdf = DateTimeFormat.SQLIF_STD_DATETIME_FORMAT.formatter();
 			if (invalidDateTime(event, sdf)) {
 				return false;
 			}

@@ -1,6 +1,6 @@
 package at.redeye.FrameWork.base.bindtypes;
 
-import at.redeye.SqlDBInterface.SqlDBIO.StmtExecInterface;
+import at.redeye.SqlDBInterface.SqlDBIO.DateTimeFormat;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -8,8 +8,7 @@ import java.util.Date;
 
 public class DBDateTime extends DBValue {
 
-    private static final SimpleDateFormat SDF_4_STD_STRING = new SimpleDateFormat(StmtExecInterface.SQLIF_STD_DATE_FORMAT + " "
-            + StmtExecInterface.SQLIF_STD_TIME_FORMAT);
+    private static final SimpleDateFormat SDF_4_STD_STRING = DateTimeFormat.SQLIF_STD_DATETIME_FORMAT.formatter();
 
     protected Date value = new Date(0);
 
