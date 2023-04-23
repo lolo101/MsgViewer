@@ -3,8 +3,6 @@ package at.redeye.FrameWork.base.tablemanipulator;
 import at.redeye.FrameWork.base.bindtypes.DBValue;
 
 import javax.swing.*;
-import java.awt.*;
-import java.util.List;
 import java.util.*;
 
 import static java.util.Collections.emptyList;
@@ -12,23 +10,9 @@ import static java.util.stream.Collectors.toList;
 
 public class TableDesign {
 
-    public static class ColoredCell {
-        int row;
-        int col;
-        Color color;
-    }
-
-    public static class ToolTipCell {
-        int row;
-        int col;
-        String tooltip;
-    }
-
     public Set<Integer> edited_cols;
     public Set<Integer> edited_rows;
-    public List<Vector<Object>> rows = new Vector<>();
-    protected Vector<ColoredCell> coloredCells = new Vector<>();
-    protected List<ToolTipCell> tooltipCells = new ArrayList<>();
+    public List<Vector<Object>> rows = new ArrayList<>();
 
     public static class Coll {
 
@@ -63,6 +47,12 @@ public class TableDesign {
         this.colls = colls;
         this.edited_cols = new HashSet<>();
         this.edited_rows = new HashSet<>();
+    }
+
+    void clear() {
+        edited_cols.clear();
+        edited_rows.clear();
+        rows.clear();
     }
 
     public List<String> getAllOfCollSorted(int col) {

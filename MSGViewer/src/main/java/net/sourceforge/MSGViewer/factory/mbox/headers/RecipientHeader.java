@@ -11,16 +11,14 @@ import org.apache.logging.log4j.Logger;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
-public abstract class RecipientHeader extends HeaderParser {
+public abstract class RecipientHeader {
     private static final Logger LOGGER = LogManager.getLogger(RecipientHeader.class);
     private final RecipientType type;
 
     RecipientHeader(RecipientType type) {
-        super(type.toString());
         this.type = type;
     }
 
-    @Override
     public void parse(Message msg, String line) {
         LOGGER.debug("line: " + line);
         splitAttendees(line).forEach(msg::addRecipient);

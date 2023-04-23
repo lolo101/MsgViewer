@@ -17,7 +17,7 @@ import java.util.Map.Entry;
 public class TableManipulator {
 
     private DBStrukt binddesc;
-    private final Collection<Integer> hidden_values = new Vector<>();
+    private final Collection<Integer> hidden_values = new ArrayList<>();
 
     private TableDesign tabledesign;
     private JTable table;
@@ -198,13 +198,6 @@ public class TableManipulator {
         addRow( values );
     }
 
-    public void add(DBStrukt strukt, boolean set_edited) {
-        add(strukt);
-
-        if (set_edited)
-            tabledesign.edited_rows.add(tabledesign.rows.size() - 1);
-    }
-
     public <T extends DBStrukt> void addAll(Iterable<T> col) {
         for (DBStrukt s : col) {
             List<DBValue> values = s.getAllValues();
@@ -289,10 +282,7 @@ public class TableManipulator {
         while( ( i = model.getRowCount() ) > 0 )
             model.removeRow( i-1 );
 
-        tabledesign.edited_cols.clear();
-        tabledesign.edited_rows.clear();
-        tabledesign.rows.clear();
-        tabledesign.coloredCells.clear();
+        tabledesign.clear();
 
         checkRowHeaderLimit();
         row_header.updateUI();
@@ -369,7 +359,7 @@ public class TableManipulator {
     }
 
     /**
-     * disable, or enables the Autocompletet feature for this column
+     * disable or enables the Autocompletet feature for this column
      */
     public void setAutoCompleteForAllOfThisColl(DBValue column, boolean doAutocomplete) {
         List<DBValue> values = binddesc.getAllValues();

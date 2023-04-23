@@ -31,7 +31,6 @@ public class JavaMailParser {
     private static final RecipientHeader TO_PARSER = new ToHeader();
     private static final RecipientHeader CC_PARSER = new CcHeader();
     private static final RecipientHeader BCC_PARSER = new BccHeader();
-    private static final DateHeader DATE_PARSER = new DateHeader();
     private static final Pattern CHARSET_PATTERN = Pattern.compile(".*;\\s*charset=.*");
     private final Path file;
 
@@ -51,7 +50,7 @@ public class JavaMailParser {
         msg.setSubject(jmsg.getSubject());
 
         msg.setHeaders(getHeaders(jmsg.getAllHeaders()));
-        DATE_PARSER.parse(msg, getFirstHeader(jmsg.getHeader("Date")) );
+        DateHeader.parse(msg, getFirstHeader(jmsg.getHeader("Date")));
         msg.setMessageId(getFirstHeader(jmsg.getHeader("Message-Id")));
 
         msg.setBodyText("");

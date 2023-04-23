@@ -19,15 +19,7 @@ public abstract class PropType {
         this.type = type;
     }
 
-    public Pid getId() {
-        return id;
-    }
-
-    public Ptyp getType() {
-        return type;
-    }
-
-    /* writes the 16 byte entry of the property stream into the given bytes
+    /* writes the 16-byte entry of the property stream into the given bytes
      */
     public final void writePropertiesEntry(ByteBuffer bytes) {
         int tag = (id.id << 16) + type.id;

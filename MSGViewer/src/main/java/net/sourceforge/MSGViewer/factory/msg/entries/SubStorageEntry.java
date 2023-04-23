@@ -17,10 +17,6 @@ public abstract class SubStorageEntry {
         this.type = type;
     }
 
-    public Ptyp getType() {
-        return type;
-    }
-
     public Pid getTag() {
         return tag;
     }

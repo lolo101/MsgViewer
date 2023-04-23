@@ -10,10 +10,12 @@ import at.redeye.FrameWork.widgets.helpwindow.OpenUrlInterface;
 public class Plugin implements at.redeye.FrameWork.Plugin.Plugin, OpenUrlInterface {
     private static final String NAME = "ShellExec";
 
+    @Override
     public String getName() {
         return NAME;
     }
 
+    @Override
     public String getLicenceText() {
         return new AutoMBox<>(Plugin.class.getSimpleName(), () -> {
             HelpFileLoader helper = new HelpFileLoader();
@@ -21,6 +23,7 @@ public class Plugin implements at.redeye.FrameWork.Plugin.Plugin, OpenUrlInterfa
         }).resultOrElse("");
     }
 
+    @Override
     public void initPlugin(Object obj) {
         if (obj instanceof Plugins) {
             Plugins plugins = (Plugins) obj;
@@ -33,14 +36,17 @@ public class Plugin implements at.redeye.FrameWork.Plugin.Plugin, OpenUrlInterfa
         }
     }
 
+    @Override
     public boolean isAvailable() {
         return Setup.is_win_system();
     }
 
+    @Override
     public String toString() {
-        return this.getName() + " " + this.getVersion();
+        return this.getName();
     }
 
+    @Override
     public String getChangeLog() {
         return new AutoMBox<>(Plugin.class.getSimpleName(), () -> {
             HelpFileLoader helper = new HelpFileLoader();
@@ -48,10 +54,7 @@ public class Plugin implements at.redeye.FrameWork.Plugin.Plugin, OpenUrlInterfa
         }).resultOrElse("");
     }
 
-    public String getVersion() {
-        return "1.1";
-    }
-
+    @Override
     public void openUrl(String url) {
         ShellExec shell = new ShellExec();
         shell.execute(url);

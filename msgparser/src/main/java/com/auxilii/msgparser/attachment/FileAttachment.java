@@ -133,13 +133,6 @@ public class FileAttachment implements Attachment {
         this.data = data;
     }
 
-    /**
-     * @return the size
-     */
-    public long getSize() {
-        return data == null ? -1 : data.length;
-    }
-
     public void setContentId(String contentId) {
         this.contentId = contentId;
     }

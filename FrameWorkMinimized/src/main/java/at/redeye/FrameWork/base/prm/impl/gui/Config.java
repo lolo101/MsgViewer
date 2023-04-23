@@ -1,7 +1,6 @@
 package at.redeye.FrameWork.base.prm.impl.gui;
 
 import at.redeye.FrameWork.base.BaseDialog;
-import at.redeye.FrameWork.base.DefaultCanClose;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.base.Saveable;
 import at.redeye.FrameWork.base.bindtypes.DBStrukt;
@@ -182,7 +181,13 @@ private void jBCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
 
     @Override
     public boolean canClose() {
-        return DefaultCanClose.DefaultCanCloseWithTable(this, tm);
+        int ret = checkSave(tm);
+
+        if (ret == 1) {
+            ((Saveable) this).saveData();
+            return true;
+        }
+        return ret != -1;
     }
 
     public void saveData() {

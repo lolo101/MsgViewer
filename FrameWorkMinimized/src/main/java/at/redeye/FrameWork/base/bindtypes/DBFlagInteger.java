@@ -1,6 +1,6 @@
 package at.redeye.FrameWork.base.bindtypes;
 
-import java.util.Vector;
+import java.util.List;
 
 public class DBFlagInteger extends DBEnumAsInteger
 {
@@ -34,13 +34,8 @@ public class DBFlagInteger extends DBEnumAsInteger
         }
 
         @Override
-        public Vector<String> getPossibleValues() {
-           Vector<String> res = new Vector<>();
-
-           res.add( "X" );
-           res.add( " " );
-
-           return res;
+        public Iterable<String> getPossibleValues() {
+            return List.of("X", " ");
         }
     }
 

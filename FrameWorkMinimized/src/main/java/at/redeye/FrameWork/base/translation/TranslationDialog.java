@@ -1,9 +1,6 @@
 package at.redeye.FrameWork.base.translation;
 
-import at.redeye.FrameWork.base.AutoMBox;
-import at.redeye.FrameWork.base.BaseDialog;
-import at.redeye.FrameWork.base.Root;
-import at.redeye.FrameWork.base.Setup;
+import at.redeye.FrameWork.base.*;
 import at.redeye.FrameWork.widgets.GridLayout2;
 import at.redeye.FrameWork.widgets.NoticeIfChangedTextField;
 import at.redeye.FrameWork.widgets.helpwindow.HelpWin;
@@ -239,6 +236,9 @@ public class TranslationDialog extends BaseDialog {
         return String.format(MlM("Übersetzungen von %s "), name);
     }
 
+    private static void adjustScrollingSpeed(JScrollPane scroll_panel) {
+        BaseDialogBaseHelper.adjustScrollingSpeed(scroll_panel);
+    }
 
     @Override
     public void close() {

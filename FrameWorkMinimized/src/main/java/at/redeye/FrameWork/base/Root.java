@@ -17,8 +17,8 @@ public class Root {
     private final MLHelper ml_helper;
 
     /**
-     * language most of the aplication is programmed in
-     * can be set in each dialog but if not set
+     * Language most of the aplication is programmed in.
+     * Can be set in each dialog, but if not set
      * here you can define the default
      * <p>
      * This is set to "en" by default.
@@ -26,13 +26,13 @@ public class Root {
     private String base_language;
 
     /**
-     * fallback language if the target language is not
+     * Fallback language if the target language is not
      * available.
      * Eg: Dialogs are programmed in german, transalations
      * are available in english too. But on a French PC
-     * we have no translatios. So whout should we do now?
+     * we have no translatios. So what should we do now?
      * Here you can define the default language which can be
-     * diferrent from the language the dialog was translated
+     * different from the language the dialog was translated
      * for.
      * <p>
      * This is set to "en" by default
@@ -100,7 +100,7 @@ public class Root {
 
     /**
      * language most of the aplication is programmed in
-     * can be set in each dialog but if not set
+     * can be set in each dialog, but if not set
      * here you can define the default
      * <p>
      * This is set to "en" by default.
@@ -110,13 +110,13 @@ public class Root {
     }
 
     /**
-     * fallback language if the target language is not
+     * Fallback language if the target language is not
      * available.
      * Eg: Dialogs are programmed in german, transalations
      * are available in english too. But on a French PC
-     * we have no translatios. So whout should we do now?
+     * we have no translatios. So what should we do now?
      * Here you can define the default language which can be
-     * diferrent from the language the dialog was translated
+     * different from the language the dialog was translated
      * for.
      * <p>
      * This is set to "en" by default
@@ -127,13 +127,13 @@ public class Root {
     }
 
     /**
-     * fallback language if the target language is not
+     * Fallback language if the target language is not
      * available.
      * Eg: Dialogs are programmed in german, transalations
      * are available in english too. But on a French PC
-     * we have no translatios. So whout should we do now?
+     * we have no translatios. So what should we do now?
      * Here you can define the default language which can be
-     * diferrent from the language the dialog was translated
+     * different from the language the dialog was translated
      * for.
      * <p>
      * This is set to "en" by default
@@ -148,7 +148,7 @@ public class Root {
 
     /**
      * language most of the aplication is programmed in
-     * can be set in each dialog but if not set
+     * can be set in each dialog, but if not set
      * here you can define the default
      * <p>
      * This is set to "en" by default.

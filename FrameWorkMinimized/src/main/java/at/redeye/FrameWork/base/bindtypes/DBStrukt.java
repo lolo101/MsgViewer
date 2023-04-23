@@ -41,17 +41,6 @@ public abstract class DBStrukt {
 		return strukt_name;
 	}
 
-	/**
-	 * retuns the DBValue by searching the element by its name by using DBValue.getName() function
-	 */
-	public DBValue getValue(DBValue val) {
-		return getValue(val.getName());
-	}
-
-	public DBValue getValue(String name) {
-		return getValueByName(name);
-	}
-
 	public List<DBValue> getAllValues() {
 		List<DBValue> values = new ArrayList<>(element_by_name.values());
 
@@ -89,17 +78,5 @@ public abstract class DBStrukt {
 
 	public String getTitle() {
 		return title;
-	}
-
-	private DBValue getValueByName(String key) {
-		return element_by_name.get(key.toLowerCase());
-	}
-
-	public void setVersion(Integer version) {
-		this.version = version;
-	}
-
-	public Integer getVersion() {
-		return version == null ? 1 : version;
 	}
 }

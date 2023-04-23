@@ -48,7 +48,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
     private static int default_pos_x = 300;
     private static int default_pos_y = 300;
     /**
-     * language the dialog is programmed in if not set, the settings from
+     * The language dialog is programmed in if not set, the settings from
      * Root.getBaseLangague() are used
      */
     private String base_language;
@@ -235,7 +235,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
     /**
      * Setzt wieder den "normalen" Mauscursor
      */
-    public void setNormalCursor() {
+    private void setNormalCursor() {
         setWaitCursor(false);
     }
 
@@ -308,10 +308,6 @@ public class BaseDialogBaseHelper implements BindVarInterface {
         onCloseListeners.add(runnable);
     }
 
-    public void setEdited() {
-        setEdited(true);
-    }
-
     public boolean isEdited() {
         return edited;
     }
@@ -325,7 +321,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
     }
 
     /**
-     * Checks, if data within the table have been change, asks the user what
+     * If data within the table have been change, asks the user what
      * sould be done (save it, don't save it, or cancel current operation
      *
      * @param tm TableManipulator object
@@ -615,7 +611,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
     }
 
     /**
-     * language the dialog is programmed in if not set, the settings from
+     * The language dialog is programmed in if not set, the settings from
      * Root.getBaseLangague() are used
      */
     public void setBaseLanguage(String language) {
@@ -623,7 +619,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
     }
 
     /**
-     * @return language the dialog is programmed in if not set, the settings
+     * @return the language dialog is programmed in if not set, the settings
      * from Root.getBaseLangague() are used
      */
     public String getBaseLanguage() {

@@ -1,6 +1,5 @@
 package at.redeye.FrameWork.base;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowListener;
 
@@ -36,18 +35,9 @@ public interface BaseDialogBase
 
     void setPreferredSize(Dimension dimension);
 
-    /**
-     * Registers a listener for a F1, ESC, or something global keypressed Event
-     * @param keyStroke Keyboard Key
-     * @param runnable      Method to call
-     */
-    void registerActionKeyListener(KeyStroke keyStroke, Runnable runnable);
-
     Container getContainer();
 
     void setCursor(Cursor predefinedCursor);
-
-    void adjustScrollingSpeed(JScrollPane scroll_panel);
 
     void setVisible(boolean b);
 
@@ -59,10 +49,6 @@ public interface BaseDialogBase
 
     boolean closeSubdialogsOnClose();
 
-    void setEdited();
-
-    void setEdited(boolean val);
-
     void dispose();
 
     int getX();
@@ -70,18 +56,8 @@ public interface BaseDialogBase
     int getY();
 
     /**
-     * The language dialog is programmed in
-     * if not set, the settings from Root.getBaseLangague() are used
-     */
-    void setBaseLanguage(String language);
-
-    /**
      * @param message native langauge message
      * @return translated message, if available
      */
     String MlM(String message);
-
-    void setWaitCursor();
-
-    void setNormalCursor();
 }

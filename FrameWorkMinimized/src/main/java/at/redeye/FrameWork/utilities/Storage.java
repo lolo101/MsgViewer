@@ -7,8 +7,8 @@ import java.nio.file.Path;
 public class Storage {
 
     /**
-     * creates a temporary directory. The directory and it's
-     * content will be automatically deleted after exit of the virtual machine.
+     * Creates a temporary directory.
+     * The directory and its content will be automatically deleted after exit of the virtual machine.
      *
      * @return the path to the directory
      */

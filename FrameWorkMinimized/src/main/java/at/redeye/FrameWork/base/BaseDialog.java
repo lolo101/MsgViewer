@@ -65,9 +65,8 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
      * @param to_listen_Key Keyboard Key
      * @param runnable      Method to call
      */
-    @Override
-    public final void registerActionKeyListener(KeyStroke to_listen_Key,
-                                                Runnable runnable) {
+    protected final void registerActionKeyListener(KeyStroke to_listen_Key,
+                                                   Runnable runnable) {
         helper.registerActionKeyListener(to_listen_Key, runnable);
     }
 
@@ -104,7 +103,7 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
      * 0 on saving should be done <br/>
      * -1 cancel current operation <br/>
      */
-    public int checkSave(TableManipulator tm) {
+    protected int checkSave(TableManipulator tm) {
         return helper.checkSave(tm);
     }
 
@@ -118,17 +117,15 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
         return true;
     }
 
-    @Override
-    public void setEdited() {
-        helper.setEdited();
+    protected final void setEdited() {
+        setEdited(true);
     }
 
-    protected boolean isEdited() {
+    protected final boolean isEdited() {
         return helper.isEdited();
     }
 
-    @Override
-    public void setEdited(boolean val) {
+    protected final void setEdited(boolean val) {
         helper.setEdited(val);
     }
 
@@ -181,19 +178,12 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
         return helper.root;
     }
 
-    @Override
     public void setWaitCursor() {
         helper.setWaitCursor();
     }
 
-    @Override
     public void setNormalCursor() {
         helper.setWaitCursor(false);
-    }
-
-    @Override
-    public final void adjustScrollingSpeed(JScrollPane scroll_panel) {
-        BaseDialogBaseHelper.adjustScrollingSpeed(scroll_panel);
     }
 
     /**
@@ -251,8 +241,7 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
      * The language dialog is programmed in if not set, the settings from
      * Root.getBaseLangague() are used
      */
-    @Override
-    public final void setBaseLanguage(String language) {
+    protected final void setBaseLanguage(String language) {
         helper.setBaseLanguage(language);
     }
 

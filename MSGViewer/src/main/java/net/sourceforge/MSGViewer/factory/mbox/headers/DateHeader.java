@@ -31,17 +31,10 @@ import java.time.ZonedDateTime;
  * <p>
  * eg: Fri, 1 Jul 2011 20:18:36 +0200
  */
-public class DateHeader extends HeaderParser
-{
+public class DateHeader {
     private static final Logger LOGGER = LogManager.getLogger(DateHeader.class);
 
-    public DateHeader()
-    {
-        super("Date");
-    }
-
-    @Override
-    public void parse(Message message, String line) {
+    public static void parse(Message message, String line) {
         if (!line.isEmpty()) try {
             ZonedDateTime date = ZonedDateTime.from(Message.DATE_TIME_FORMATTER.parse(line));
             message.setDate(date);

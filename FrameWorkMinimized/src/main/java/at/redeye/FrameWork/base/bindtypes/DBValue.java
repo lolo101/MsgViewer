@@ -2,8 +2,8 @@ package at.redeye.FrameWork.base.bindtypes;
 
 public abstract class DBValue {
 
-    protected String name;
-    protected String title;
+    protected final String name;
+    protected final String title;
 
     protected DBValue(String name) {
         this(name, "", false);
@@ -27,10 +27,6 @@ public abstract class DBValue {
      */
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name.toLowerCase();
     }
 
     public String getTitle()
