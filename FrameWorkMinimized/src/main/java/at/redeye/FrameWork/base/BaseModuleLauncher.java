@@ -121,9 +121,7 @@ public abstract class BaseModuleLauncher {
         loggerConfig.setLevel(Level.getLevel(logFileLevel));
         loggerConfig.addAppender(consoleAppender, null, null);
 
-        if (loggingEnabled.equalsIgnoreCase("ja")
-                || loggingEnabled.equalsIgnoreCase("yes")
-                || loggingEnabled.equalsIgnoreCase("true")) {
+        if (StringUtils.isYes(loggingEnabled)) {
 
             RollingFileAppender fileAppender = RollingFileAppender.newBuilder()
                     .setLayout(layout)
