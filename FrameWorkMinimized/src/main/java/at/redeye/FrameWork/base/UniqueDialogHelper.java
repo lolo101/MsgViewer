@@ -23,9 +23,8 @@ public class UniqueDialogHelper
 
             return dialog;
 
-        } else {
-            dialog.close();
         }
+        dialog.close();
 
         return d;
     }

@@ -67,16 +67,6 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
 	}
 
 	/**
-	 * Schließt das Fenster, ohne die Appliaktion zu beenden, auch wenn das zu
-	 * schließende Fenster das Letzte offene ist. Das default Verhalten der
-	 * Appliaktion ist, dass beim Schließen des letzten offenen Fensters die
-	 * komplette Applikation geschlossen wird.
-	 */
-	public void closeNoAppExit() {
-		close();
-	}
-
-	/**
 	 * to be overrided by subdialogs
 	 *
 	 * @return true if the dialog can be closed

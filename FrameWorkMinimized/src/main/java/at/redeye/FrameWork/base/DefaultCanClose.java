@@ -11,6 +11,7 @@ public class DefaultCanClose {
         if (ret == 1) {
             iface.saveData();
             return true;
-        } else return ret != -1;
+        }
+        return ret != -1;
     }
 }

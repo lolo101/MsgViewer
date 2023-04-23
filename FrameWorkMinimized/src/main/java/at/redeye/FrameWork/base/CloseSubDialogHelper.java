@@ -2,7 +2,7 @@ package at.redeye.FrameWork.base;
 
 public class CloseSubDialogHelper
 {
-    BaseDialogBase parent;
+    private final BaseDialogBase parent;
 
     CloseSubDialogHelper(BaseDialogBase parent)
     {

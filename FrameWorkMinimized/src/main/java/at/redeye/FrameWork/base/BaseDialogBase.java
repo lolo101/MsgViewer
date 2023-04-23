@@ -18,7 +18,7 @@ public interface BaseDialogBase
      * width and height of the dialog.
      * The default behavior is retuning the dialog title.
      * This function should be overloaded if some instances of dialogs
-     * should all have the same e.g. size, but it's not possible, because
+     * should all have the same e.g. size, but it's not possible because
      * each one has a different title.
      */
 
@@ -69,12 +69,10 @@ public interface BaseDialogBase
 
     int getY();
 
-    void closeNoAppExit();
-
     /**
-    * language the dialog is programmed in
-    * if not set, the settings from Root.getBaseLangague() are used
-    */
+     * The language dialog is programmed in
+     * if not set, the settings from Root.getBaseLangague() are used
+     */
     void setBaseLanguage(String language);
 
     /**

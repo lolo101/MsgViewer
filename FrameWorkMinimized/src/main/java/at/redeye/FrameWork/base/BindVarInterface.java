@@ -22,8 +22,8 @@ public interface BindVarInterface {
 
     class TextStringPair implements Pair {
 
-        JTextField textfield;
-        StringBuffer value;
+        private final JTextField textfield;
+        private final StringBuffer value;
 
         public TextStringPair(JTextField textfield, StringBuffer value) {
             this.textfield = textfield;
@@ -50,8 +50,8 @@ public interface BindVarInterface {
 
     class ComboStringPair implements Pair {
 
-        JComboBox<?> combo;
-        DBValue value;
+        private final JComboBox<?> combo;
+        private final DBValue value;
 
         public ComboStringPair(JComboBox<?> combo, DBValue value) {
             this.combo = combo;
@@ -78,8 +78,8 @@ public interface BindVarInterface {
 
     class DateComponentPair implements Pair {
 
-        IDateTimeComponent comp;
-        DBDateTime value;
+        private final IDateTimeComponent comp;
+        private final DBDateTime value;
 
         public DateComponentPair(IDateTimeComponent comp, DBDateTime value) {
             this.comp = comp;
@@ -110,8 +110,8 @@ public interface BindVarInterface {
 
     class TextDBStringPair implements Pair {
 
-        JTextField textfield;
-        DBValue value;
+        private final JTextField textfield;
+        private final DBValue value;
 
         public TextDBStringPair(JTextField textfield, DBValue value) {
             this.textfield = textfield;
@@ -137,8 +137,8 @@ public interface BindVarInterface {
 
     class FlagCheckboxPair implements Pair {
 
-        JCheckBox checkbox;
-        DBFlagInteger value;
+        private final JCheckBox checkbox;
+        private final DBFlagInteger value;
 
         public FlagCheckboxPair(JCheckBox checkbox, DBFlagInteger value) {
             this.checkbox = checkbox;
@@ -167,8 +167,8 @@ public interface BindVarInterface {
 
     class TextAreaDBValuePair implements Pair {
 
-        JTextArea textarea;
-        DBValue value;
+        private final JTextArea textarea;
+        private final DBValue value;
 
         public TextAreaDBValuePair(JTextArea textarea, DBValue value) {
             this.textarea = textarea;
@@ -195,8 +195,8 @@ public interface BindVarInterface {
 
     class TextAreaStringBufferPair implements Pair {
 
-        JTextArea textarea;
-        StringBuffer value;
+        private final JTextArea textarea;
+        private final StringBuffer value;
 
         public TextAreaStringBufferPair(JTextArea textarea, StringBuffer value) {
             this.textarea = textarea;
