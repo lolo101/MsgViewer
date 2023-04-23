@@ -200,8 +200,8 @@ private void jBCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
 
     public void onChange(PrmDefaultChecksInterface checks, PrmActionEvent event) {
         if(!checks.doChecks(event)) {
-          PrmErrUtil.displayPrmError(this, event.getParameterName().toString());
-          root.getSetup().setLocalConfig(event.getParameterName().toString(), event.getOldPrmValue().toString());
+          PrmErrUtil.displayPrmError(this, event.getParameterName());
+            root.getSetup().setLocalConfig(event.getParameterName().toString(), event.getOldPrmValue().toString());
 
       }
     }
