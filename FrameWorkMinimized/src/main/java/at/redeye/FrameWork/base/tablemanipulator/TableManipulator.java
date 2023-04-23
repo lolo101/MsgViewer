@@ -1,7 +1,6 @@
 package at.redeye.FrameWork.base.tablemanipulator;
 
 import at.redeye.FrameWork.base.*;
-import at.redeye.FrameWork.base.bindtypes.DBEnumAsInteger;
 import at.redeye.FrameWork.base.bindtypes.DBStrukt;
 import at.redeye.FrameWork.base.bindtypes.DBValue;
 import org.apache.logging.log4j.LogManager;
@@ -224,13 +223,7 @@ public class TableManipulator {
         {
             TableColumn col = table.getColumnModel().getColumn(i);
 
-            TableDesign.Coll tcoll = tabledesign.colls.get(i);
-
-            if (tcoll.dbval instanceof DBEnumAsInteger) {
-                col.setCellEditor(new AdvancedEnumTableCellEditor(tabledesign, (DBEnumAsInteger) tcoll.dbval));
-            } else {
-                col.setCellEditor(new AdvancedTableCellEditor(tabledesign));
-            }
+            col.setCellEditor(new AdvancedTableCellEditor(tabledesign));
         }
     }
 
@@ -335,11 +328,6 @@ public class TableManipulator {
 
     public void setEditable( DBValue column )
     {
-        setEditable( column, true );
-    }
-
-    public void setEditable( DBValue column, boolean isEditable )
-    {
         List<DBValue> values = binddesc.getAllValues();
 
         for( int i = 0, col=0; i < values.size(); i++ )
@@ -349,8 +337,7 @@ public class TableManipulator {
 
             if( values.get(i).hashCode() == column.hashCode() )
             {
-
-                tabledesign.colls.get(col).setEditable( isEditable );
+                tabledesign.colls.get(col).setEditable();
                 return;
             }
 

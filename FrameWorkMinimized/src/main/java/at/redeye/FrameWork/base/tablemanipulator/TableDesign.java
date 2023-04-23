@@ -27,8 +27,8 @@ public class TableDesign {
             this.dbval = val;
         }
 
-        void setEditable(boolean isEditable) {
-            this.isEditable = isEditable;
+        void setEditable() {
+            this.isEditable = true;
         }
 
         void setDoAutocompleteForAllOfThisColl(boolean state) {
