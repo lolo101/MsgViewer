@@ -95,4 +95,24 @@ public class TableDesign extends AbstractTableModel {
     public boolean isCellEditable(int rowindex, int columnindex) {
         return colls.get(columnindex).isEditable;
     }
+
+    public void remove(int row) {
+        rows.remove(row);
+
+        Set<Integer> er = new HashSet<>();
+
+        for (Integer editedRow : edited_rows) {
+            if (editedRow == row) {
+                continue;
+            }
+
+            if (editedRow < row) {
+                er.add(editedRow);
+            } else {
+                er.add(editedRow - 1);
+            }
+        }
+
+        edited_rows = er;
+    }
 }

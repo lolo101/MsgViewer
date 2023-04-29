@@ -211,26 +211,7 @@ public class TableManipulator {
         editor_stopper.doPause();
         logger.info(("PAUSE PAUSE PAUSE"));
 
-        tabledesign.rows.remove(row);
-
-        Integer[] rows = getEditedRows().toArray(Integer[]::new);
-
-        Set<Integer> er = new HashSet<>();
-
-        for( int i = 0; i < rows.length; i++ )
-        {
-            if (rows[i] == row) {
-                continue;
-            }
-
-            if (rows[i] < row) {
-                er.add(i);
-            } else {
-                er.add(i - 1);
-            }
-        }
-
-        tabledesign.edited_rows = er;
+        tabledesign.remove(row);
 
         checkRowHeaderLimit();
         row_header.updateUI();
