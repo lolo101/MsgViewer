@@ -206,14 +206,9 @@ public class TableManipulator {
 
     public void prepareTable()
     {
-        /* Das muß so sein,
-         * da bei der ersten for Schleife der CellEditor resetted wird
-         * anscheinend
-         */
-        for( int i = 0; i < table.getColumnCount(); i++ )
-        {
-            TableColumn col = table.getColumnModel().getColumn(i);
-
+        TableColumnModel columnModel = table.getColumnModel();
+        for (Enumeration<TableColumn> columns = columnModel.getColumns(); columns.hasMoreElements(); ) {
+            TableColumn col = columns.nextElement();
             col.setCellEditor(new AdvancedTableCellEditor(tabledesign));
         }
     }
@@ -224,19 +219,6 @@ public class TableManipulator {
 
 
     private void addRow(Iterable<?> data, boolean update_ui) {
-        /* Wir müssen hier einen 2. Vector anlegen,
-         * da der eine an die Tabelle angebunden wird
-         * und wenn über den TableVelidator ein
-         * anderer Anzeige Format String verwendet wird
-         * wird unser ursprüngliches Objekt in
-         * table_copy durch einen String ersetzt,
-         * und weil das alles Referenzen sind,
-         * würde dies auch mit unserem db_copy
-         * Vector passieren.
-         * Deswegen der 2. Vector.
-         */
-
-
         List<Object> db_copy = new ArrayList<>();
 
         int i = 0;

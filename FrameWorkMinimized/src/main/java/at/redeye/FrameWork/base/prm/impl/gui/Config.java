@@ -39,12 +39,12 @@ public class Config extends BaseDialog implements Saveable, PrmListener {
 
         tm = new TableManipulator(root.getSetup(), jTContent, config);
 
-        tm.hide(config.hist.lo_user);
-        tm.hide(config.hist.lo_zeit);
-        tm.hide(config.hist.an_zeit);
-        tm.hide(config.hist.an_user);
-        tm.hide(config.hist.ae_zeit);
-        tm.hide(config.hist.ae_user);
+        tm.hide(config.hist.lo_user,
+                config.hist.lo_zeit,
+                config.hist.an_zeit,
+                config.hist.an_user,
+                config.hist.ae_zeit,
+                config.hist.ae_user);
 
         tm.setEditable(config.value);
         tm.setAutoCompleteForAllOfThisColl(config.value, false);
