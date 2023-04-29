@@ -3,6 +3,7 @@ package at.redeye.FrameWork.base.tablemanipulator;
 import at.redeye.FrameWork.base.*;
 import at.redeye.FrameWork.base.bindtypes.DBStrukt;
 import at.redeye.FrameWork.base.bindtypes.DBValue;
+import at.redeye.FrameWork.base.prm.bindtypes.DBConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -61,7 +62,7 @@ public class TableManipulator {
 
         this.tabledesign = new TableDesign(getBaseDialog(), colls);
         table.setModel(tabledesign);
-        table.setDefaultRenderer(Object.class, new NormalCellRenderer(this.tabledesign));
+        table.setDefaultRenderer(DBValue.class, new NormalCellRenderer(this.tabledesign));
         row_header = new RowHeader(table, this::checkRowHeaderLimit);
     }
 
@@ -179,8 +180,8 @@ public class TableManipulator {
         table.setAutoCreateRowSorter(state);
     }
 
-    public <T extends DBStrukt> void addAll(Iterable<T> rows) {
-        for (DBStrukt row : rows) {
+    public void addAll(Iterable<DBConfig> rows) {
+        for (DBConfig row : rows) {
             List<DBValue> columns = row.getAllValues();
 
             addRow(columns);
@@ -199,14 +200,13 @@ public class TableManipulator {
     }
 
 
-    private void addRow(Iterable<?> data) {
-        List<Object> db_copy = new ArrayList<>();
+    private void addRow(Iterable<DBValue> data) {
+        List<DBValue> db_copy = new ArrayList<>();
 
         int i = 0;
-        for( Object d : data )
-        {
-            if( !hidden_values.contains(i) ) {
-                db_copy.add( d );
+        for (DBValue d : data) {
+            if (!hidden_values.contains(i)) {
+                db_copy.add(d);
             }
             i++;
 
