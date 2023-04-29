@@ -196,18 +196,7 @@ public class TableManipulator {
 
 
     private void addRow(DBConfig data) {
-        List<DBValue> db_copy = new ArrayList<>();
-
-        int i = 0;
-        for (DBValue d : data.getAllValues()) {
-            if (!hidden_values.contains(i)) {
-                db_copy.add(d);
-            }
-            i++;
-
-        }
-
-        tabledesign.rows.add(db_copy);
+        tabledesign.rows.add(data);
     }
 
     public void clear()
@@ -224,23 +213,19 @@ public class TableManipulator {
 
         tabledesign.rows.remove(row);
 
-        Object[] rows = getEditedRows().toArray();
+        Integer[] rows = getEditedRows().toArray(Integer[]::new);
 
         Set<Integer> er = new HashSet<>();
 
         for( int i = 0; i < rows.length; i++ )
         {
-            if( (Integer)rows[i] == row )
-            {
+            if (rows[i] == row) {
                 continue;
             }
 
-            if( (Integer)rows[i] < row )
-            {
+            if (rows[i] < row) {
                 er.add(i);
-            }
-            else
-            {
+            } else {
                 er.add(i - 1);
             }
         }

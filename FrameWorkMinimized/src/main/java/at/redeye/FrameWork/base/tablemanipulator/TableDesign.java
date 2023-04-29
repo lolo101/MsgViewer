@@ -2,6 +2,7 @@ package at.redeye.FrameWork.base.tablemanipulator;
 
 import at.redeye.FrameWork.base.BaseDialogBase;
 import at.redeye.FrameWork.base.bindtypes.DBValue;
+import at.redeye.FrameWork.base.prm.bindtypes.DBConfig;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -15,12 +16,12 @@ import static java.util.stream.Collectors.toList;
 
 public class TableDesign extends AbstractTableModel {
 
-    public Set<Integer> edited_cols = new HashSet<>();
+    public final Set<Integer> edited_cols = new HashSet<>();
     public Set<Integer> edited_rows = new HashSet<>();
-    public List<List<DBValue>> rows = new ArrayList<>();
+    public final List<DBConfig> rows = new ArrayList<>();
     private final BaseDialogBase base;
 
-    public List<Coll> colls;
+    public final List<Coll> colls;
 
     public TableDesign(BaseDialogBase base, List<Coll> colls) {
         this.base = base;
@@ -44,8 +45,7 @@ public class TableDesign extends AbstractTableModel {
             return emptyList();
 
         return rows.stream()
-                .filter(row -> row.size() > col && col > 0)
-                .map(row -> row.get(col))
+                .map(row -> row.getAllValues().get(col))
                 .map(Object::toString)
                 .sorted()
                 .collect(toList());
@@ -78,7 +78,7 @@ public class TableDesign extends AbstractTableModel {
 
     @Override
     public DBValue getValueAt(int rowIndex, int columnIndex) {
-        return rows.get(rowIndex).get(columnIndex);
+        return rows.get(rowIndex).getAllValues().get(columnIndex);
     }
 
     @Override
