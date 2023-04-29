@@ -20,7 +20,6 @@ public class TableManipulator {
 
     private TableDesign tabledesign;
     private JTable table;
-    private boolean allEditable;
     private final Setup setup;
     private RowHeader row_header;
     private int auto_show_row_header = 20;
@@ -32,13 +31,9 @@ public class TableManipulator {
     private static final boolean saveUserColWidth = true;
 
     public TableManipulator(Setup setup, JTable table, DBStrukt binddesc) {
-        this(setup, table, binddesc, false);
-    }
-
-    private TableManipulator(Setup setup, JTable table, DBStrukt binddesc, boolean allEditable) {
         this.setup = setup;
         readShowHeaderLimit();
-        configure(table, binddesc, allEditable);
+        configure(table, binddesc);
         addCloseListener();
     }
 
@@ -46,9 +41,8 @@ public class TableManipulator {
         return hidden_values.contains(i);
     }
 
-    private void configure(JTable table, DBStrukt binddesc, boolean allEditable) {
+    private void configure(JTable table, DBStrukt binddesc) {
         this.binddesc = binddesc;
-        this.allEditable = allEditable;
 
         if (editor_stopper == null) {
             // ansonten hängen wir mehrere listener drann und das wollen wir nicht.
@@ -357,7 +351,7 @@ public class TableManipulator {
             }
         }
 
-        configure( table, binddesc, allEditable );
+        configure(table, binddesc);
     }
 
 
