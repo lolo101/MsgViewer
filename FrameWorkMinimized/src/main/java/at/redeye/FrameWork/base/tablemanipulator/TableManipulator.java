@@ -58,14 +58,14 @@ public class TableManipulator {
             editor_stopper = new TableEditorStopper(table);
         }
 
-        Vector<TableDesign.Coll> vec = new Vector<>();
+        Vector<Coll> vec = new Vector<>();
 
         ArrayList<String> names = binddesc.getAllNames();
         List<DBValue> values = binddesc.getAllValues();
 
         for (int i = 0; i < names.size(); i++) {
             if (!isHidden(i))
-                vec.add(new TableDesign.Coll(names.get(i), false, values.get(i)));
+                vec.add(new Coll(names.get(i), false, values.get(i)));
         }
 
         this.tabledesign = new TableDesign(vec);
@@ -210,8 +210,7 @@ public class TableManipulator {
 
     public void prepareTable()
     {
-        for( TableDesign.Coll coll : tabledesign.colls )
-        {
+        for (Coll coll : tabledesign.colls) {
             model.addColumn(MlM(coll.title));
         }
 
@@ -534,7 +533,7 @@ public class TableManipulator {
         {
             Rectangle col_rect = header.getHeaderRect(j);
 
-            TableDesign.Coll col =  tabledesign.colls.get(TableDesign.getModelCol(table, j));
+            Coll col = tabledesign.colls.get(TableDesign.getModelCol(table, j));
 
             logger.info(j + ": " + col_rect.width + " " + col.title + " => " + col.dbval.getName());
 
@@ -573,7 +572,7 @@ public class TableManipulator {
 
             int width = 0;
 
-            TableDesign.Coll col = tabledesign.colls.get(TableDesign.getModelCol(table, i));
+            Coll col = tabledesign.colls.get(TableDesign.getModelCol(table, i));
 
             String col_uid = uid + "_" + col.dbval.getName();
 
