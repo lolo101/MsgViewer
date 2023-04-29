@@ -184,6 +184,7 @@ private void jBCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
         return ret != -1;
     }
 
+    @Override
     public void saveData() {
         for (Integer i : tm.getEditedRows()) {
             DBConfig entry = (DBConfig) values.get(i);
@@ -198,12 +199,13 @@ private void jBCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     private javax.swing.JTable jTContent;
     // End of variables declaration//GEN-END:variables
 
+    @Override
     public void onChange(PrmDefaultChecksInterface checks, PrmActionEvent event) {
         if(!checks.doChecks(event)) {
-          PrmErrUtil.displayPrmError(this, event.getParameterName());
+            PrmErrUtil.displayPrmError(this, event.getParameterName());
             root.getSetup().setLocalConfig(event.getParameterName().toString(), event.getOldPrmValue().toString());
 
-      }
+        }
     }
 
 }

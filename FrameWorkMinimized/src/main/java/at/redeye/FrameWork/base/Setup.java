@@ -114,7 +114,6 @@ public class Setup {
 
     public void setLocalConfig(String key, String value) {
         check();
-        props.getProperty(key);
         props.setProperty(key, value);
     }
 
