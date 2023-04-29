@@ -181,12 +181,7 @@ public class TableManipulator {
     }
 
     public void addAll(Iterable<DBConfig> rows) {
-        for (DBConfig row : rows) {
-            List<DBValue> columns = row.getAllValues();
-
-            addRow(columns);
-        }
-
+        rows.forEach(this::addRow);
         checkRowHeaderLimit();
         row_header.updateUI();
     }
@@ -200,11 +195,11 @@ public class TableManipulator {
     }
 
 
-    private void addRow(Iterable<DBValue> data) {
+    private void addRow(DBConfig data) {
         List<DBValue> db_copy = new ArrayList<>();
 
         int i = 0;
-        for (DBValue d : data) {
+        for (DBValue d : data.getAllValues()) {
             if (!hidden_values.contains(i)) {
                 db_copy.add(d);
             }
