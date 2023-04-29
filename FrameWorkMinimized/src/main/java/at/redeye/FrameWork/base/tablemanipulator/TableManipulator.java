@@ -15,11 +15,11 @@ import java.util.Map.Entry;
 
 public class TableManipulator {
 
-    private DBStrukt binddesc;
+    private final DBStrukt binddesc;
     private final Collection<Integer> hidden_values = new ArrayList<>();
 
     private TableDesign tabledesign;
-    private JTable table;
+    private final JTable table;
     private final Setup setup;
     private RowHeader row_header;
     private int auto_show_row_header = 20;
@@ -32,8 +32,10 @@ public class TableManipulator {
 
     public TableManipulator(Setup setup, JTable table, DBStrukt binddesc) {
         this.setup = setup;
+        this.binddesc = binddesc;
+        this.table = table;
         readShowHeaderLimit();
-        configure(table, binddesc);
+        configure();
         addCloseListener();
     }
 
@@ -41,9 +43,7 @@ public class TableManipulator {
         return hidden_values.contains(i);
     }
 
-    private void configure(JTable table, DBStrukt binddesc) {
-        this.binddesc = binddesc;
-
+    private void configure() {
         if (editor_stopper == null) {
             // ansonten hängen wir mehrere listener drann und das wollen wir nicht.
             editor_stopper = new TableEditorStopper(table);
@@ -59,7 +59,6 @@ public class TableManipulator {
                 vec.add(new Coll(names.get(i), false, values.get(i)));
         }
 
-        this.table = table;
         this.tabledesign = new TableDesign(getBaseDialog(), vec);
         table.setModel(tabledesign);
         table.setDefaultRenderer(Object.class, new NormalCellRenderer(this.tabledesign));
@@ -351,7 +350,7 @@ public class TableManipulator {
             }
         }
 
-        configure(table, binddesc);
+        configure();
     }
 
 
