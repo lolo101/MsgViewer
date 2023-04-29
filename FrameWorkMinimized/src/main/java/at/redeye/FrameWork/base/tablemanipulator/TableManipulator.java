@@ -246,7 +246,7 @@ public class TableManipulator {
 
 
         Vector<Object> table_copy = new Vector<>();
-        Vector<Object> db_copy = new Vector<>();
+        List<Object> db_copy = new ArrayList<>();
 
         int i = 0;
         for( Object d : data )

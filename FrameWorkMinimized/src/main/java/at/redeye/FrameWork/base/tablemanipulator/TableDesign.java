@@ -10,7 +10,7 @@ public class TableDesign {
 
     public Set<Integer> edited_cols;
     public Set<Integer> edited_rows;
-    public List<Vector<Object>> rows = new ArrayList<>();
+    public List<List<Object>> rows = new ArrayList<>();
 
     public Vector<Coll> colls;
 
