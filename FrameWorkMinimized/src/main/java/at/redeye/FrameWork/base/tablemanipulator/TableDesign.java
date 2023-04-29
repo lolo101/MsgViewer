@@ -1,23 +1,22 @@
 package at.redeye.FrameWork.base.tablemanipulator;
 
 import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
 import java.util.*;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
-public class TableDesign {
+public class TableDesign extends AbstractTableModel {
 
-    public Set<Integer> edited_cols;
-    public Set<Integer> edited_rows;
-    public List<List<Object>> rows = new ArrayList<>();
+    public Set<Integer> edited_cols = new HashSet<>();
+    public Set<Integer> edited_rows = new HashSet<>();
+    public List<List<?>> rows = new ArrayList<>();
 
     public Vector<Coll> colls;
 
     public TableDesign(Vector<Coll> colls) {
         this.colls = colls;
-        this.edited_cols = new HashSet<>();
-        this.edited_rows = new HashSet<>();
     }
 
     void clear() {
@@ -50,13 +49,32 @@ public class TableDesign {
         return table.getColumnModel().getColumn(col).getModelIndex();
     }
 
-    static int getModelRow( JTable table, int row )
-    {
+    static int getModelRow(JTable table, int row) {
         RowSorter<?> sorter = table.getRowSorter();
 
-        if( sorter == null )
+        if (sorter == null)
             return row;
 
-        return sorter.convertRowIndexToModel( row );
+        return sorter.convertRowIndexToModel(row);
+    }
+
+    @Override
+    public int getRowCount() {
+        return rows.size();
+    }
+
+    @Override
+    public int getColumnCount() {
+        return colls.size();
+    }
+
+    @Override
+    public Object getValueAt(int rowIndex, int columnIndex) {
+        return rows.get(rowIndex).get(columnIndex);
+    }
+
+    @Override
+    public boolean isCellEditable(int rowindex, int columnindex) {
+        return colls.get(columnindex).isEditable;
     }
 }
