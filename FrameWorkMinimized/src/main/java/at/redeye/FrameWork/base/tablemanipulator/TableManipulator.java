@@ -20,7 +20,6 @@ public class TableManipulator {
 
     private TableDesign tabledesign;
     private JTable table;
-    private NormalTableModel model;
     private boolean allEditable;
     private final Root root;
     private RowHeader row_header;
@@ -70,8 +69,7 @@ public class TableManipulator {
 
         this.tabledesign = new TableDesign(vec);
         this.table = table;
-        this.model = new NormalTableModel(tabledesign);
-        table.setModel(model);
+        table.setModel(tabledesign);
         table.setDefaultRenderer(Object.class, new NormalCellRenderer(this.tabledesign));
         row_header = new RowHeader(table, this::checkRowHeaderLimit);
     }
@@ -210,10 +208,6 @@ public class TableManipulator {
 
     public void prepareTable()
     {
-        for (Coll coll : tabledesign.colls) {
-            model.addColumn(MlM(coll.title));
-        }
-
         /* Das muß so sein,
          * da bei der ersten for Schleife der CellEditor resetted wird
          * anscheinend
@@ -245,21 +239,18 @@ public class TableManipulator {
          */
 
 
-        Vector<Object> table_copy = new Vector<>();
         List<Object> db_copy = new ArrayList<>();
 
         int i = 0;
         for( Object d : data )
         {
             if( !hidden_values.contains(i) ) {
-                table_copy.add( d );
                 db_copy.add( d );
             }
             i++;
 
         }
 
-        model.addRow(table_copy);
         tabledesign.rows.add(db_copy);
 
         if( update_ui ) {
@@ -270,12 +261,7 @@ public class TableManipulator {
 
     public void clear()
     {
-        int i;
-        while( ( i = model.getRowCount() ) > 0 )
-            model.removeRow( i-1 );
-
         tabledesign.clear();
-
         checkRowHeaderLimit();
         row_header.updateUI();
     }
@@ -285,7 +271,6 @@ public class TableManipulator {
         editor_stopper.doPause();
         logger.info(("PAUSE PAUSE PAUSE"));
 
-        model.removeRow(row);
         tabledesign.rows.remove(row);
 
         Object[] rows = getEditedRows().toArray();
