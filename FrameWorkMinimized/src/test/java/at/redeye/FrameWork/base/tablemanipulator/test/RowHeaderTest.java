@@ -8,8 +8,8 @@ import at.redeye.FrameWork.base.tablemanipulator.TableManipulator;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Vector;
 
 public class RowHeaderTest extends BaseDialog {
 
@@ -31,7 +31,7 @@ public class RowHeaderTest extends BaseDialog {
 
         DBConfig config = new DBConfig();
 
-        tm = new TableManipulator(root, table, config);
+        tm = new TableManipulator(root.getSetup(), table, config);
 
         tm.hide(config.hist.an_user);
         tm.hide(config.hist.an_zeit);
@@ -40,7 +40,7 @@ public class RowHeaderTest extends BaseDialog {
 
         tm.setEditable(config.name);
 
-        Collection<DBConfig> data = new Vector<>();
+        Collection<DBConfig> data = new ArrayList<>();
 
         for (i = 0; i < 19; i++) {
             DBConfig c = new DBConfig();

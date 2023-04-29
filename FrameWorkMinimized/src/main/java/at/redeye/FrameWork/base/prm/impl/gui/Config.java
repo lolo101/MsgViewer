@@ -16,14 +16,15 @@ import at.redeye.FrameWork.widgets.helpwindow.HelpWin;
 import at.redeye.FrameWork.widgets.helpwindow.HelpWinHook;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
-import java.util.Vector;
 
 public class Config extends BaseDialog implements Saveable, PrmListener {
 
     private static final long serialVersionUID = 1L;
-    private final Vector<DBStrukt> values = new Vector<>();
+    private final List<DBStrukt> values = new ArrayList<>();
     private final TableManipulator tm;
 
     /**
@@ -36,7 +37,7 @@ public class Config extends BaseDialog implements Saveable, PrmListener {
 
         DBConfig config = new DBConfig();
 
-        tm = new TableManipulator(root, jTContent, config);
+        tm = new TableManipulator(root.getSetup(), jTContent, config);
 
         tm.hide(config.hist.lo_user);
         tm.hide(config.hist.lo_zeit);

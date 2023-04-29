@@ -21,7 +21,7 @@ public class TableManipulator {
     private TableDesign tabledesign;
     private JTable table;
     private boolean allEditable;
-    private final Root root;
+    private final Setup setup;
     private RowHeader row_header;
     private int auto_show_row_header = 20;
     private static final Logger logger = LogManager.getLogger(TableManipulator.class);
@@ -31,12 +31,12 @@ public class TableManipulator {
     private boolean allowResorting = true;
     private static final boolean saveUserColWidth = true;
 
-    public TableManipulator(Root root, JTable table, DBStrukt binddesc) {
-        this(root, table, binddesc, false);
+    public TableManipulator(Setup setup, JTable table, DBStrukt binddesc) {
+        this(setup, table, binddesc, false);
     }
 
-    private TableManipulator(Root root, JTable table, DBStrukt binddesc, boolean allEditable) {
-        this.root = root;
+    private TableManipulator(Setup setup, JTable table, DBStrukt binddesc, boolean allEditable) {
+        this.setup = setup;
         readShowHeaderLimit();
         configure(table, binddesc, allEditable);
         addCloseListener();
@@ -46,13 +46,11 @@ public class TableManipulator {
         return hidden_values.contains(i);
     }
 
-    private void configure( JTable table, DBStrukt binddesc, boolean allEditable )
-    {
+    private void configure(JTable table, DBStrukt binddesc, boolean allEditable) {
         this.binddesc = binddesc;
         this.allEditable = allEditable;
 
-        if( editor_stopper == null )
-        {
+        if (editor_stopper == null) {
             // ansonten hängen wir mehrere listener drann und das wollen wir nicht.
             editor_stopper = new TableEditorStopper(table);
         }
@@ -512,8 +510,6 @@ public class TableManipulator {
 
         logger.info("saving cols width for binddesc: " + binddesc.getName() );
 
-        Setup setup = root.getSetup();
-
         for( int j = 0; j < table.getColumnCount(); j++ )
         {
             Rectangle col_rect = header.getHeaderRect(j);
@@ -545,7 +541,6 @@ public class TableManipulator {
         }
 
         uid += binddesc.getName();
-        Setup setup = root.getSetup();
 
         // remember the position of each column
         // in this array
