@@ -43,8 +43,7 @@ public class AdvancedTableCellEditor extends AbstractCellEditor implements Table
         System.out.println("getTableCellEditorComponent col: " + last_col + " row: " + last_row + " Value " + (current_value != null ? current_value.toString() : "(null)"));
 
         component.enable_complete(false);
-
-        component.set_items(tabledesign.getAllOfCollSorted(last_col));
+        component.set_items(tabledesign.getPossibleValues(last_row));
         component.enable_complete(true);
 
         component.setBackground(Color.YELLOW);

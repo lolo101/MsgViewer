@@ -6,13 +6,7 @@ import at.redeye.FrameWork.base.prm.bindtypes.DBConfig;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
+import java.util.*;
 
 public class TableDesign extends AbstractTableModel {
 
@@ -34,26 +28,12 @@ public class TableDesign extends AbstractTableModel {
         rows.clear();
     }
 
-    public List<String> getAllOfCollSorted(int col) {
-        Coll coll = null;
-
-        if (col >= 0 && col < colls.size()) {
-            coll = colls.get(col);
-        }
-
-        if (coll == null || !coll.getDoAutocompleteForAllOfThisColl())
-            return emptyList();
-
-        return rows.stream()
-                .map(row -> row.getAllValues().get(col))
-                .map(Object::toString)
-                .sorted()
-                .collect(toList());
+    public List<String> getPossibleValues(int row) {
+        return Arrays.asList(rows.get(row).getPossibleValues());
     }
 
 
-    static int getModelCol( JTable table, int col )
-    {
+    static int getModelCol(JTable table, int col) {
         return table.getColumnModel().getColumn(col).getModelIndex();
     }
 
