@@ -27,9 +27,6 @@ public class TableManipulator {
     private static final Logger logger = LogManager.getLogger(TableManipulator.class);
     private TableEditorStopper editor_stopper;
     private BaseDialogBase base_dlg;
-    private boolean allowReordering = true;
-    private boolean allowResorting = true;
-    private static final boolean saveUserColWidth = true;
 
     public TableManipulator(Setup setup, JTable table, DBStrukt binddesc) {
         this.setup = setup;
@@ -68,11 +65,11 @@ public class TableManipulator {
 
     public void autoResize()
     {
-        autoResizeColWidth( table );
+        autoResizeColWidth();
         setUserColWidth();
     }
 
-    private void autoResizeColWidth(JTable table) {
+    private void autoResizeColWidth() {
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
         String smargin_default = FrameWorkConfigDefinitions.SpreadSheetMarginReadOnly.getConfigValue();
@@ -132,20 +129,18 @@ public class TableManipulator {
         }
 
         ((DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(
-            SwingConstants.LEFT);
+                SwingConstants.LEFT);
 
-        setReorderingAllowed(allowReordering);
-        setResortingAllowed(allowResorting);
+        setReorderingAllowed();
+        setResortingAllowed();
 
-        if( max_height > 0 )
-        {
+        if (max_height > 0) {
 
             int correction = 0;
 
             LookAndFeel look_and_feel = UIManager.getLookAndFeel();
 
-            if( look_and_feel != null )
-            {
+            if (look_and_feel != null) {
                 logger.info("look and feel: " + look_and_feel.getID() );
 
                 if( Setup.is_linux_system() )
@@ -161,23 +156,21 @@ public class TableManipulator {
 
                     if( look_and_feel.getID().equals("Nimbus") )
                         correction = 4;
-                    else if( look_and_feel.getID().equals("Windows") )
+                    else if (look_and_feel.getID().equals("Windows"))
                         correction = 0;
                 }
             }
 
-            row_header.setCellHeight(max_height-correction);
+            row_header.setCellHeight(max_height - correction);
         }
     }
 
-    private void setReorderingAllowed(boolean state) {
-        allowReordering = state;
-        table.getTableHeader().setReorderingAllowed(state);
+    private void setReorderingAllowed() {
+        table.getTableHeader().setReorderingAllowed(true);
     }
 
-    private void setResortingAllowed(boolean state) {
-        allowResorting = state;
-        table.setAutoCreateRowSorter(state);
+    private void setResortingAllowed() {
+        table.setAutoCreateRowSorter(true);
     }
 
     public void addAll(Iterable<DBConfig> rows) {
@@ -209,14 +202,14 @@ public class TableManipulator {
     public void remove( int row )
     {
         editor_stopper.doPause();
-        logger.info(("PAUSE PAUSE PAUSE"));
+        logger.info("PAUSE PAUSE PAUSE");
 
         tabledesign.remove(row);
 
         checkRowHeaderLimit();
         row_header.updateUI();
 
-        logger.info(("CONTINUE CONTINUE CONTINUE"));
+        logger.info("CONTINUE CONTINUE CONTINUE");
 
         editor_stopper.doContinue();
     }
@@ -369,10 +362,7 @@ public class TableManipulator {
         if( base == null )
             return;
 
-        base.registerOnCloseListener(() -> {
-            if( saveUserColWidth )
-                saveTableHeaderSize();
-        });
+        base.registerOnCloseListener(this::saveTableHeaderSize);
     }
 
     private BaseDialogBase getBaseDialog()
@@ -496,20 +486,17 @@ public class TableManipulator {
                 positions.add(new AbstractMap.SimpleEntry<>(col_uid, -1));
             }
 
-            if( width > 5 )
+            if (width > 5)
                 tcol.setPreferredWidth(width);
         }
 
-        if (allowReordering) {
-            ColumnOrder orderer = new ColumnOrder(table);
+        ColumnOrder orderer = new ColumnOrder(table);
 
-            for (int i = 0; i < positions.size(); i++)
-            {
-                Entry<String,Integer> entry = positions.get(i);
-                orderer.addColumn(entry.getKey(), i, entry.getValue());
-            }
-
-            orderer.moveColumns();
+        for (int i = 0; i < positions.size(); i++) {
+            Entry<String, Integer> entry = positions.get(i);
+            orderer.addColumn(entry.getKey(), i, entry.getValue());
         }
+
+        orderer.moveColumns();
     }
 }
