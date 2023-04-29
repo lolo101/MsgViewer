@@ -11,6 +11,8 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import static java.util.Collections.singleton;
+
 public class RowHeaderTest extends BaseDialog {
 
     private int i;
@@ -148,7 +150,7 @@ public class RowHeaderTest extends BaseDialog {
 
         i++;
 
-        tm.add(c);
+        tm.addAll(singleton(c));
 
     }//GEN-LAST:event_jButton1ActionPerformed
 

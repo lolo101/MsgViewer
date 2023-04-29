@@ -4,7 +4,10 @@ import at.redeye.FrameWork.base.BaseDialogBase;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
@@ -16,9 +19,9 @@ public class TableDesign extends AbstractTableModel {
     public List<List<?>> rows = new ArrayList<>();
     private final BaseDialogBase base;
 
-    public Vector<Coll> colls;
+    public List<Coll> colls;
 
-    public TableDesign(BaseDialogBase base, Vector<Coll> colls) {
+    public TableDesign(BaseDialogBase base, List<Coll> colls) {
         this.base = base;
         this.colls = colls;
     }

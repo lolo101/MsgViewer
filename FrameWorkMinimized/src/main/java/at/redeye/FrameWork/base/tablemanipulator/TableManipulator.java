@@ -49,17 +49,17 @@ public class TableManipulator {
             editor_stopper = new TableEditorStopper(table);
         }
 
-        Vector<Coll> vec = new Vector<>();
+        List<Coll> colls = new ArrayList<>();
 
-        ArrayList<String> names = binddesc.getAllNames();
+        ArrayList<String> titles = binddesc.getAllNames();
         List<DBValue> values = binddesc.getAllValues();
 
-        for (int i = 0; i < names.size(); i++) {
+        for (int i = 0; i < titles.size(); i++) {
             if (!isHidden(i))
-                vec.add(new Coll(names.get(i), false, values.get(i)));
+                colls.add(new Coll(titles.get(i), false, values.get(i)));
         }
 
-        this.tabledesign = new TableDesign(getBaseDialog(), vec);
+        this.tabledesign = new TableDesign(getBaseDialog(), colls);
         table.setModel(tabledesign);
         table.setDefaultRenderer(Object.class, new NormalCellRenderer(this.tabledesign));
         row_header = new RowHeader(table, this::checkRowHeaderLimit);
@@ -179,26 +179,18 @@ public class TableManipulator {
         table.setAutoCreateRowSorter(state);
     }
 
-    public void add(DBStrukt binddesc)
-    {
-        List<DBValue> values = binddesc.getAllValues();
+    public <T extends DBStrukt> void addAll(Iterable<T> rows) {
+        for (DBStrukt row : rows) {
+            List<DBValue> columns = row.getAllValues();
 
-        addRow( values );
-    }
-
-    public <T extends DBStrukt> void addAll(Iterable<T> col) {
-        for (DBStrukt s : col) {
-            List<DBValue> values = s.getAllValues();
-
-            addRow(values, false);
+            addRow(columns);
         }
 
         checkRowHeaderLimit();
         row_header.updateUI();
     }
 
-    public void prepareTable()
-    {
+    public void prepareTable() {
         TableColumnModel columnModel = table.getColumnModel();
         for (Enumeration<TableColumn> columns = columnModel.getColumns(); columns.hasMoreElements(); ) {
             TableColumn col = columns.nextElement();
@@ -206,12 +198,8 @@ public class TableManipulator {
         }
     }
 
+
     private void addRow(Iterable<?> data) {
-        addRow(data, true);
-    }
-
-
-    private void addRow(Iterable<?> data, boolean update_ui) {
         List<Object> db_copy = new ArrayList<>();
 
         int i = 0;
@@ -225,11 +213,6 @@ public class TableManipulator {
         }
 
         tabledesign.rows.add(db_copy);
-
-        if( update_ui ) {
-            checkRowHeaderLimit();
-            row_header.updateUI();
-        }
     }
 
     public void clear()
