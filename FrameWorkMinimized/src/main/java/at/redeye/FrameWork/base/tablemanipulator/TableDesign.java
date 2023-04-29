@@ -1,5 +1,7 @@
 package at.redeye.FrameWork.base.tablemanipulator;
 
+import at.redeye.FrameWork.base.BaseDialogBase;
+
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.util.*;
@@ -12,10 +14,12 @@ public class TableDesign extends AbstractTableModel {
     public Set<Integer> edited_cols = new HashSet<>();
     public Set<Integer> edited_rows = new HashSet<>();
     public List<List<?>> rows = new ArrayList<>();
+    private final BaseDialogBase base;
 
     public Vector<Coll> colls;
 
-    public TableDesign(Vector<Coll> colls) {
+    public TableDesign(BaseDialogBase base, Vector<Coll> colls) {
+        this.base = base;
         this.colls = colls;
     }
 
@@ -71,6 +75,11 @@ public class TableDesign extends AbstractTableModel {
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         return rows.get(rowIndex).get(columnIndex);
+    }
+
+    @Override
+    public String getColumnName(int column) {
+        return base.MlM(colls.get(column).title);
     }
 
     @Override

@@ -67,8 +67,8 @@ public class TableManipulator {
                 vec.add(new Coll(names.get(i), false, values.get(i)));
         }
 
-        this.tabledesign = new TableDesign(vec);
         this.table = table;
+        this.tabledesign = new TableDesign(getBaseDialog(), vec);
         table.setModel(tabledesign);
         table.setDefaultRenderer(Object.class, new NormalCellRenderer(this.tabledesign));
         row_header = new RowHeader(table, this::checkRowHeaderLimit);
@@ -597,15 +597,5 @@ public class TableManipulator {
 
             orderer.moveColumns();
         }
-    }
-
-    public String MlM( String message )
-    {
-        base_dlg = getBaseDialog();
-
-        if( base_dlg == null )
-            return message;
-
-        return base_dlg.MlM(message);
     }
 }
