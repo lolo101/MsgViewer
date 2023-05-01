@@ -6,39 +6,32 @@ import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
+import static javax.swing.SwingConstants.RIGHT;
+
 public class RowHeader
 {
-    static class RowHeaderRenderer extends JLabel implements ListCellRenderer<Integer> {
+    static class RowHeaderRenderer implements ListCellRenderer<Integer> {
 
-        private final Font font;
+        private final JTableHeader header;
 
-        private RowHeaderRenderer(JTable table) {
-            JTableHeader header = table.getTableHeader();
-            setOpaque(true);
-            setBorder(UIManager.getBorder("TableHeader.cellBorder"));
-            setHorizontalAlignment(RIGHT);
-            setForeground(header.getForeground());
-            setBackground(header.getBackground());
-            font = header.getFont();
-            setFont(font);
-
-            if (table.getRowCount() > 0)
-                setText(String.format(" %d ", table.getRowCount()));
+        private RowHeaderRenderer(JTableHeader header) {
+            this.header = header;
         }
 
         @Override
         public Component getListCellRendererComponent(JList<? extends Integer> list, Integer value,
                                                       int index, boolean isSelected, boolean cellHasFocus) {
+            String text = value == null ? " " : (value + " ");
+            JLabel component = new JLabel(text);
+            component.setOpaque(true);
+            component.setBorder(UIManager.getBorder("TableHeader.cellBorder"));
+            component.setHorizontalAlignment(RIGHT);
 
-            // weil sonst wird plötzlich die Schrift fett
-            setFont(font);
+            component.setForeground(header.getForeground());
+            component.setBackground(header.getBackground());
+            component.setFont(header.getFont());
 
-            if (value == null)
-                setText("");
-            else
-                setText(value + " ");
-
-            return this;
+            return component;
         }
 
     }
@@ -87,7 +80,7 @@ public class RowHeader
 
             list.setOpaque(false);
 
-            ListCellRenderer<Integer> header = new RowHeaderRenderer(table);
+            ListCellRenderer<Integer> header = new RowHeaderRenderer(table.getTableHeader());
 
             list.setCellRenderer(header);
 
