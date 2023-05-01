@@ -234,26 +234,6 @@ public class TableManipulator {
         }
     }
 
-    /**
-     * disable or enables the Autocompletet feature for this column
-     */
-    public void setAutoCompleteForAllOfThisColl(DBValue column, boolean doAutocomplete) {
-        List<DBValue> values = binddesc.getAllValues();
-
-        for (int i = 0, col = 0; i < values.size(); i++) {
-            if (isHidden(i)) {
-                continue;
-            }
-
-            if (values.get(i).hashCode() == column.hashCode()) {
-                tabledesign.colls.get(col).setDoAutocompleteForAllOfThisColl(doAutocomplete);
-                return;
-            }
-
-            col++;
-        }
-    }
-
 
     public void hide(DBValue... columns) {
         hide(Arrays.asList(columns));

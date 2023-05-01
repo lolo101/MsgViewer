@@ -47,8 +47,6 @@ public class Config extends BaseDialog implements Saveable, PrmListener {
                 config.hist.ae_user);
 
         tm.setEditable(config.value);
-        tm.setAutoCompleteForAllOfThisColl(config.value, false);
-
         tm.prepareTable();
 
         reloadConfig();
