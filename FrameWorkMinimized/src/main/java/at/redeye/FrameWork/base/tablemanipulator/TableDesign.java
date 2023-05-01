@@ -12,7 +12,7 @@ public class TableDesign extends AbstractTableModel {
 
     public final Set<Integer> edited_cols = new HashSet<>();
     public Set<Integer> edited_rows = new HashSet<>();
-    public final List<DBConfig> rows = new ArrayList<>();
+    private final List<DBConfig> rows = new ArrayList<>();
     private final BaseDialogBase base;
 
     public final List<Coll> colls;
@@ -74,6 +74,14 @@ public class TableDesign extends AbstractTableModel {
     @Override
     public boolean isCellEditable(int rowindex, int columnindex) {
         return colls.get(columnindex).isEditable;
+    }
+
+    public void addRows(Collection<DBConfig> rows) {
+        if (rows.isEmpty()) return;
+        int firstRow = this.rows.size();
+        this.rows.addAll(rows);
+        int lastRow = this.rows.size() - 1;
+        fireTableRowsInserted(firstRow, lastRow);
     }
 
     public void remove(int row) {

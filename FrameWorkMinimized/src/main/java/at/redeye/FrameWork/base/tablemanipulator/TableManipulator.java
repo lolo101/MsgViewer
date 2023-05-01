@@ -173,8 +173,8 @@ public class TableManipulator {
         table.setAutoCreateRowSorter(true);
     }
 
-    public void addAll(Iterable<DBConfig> rows) {
-        rows.forEach(this::addRow);
+    public void addAll(Collection<DBConfig> rows) {
+        tabledesign.addRows(rows);
         checkRowHeaderLimit();
         row_header.updateUI();
     }
@@ -185,11 +185,6 @@ public class TableManipulator {
             TableColumn col = columns.nextElement();
             col.setCellEditor(new AdvancedTableCellEditor(tabledesign));
         }
-    }
-
-
-    private void addRow(DBConfig data) {
-        tabledesign.rows.add(data);
     }
 
     public void clear()

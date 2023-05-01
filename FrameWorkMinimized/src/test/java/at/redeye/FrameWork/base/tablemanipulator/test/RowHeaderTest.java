@@ -197,7 +197,6 @@ public class RowHeaderTest extends BaseDialog {
 
     // FIXME make me a JUnit test
     public static void main(String[] args) {
-
         Root main_root = new Root("TT");
         new RowHeaderTest(main_root).setVisible(true);
     }
