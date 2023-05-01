@@ -12,11 +12,10 @@ public class ColumnOrder implements Comparator<Order> {
     private static final Logger logger = LogManager.getLogger(ColumnOrder.class);
 
     private final JTable table;
-    private final ArrayList<Order> order_list;
+    private final ArrayList<Order> order_list = new ArrayList<>();
 
     public ColumnOrder(JTable table) {
         this.table = table;
-        this.order_list = new ArrayList<>();
     }
 
     void addColumn(String name, int position_now, int position_wanted) {

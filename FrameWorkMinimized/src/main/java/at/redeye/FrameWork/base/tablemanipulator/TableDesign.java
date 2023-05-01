@@ -94,5 +94,6 @@ public class TableDesign extends AbstractTableModel {
         }
 
         edited_rows = er;
+        fireTableRowsDeleted(row, row);
     }
 }
