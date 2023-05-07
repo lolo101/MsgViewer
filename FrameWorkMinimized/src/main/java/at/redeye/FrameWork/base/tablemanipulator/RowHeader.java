@@ -3,8 +3,8 @@ package at.redeye.FrameWork.base.tablemanipulator;
 import javax.swing.*;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 
 import static javax.swing.SwingConstants.RIGHT;
 
@@ -90,14 +90,7 @@ public class RowHeader
 
             if( scroll_bar != null )
             {
-                scroll_bar.addComponentListener(new ComponentListener() {
-
-                    @Override
-                    public void componentResized(ComponentEvent e) {}
-
-                    @Override
-                    public void componentMoved(ComponentEvent e) {}
-
+                scroll_bar.addComponentListener(new ComponentAdapter() {
                     @Override
                     public void componentShown(ComponentEvent e) {
                         vertical_scroll_bar_visible = true;
@@ -135,11 +128,7 @@ public class RowHeader
 
         visible_state = state;
 
-        if (state) {
-            scroll.setRowHeaderView(list);
-        } else {
-            scroll.setRowHeaderView(null);
-        }
+        scroll.setRowHeaderView(state ? list : null);
 
         updateUI();
     }
