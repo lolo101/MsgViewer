@@ -21,7 +21,7 @@ public class TranslationDialog extends BaseDialog {
     private static final String TRANS_LAST_RIGHT_COLCOUNT = "trans_last_left_colcount";
 
     private final Map<String, StringBuffer> data = new HashMap<>();
-    private final Vector<NoticeIfChangedTextField> fields = new Vector<>();
+    private final Collection<NoticeIfChangedTextField> fields = new ArrayList<>();
 
     private final String ClassName;
 
@@ -31,8 +31,8 @@ public class TranslationDialog extends BaseDialog {
     private boolean force_undo_country;
     private boolean force_undo_language;
 
-    private final Vector<JTextField> left_cols = new Vector<>();
-    private final Vector<JTextField> right_cols = new Vector<>();
+    private final Collection<JTextField> left_cols = new ArrayList<>();
+    private final Collection<JTextField> right_cols = new ArrayList<>();
 
     public TranslationDialog(final Root root, Container frame, String name, ExtractStrings es) {
         super(root, name);
