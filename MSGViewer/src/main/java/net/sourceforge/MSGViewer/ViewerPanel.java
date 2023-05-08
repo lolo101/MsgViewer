@@ -89,7 +89,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         jRHTML.setSelected(!rtfFormat);
 
         jSplitPane.setDividerLocation(Integer.parseInt(root.getSetup().getConfig("DividerLocation", "150")));
-        header.setText(parent.MlM("Drag a msg file into this window"));
+        header.setText("Drag a msg file into this window");
     }
 
     public void setOpenNewMailInterface(OpenNewMailInterface open_new_mail_handler) {

@@ -3,6 +3,7 @@ package at.redeye.FrameWork.base.translation;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
@@ -53,13 +54,10 @@ public class ExtractStrings {
         }
     }
 
-    Set<String> strings;
-    private final Map<String, List<JComponent>> components;
+    final Set<String> strings = new TreeSet<>();
+    private final Map<String, List<JComponent>> components = new HashMap<>();
 
     public ExtractStrings(Container cont) {
-        strings = new TreeSet<>();
-        components = new HashMap<>();
-
         extractStrings(cont);
     }
 
@@ -73,28 +71,22 @@ public class ExtractStrings {
 
     public static void assign(JComponent comp, String value) {
 
-        if (comp instanceof JButton)
-            ((JButton) comp).setText(value);
+        if (comp instanceof AbstractButton)
+            ((AbstractButton) comp).setText(value);
         else if (comp instanceof JLabel)
             ((JLabel) comp).setText(value);
-        else if (comp instanceof JMenuItem)
-            ((JMenuItem) comp).setText(value);
-        else if (comp instanceof JRadioButton)
-            ((JRadioButton) comp).setText(value);
-        else if (comp instanceof JCheckBox)
-            ((JCheckBox) comp).setText(value);
         else if (comp instanceof TabTitleWrapper)
             ((TabTitleWrapper) comp).setText(value);
         else if (comp instanceof ToolTipWrapper)
             ((ToolTipWrapper) comp).setText(value);
         else if (comp instanceof FrameTitleWrapper)
             ((FrameTitleWrapper) comp).setText(value);
+        else if (comp instanceof JTextComponent)
+            ((JTextComponent) comp).setText(value);
     }
 
     private void extractStrings(Container cont) {
         for (Component comp : cont.getComponents()) {
-//            System.out.println("com:" + comp);
-
             if (comp instanceof JComponent) {
                 JComponent jcomp = (JComponent) comp;
 
@@ -130,6 +122,8 @@ public class ExtractStrings {
                 addString((JMenuItem) comp);
             else if (comp instanceof JToggleButton)
                 addString((JToggleButton) comp);
+            else if (comp instanceof JTextComponent)
+                addString((JTextComponent) comp);
             else if (comp instanceof JTabbedPane) {
                 addString((JTabbedPane) comp);
 
@@ -144,13 +138,6 @@ public class ExtractStrings {
                 }
             }
         }
-    }
-
-    private void addComp( String text, JComponent comp ) {
-        strings.add(text);
-
-        List<JComponent> vcomp = components.computeIfAbsent(text, k -> new ArrayList<>());
-        vcomp.add(comp);
     }
 
     private void addString( JLabel label )
@@ -182,18 +169,27 @@ public class ExtractStrings {
 
     private void addString(JMenuItem menu_item) {
 
-        if( menu_item.getText().isEmpty() )
+        if (menu_item.getText().isEmpty())
             return;
 
-        addComp(menu_item.getText(),menu_item);
+        addComp(menu_item.getText(), menu_item);
     }
 
-    private void addString(JTabbedPane jTabbedPane)
-    {
-        for( int i = 0; i < jTabbedPane.getTabCount(); i++ )
-        {
-            TabTitleWrapper wrapper = new TabTitleWrapper(jTabbedPane, i );
-            addComp(wrapper.getText(),wrapper);
+    private void addString(JTextComponent jTextComponent) {
+        addComp(jTextComponent.getText(), jTextComponent);
+    }
+
+    private void addString(JTabbedPane jTabbedPane) {
+        for (int i = 0; i < jTabbedPane.getTabCount(); i++) {
+            TabTitleWrapper wrapper = new TabTitleWrapper(jTabbedPane, i);
+            addComp(wrapper.getText(), wrapper);
         }
+    }
+
+    private void addComp(String text, JComponent comp) {
+        strings.add(text);
+
+        List<JComponent> vcomp = components.computeIfAbsent(text, k -> new ArrayList<>());
+        vcomp.add(comp);
     }
 }
