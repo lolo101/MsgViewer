@@ -8,7 +8,6 @@ import jakarta.mail.Message.RecipientType;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimePart;
 import jakarta.mail.internet.MimeUtility;
-import net.sourceforge.MSGViewer.factory.FileExtension;
 import net.sourceforge.MSGViewer.factory.mbox.headers.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -109,17 +108,12 @@ public class JavaMailParser {
                 FileAttachment att = new FileAttachment();
                 String filename = MimeUtility.decodeText(part.getFileName());
                 att.setMimeTag(getMime(part.getContentType()));
-                att.setFilename(filename);
-                att.setExtension(new FileExtension(filename).toString());
+                att.setLongFilename(filename);
 
                 String cid = mpart.getContentID();
                 if( cid != null ) {
                     cid = StringUtils.strip(cid, "<>");
                     att.setContentId(cid);
-                }
-
-                if( att.getFilename() == null ) {
-                    att.setFilename("");
                 }
 
                 att.setData(getContent(part));

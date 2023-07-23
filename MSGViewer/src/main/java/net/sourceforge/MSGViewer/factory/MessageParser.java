@@ -7,6 +7,8 @@ import net.sourceforge.MSGViewer.factory.mbox.JavaMailParser;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import static org.apache.commons.io.FilenameUtils.getExtension;
+
 public class MessageParser {
 
     private final Path file;
@@ -16,9 +18,9 @@ public class MessageParser {
     }
 
     public Message parseMessage() throws Exception {
-        FileExtension extention = new FileExtension(file);
+        String extention = getExtension(file.toString());
 
-        switch (extention.toString()) {
+        switch (extention) {
             case "msg":
             case "oft":
                 return parseMsgFile();

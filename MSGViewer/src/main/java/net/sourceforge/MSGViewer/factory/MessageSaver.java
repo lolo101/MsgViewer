@@ -11,6 +11,8 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static org.apache.commons.io.FilenameUtils.getExtension;
+
 public class MessageSaver {
 
     private final AttachmentRepository attachmentRepository;
@@ -22,9 +24,9 @@ public class MessageSaver {
     }
 
     public void saveMessage(Path file) throws Exception {
-        FileExtension extension = new FileExtension(file);
+        String extension = getExtension(file.toString());
 
-        switch (extension.toString()) {
+        switch (extension) {
             case "msg":
                 saveMsgFile(file);
                 break;
