@@ -18,6 +18,7 @@
 package com.auxilii.msgparser.attachment;
 
 import com.auxilii.msgparser.Property;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.stream.Stream;
@@ -64,17 +65,31 @@ public class FileAttachment implements Attachment {
     }
 
     /**
-     * @return the extension
-     */
-    public String getExtension() {
-        return extension;
-    }
-
-    /**
      * @param extension the extension to set
      */
     public void setExtension(String extension) {
         this.extension = extension;
+    }
+
+    /**
+     * @return the extension
+     * @see <a href="https://learn.microsoft.com/en-us/office/client-developer/outlook/mapi/pidtagattachextension-canonical-property">PidTagAttachExtension Canonical Property</a>
+     */
+    public String getExtension() {
+        if (extension != null)
+            return extension;
+        String extensionFromFilename = extensionFromFilename();
+        return extensionFromFilename.isEmpty()
+                ? extensionFromFilename
+                : "." + extensionFromFilename;
+    }
+
+    private String extensionFromFilename() {
+        if (longFilename != null)
+            return FilenameUtils.getExtension(longFilename);
+        if (filename != null)
+            return FilenameUtils.getExtension(filename);
+        return "";
     }
 
     /**
@@ -101,7 +116,7 @@ public class FileAttachment implements Attachment {
     /**
      * @param longFilename the longFilename to set
      */
-    private void setLongFilename(String longFilename) {
+    public void setLongFilename(String longFilename) {
         this.longFilename = longFilename;
     }
 

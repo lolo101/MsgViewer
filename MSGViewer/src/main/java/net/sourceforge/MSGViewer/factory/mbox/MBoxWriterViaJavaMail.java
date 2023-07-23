@@ -92,7 +92,7 @@ public class MBoxWriterViaJavaMail {
     private void dumpFileAttachment(FileAttachment fatt, MimeBodyPart part) throws IOException, MessagingException {
         Path content = attachmentRepository.getTempFile(fatt);
         part.attachFile(content.toFile());
-        part.setFileName(MimeUtility.encodeText(content.getFileName().toString(), "UTF-8", null));
+        part.setFileName(MimeUtility.encodeText(fatt.toString(), "UTF-8", null));
         part.setContentID(fatt.getContentId());
 
         try (OutputStream fout = Files.newOutputStream(content)) {
