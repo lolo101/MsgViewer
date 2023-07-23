@@ -6,4 +6,5 @@ module msgviewer {
     requires org.apache.commons.lang3;
     requires org.apache.commons.codec;
     requires org.apache.logging.log4j;
+    requires commons.validator;
 }
