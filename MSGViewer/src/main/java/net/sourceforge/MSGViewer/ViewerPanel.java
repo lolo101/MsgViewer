@@ -356,17 +356,16 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
 
         final String protocol = uri.getScheme();
 
-        if (!protocol.equals("file")) {
+        if (protocol.equals("file")) {
+            openLocalFile(uri);
+        } else {
             open(uri.toString());
-            return;
         }
 
+    }
+
+    private void openLocalFile(URI uri) throws IOException {
         Path content = helper.extractUrl(uri, message);
-
-        if (content == null) {
-            // maybe the url points to a local directory
-            content = Path.of(uri.getPath());
-        }
 
         if (ViewerHelper.is_mail_message(content.toString())) {
 
@@ -376,7 +375,6 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         } else {
             open(content.toString());
         }
-
     }
 
     private void open(String path) throws IOException {

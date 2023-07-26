@@ -86,7 +86,7 @@ public class ViewerHelper {
             }
         }
 
-        return null;
+        return Path.of(uri.getPath());
     }
 
     public static boolean isValidEmail(String email) {
