@@ -49,4 +49,14 @@ class FileAttachmentTest {
             assertEquals("", fileAttachment.getExtension());
         }
     }
+
+    @Nested
+    class GetLongFilename {
+        @Test
+        void should_return_filename_when_long_filename_absent() {
+            FileAttachment fileAttachment = new FileAttachment();
+            fileAttachment.setFilename("toto.txt");
+            assertEquals("toto.txt", fileAttachment.getLongFilename());
+        }
+    }
 }

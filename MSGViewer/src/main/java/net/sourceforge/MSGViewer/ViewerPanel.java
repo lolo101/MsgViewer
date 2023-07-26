@@ -524,7 +524,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
             sb.append("<img border=0 src=\"").append(thumbnailFile.toURI()).append("\"/> ");
         }
 
-        if (ViewerHelper.is_mail_message(att.getFilename())) {
+        if (ViewerHelper.is_mail_message(att.getLongFilename())) {
             if (!Files.exists(content)) {
                 write(content, att.getData());
             }

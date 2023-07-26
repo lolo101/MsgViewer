@@ -107,10 +107,10 @@ public class FileAttachment implements Attachment {
     }
 
     /**
-     * @return the longFilename
+     * @return the long filename if present, 8.3 filename otherwise
      */
     public String getLongFilename() {
-        return longFilename;
+        return longFilename == null ? filename : longFilename;
     }
 
     /**
