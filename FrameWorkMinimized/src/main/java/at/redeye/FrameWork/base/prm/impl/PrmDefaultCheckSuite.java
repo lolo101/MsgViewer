@@ -93,14 +93,14 @@ public class PrmDefaultCheckSuite implements PrmDefaultChecksInterface {
 
 	}
 
-	private boolean invalidDateTime(PrmActionEvent event, SimpleDateFormat sdf) {
+	private boolean passesDateTime(PrmActionEvent event, SimpleDateFormat sdf) {
 		try {
 			sdf.parse(event.getNewPrmValue().toString());
-			return false;
+			return true;
 		} catch (ParseException pe) {
 			logger.warn(event.getParameterName().toString()
 					+ ": Date and/or Time is not valid!\n" + pe.getMessage());
-			return true;
+			return false;
 		}
 	}
 
@@ -121,67 +121,53 @@ public class PrmDefaultCheckSuite implements PrmDefaultChecksInterface {
 
 	public boolean doChecks(PrmActionEvent event) {
 
-		if ((checks2Execute & PRM_IS_DOUBLE) != 0) {
-			if (!passesDouble(event)) {
-				return false;
-			}
+		if (parameterType(PRM_IS_DOUBLE)) {
+			return passesDouble(event);
 		}
 
-		if ((checks2Execute & PRM_IS_LONG) != 0) {
-			if (!passesLong(event)) {
-				return false;
-			}
+		if (parameterType(PRM_IS_LONG)) {
+			return passesLong(event);
 		}
 
-		if ((checks2Execute & PRM_IS_BIT) != 0) {
-			if (!passesBit(event)) {
-				return false;
-			}
+		if (parameterType(PRM_IS_BIT)) {
+			return passesBit(event);
 		}
 
-		if ((checks2Execute & PRM_IS_TRUE_FALSE) != 0) {
-			if (!passesJaNein(event)) {
-				return false;
-			}
+		if (parameterType(PRM_IS_TRUE_FALSE)) {
+			return passesJaNein(event);
 		}
 
-		if ((checks2Execute & PRM_HAS_VALUE) != 0) {
-			if (!passesHasAValueEqual(event)) {
-				return false;
-			}
+		if (parameterType(PRM_HAS_VALUE)) {
+			return passesHasAValueEqual(event);
 		}
 
-		if ((checks2Execute & PRM_IS_DATE) != 0) {
+		if (parameterType(PRM_IS_DATE)) {
 			SimpleDateFormat sdf = DateTimeFormat.SQLIF_STD_DATE_FORMAT.formatter();
-			if (invalidDateTime(event, sdf)) {
-				return false;
-			}
+			return passesDateTime(event, sdf);
 		}
 
-		if ((checks2Execute & PRM_IS_TIME) != 0) {
+		if (parameterType(PRM_IS_TIME)) {
 			SimpleDateFormat sdf = DateTimeFormat.SQLIF_STD_TIME_FORMAT.formatter();
-			if (invalidDateTime(event, sdf)) {
-				return false;
-			}
+			return passesDateTime(event, sdf);
 		}
 
-		if ((checks2Execute & PRM_IS_SHORTTIME) != 0) {
+		if (parameterType(PRM_IS_SHORTTIME)) {
 			SimpleDateFormat sdf = DateTimeFormat.SQLIF_STD_SHORTTIME_FORMAT.formatter();
-			if (invalidDateTime(event, sdf)) {
-				return false;
-			}
+			return passesDateTime(event, sdf);
 		}
 
-		if ((checks2Execute & PRM_IS_DATETIME) != 0) {
+		if (parameterType(PRM_IS_DATETIME)) {
 			SimpleDateFormat sdf = DateTimeFormat.SQLIF_STD_DATETIME_FORMAT.formatter();
-			if (invalidDateTime(event, sdf)) {
-				return false;
-			}
+			return passesDateTime(event, sdf);
 		}
 
-		if ((checks2Execute & PRM_IS_LOOKANDFEEL) != 0) {
+		if (parameterType(PRM_IS_LOOKANDFEEL)) {
 			return passesLookAndFeel(event);
 		}
 		return true;
+	}
+
+	private boolean parameterType(long type) {
+		return (checks2Execute & type) != 0;
 	}
 }
