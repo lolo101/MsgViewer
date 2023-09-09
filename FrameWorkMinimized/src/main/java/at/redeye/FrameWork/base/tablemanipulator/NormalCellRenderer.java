@@ -71,8 +71,7 @@ public class NormalCellRenderer extends DefaultTableCellRenderer {
     @Override
     protected void setValue(Object v) {
         DBValue val = tabledesign.getValueAt(model_row, model_col);
-        if (v instanceof String && val != null) {
-            String s = (String) v;
+        if (v instanceof String s && val != null) {
             if (val.acceptString(s)) {
                 val.loadFromString(s);
             }

@@ -105,7 +105,7 @@ public class MBoxWriterViaJavaMail {
         part.attachFile(attachedMessagePath.toFile());
         part.setFileName(MimeUtility.encodeText(attachedMessagePath.getFileName().toString(), "UTF-8", null));
 
-        Message attachedMessage = msgAtt.getMessage();
+        Message attachedMessage = msgAtt.message();
         new MessageSaver(attachmentRepository, attachedMessage).saveMessage(withExtension(attachedMessagePath));
     }
 

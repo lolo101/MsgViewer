@@ -29,9 +29,8 @@ public class EditNode extends BaseDialog {
 
             if (data instanceof String) {
                 jtHex.setText((String) data);
-            } else if (data instanceof byte[]) {
+            } else if (data instanceof byte[] bytes) {
                 StringBuilder sb = new StringBuilder();
-                byte[] bytes = (byte[]) data;
 
                 for (int i = 0; i < bytes.length; i++) {
 

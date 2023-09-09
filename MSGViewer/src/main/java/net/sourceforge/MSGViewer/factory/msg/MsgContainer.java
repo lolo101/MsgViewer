@@ -266,7 +266,7 @@ public class MsgContainer {
         createPropertyStreamEntry(bytes, att_dir);
 
         DirectoryEntry msg_dir = att_dir.createDirectory(Ptyp.SUBSTORAGE_PREFIX + "3701000D");
-        writeMessage(attachment.getMessage(), msg_dir);
+        writeMessage(attachment.message(), msg_dir);
     }
 
     private static void writeMessage(Message message, DirectoryEntry msg_dir) throws IOException {

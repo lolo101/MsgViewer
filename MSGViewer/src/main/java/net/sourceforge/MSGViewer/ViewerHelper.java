@@ -67,8 +67,7 @@ public class ViewerHelper {
         List<Attachment> attachments = message.getAttachments();
 
         for (Attachment att : attachments) {
-            if (att instanceof FileAttachment) {
-                FileAttachment fatt = (FileAttachment) att;
+            if (att instanceof FileAttachment fatt) {
 
                 Path content = attachmentRepository.getTempFile(fatt);
 

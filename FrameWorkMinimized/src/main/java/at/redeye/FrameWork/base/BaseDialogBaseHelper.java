@@ -352,14 +352,11 @@ public class BaseDialogBaseHelper implements BindVarInterface {
                         parent.getTitle(), JOptionPane.YES_NO_CANCEL_OPTION,
                         JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
-        switch (n) {
-            case JOptionPane.YES_OPTION:
-                return 1;
-            case JOptionPane.NO_OPTION:
-                return 0;
-            default:
-                return -1;
-        }
+        return switch (n) {
+            case JOptionPane.YES_OPTION -> 1;
+            case JOptionPane.NO_OPTION -> 0;
+            default -> -1;
+        };
     }
 
     /**
@@ -473,10 +470,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
             return;
 
         for (Pair pair : bind_vars.getBindVarPairs()) {
-            if (pair.get_first() instanceof NoticeIfChangedTextField) {
-                NoticeIfChangedTextField text_field = (NoticeIfChangedTextField) pair
-                        .get_first();
-
+            if (pair.get_first() instanceof NoticeIfChangedTextField text_field) {
                 text_field.setChanged(false);
             }
         }

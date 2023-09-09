@@ -255,7 +255,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
 
         EditorKit editor = body.getEditorKit();
 
-        if (editor instanceof HTMLEditorKit) {
+        if (editor instanceof HTMLEditorKit html_editor) {
 
             System.out.println("Value: " + jSFontSize.getValue());
 
@@ -268,7 +268,6 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
                     .map(t -> t + rule)
                     .collect(joining());
 
-            HTMLEditorKit html_editor = (HTMLEditorKit) editor;
             StyleSheet sheet = html_editor.getStyleSheet();
             sheet.addRule(tags);
 
@@ -312,10 +311,10 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
 
         Content content = bodyText();
 
-        logger.trace(content.text);
+        logger.trace(content.text());
 
-        body.setContentType(content.type);
-        body.setText(content.text);
+        body.setContentType(content.type());
+        body.setText(content.text());
         body.setCaretPosition(0);
     }
 
@@ -538,7 +537,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
     }
 
     private String printMsgAttachment(MsgAttachment att) {
-        final Message msg = att.getMessage();
+        final Message msg = att.message();
 
         Path sub_file = attachmentRepository.getTempFile(att);
 

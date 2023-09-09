@@ -18,7 +18,7 @@ public class AttachmentRepository {
     }
 
     public Path getTempFile(MsgAttachment matt) {
-        return getTempFile(matt.getMessage().hashCode() + ".msg");
+        return getTempFile(matt.message().hashCode() + ".msg");
     }
 
     private Path getTempFile(String fileName) {

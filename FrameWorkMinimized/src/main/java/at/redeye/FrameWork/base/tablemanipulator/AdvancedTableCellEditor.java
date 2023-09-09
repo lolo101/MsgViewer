@@ -50,17 +50,13 @@ public class AdvancedTableCellEditor extends AbstractCellEditor implements Table
 
         System.out.println("comp size: " + component.getPreferredSize());
 
-        if (current_value instanceof DBValue) {
-            if (current_value instanceof DBString) {
-                DBString s = (DBString) current_value;
+        if (current_value instanceof DBValue val) {
+            if (current_value instanceof DBString s) {
                 component.setDocument(new DocumentFieldLimit(s.getMaxLen()));
             } else if (current_value instanceof DBDateTime) {
-
                 component.setDocument(new DocumentFieldDateTime());
 
             }
-
-            DBValue val = (DBValue) current_value;
 
             if (!val.acceptString(String.valueOf(value))) {
                 component.setBorder(new LineBorder(Color.RED));
@@ -85,8 +81,7 @@ public class AdvancedTableCellEditor extends AbstractCellEditor implements Table
 
         System.out.println("Advanced stopCellEditing");
 
-        if (current_value instanceof DBValue) {
-            DBValue val = (DBValue) current_value;
+        if (current_value instanceof DBValue val) {
             String s = component.getText();
 
             if (!val.acceptString(s)) {

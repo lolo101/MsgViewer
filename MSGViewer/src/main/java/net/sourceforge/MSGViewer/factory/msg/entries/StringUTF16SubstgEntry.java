@@ -28,14 +28,11 @@ public class StringUTF16SubstgEntry extends SubStorageEntry {
 
     @Override
     protected InputStream createEntryContent() {
-        switch (type) {
-            case PtypString8:
-                return new ByteArrayInputStream(value.getBytes(StandardCharsets.ISO_8859_1));
-            case PtypString:
-                return new ByteArrayInputStream(value.getBytes(StandardCharsets.UTF_16LE));
-            default:
-                throw new IllegalArgumentException(type.toString());
-        }
+        return switch (type) {
+            case PtypString8 -> new ByteArrayInputStream(value.getBytes(StandardCharsets.ISO_8859_1));
+            case PtypString -> new ByteArrayInputStream(value.getBytes(StandardCharsets.UTF_16LE));
+            default -> throw new IllegalArgumentException(type.toString());
+        };
     }
 
 }

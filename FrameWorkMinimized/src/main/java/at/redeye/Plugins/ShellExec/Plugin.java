@@ -25,8 +25,7 @@ public class Plugin implements at.redeye.FrameWork.Plugin.Plugin, OpenUrlInterfa
 
     @Override
     public void initPlugin(Object obj) {
-        if (obj instanceof Plugins) {
-            Plugins plugins = (Plugins) obj;
+        if (obj instanceof Plugins plugins) {
             plugins.addDllExtractorToCache(new HSWChellExecDLL());
             if (Setup.is_win_system()) {
                 HyperlinkExecuter.setOpenUrl(this);

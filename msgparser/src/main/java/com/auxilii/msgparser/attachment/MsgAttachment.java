@@ -26,31 +26,16 @@ import com.auxilii.msgparser.Message;
  * implementation provides an embedded
  * {@link Message} object.
  *
+ * @param message The encapsulated (attached) message.
  * @author roman.kurmanowytsch
  */
-public class MsgAttachment implements Attachment {
-
-	/**
-	 * The encapsulated (attached) message.
-	 */
-	private final Message message;
-
-	public MsgAttachment(Message message) {
-		this.message = message;
-	}
-
-	/**
-	 * @return the message
-	 */
-	public Message getMessage() {
-		return message;
-	}
+public record MsgAttachment(Message message) implements Attachment {
 
 	/**
 	 * Returns the String returned by
 	 * {@link Message#toString()}.
 	 *
-	 * @see java.lang.Object#toString()
+	 * @see Object#toString()
 	 */
 	@Override
 	public String toString() {

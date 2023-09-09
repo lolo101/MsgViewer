@@ -1,12 +1,19 @@
 package net.sourceforge.MSGViewer;
 
-import java.awt.*;
-import java.awt.datatransfer.*;
-import java.awt.dnd.*;
-import java.io.*;
-import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javax.swing.text.JTextComponent;
-import org.apache.logging.log4j.*;
+import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 public class EditorDropTarget implements DropTargetListener {
     private static final Logger logger = LogManager.getLogger(EditorDropTarget.class);
@@ -180,10 +187,9 @@ public class EditorDropTarget implements DropTargetListener {
                     + data.getClass().getName());
 
             String insertData = null;
-            if (data instanceof InputStream) {
+            if (data instanceof InputStream is) {
                 // Plain text flavor
                 String charSet = selectedFlavor.getParameter("charset");
-                InputStream is = (InputStream) data;
                 byte[] bytes = new byte[is.available()];
                 is.read(bytes);
                 try {
