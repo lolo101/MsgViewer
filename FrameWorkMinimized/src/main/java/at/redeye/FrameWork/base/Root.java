@@ -57,12 +57,8 @@ public class Root {
     private String[] startupArgs;
 
     public Root(String app_name) {
-        this(app_name, app_name);
-    }
-
-    public Root(String app_name, String app_title) {
         this.app_name = app_name;
-        this.app_title = app_title;
+        this.app_title = app_name;
         static_root = this;
         setup = new Setup(app_name);
         plugins = new Plugins(app_name);
@@ -182,15 +178,7 @@ public class Root {
     {
         if (display_language == null)
         {
-            display_language = Locale.getDefault().toString();
-
-            String lang = BaseAppConfigDefinitions.DisplayLanguage.getConfigValue();
-
-            if (lang != null && lang.trim().isEmpty()) {
-                return display_language;
-            }
-
-            display_language = lang;
+            display_language = selectDisplayLanguage();
         }
 
         return display_language;
@@ -258,5 +246,13 @@ public class Root {
         }
 
         return configs;
+    }
+
+    private String selectDisplayLanguage() {
+        String lang = BaseAppConfigDefinitions.DisplayLanguage.getConfigValue();
+        if (lang == null || lang.isBlank()) {
+            return Locale.getDefault().toString();
+        }
+        return lang;
     }
 }
