@@ -11,7 +11,7 @@ It has been Mavenized, and support for .eml to .msg has been added.
 
 ## Build
 
-In order to build this project, make sure to have JDK 11+ installed, then clone the project sources:
+In order to build this project, make sure to have JDK 17+ installed, then clone the project sources:
 
 `git clone https://github.com/lolo101/MsgViewer.git`
 
@@ -45,7 +45,7 @@ cd MSGViewer/target
 java -jar msgviewer.jar
 ```
 
-In the GUI, you may open a message with the 'Open File' menu item or by dropping a message file in the window.
+In the GUI, you may open a message with the 'Open File' menu item or drop a message file in the window.
 
 You may also open multiple messages at once by dropping a list of message files,
 a flat file with paths to message files or a selection of paths.
@@ -56,6 +56,6 @@ Translation files are located under `~/.MSGViewer/translations/`
 
 Display Language may be configured in the Options. The default value is the platform locale.
 
-`F11` will switch between English and current Display Language.
+`F11` will switch between English and the current Display Language.
 
 `F12` will show Translation Dialog to edit a locale.
