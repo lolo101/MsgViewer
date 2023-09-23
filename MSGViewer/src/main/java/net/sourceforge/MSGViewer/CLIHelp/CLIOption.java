@@ -5,8 +5,6 @@ import at.redeye.FrameWork.utilities.StringUtils;
 import java.util.Arrays;
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
-
 public class CLIOption {
     private final String name;
     private final String short_description;
@@ -88,6 +86,6 @@ public class CLIOption {
 
         return Arrays.stream(breaked_array)
                 .map(s -> addWithFillSpacesLeading(fill_len_to_short_description) + s)
-                .collect(toList());
+                .toList();
     }
 }

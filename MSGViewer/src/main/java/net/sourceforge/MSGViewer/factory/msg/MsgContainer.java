@@ -19,7 +19,6 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.auxilii.msgparser.Pid.*;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -253,7 +252,7 @@ public class MsgContainer {
 
         List<PropType> props = entries.stream()
                 .map(SubStorageEntry::getPropType)
-                .collect(Collectors.toList());
+                .toList();
 
         ByteBuffer bytes = createPropertiesEntryContent(props);
 

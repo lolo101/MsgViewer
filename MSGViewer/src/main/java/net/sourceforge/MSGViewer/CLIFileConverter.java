@@ -16,8 +16,6 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
-
 public abstract class CLIFileConverter {
 
 	private static final Logger LOGGER = BaseModuleLauncher.logger;
@@ -70,7 +68,7 @@ public abstract class CLIFileConverter {
 	void work() {
 		List<String> processableFiles = Arrays.stream(module_launcher.args)
 				.filter(sourcePath -> sourcePath.toLowerCase().endsWith(String.format(".%s", sourceType)))
-				.collect(toList());
+				.toList();
 		processableFiles.forEach(this::processFile);
 
 		if (processableFiles.isEmpty()) {
