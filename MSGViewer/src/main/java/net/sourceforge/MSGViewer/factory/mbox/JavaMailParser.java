@@ -106,7 +106,12 @@ public class JavaMailParser {
                 MimePart mpart = (MimePart) part;
 
                 FileAttachment att = new FileAttachment();
-                String filename = MimeUtility.decodeText(part.getFileName());
+                String filename = part.getFileName();
+                if (filename != null) {
+                    filename = MimeUtility.decodeText(filename);
+                } else {
+                    filename = "unknown";
+                }
                 att.setMimeTag(getMime(part.getContentType()));
                 att.setLongFilename(filename);
 
