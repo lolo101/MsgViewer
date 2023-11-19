@@ -159,9 +159,11 @@ public class MBoxWriterViaJavaMail {
         while (!lines.isEmpty()) {
             String headerLine = lines.remove();
             int separatorIndex = headerLine.indexOf(':');
-            String name = headerLine.substring(0, separatorIndex);
-            String value = accumulateValue(lines, headerLine.substring(separatorIndex + 1));
-            jmsg.addHeader(name, value);
+            if (separatorIndex > 0) {
+                String name = headerLine.substring(0, separatorIndex);
+                String value = accumulateValue(lines, headerLine.substring(separatorIndex + 1));
+                jmsg.addHeader(name, value);
+            }
         }
     }
 
