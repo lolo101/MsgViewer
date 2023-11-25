@@ -10,7 +10,7 @@ public abstract class BaseWin extends BaseDialog implements MainDialog {
     protected final FileChooser fileChooser;
 
     public BaseWin(Root root) {
-        super(root, root.MlM(root.getAppTitle()));
+        super(root, root.MlM(root.getAppName()));
         fileChooser = new FileChooser(this);
     }
 

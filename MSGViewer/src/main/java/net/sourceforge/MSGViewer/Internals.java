@@ -16,7 +16,7 @@ public class Internals extends BaseDialog {
      * Creates new form Internals
      */
     public Internals(Root root, final Message message) {
-        super(root, root.MlM("Detail info") + ": " + (message.getSubject() != null ? message.getSubject() : root.getAppTitle()));
+        super(root, root.MlM("Detail info") + ": " + (message.getSubject() != null ? message.getSubject() : root.getAppName()));
 
         initComponents();
 

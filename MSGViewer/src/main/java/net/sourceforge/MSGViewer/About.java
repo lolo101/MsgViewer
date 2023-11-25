@@ -13,7 +13,7 @@ public class About extends BaseDialog {
         super(root,"About");
         initComponents();
 
-        jLTitle.setText(MlM("About") + " " + MlM(root.getAppTitle()));
+        jLTitle.setText(MlM("About") + " " + MlM(root.getAppName()));
         String version = About.class.getPackage().getImplementationVersion();
         jLVersion.setText(MlM("Version") + " " + version);
     }

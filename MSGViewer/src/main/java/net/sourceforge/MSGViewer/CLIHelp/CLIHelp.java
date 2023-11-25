@@ -37,14 +37,14 @@ public class CLIHelp
             o.buildLongHelpText(sb, max_option_len + 1, LINE_LEN);
         }
 
-        System.out.println( module_launcher.root.getAppName() + " - " + module_launcher.root.getAppTitle() );
+        System.out.println(module_launcher.root.getAppName());
 
         System.out.println(sb);
     }
 
-    public void printVersion()
+    public void printAppName()
     {
-        System.out.println( module_launcher.root.getAppName() + " - " + module_launcher.root.getAppTitle() );
+        System.out.println(module_launcher.root.getAppName());
     }
 
     private int getMaxOptionLen()

@@ -175,7 +175,7 @@ public class SingleWin extends BaseWin {
     private void viewerPanelPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_viewerPanelPropertyChange
         if (ViewerPanel.FILE_NAME_PROPERTY.equals(evt.getPropertyName())) {
             String file_name = (String) evt.getNewValue();
-            setTitle(root.MlM(root.getAppTitle()) + ": " + file_name);
+            setTitle(root.MlM(root.getAppName()) + ": " + file_name);
             jMDetail.setEnabled(true);
             jMNav.setEnabled(file_name.toLowerCase().endsWith(".msg"));
         }

@@ -40,7 +40,7 @@ public class ModuleLauncher extends BaseModuleLauncher {
 
         if (anyArgumentMatches(CLIHelpMSGViewer.CLI_VERSION)) {
             CLIHelpMSGViewer help = new CLIHelpMSGViewer(this);
-            help.printVersion();
+            help.printAppName();
 
             System.out.println("""
                     Copyright (C) 2015  Martin Oberzalek <msgviewer@hoffer.cx>

@@ -12,7 +12,6 @@ import java.util.Locale;
 public class Root {
     private static Root static_root;
     private final String app_name;
-    private final String app_title;
     private final Setup setup;
     private final Plugins plugins;
     private final Path storage;
@@ -58,7 +57,6 @@ public class Root {
 
     public Root(String app_name) {
         this.app_name = app_name;
-        this.app_title = app_name;
         static_root = this;
         setup = new Setup(app_name);
         plugins = new Plugins(app_name);
@@ -87,10 +85,6 @@ public class Root {
 
     public String getAppName() {
         return app_name;
-    }
-
-    public String getAppTitle() {
-        return app_title;
     }
 
     public Plugins getPlugins() {
@@ -248,7 +242,7 @@ public class Root {
         return configs;
     }
 
-    private String selectDisplayLanguage() {
+    private static String selectDisplayLanguage() {
         String lang = BaseAppConfigDefinitions.DisplayLanguage.getConfigValue();
         if (lang == null || lang.isBlank()) {
             return Locale.getDefault().toString();
