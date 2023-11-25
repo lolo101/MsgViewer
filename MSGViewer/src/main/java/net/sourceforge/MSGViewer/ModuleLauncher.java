@@ -82,11 +82,6 @@ public class ModuleLauncher extends BaseModuleLauncher {
         return null;
     }
 
-    @Override
-    public String getVersion() {
-        return Version.getVersion();
-    }
-
     private void invokeGui() {
         if (splashEnabled()) {
             splash = new StartupWindow(

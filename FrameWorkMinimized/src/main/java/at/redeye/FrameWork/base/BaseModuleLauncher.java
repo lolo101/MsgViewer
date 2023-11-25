@@ -17,7 +17,7 @@ import java.io.File;
 import java.util.Properties;
 import java.util.stream.Stream;
 
-public abstract class BaseModuleLauncher {
+public class BaseModuleLauncher {
     protected StartupWindow splash;
     public static final Logger logger = LogManager.getRootLogger();
     public Root root;
@@ -134,8 +134,6 @@ public abstract class BaseModuleLauncher {
         }
 
     }
-
-    public abstract String getVersion();
 
     protected final boolean splashEnabled() {
         return !StringUtils.isYes(getNoSplash());

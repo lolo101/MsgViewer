@@ -102,11 +102,6 @@ public class testRTF2HTML extends BaseModuleLauncher {
         }
     }
 
-    @Override
-    public String getVersion() {
-        return "0.1";
-    }
-
     // FIXME make me a JUnit test class
     public static void main(String[] args) throws Exception {
         testRTF2HTML test = new testRTF2HTML(args);

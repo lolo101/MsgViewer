@@ -25,6 +25,7 @@
                     <archive>
                         <manifest>
                             <mainClass>net.sourceforge.MSGViewer.ModuleLauncher</mainClass>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                         </manifest>
                     </archive>
                 </configuration>

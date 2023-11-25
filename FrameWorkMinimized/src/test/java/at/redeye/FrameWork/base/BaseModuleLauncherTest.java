@@ -12,12 +12,7 @@ class BaseModuleLauncherTest {
 
     @Nested
     class GivenNoArg {
-        private final BaseModuleLauncher sut = new BaseModuleLauncher() {
-            @Override
-            public String getVersion() {
-                return null;
-            }
-        };
+        private final BaseModuleLauncher sut = new BaseModuleLauncher();
 
         @ParameterizedTest
         @ValueSource(strings = {"No way !", "false"})
@@ -43,12 +38,7 @@ class BaseModuleLauncherTest {
 
     @Nested
     class GivenNoSplashArg {
-        private final BaseModuleLauncher sut = new BaseModuleLauncher("-nosplash") {
-            @Override
-            public String getVersion() {
-                return null;
-            }
-        };
+        private final BaseModuleLauncher sut = new BaseModuleLauncher("-nosplash");
 
         @Test
         void should_disable_Splash() {
