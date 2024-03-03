@@ -134,9 +134,9 @@ public class BaseDialogBaseHelper implements BindVarInterface {
         if (y < 0)
             y = 100;
 
-        logger.info("setting bounds to: " + x + "x" + y);
+        logger.info("setting bounds to: {}x{}", x, y);
         parent.setBounds(x, y, 0, 0);
-        logger.info("position now: " + parent.getX() + "x" + parent.getY());
+        logger.info("position now: {}x{}", parent.getX(), parent.getY());
 
         if (w > 0 && h > 0 && parent.openWithLastWidthAndHeight()) {
             logger.info(String.format("x (%d) + w (%d) = %d dim.Width: %d", x,
@@ -155,7 +155,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
                 h = (int) dim.getHeight() - y;
             }
 
-            logger.info("set size to: " + w + "x" + h);
+            logger.info("set size to: {}x{}", w, h);
             parent.setPreferredSize(new Dimension(w, h));
         }
 
@@ -257,8 +257,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
         int i = Integer.parseInt(value);
 
         if (i <= 0) {
-            logger.error("invalid scrolling interval: " + i
-                    + " using default value: " + config.getConfigValue());
+            logger.error("invalid scrolling interval: {} using default value: {}", i, config.getConfigValue());
             i = Integer.parseInt(config.getConfigValue());
         }
 
@@ -369,8 +368,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
         String id_xy = parent.getUniqueDialogIdentifier();
         String id_wh = parent.getUniqueDialogIdentifier();
 
-        logger.info("store size to: " + parent.getWidth() + "x"
-                + parent.getHeight());
+        logger.info("store size to: {}x{}", parent.getWidth(), parent.getHeight());
 
         root.getSetup().setLocalConfig(id_xy.concat(Setup.WindowX),
                 Integer.toString(parent.getX()));
