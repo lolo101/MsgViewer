@@ -21,7 +21,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <poi.version>5.2.5</poi.version>
-        <log4j.version>2.23.0</log4j.version>
+        <log4j.version>2.23.1</log4j.version>
         <commons-validator.version>1.8.0</commons-validator.version>
         <commons-lang3.version>3.14.0</commons-lang3.version>
     </properties>
