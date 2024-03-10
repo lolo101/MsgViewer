@@ -74,100 +74,6 @@ public class BaseDialogBaseHelper implements BindVarInterface {
         initCommon(do_not_inform_root);
     }
 
-    private void initCommon(boolean do_not_inform_root) {
-        translation_helper = new TranslationHelper(root, parent, this);
-        parent.setTitle(MlM(title));
-
-        root.loadMlM4Class(this, "de");
-
-        if (!do_not_inform_root)
-            root.getDialogs().informWindowOpened(parent);
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(title);
-        }
-
-        parent.addWindowListener(new java.awt.event.WindowAdapter() {
-
-            @Override
-            public void windowClosing(java.awt.event.WindowEvent e) {
-                if (parent.canClose()) {
-                    parent.close();
-                }
-            }
-        });
-
-        String id = parent.getUniqueDialogIdentifier();
-
-        int x = Integer.parseInt(root.getSetup().getConfig(
-                id.concat(Setup.WindowX), String.valueOf(default_pos_x += 30)));
-        int y = Integer.parseInt(root.getSetup().getConfig(
-                id.concat(Setup.WindowY), String.valueOf(default_pos_y += 30)));
-        int w = Integer.parseInt(root.getSetup().getConfig(
-                id.concat(Setup.WindowWidth), "0"));
-        int h = Integer.parseInt(root.getSetup().getConfig(
-                id.concat(Setup.WindowHeight), "0"));
-
-        Dimension dim = getVirtualScreenSize();
-
-        Point mouse_point = MouseInfo.getPointerInfo().getLocation();
-
-        if ((mouse_point.x <= x || x + w <= mouse_point.x)
-                && Math.abs(x + w - mouse_point.x) >= w) {
-            x = mouse_point.x - 100;
-        }
-
-        if ((mouse_point.y <= y || y + h <= mouse_point.y)
-                && Math.abs(y + h - mouse_point.y) >= h) {
-            y = mouse_point.y - 100;
-        }
-
-        if (dim.getWidth() < x + parent.getWidth())
-            x = 100;
-
-        if (dim.getHeight() < y + parent.getHeight())
-            y = 100;
-
-        if (x < 0)
-            x = 100;
-
-        if (y < 0)
-            y = 100;
-
-        logger.info("setting bounds to: {}x{}", x, y);
-        parent.setBounds(x, y, 0, 0);
-        logger.info("position now: {}x{}", parent.getX(), parent.getY());
-
-        if (w > 0 && h > 0 && parent.openWithLastWidthAndHeight()) {
-            logger.info(String.format("x (%d) + w (%d) = %d dim.Width: %d", x,
-                    w, x + w, (int) dim.getWidth()));
-
-            if (x + w > dim.getWidth()) {
-                logger.info("reducing with");
-                w = (int) dim.getWidth() - x;
-            }
-
-            logger.info(String.format("y (%d) + h (%d) = %d dim.Height: %d", y,
-                    h, y + h, (int) dim.getHeight()));
-
-            if (y + h > dim.getHeight()) {
-                logger.info("reducing height");
-                h = (int) dim.getHeight() - y;
-            }
-
-            logger.info("set size to: {}x{}", w, h);
-            parent.setPreferredSize(new Dimension(w, h));
-        }
-
-        registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                () -> {
-                    if (parent.canClose()) {
-                        parent.close();
-                    }
-                });
-        StringUtils.set_defaultAutoLineLenght(Integer.parseInt(FrameWorkConfigDefinitions.DefaultAutoLineBreakWidth.getConfigValue()));
-    }
-
     /**
      * automatically opens the Help Windows, when F1 is pressed
      *
@@ -178,23 +84,6 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 
         registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0),
                 runnable);
-    }
-
-    /**
-     * returns the virtual screensize in a multimonitor system
-     */
-    private static Dimension getVirtualScreenSize() {
-        Rectangle virtualBounds = new Rectangle();
-        GraphicsEnvironment ge = GraphicsEnvironment
-                .getLocalGraphicsEnvironment();
-        GraphicsDevice[] gs = ge.getScreenDevices();
-        for (GraphicsDevice gd : gs) {
-            GraphicsConfiguration[] gc = gd.getConfigurations();
-            for (GraphicsConfiguration graphicsConfiguration : gc) {
-                virtualBounds = virtualBounds.union(graphicsConfiguration.getBounds());
-            }
-        }
-        return virtualBounds.getSize();
     }
 
     /**
@@ -229,13 +118,6 @@ public class BaseDialogBaseHelper implements BindVarInterface {
     }
 
     /**
-     * Setzt wieder den "normalen" Mauscursor
-     */
-    private void setNormalCursor() {
-        setWaitCursor(false);
-    }
-
-    /**
      * Konfiguriert das jScrollpanel entsprechen dem im Setup hinterlegten
      * Geschwindigkeit. Vom User über den Parameter VerticalScrollingSpeed
      * einstellbar.
@@ -249,19 +131,6 @@ public class BaseDialogBaseHelper implements BindVarInterface {
         } catch (NumberFormatException ex) {
             logger.error(ex);
         }
-    }
-
-    private static void adjustScrollingSpeed(Adjustable scrollBar, DBConfig config) {
-        String value = config.getConfigValue();
-
-        int i = Integer.parseInt(value);
-
-        if (i <= 0) {
-            logger.error("invalid scrolling interval: {} using default value: {}", i, config.getConfigValue());
-            i = Integer.parseInt(config.getConfigValue());
-        }
-
-        scrollBar.setUnitIncrement(i);
     }
 
     /**
@@ -391,14 +260,6 @@ public class BaseDialogBaseHelper implements BindVarInterface {
         parent.dispose();
     }
 
-    private void registerActionKeyListenerOnRootPane(KeyStroke key) {
-        if (myrootPane == null)
-            return;
-
-        myrootPane.registerKeyboardAction(new ActionKeyListener(key), key,
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
-    }
-
     /**
      * Registers a listener for a F1, ESC, or something global keypressed Event
      *
@@ -462,29 +323,12 @@ public class BaseDialogBaseHelper implements BindVarInterface {
         bind_vars.gui_to_var();
     }
 
-    private void setBindVarsChanged() {
-
-        if (bind_vars == null)
-            return;
-
-        for (Pair pair : bind_vars.getBindVarPairs()) {
-            if (pair.get_first() instanceof NoticeIfChangedTextField text_field) {
-                text_field.setChanged(false);
-            }
-        }
-    }
-
     @Override
     public Collection<Pair> getBindVarPairs() {
 
         checkBindVars();
 
         return bind_vars.getBindVarPairs();
-    }
-
-    private void checkBindVars() {
-        if (bind_vars == null)
-            bind_vars = new BindVarBase();
     }
 
     /**
@@ -506,10 +350,6 @@ public class BaseDialogBaseHelper implements BindVarInterface {
         return base_language;
     }
 
-    private void autoSwitchToCurrentLocale() {
-        translation_helper.autoSwitchToCurrentLocale();
-    }
-
     public void doLayout() {
         if (autoswitch_trans_first_run) {
             autoSwitchToCurrentLocale();
@@ -523,6 +363,171 @@ public class BaseDialogBaseHelper implements BindVarInterface {
      */
     public String MlM(String message) {
         return translation_helper.MlM(message);
+    }
+
+    private void initCommon(boolean do_not_inform_root) {
+        translation_helper = new TranslationHelper(root, parent, this);
+        parent.setTitle(MlM(title));
+
+        root.loadMlM4Class(this, "de");
+
+        if (!do_not_inform_root)
+            root.getDialogs().informWindowOpened(parent);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(title);
+        }
+
+        parent.addWindowListener(new java.awt.event.WindowAdapter() {
+
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                if (parent.canClose()) {
+                    parent.close();
+                }
+            }
+        });
+
+        initGeometry();
+
+        registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                () -> {
+                    if (parent.canClose()) {
+                        parent.close();
+                    }
+                });
+        StringUtils.set_defaultAutoLineLenght(Integer.parseInt(FrameWorkConfigDefinitions.DefaultAutoLineBreakWidth.getConfigValue()));
+    }
+
+    private void initGeometry() {
+        int x = getConfig(Setup.WindowX, default_pos_x += 30);
+        int y = getConfig(Setup.WindowY, default_pos_y += 30);
+        int w = getConfig(Setup.WindowWidth, 0);
+        int h = getConfig(Setup.WindowHeight, 0);
+
+        Point mouse_point = parent.mousePosition();
+
+        if ((mouse_point.x <= x || x + w <= mouse_point.x)
+                && Math.abs(x + w - mouse_point.x) >= w) {
+            x = mouse_point.x - 100;
+        }
+
+        if ((mouse_point.y <= y || y + h <= mouse_point.y)
+                && Math.abs(y + h - mouse_point.y) >= h) {
+            y = mouse_point.y - 100;
+        }
+
+        Dimension dim = getVirtualScreenSize();
+        if (xOutsideWidth(x, dim.getWidth()))
+            x = 100;
+
+        if (yOutsideHeight(y, dim.getHeight()))
+            y = 100;
+
+        logger.info("setting bounds to: {}x{}", x, y);
+        parent.setBounds(x, y, 0, 0);
+        logger.info("position now: {}x{}", parent.getX(), parent.getY());
+
+        if (w > 0 && h > 0 && parent.openWithLastWidthAndHeight()) {
+            logger.info(String.format("x (%d) + w (%d) = %d dim.Width: %d", x,
+                    w, x + w, (int) dim.getWidth()));
+
+            if (x + w > dim.getWidth()) {
+                logger.info("reducing with");
+                w = (int) dim.getWidth() - x;
+            }
+
+            logger.info(String.format("y (%d) + h (%d) = %d dim.Height: %d", y,
+                    h, y + h, (int) dim.getHeight()));
+
+            if (y + h > dim.getHeight()) {
+                logger.info("reducing height");
+                h = (int) dim.getHeight() - y;
+            }
+
+            logger.info("set size to: {}x{}", w, h);
+            parent.setPreferredSize(new Dimension(w, h));
+        }
+    }
+
+    private int getConfig(String key, int defaultValue) {
+        String id = parent.getUniqueDialogIdentifier();
+        return Integer.parseInt(root.getSetup().getConfig(
+                id + key, String.valueOf(defaultValue)));
+    }
+
+    /**
+     * returns the virtual screensize in a multimonitor system
+     */
+    private static Dimension getVirtualScreenSize() {
+        Rectangle virtualBounds = new Rectangle();
+        GraphicsEnvironment ge = GraphicsEnvironment
+                .getLocalGraphicsEnvironment();
+        GraphicsDevice[] gs = ge.getScreenDevices();
+        for (GraphicsDevice gd : gs) {
+            GraphicsConfiguration[] gc = gd.getConfigurations();
+            for (GraphicsConfiguration graphicsConfiguration : gc) {
+                virtualBounds = virtualBounds.union(graphicsConfiguration.getBounds());
+            }
+        }
+        return virtualBounds.getSize();
+    }
+
+    private boolean xOutsideWidth(int x, double width) {
+        return width < x + parent.getWidth() || x < 0;
+    }
+
+    private boolean yOutsideHeight(int y, double height) {
+        return height < y + parent.getHeight() || y < 0;
+    }
+
+    /**
+     * Setzt wieder den "normalen" Mauscursor
+     */
+    private void setNormalCursor() {
+        setWaitCursor(false);
+    }
+
+    private static void adjustScrollingSpeed(Adjustable scrollBar, DBConfig config) {
+        String value = config.getConfigValue();
+
+        int i = Integer.parseInt(value);
+
+        if (i <= 0) {
+            logger.error("invalid scrolling interval: {} using default value: {}", i, config.getConfigValue());
+            i = Integer.parseInt(config.getConfigValue());
+        }
+
+        scrollBar.setUnitIncrement(i);
+    }
+
+    private void registerActionKeyListenerOnRootPane(KeyStroke key) {
+        if (myrootPane == null)
+            return;
+
+        myrootPane.registerKeyboardAction(new ActionKeyListener(key), key,
+                JComponent.WHEN_IN_FOCUSED_WINDOW);
+    }
+
+    private void setBindVarsChanged() {
+
+        if (bind_vars == null)
+            return;
+
+        for (Pair pair : bind_vars.getBindVarPairs()) {
+            if (pair.get_first() instanceof NoticeIfChangedTextField text_field) {
+                text_field.setChanged(false);
+            }
+        }
+    }
+
+    private void checkBindVars() {
+        if (bind_vars == null)
+            bind_vars = new BindVarBase();
+    }
+
+    private void autoSwitchToCurrentLocale() {
+        translation_helper.autoSwitchToCurrentLocale();
     }
 
     private void cancelAutoRefreshTimer() {

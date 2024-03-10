@@ -60,4 +60,8 @@ public interface BaseDialogBase
      * @return translated message, if available
      */
     String MlM(String message);
+
+    default Point mousePosition() {
+        return MouseInfo.getPointerInfo().getLocation();
+    }
 }
