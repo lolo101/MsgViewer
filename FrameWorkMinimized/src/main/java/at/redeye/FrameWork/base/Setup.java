@@ -7,6 +7,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -23,15 +25,13 @@ public class Setup {
     private static final boolean b_is_win_system = WINDOWS_OS_NAME.matcher(System.getProperty("os.name")).matches();
     private static final boolean b_is_linux_system = System.getProperty("os.name").equals("Linux");
     private static final boolean b_is_mac = System.getProperty("os.name").toLowerCase().contains("mac");
-    private final String config_file;
+    private final Path config_file;
     private Properties props;
 
     protected Setup(String app_name) {
-        String new_location = getAppConfigFile(app_name);
+        Path new_location = getAppConfigFile(app_name);
 
-        File file = new File(new_location);
-
-        if (file.exists()) {
+        if (Files.exists(new_location)) {
             config_file = new_location;
             check();
         } else {
@@ -57,7 +57,7 @@ public class Setup {
         try {
             Properties oldProps = new Properties();
 
-            try (FileInputStream in = new FileInputStream(config_file)) {
+            try (InputStream in = Files.newInputStream(config_file)) {
                 oldProps.load(in);
             } catch (FileNotFoundException ex) {
                 logger.error(ex.toString());
@@ -77,7 +77,7 @@ public class Setup {
                 }
             }
 
-            try (FileOutputStream out = new FileOutputStream(config_file)) {
+            try (OutputStream out = Files.newOutputStream(config_file)) {
                 props.store(out, "nix");
             }
 
@@ -123,12 +123,12 @@ public class Setup {
         return config_path + File.separator + name;
     }
 
-    private static String getAppConfigFile(String app_name) {
+    private static Path getAppConfigFile(String app_name) {
         String file_name = app_name + ".properties";
 
         String dir = getAppConfigDir(app_name);
 
-        return dir + File.separator + file_name;
+        return Path.of(dir, file_name);
     }
 
     private void check() {
@@ -140,7 +140,7 @@ public class Setup {
     private void loadProps() {
         props = new Properties();
 
-        try (FileInputStream in = new FileInputStream(config_file)) {
+        try (InputStream in = Files.newInputStream(config_file)) {
             props.load(in);
 
         } catch (FileNotFoundException ignored) {
