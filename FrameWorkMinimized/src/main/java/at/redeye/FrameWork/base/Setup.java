@@ -29,14 +29,11 @@ public class Setup {
     private Properties props;
 
     protected Setup(String app_name) {
-        Path new_location = getAppConfigFile(app_name);
+        config_file = getAppConfigFile(app_name);
 
-        if (Files.exists(new_location)) {
-            config_file = new_location;
-            check();
+        if (Files.exists(config_file)) {
+            initProps();
         } else {
-            check();
-            config_file = new_location;
             saveProps();
         }
     }
@@ -104,12 +101,12 @@ public class Setup {
     }
 
     public String getConfig(String key, String default_value) {
-        check();
+        initProps();
         return props.getProperty(key, default_value);
     }
 
     public void setLocalConfig(String key, String value) {
-        check();
+        initProps();
         props.setProperty(key, value);
     }
 
@@ -131,25 +128,22 @@ public class Setup {
         return Path.of(dir, file_name);
     }
 
-    private void check() {
+    private void initProps() {
         if (props == null) {
-            loadProps();
+            props = loadProps();
         }
     }
 
-    private void loadProps() {
-        props = new Properties();
+    private Properties loadProps() {
+        Properties properties = new Properties();
 
         try (InputStream in = Files.newInputStream(config_file)) {
-            props.load(in);
-
+            properties.load(in);
         } catch (FileNotFoundException ignored) {
-
-
         } catch (IOException ioe) {
-
             System.err.println("Unhandled exception:");
             ioe.printStackTrace();
         }
+        return properties;
     }
 }
