@@ -23,15 +23,11 @@ public class Setup {
     private static final boolean b_is_win_system = WINDOWS_OS_NAME.matcher(System.getProperty("os.name")).matches();
     private static final boolean b_is_linux_system = System.getProperty("os.name").equals("Linux");
     private static final boolean b_is_mac = System.getProperty("os.name").toLowerCase().contains("mac");
-    private String config_file;
+    private final String config_file;
     private Properties props;
 
     protected Setup(String app_name) {
-        String config_name = app_name + ".properties";
-
-        config_file = getHiddenUserHomeFileName(config_name);
-
-        String new_location = getAppConfigFile(app_name, config_name);
+        String new_location = getAppConfigFile(app_name);
 
         File file = new File(new_location);
 
@@ -100,7 +96,7 @@ public class Setup {
         if( !file.exists() )
         {
             if (!file.mkdirs()) {
-                logger.error("failed createing directory" + name + " !!!");
+                logger.error("failed createing directory {} !!!", name);
                 name = null;
             }
         }
@@ -127,7 +123,9 @@ public class Setup {
         return config_path + File.separator + name;
     }
 
-    private static String getAppConfigFile(String app_name, String file_name) {
+    private static String getAppConfigFile(String app_name) {
+        String file_name = app_name + ".properties";
+
         String dir = getAppConfigDir(app_name);
 
         return dir + File.separator + file_name;
