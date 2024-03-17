@@ -6,7 +6,10 @@ import at.redeye.FrameWork.base.prm.impl.PrmActionEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
@@ -70,18 +73,15 @@ public class Setup {
 
     public static String getAppConfigDir( String app_name )
     {
-        String name = getHiddenUserHomeFileName( app_name );
+        Path name = getHiddenUserHomeFileName(app_name);
 
-        File file = new File(name);
-
-        if( !file.exists() )
-        {
-            if (!file.mkdirs()) {
-                logger.error("failed createing directory {} !!!", name);
-                name = null;
-            }
+        try {
+            Files.createDirectories(name);
+        } catch (IOException ignored) {
+            logger.error("failed createing directory {} !!!", name);
         }
-        return name;
+
+        return name.toString();
     }
 
     public String getConfig(String key, String default_value) {
@@ -92,14 +92,14 @@ public class Setup {
         props.setProperty(key, value);
     }
 
-    private static String getHiddenUserHomeFileName(String name) {
+    private static Path getHiddenUserHomeFileName(String name) {
         String config_path = System.getProperty("user.home");
 
         if (!is_win_system()) {
             name = "." + name;
         }
 
-        return config_path + File.separator + name;
+        return Path.of(config_path, name);
     }
 
     private static Path getAppConfigFile(String app_name) {
