@@ -10,7 +10,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 public class Setup {
@@ -26,15 +25,16 @@ public class Setup {
     private static final boolean b_is_linux_system = System.getProperty("os.name").equals("Linux");
     private static final boolean b_is_mac = System.getProperty("os.name").toLowerCase().contains("mac");
     private final Path config_file;
-    private Properties props;
+    private final Properties props;
 
     protected Setup(String app_name) {
         config_file = getAppConfigFile(app_name);
 
         if (Files.exists(config_file)) {
-            initProps();
+            props = loadProps();
         } else {
-            saveProps();
+            props = new Properties();
+            writeAppConfigFile(props);
         }
     }
 
@@ -60,23 +60,7 @@ public class Setup {
                 logger.error(ex.toString());
             }
 
-            Set<String> keys = oldProps.stringPropertyNames();
-
-            for (String currKey : keys) {
-                DBConfig c = ConfigDefinitions.get(currKey);
-                if (c != null) {
-                    PrmActionEvent event = new PrmActionEvent();
-                    event.setOldPrmValue(oldProps.getProperty(currKey, ""));
-                    event.setNewPrmValue(props.getProperty(currKey, ""));
-                    event.setParameterName(currKey);
-                    event.setPossibleVals(c.getPossibleValues());
-                    c.updateListeners(event);
-                }
-            }
-
-            try (OutputStream out = Files.newOutputStream(config_file)) {
-                props.store(out, "nix");
-            }
+            writeAppConfigFile(oldProps);
 
         } catch (IOException ioe) {
             System.err.println("Unhandled exception:");
@@ -101,12 +85,10 @@ public class Setup {
     }
 
     public String getConfig(String key, String default_value) {
-        initProps();
         return props.getProperty(key, default_value);
     }
 
     public void setLocalConfig(String key, String value) {
-        initProps();
         props.setProperty(key, value);
     }
 
@@ -128,22 +110,36 @@ public class Setup {
         return Path.of(dir, file_name);
     }
 
-    private void initProps() {
-        if (props == null) {
-            props = loadProps();
-        }
-    }
-
     private Properties loadProps() {
         Properties properties = new Properties();
 
         try (InputStream in = Files.newInputStream(config_file)) {
             properties.load(in);
-        } catch (FileNotFoundException ignored) {
         } catch (IOException ioe) {
             System.err.println("Unhandled exception:");
             ioe.printStackTrace();
         }
         return properties;
+    }
+
+    private void writeAppConfigFile(Properties oldProps) {
+        for (String currKey : oldProps.stringPropertyNames()) {
+            DBConfig c = ConfigDefinitions.get(currKey);
+            if (c != null) {
+                PrmActionEvent event = new PrmActionEvent();
+                event.setOldPrmValue(oldProps.getProperty(currKey, ""));
+                event.setNewPrmValue(props.getProperty(currKey, ""));
+                event.setParameterName(currKey);
+                event.setPossibleVals(c.getPossibleValues());
+                c.updateListeners(event);
+            }
+        }
+
+        try (OutputStream out = Files.newOutputStream(config_file)) {
+            props.store(out, "nix");
+        } catch (IOException ioe) {
+            System.err.println("Unhandled exception:");
+            ioe.printStackTrace();
+        }
     }
 }
