@@ -59,10 +59,6 @@ public class Message {
     public static final DateTimeFormatter DATE_TIME_FORMATTER = new DateTimeFormatterBuilder().appendPattern("[EEE, ]d MMM y HH:mm[:ss] Z").toFormatter(Locale.US);
 
     /**
-     * The message class as defined in the .msg file.
-     */
-    private String messageClass = "IPM.Note";
-    /**
      * The message Id.
      */
     private String messageId;
@@ -143,9 +139,6 @@ public class Message {
     void setProperty(Property property) {
         this.properties.add(property);
         switch (property.getPid()) {
-            case PidTagMessageClass:
-                this.setMessageClass((String) property.getValue());
-                break;
             case PidTagInternetMessageId:
                 this.setMessageId((String) property.getValue());
                 break;
@@ -360,13 +353,6 @@ public class Message {
 
     private void setDisplayBcc(String displayBcc) {
         this.displayBcc = displayBcc;
-    }
-
-    /**
-     * @param messageClass the messageClass to set
-     */
-    private void setMessageClass(String messageClass) {
-        this.messageClass = messageClass;
     }
 
     /**

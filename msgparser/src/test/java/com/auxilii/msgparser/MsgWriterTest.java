@@ -1,9 +1,7 @@
-package net.sourceforge.MSGViewer.factory.msg;
+package com.auxilii.msgparser;
 
-import com.auxilii.msgparser.Message;
+import com.auxilii.msgparser.attachment.FileAttachment;
 import com.google.common.jimfs.Jimfs;
-import net.sourceforge.MSGViewer.ModuleLauncher;
-import net.sourceforge.MSGViewer.factory.MessageParser;
 import org.apache.poi.poifs.filesystem.DirectoryNode;
 import org.apache.poi.poifs.filesystem.DocumentEntry;
 import org.apache.poi.poifs.filesystem.DocumentInputStream;
@@ -11,39 +9,23 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.junit.jupiter.api.Test;
 
 import java.io.OutputStream;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class MsgWriterTest {
 
-    @Test
-    void testWrite() throws Exception {
-        ModuleLauncher.BaseConfigureLogging();
-
-        try (FileSystem fileSystem = Jimfs.newFileSystem()) {
-            Path testOut = fileSystem.getPath("test_out.msg");
-            try (OutputStream outputStream = Files.newOutputStream(testOut)) {
-                Message msg = givenMessage("/danke.msg");
-                new MsgWriter(msg).write(outputStream);
-            }
-            assertThat(Files.isRegularFile(testOut)).isTrue();
-        }
-    }
+    private static final String CONTENT_ID = "part1.HRgTI02d.mjRZp5Gh@neuf.fr";
 
     @Test
     void issue129() throws Exception {
-        ModuleLauncher.BaseConfigureLogging();
-
         try (FileSystem fileSystem = Jimfs.newFileSystem()) {
             Path testOut = fileSystem.getPath("test_out.msg");
             try (OutputStream outputStream = Files.newOutputStream(testOut)) {
-                Message msg = givenMessage("/issue129/test.eml");
+                Message msg = givenMessage();
                 new MsgWriter(msg).write(outputStream);
             }
 
@@ -53,14 +35,18 @@ class MsgWriterTest {
                 DocumentEntry contentId = (DocumentEntry) attachment.getEntry("__substg1.0_3712001F");
                 try (DocumentInputStream stream = new DocumentInputStream(contentId)) {
                     String contentIdValue = new String(stream.readAllBytes(), StandardCharsets.UTF_16LE);
-                    assertThat(contentIdValue).isEqualTo("part1.HRgTI02d.mjRZp5Gh@neuf.fr");
+                    assertThat(contentIdValue).isEqualTo(CONTENT_ID);
                 }
             }
         }
     }
 
-    private static Message givenMessage(String name) throws Exception {
-        URI uri = Objects.requireNonNull(MsgWriterTest.class.getResource(name)).toURI();
-        return new MessageParser(Path.of(uri)).parseMessage();
+    private static Message givenMessage() {
+        Message message = new Message();
+        FileAttachment attachment = new FileAttachment();
+        attachment.setContentId(CONTENT_ID);
+        attachment.setData(new byte[0]);
+        message.addAttachment(attachment);
+        return message;
     }
 }
