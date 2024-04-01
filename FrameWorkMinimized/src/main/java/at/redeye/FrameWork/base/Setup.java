@@ -1,19 +1,13 @@
 package at.redeye.FrameWork.base;
 
+import static java.nio.file.StandardOpenOption.CREATE;
 import at.redeye.FrameWork.base.prm.bindtypes.DBConfig;
-import at.redeye.FrameWork.base.prm.impl.ConfigDefinitions;
-import at.redeye.FrameWork.base.prm.impl.PrmActionEvent;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import at.redeye.FrameWork.base.prm.impl.*;
+import java.io.*;
+import java.nio.file.*;
 import java.util.Properties;
 import java.util.regex.Pattern;
+import org.apache.logging.log4j.*;
 
 public class Setup {
 
@@ -30,7 +24,7 @@ public class Setup {
     private final Path config_file;
     private final Properties props;
 
-    protected Setup(String userHome, String app_name) {
+    protected Setup(Path userHome, String app_name) {
         config_file = getAppConfigFile(userHome, app_name);
 
         if (Files.exists(config_file)) {
@@ -71,15 +65,15 @@ public class Setup {
         }
     }
 
-    private static Path getAppConfigFile(String userHome, String app_name) {
+    private static Path getAppConfigFile(Path userHome, String app_name) {
         String file_name = app_name + ".properties";
 
-        String dir = getAppConfigDir(userHome, app_name);
+        Path dir = getAppConfigDir(userHome, app_name);
 
-        return Path.of(dir, file_name);
+        return dir.resolve(file_name);
     }
 
-    public static String getAppConfigDir(String userHome, String app_name)
+    public static Path getAppConfigDir(Path userHome, String app_name)
     {
         Path name = getHiddenUserHomeFileName(userHome, app_name);
 
@@ -89,16 +83,16 @@ public class Setup {
             logger.error("failed createing directory {} !!!", name);
         }
 
-        return name.toString();
+        return name;
     }
 
-    private static Path getHiddenUserHomeFileName(String userHome, String name) {
+    private static Path getHiddenUserHomeFileName(Path userHome, String name) {
 
         if (!is_win_system()) {
             name = "." + name;
         }
 
-        return Path.of(userHome, name);
+        return userHome.resolve(name);
     }
 
     public String getConfig(String key, String default_value) {
@@ -134,7 +128,7 @@ public class Setup {
             }
         }
 
-        try (OutputStream out = Files.newOutputStream(config_file)) {
+        try (OutputStream out = Files.newOutputStream(config_file, CREATE)) {
             props.store(out, "nix");
         } catch (IOException ioe) {
             System.err.println("Unhandled exception:");

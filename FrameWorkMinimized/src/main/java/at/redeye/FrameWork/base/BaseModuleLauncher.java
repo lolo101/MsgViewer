@@ -1,7 +1,6 @@
 package at.redeye.FrameWork.base;
 
-import at.redeye.FrameWork.utilities.ParseJNLP;
-import at.redeye.FrameWork.utilities.StringUtils;
+import at.redeye.FrameWork.utilities.*;
 import at.redeye.FrameWork.widgets.StartupWindow;
 import java.io.File;
 import java.nio.file.Path;
@@ -10,15 +9,9 @@ import java.util.stream.Stream;
 import javax.swing.*;
 import org.apache.logging.log4j.*;
 import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.appender.ConsoleAppender;
-import org.apache.logging.log4j.core.appender.RollingFileAppender;
+import org.apache.logging.log4j.core.appender.*;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.layout.PatternLayout;
-
-import javax.swing.*;
-import java.io.File;
-import java.util.Properties;
-import java.util.stream.Stream;
 
 public class BaseModuleLauncher {
     protected StartupWindow splash;
@@ -112,7 +105,7 @@ public class BaseModuleLauncher {
         String loggingEnabled = BaseAppConfigDefinitions.DoLogging.getConfigValue();
 
         if (logFileDir.equals("APPHOME"))
-            logFileDir = Setup.getAppConfigDir(System.getProperty("user.home"), root.getAppName() + "/log");
+            logFileDir = Setup.getAppConfigDir(Path.of(System.getProperty("user.home")), root.getAppName()).resolve("log").toString();
 
         String filename = logFileDir + (logFileDir.isEmpty() ? "" : "/")
                 + "log.OS-" + System.getProperty("user.name", "unknown-user")

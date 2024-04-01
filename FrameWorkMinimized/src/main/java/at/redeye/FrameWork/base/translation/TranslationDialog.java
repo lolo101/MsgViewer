@@ -1,17 +1,13 @@
 package at.redeye.FrameWork.base.translation;
 
 import at.redeye.FrameWork.base.*;
-import at.redeye.FrameWork.widgets.GridLayout2;
-import at.redeye.FrameWork.widgets.NoticeIfChangedTextField;
+import at.redeye.FrameWork.widgets.*;
 import at.redeye.FrameWork.widgets.helpwindow.HelpWin;
-
-import javax.swing.*;
 import java.awt.*;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Path;
 import java.util.*;
+import javax.swing.*;
 
 public class TranslationDialog extends BaseDialog {
 
@@ -557,7 +553,7 @@ public class TranslationDialog extends BaseDialog {
     }
 
     public static String getTranslationsDir(Root root) {
-        String dir = Setup.getAppConfigDir(System.getProperty("user.home"), root.getAppName()) + "/translations/";
+        String dir = Setup.getAppConfigDir(Path.of(System.getProperty("user.home")), root.getAppName()) + "/translations/";
 
         File fdir = new File(dir);
 

@@ -4,10 +4,8 @@ import at.redeye.FrameWork.base.prm.bindtypes.DBConfig;
 import at.redeye.FrameWork.base.prm.impl.ConfigDefinitions;
 import at.redeye.FrameWork.base.translation.MLHelper;
 import at.redeye.FrameWork.utilities.Storage;
-
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Locale;
+import java.util.*;
 
 public class Root {
     private static Root static_root;
@@ -58,7 +56,7 @@ public class Root {
     public Root(String app_name) {
         this.app_name = app_name;
         static_root = this;
-        setup = new Setup(System.getProperty("user.home"), app_name);
+        setup = new Setup(Path.of(System.getProperty("user.home")), app_name);
         plugins = new Plugins(app_name);
         storage = Storage.getEphemeralStorage(this.app_name);
         dialogs = new Dialogs(this);

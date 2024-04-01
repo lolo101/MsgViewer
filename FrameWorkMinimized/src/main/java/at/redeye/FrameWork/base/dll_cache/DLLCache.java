@@ -1,11 +1,9 @@
 package at.redeye.FrameWork.base.dll_cache;
 
 import at.redeye.FrameWork.base.Setup;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.util.ArrayList;
-import java.util.Collection;
+import java.nio.file.Path;
+import java.util.*;
+import org.apache.logging.log4j.*;
 
 public class DLLCache {
     private static final Logger logger = LogManager.getLogger(DLLCache.class);
@@ -16,7 +14,7 @@ public class DLLCache {
     private final Collection<DLLExtractor> extractors = new ArrayList<>();
 
     public DLLCache(String appName) {
-        cache_dir = Setup.getAppConfigDir(System.getProperty("user.home"), appName + "/jar/dll_cache");
+        cache_dir = Setup.getAppConfigDir(Path.of(System.getProperty("user.home")), appName).resolve("jar/dll_cache").toString();
     }
 
     synchronized public void initEnv() {
