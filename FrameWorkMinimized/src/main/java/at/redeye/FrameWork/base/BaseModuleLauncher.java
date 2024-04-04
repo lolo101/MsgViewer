@@ -3,6 +3,8 @@ package at.redeye.FrameWork.base;
 import at.redeye.FrameWork.utilities.ParseJNLP;
 import at.redeye.FrameWork.utilities.StringUtils;
 import at.redeye.FrameWork.widgets.StartupWindow;
+import java.util.Arrays;
+import java.util.List;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -158,7 +160,8 @@ public class BaseModuleLauncher {
         try {
             UIManager.setLookAndFeel(UIManager.createLookAndFeel(config));
         } catch (UnsupportedLookAndFeelException e) {
-            logger.error(e.getMessage(), e);
+            List<String> names = Arrays.stream(UIManager.getInstalledLookAndFeels()).map(UIManager.LookAndFeelInfo::getName).toList();
+            logger.error("{} is unavailable. Available LnF: {}", config, names);
         }
     }
 }
