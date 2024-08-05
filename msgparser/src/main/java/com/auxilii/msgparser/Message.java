@@ -32,7 +32,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -59,7 +58,7 @@ public class Message {
     public static final DateTimeFormatter DATE_TIME_FORMATTER = new DateTimeFormatterBuilder().appendPattern("[EEE, ]d MMM y HH:mm[:ss] Z").toFormatter(Locale.US);
 
     /**
-     * The message Id.
+     * The message ID.
      */
     private String messageId;
     /**
@@ -70,7 +69,7 @@ public class Message {
     private String fromSMTPAddress;
 
     /**
-     * The name part of the From: mail address
+     * The name part of the "From:" mail address
      */
     private String fromName;
     private String fromAddressType;
@@ -121,7 +120,7 @@ public class Message {
     /**
      * Contains all properties that are not covered by the special properties.
      */
-    private final Collection<Property> properties = new ArrayList<>();
+    private final List<Property> properties = new ArrayList<>();
     /**
      * A list containing all recipients for this message (which can be set in the
      * 'to:', 'cc:' and 'bcc:' field, respectively).
@@ -199,6 +198,13 @@ public class Message {
                 }
                 break;
         }
+    }
+
+    /**
+     * The properties in the order they were added to the message.
+     */
+    public List<Property> getProperties() {
+        return properties;
     }
 
     /**
@@ -485,7 +491,7 @@ public class Message {
         try {
             return ZonedDateTime.from(DATE_TIME_FORMATTER.parse(dateValue));
         } catch (Exception e) {
-            LOGGER.info("Could not parse date " + dateValue, e);
+            LOGGER.info("Could not parse date {}", dateValue, e);
             return null;
         }
     }
