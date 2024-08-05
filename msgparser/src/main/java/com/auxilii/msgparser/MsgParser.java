@@ -70,7 +70,7 @@ public class MsgParser {
                 msg.addAttachment(parseAttachment(entry));
             }
             while (propertyStream.available() > 0) {
-                msg.setProperty(new Property(propertyStream, dir));
+                msg.addProperty(new Property(propertyStream, dir));
             }
             return msg;
         }
@@ -90,7 +90,7 @@ public class MsgParser {
         try (DocumentInputStream propertyStream = new DocumentInputStream(propertyEntry)) {
             propertyStream.skip(8);
             while (propertyStream.available() > 0) {
-                recipient.setProperty(new Property(propertyStream, dir));
+                recipient.addProperty(new Property(propertyStream, dir));
             }
         }
         return recipient;
@@ -135,7 +135,7 @@ public class MsgParser {
         FileAttachment fileAttachment = new FileAttachment();
         while (propertyStream.available() > 0) {
             Property property = new Property(propertyStream, dir);
-            fileAttachment.setProperty(property);
+            fileAttachment.addProperty(property);
         }
         return fileAttachment;
     }

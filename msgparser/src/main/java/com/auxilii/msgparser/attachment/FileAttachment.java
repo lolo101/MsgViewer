@@ -164,7 +164,7 @@ public class FileAttachment implements Attachment {
         this.contentLocation = contentLocation;
     }
 
-    public void setProperty(Property property) throws ClassCastException {
+    public void addProperty(Property property) throws ClassCastException {
         switch (property.getPid()) {
             case PidTagDisplayName:
                 setDisplayName((String) property.getValue());

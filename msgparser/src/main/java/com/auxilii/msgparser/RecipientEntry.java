@@ -1,20 +1,3 @@
-/*
- * msgparser - http://auxilii.com/msgparser
- * Copyright (C) 2007  Roman Kurmanowytsch
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
- */
 package com.auxilii.msgparser;
 
 import org.apache.commons.validator.routines.EmailValidator;
@@ -35,7 +18,7 @@ public class RecipientEntry {
     private String name;
     private RecipientType type;
 
-    void setProperty(Property property) {
+    void addProperty(Property property) {
         switch (property.getPid()) {
             case PidTagRecipientType:
                 setType(RecipientType.from((int) property.getValue()));
@@ -105,7 +88,7 @@ public class RecipientEntry {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(this.name);
-        if (sb.length() > 0) {
+        if (!sb.isEmpty()) {
             sb.append(" ");
         }
         String mailTo = mailTo();

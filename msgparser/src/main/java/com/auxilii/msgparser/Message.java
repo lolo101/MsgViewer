@@ -135,7 +135,7 @@ public class Message {
         this.recipients.add(recipient);
     }
 
-    void setProperty(Property property) {
+    void addProperty(Property property) {
         this.properties.add(property);
         switch (property.getPid()) {
             case PidTagInternetMessageId:
