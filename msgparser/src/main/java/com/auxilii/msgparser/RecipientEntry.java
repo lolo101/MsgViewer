@@ -2,6 +2,9 @@ package com.auxilii.msgparser;
 
 import org.apache.commons.validator.routines.EmailValidator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
@@ -17,8 +20,10 @@ public class RecipientEntry {
     private String smtp;
     private String name;
     private RecipientType type;
+    private final List<Property> properties = new ArrayList<>();
 
     void addProperty(Property property) {
+        properties.add(property);
         switch (property.getPid()) {
             case PidTagRecipientType:
                 setType(RecipientType.from((int) property.getValue()));
@@ -33,6 +38,10 @@ public class RecipientEntry {
                 setSmtp((String) property.getValue());
                 break;
         }
+    }
+
+    public List<Property> getProperties() {
+        return properties;
     }
 
     public String getEmail() {

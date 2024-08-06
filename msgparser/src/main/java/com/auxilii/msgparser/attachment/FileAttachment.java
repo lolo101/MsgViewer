@@ -21,6 +21,8 @@ import com.auxilii.msgparser.Property;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
 /**
@@ -59,6 +61,8 @@ public class FileAttachment implements Attachment {
      */
     private String contentId;
     private String contentLocation;
+
+    private final List<Property> properties = new ArrayList<>();
 
     private void setDisplayName(String displayName) {
         this.displayName = displayName;
@@ -165,6 +169,7 @@ public class FileAttachment implements Attachment {
     }
 
     public void addProperty(Property property) throws ClassCastException {
+        properties.add(property);
         switch (property.getPid()) {
             case PidTagDisplayName:
                 setDisplayName((String) property.getValue());
@@ -191,6 +196,10 @@ public class FileAttachment implements Attachment {
                 setContentLocation((String) property.getValue());
                 break;
         }
+    }
+
+    public List<Property> getProperties() {
+        return properties;
     }
 
     /**
