@@ -31,7 +31,7 @@ import java.util.stream.Stream;
  *
  * @author roman.kurmanowytsch
  */
-public class FileAttachment implements Attachment {
+public final class FileAttachment implements Attachment {
 
     private String displayName;
 
