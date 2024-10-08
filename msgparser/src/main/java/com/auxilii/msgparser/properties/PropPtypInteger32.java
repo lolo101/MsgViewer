@@ -1,4 +1,4 @@
-package net.sourceforge.MSGViewer.factory.msg.properties;
+package com.auxilii.msgparser.properties;
 
 import com.auxilii.msgparser.Pid;
 

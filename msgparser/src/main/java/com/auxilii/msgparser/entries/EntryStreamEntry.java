@@ -1,4 +1,4 @@
-package net.sourceforge.MSGViewer.factory.msg.entries;
+package com.auxilii.msgparser.entries;
 
 import static com.auxilii.msgparser.Pid.PidTagEntryStream;
 
