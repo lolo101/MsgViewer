@@ -1,8 +1,8 @@
-package net.sourceforge.MSGViewer.factory.msg.entries;
+package com.auxilii.msgparser.entries;
 
 import com.auxilii.msgparser.Pid;
-import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypByteArray;
-import net.sourceforge.MSGViewer.factory.msg.properties.PropType;
+import com.auxilii.msgparser.properties.PropPtypByteArray;
+import com.auxilii.msgparser.properties.PropType;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
