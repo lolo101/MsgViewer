@@ -1,10 +1,10 @@
 package net.sourceforge.MSGViewer.factory;
 
 import com.auxilii.msgparser.Message;
+import com.auxilii.msgparser.MsgWriter;
 import net.sourceforge.MSGViewer.AttachmentRepository;
 import net.sourceforge.MSGViewer.factory.mbox.EMLWriterViaJavaMail;
 import net.sourceforge.MSGViewer.factory.mbox.MBoxWriterViaJavaMail;
-import net.sourceforge.MSGViewer.factory.msg.MsgWriter;
 
 import java.io.IOException;
 import java.io.OutputStream;
