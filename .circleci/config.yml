@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: cimg/openjdk:17.0.13-browsers
+      - image: cimg/openjdk:17.0.14-browsers
 
     steps:
       - checkout
