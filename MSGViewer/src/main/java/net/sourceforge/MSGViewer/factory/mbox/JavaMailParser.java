@@ -69,7 +69,7 @@ public class JavaMailParser {
 
     private static void parse(Message msg, Part part) throws MessagingException, IOException
     {
-        LOGGER.info("Content Type: " + part.getContentType());
+        LOGGER.info("Content Type: {}", part.getContentType());
 
         if( part.isMimeType("text/plain") && msg.getBodyText().isEmpty() )
         {
@@ -125,7 +125,7 @@ public class JavaMailParser {
             try {
                 new String(c,charset);
             } catch( UnsupportedEncodingException ex ) {
-                LOGGER.error("Invalid encoding: " + content + "=>'" + charset +"'", ex);
+                LOGGER.error("Invalid encoding: {}=>'{}'", content, charset, ex);
                 return "ASCII";
             }
 

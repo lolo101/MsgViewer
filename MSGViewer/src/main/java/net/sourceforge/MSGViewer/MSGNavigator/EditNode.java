@@ -118,7 +118,7 @@ public class EditNode extends BaseDialog {
                 String data = jtHex.getText();
 
                 data = data.replaceAll("[ \t\n]", "");
-                logger.info("Data: " + data);
+                logger.info("Data: {}", data);
 
                 byte[] bytes = new byte[data.length() / 2];
                 int bcount = 0;

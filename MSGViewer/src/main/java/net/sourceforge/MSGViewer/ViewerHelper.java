@@ -72,7 +72,7 @@ public class ViewerHelper {
                 Path content = attachmentRepository.getTempFile(fatt);
 
                 if (content.toUri().equals(uri)) {
-                    logger.info("opening " + fatt);
+                    logger.info("opening {}", fatt);
 
                     if (!Files.exists(content)) {
                         try (OutputStream fout = Files.newOutputStream(content)) {

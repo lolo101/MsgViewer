@@ -79,9 +79,9 @@ public class EditorDropTarget implements DropTargetListener {
                 }
 
                 dtde.dropComplete(result);
-                logger.info("Drop completed, success: " + result);
+                logger.info("Drop completed, success: {}", result);
             } catch (Exception e) {
-                logger.info("Exception while handling drop " + e);
+                logger.info("Exception while handling drop {}", String.valueOf(e));
                 dtde.rejectDrop();
             }
         } else {
@@ -134,8 +134,8 @@ public class EditorDropTarget implements DropTargetListener {
         draggingContent = dtde.isDataFlavorSupported(DataFlavor.plainTextFlavor)
                 || dtde.isDataFlavorSupported(DataFlavor.stringFlavor);
 
-        logger.info("Dragging a file - " + draggingFile);
-        logger.info("Dragging content - " + draggingContent);
+        logger.info("Dragging a file - {}", draggingFile);
+        logger.info("Dragging content - {}", draggingContent);
     }
 
     // This method handles a drop for a list of files
@@ -144,7 +144,7 @@ public class EditorDropTarget implements DropTargetListener {
         List<File> fileList = (List<File>) transferable
                 .getTransferData(DataFlavor.javaFileListFlavor);
         fileList.forEach(transferFile -> {
-            logger.info("Opening file " + transferFile);
+            logger.info("Opening file {}", transferFile);
             messageView.view(transferFile.getPath());
         });
 
@@ -163,8 +163,7 @@ public class EditorDropTarget implements DropTargetListener {
 
             // Look for either plain text or a String.
             for (DataFlavor flavor : flavors) {
-                logger.info("Drop MIME type " + flavor.getMimeType()
-                        + " is available");
+                logger.info("Drop MIME type {} is available", flavor.getMimeType());
                 if (flavor.equals(DataFlavor.plainTextFlavor)
                         || flavor.equals(DataFlavor.stringFlavor)) {
                     selectedFlavor = flavor;
@@ -177,14 +176,12 @@ public class EditorDropTarget implements DropTargetListener {
                 return false;
             }
 
-            logger.info("Selected flavor is "
-                    + selectedFlavor.getHumanPresentableName());
+            logger.info("Selected flavor is {}", selectedFlavor.getHumanPresentableName());
 
-            // Get the transferable and then obtain the data
+            // Get the transferable data
             Object data = transferable.getTransferData(selectedFlavor);
 
-            logger.info("Transfer data type is "
-                    + data.getClass().getName());
+            logger.info("Transfer data type is {}", data.getClass().getName());
 
             String insertData = null;
             if (data instanceof InputStream is) {
@@ -205,7 +202,7 @@ public class EditorDropTarget implements DropTargetListener {
 
             if (insertData != null) {
 
-                logger.info("inserting text:" + insertData);
+                logger.info("inserting text:{}", insertData);
 
                 String[] files_to_open = insertData.split("\n");
 

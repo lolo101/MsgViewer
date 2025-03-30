@@ -27,9 +27,9 @@ public abstract class CLIFileConverter {
 	private boolean openAfterConvert;
 
 	/**
-	 * @param sourceType the source file type (i.e. ending) without a leading dot. E.g.
+	 * @param sourceType the source file type (i.e., ending) without a leading dot. E.g.
 	 *                   "msg"
-	 * @param targetType the target file type (i.e. ending) without a leading dot. E.g.
+	 * @param targetType the target file type (i.e., ending) without a leading dot. E.g.
 	 *                   "mbox"
 	 */
 	CLIFileConverter(ModuleLauncher module_launcher, String sourceType,
@@ -91,10 +91,10 @@ public abstract class CLIFileConverter {
 					? Files.createTempFile(baseFileName, String.format(".%s", targetType))
 					: sourceFile.getParent().resolve(String.format("%s.%s", baseFileName, targetType));
 
-			LOGGER.info("conversion source file: " + sourceFile);
+			LOGGER.info("conversion source file: {}", sourceFile);
 			Message msg = new MessageParser(sourceFile).parseMessage();
 
-			LOGGER.info("conversion target file: " + targetFile);
+			LOGGER.info("conversion target file: {}", targetFile);
 			AttachmentRepository attachmentRepository = new AttachmentRepository(module_launcher.root);
 			new MessageSaver(attachmentRepository, msg).saveMessage(targetFile);
 

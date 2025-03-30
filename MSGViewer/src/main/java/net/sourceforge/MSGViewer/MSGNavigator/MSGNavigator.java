@@ -197,7 +197,7 @@ public class MSGNavigator extends BaseDialog {
 
             TreeNodeContainer cont = (TreeNodeContainer) path.getLastPathComponent();
 
-            logger.info("deleting : " + cont.getEntry().getName());
+            logger.info("deleting : {}", cont.getEntry().getName());
 
             TopLevelPropertyStream tops = new TopLevelPropertyStream(fs.getRoot());
             tops.delete(cont.getEntry());

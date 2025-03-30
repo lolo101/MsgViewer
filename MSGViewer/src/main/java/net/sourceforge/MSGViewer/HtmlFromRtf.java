@@ -33,7 +33,7 @@ class HtmlFromRtf {
 {\*\htmltag1 \par }
 {\*\htmltag241 <style>}
      *
-     *  So we will try to remove all leading { and } and all \htmltag and hoping the best
+     *  So we will try to remove all leading { and } and all \htmltag and hope for the best
      */
 
     byte[] extractHtml() throws ParseException {

@@ -31,7 +31,7 @@ public class FileChooser {
         fc.setMultiSelectionEnabled(true);
 
         String lastPath = setup.getConfig(LAST_PATH_KEY, null);
-        logger.info("last path: " + lastPath);
+        logger.info("last path: {}", lastPath);
         if (lastPath != null) {
             fc.setCurrentDirectory(new File(lastPath));
         }
@@ -53,7 +53,7 @@ public class FileChooser {
         fc.addChoosableFileFilter(eml_filter);
         fc.setMultiSelectionEnabled(false);
         String lastPath = setup.getConfig(LAST_PATH_KEY, null);
-        logger.info("last path: " + lastPath);
+        logger.info("last path: {}", lastPath);
         if (lastPath != null) {
             fc.setCurrentDirectory(new File(lastPath));
         }

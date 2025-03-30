@@ -20,7 +20,7 @@ public abstract class RecipientHeader {
     }
 
     public void parse(Message msg, String line) {
-        LOGGER.debug("line: " + line);
+        LOGGER.debug("line: {}", line);
         splitAttendees(line).forEach(msg::addRecipient);
     }
 

@@ -97,7 +97,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
     }
 
     public void view(String file_name) {
-        logger.info("filename: " + file_name);
+        logger.info("filename: {}", file_name);
 
         if (file_name.startsWith("file://")) {
             file_name = URLDecoder.decode(file_name, StandardCharsets.UTF_8);
@@ -326,7 +326,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
                     logger.info("extracting HTML data from RTF Code");
 
                     if (logger.isTraceEnabled()) {
-                        logger.trace("\n" + StringUtils.addLineNumbers(bodyRTF));
+                        logger.trace("\n{}", StringUtils.addLineNumbers(bodyRTF));
                     }
 
                     Source source = ViewerHelper.extractHTMLFromRTF(bodyRTF);
@@ -378,15 +378,15 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
 
     private void open(String path) throws IOException {
         if (Setup.is_win_system() && root.getPlugins().getAvailable("ShellExec") != null) {
-            logger.info("opening: " + path);
+            logger.info("opening: {}", path);
 
             ShellExec shell = new ShellExec();
             int ret = shell.execute(path);
-            logger.debug("shell exec returned: " + ret);
+            logger.debug("shell exec returned: {}", ret);
         } else {
             String open_command = ViewerHelper.getOpenCommand();
 
-            logger.info(open_command + " \"" + path + "\"");
+            logger.info("{} \"{}\"", open_command, path);
 
             String[] command_array = new String[2];
 
@@ -432,7 +432,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         if (!Files.exists(file))
             throw new FileNotFoundException(parent.MlM(String.format("File %s not found", file_name)));
         message = new MessageParser(file).parseMessage();
-        logger.info("Message From:" + message.getFromName() + "\n To:" + message.getToName() + "\n Email: " + message.getFromEmail());
+        logger.info("Message From:{}\n To:{}\n Email: {}", message.getFromName(), message.getToName(), message.getFromEmail());
     }
 
     private void updateHeader() throws MimeTypeParseException {
@@ -497,7 +497,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         if (att instanceof MsgAttachment) {
             return printMsgAttachment((MsgAttachment) att);
         }
-        logger.error("unknown Attachment: " + att + " " + att.getClass().getName());
+        logger.error("unknown Attachment: {} {}", att, att.getClass().getName());
         return "";
     }
 
@@ -511,7 +511,7 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
 
         String mime_type = att.getMimeTag();
 
-        logger.info("<a href=\"" + content.toUri() + "\"> " + mime_type);
+        logger.info("<a href=\"{}\"> {}", content.toUri(), mime_type);
 
         if (mime_type != null && ViewerHelper.is_image_mime_type(new MimeType(mime_type))) {
             File thumbnailFile = new File(content.toAbsolutePath() + "-small.jpg");
