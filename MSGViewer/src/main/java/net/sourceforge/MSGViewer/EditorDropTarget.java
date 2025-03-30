@@ -12,9 +12,9 @@ import java.awt.dnd.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 
-public class EditorDropTarget implements DropTargetListener {
+class EditorDropTarget implements DropTargetListener {
     private static final Logger logger = LogManager.getLogger(EditorDropTarget.class);
     private final MessageView messageView;
     private Color backgroundColor;
@@ -139,7 +139,7 @@ public class EditorDropTarget implements DropTargetListener {
     // This method handles a drop for a list of files
     private boolean dropFile(Transferable transferable) throws IOException,
             UnsupportedFlavorException {
-        List<File> fileList = (List<File>) transferable
+        var fileList = (Collection<File>) transferable
                 .getTransferData(DataFlavor.javaFileListFlavor);
         fileList.stream().map(File::getPath).forEach(messageView::view);
         return true;
