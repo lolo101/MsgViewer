@@ -75,7 +75,7 @@ public class EditorDropTarget implements DropTargetListener {
                 if (draggingFile) {
                     result = dropFile(transferable);
                 } else {
-                    result = dropContent(transferable, dtde);
+                    result = dropContent(transferable, dtde.getCurrentDataFlavors());
                 }
 
                 dtde.dropComplete(result);
@@ -152,13 +152,10 @@ public class EditorDropTarget implements DropTargetListener {
     }
 
     // This method handles a drop with data content
-    private boolean dropContent(Transferable transferable,
-                                DropTargetDropEvent dtde) {
+    private boolean dropContent(Transferable transferable, DataFlavor[] flavors) {
 
         try {
             // Check for a match with the current content type
-            DataFlavor[] flavors = dtde.getCurrentDataFlavors();
-
             DataFlavor selectedFlavor = selectTextFlavor(flavors);
 
             if (selectedFlavor == null) {
