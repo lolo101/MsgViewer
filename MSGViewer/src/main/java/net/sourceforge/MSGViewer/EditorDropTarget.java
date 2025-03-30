@@ -74,7 +74,7 @@ public class EditorDropTarget implements DropTargetListener {
                 if (draggingFile) {
                     result = dropFile(transferable);
                 } else {
-                    result = dropContent(transferable, dtde.getCurrentDataFlavors());
+                    result = dropContent(transferable);
                 }
 
                 dtde.dropComplete(result);
@@ -150,21 +150,11 @@ public class EditorDropTarget implements DropTargetListener {
     }
 
     // This method handles a drop with data content
-    private boolean dropContent(Transferable transferable, DataFlavor[] flavors) {
+    private boolean dropContent(Transferable transferable) {
 
         try {
-            // Check for a match with the current content type
-            DataFlavor selectedFlavor = selectTextFlavor(flavors);
-
-            if (selectedFlavor == null) {
-                // No compatible flavor - should never happen
-                return false;
-            }
-
-            logger.info("Selected flavor is {}", selectedFlavor.getHumanPresentableName());
-
             // Get the transferable data
-            try (BufferedReader data = new BufferedReader(selectedFlavor.getReaderForText(transferable))) {
+            try (BufferedReader data = new BufferedReader(DataFlavor.stringFlavor.getReaderForText(transferable))) {
                 data.lines().forEach(messageView::view);
             }
             return true;
@@ -173,16 +163,4 @@ public class EditorDropTarget implements DropTargetListener {
             return false;
         }
     }
-
-    private static DataFlavor selectTextFlavor(DataFlavor[] flavors) {
-        // Look for either plain text or a String.
-        for (DataFlavor flavor : flavors) {
-            logger.info("Drop MIME type {} is available", flavor.getMimeType());
-            if (flavor.equals(DataFlavor.stringFlavor)) {
-                return flavor;
-            }
-        }
-        return null;
-    }
-
 }
