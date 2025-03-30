@@ -9,11 +9,10 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.*;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 
 public class EditorDropTarget implements DropTargetListener {
     private static final Logger logger = LogManager.getLogger(EditorDropTarget.class);
@@ -166,39 +165,10 @@ public class EditorDropTarget implements DropTargetListener {
             logger.info("Selected flavor is {}", selectedFlavor.getHumanPresentableName());
 
             // Get the transferable data
-            Object data = transferable.getTransferData(selectedFlavor);
-
-            logger.info("Transfer data type is {}", data.getClass().getName());
-
-            String insertData = null;
-            if (data instanceof InputStream is) {
-                // Plain text flavor
-                String charSet = selectedFlavor.getParameter("charset");
-                byte[] bytes = new byte[is.available()];
-                is.read(bytes);
-                try {
-                    insertData = new String(bytes, charSet);
-                } catch (UnsupportedEncodingException e) {
-                    // Use the platform default encoding
-                    insertData = new String(bytes);
-                }
-            } else if (data instanceof String) {
-                // String flavor
-                insertData = (String) data;
+            try (BufferedReader data = new BufferedReader(selectedFlavor.getReaderForText(transferable))) {
+                data.lines().forEach(messageView::view);
             }
-
-            if (insertData != null) {
-
-                logger.info("inserting text:{}", insertData);
-
-                String[] files_to_open = insertData.split("\n");
-
-                for (String file_to_open : files_to_open)
-                    messageView.view(file_to_open);
-
-                return true;
-            }
-            return false;
+            return true;
         } catch (Exception e) {
             logger.error(e.getLocalizedMessage(), e);
             return false;
