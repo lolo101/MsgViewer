@@ -11,9 +11,9 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.List;
 
 public class EditorDropTarget implements DropTargetListener {
     private static final Logger logger = LogManager.getLogger(EditorDropTarget.class);
@@ -159,17 +159,7 @@ public class EditorDropTarget implements DropTargetListener {
             // Check for a match with the current content type
             DataFlavor[] flavors = dtde.getCurrentDataFlavors();
 
-            DataFlavor selectedFlavor = null;
-
-            // Look for either plain text or a String.
-            for (DataFlavor flavor : flavors) {
-                logger.info("Drop MIME type {} is available", flavor.getMimeType());
-                if (flavor.equals(DataFlavor.plainTextFlavor)
-                        || flavor.equals(DataFlavor.stringFlavor)) {
-                    selectedFlavor = flavor;
-                    break;
-                }
-            }
+            DataFlavor selectedFlavor = selectTextFlavor(flavors);
 
             if (selectedFlavor == null) {
                 // No compatible flavor - should never happen
@@ -216,6 +206,21 @@ public class EditorDropTarget implements DropTargetListener {
             logger.error(e.getLocalizedMessage(), e);
             return false;
         }
+    }
+
+    private static DataFlavor selectTextFlavor(DataFlavor[] flavors) {
+        DataFlavor selectedFlavor = null;
+
+        // Look for either plain text or a String.
+        for (DataFlavor flavor : flavors) {
+            logger.info("Drop MIME type {} is available", flavor.getMimeType());
+            if (flavor.equals(DataFlavor.plainTextFlavor)
+                    || flavor.equals(DataFlavor.stringFlavor)) {
+                selectedFlavor = flavor;
+                break;
+            }
+        }
+        return selectedFlavor;
     }
 
 }
