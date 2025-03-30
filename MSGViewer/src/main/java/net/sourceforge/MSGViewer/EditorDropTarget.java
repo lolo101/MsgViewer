@@ -206,18 +206,15 @@ public class EditorDropTarget implements DropTargetListener {
     }
 
     private static DataFlavor selectTextFlavor(DataFlavor[] flavors) {
-        DataFlavor selectedFlavor = null;
-
         // Look for either plain text or a String.
         for (DataFlavor flavor : flavors) {
             logger.info("Drop MIME type {} is available", flavor.getMimeType());
             if (flavor.equals(DataFlavor.plainTextFlavor)
                     || flavor.equals(DataFlavor.stringFlavor)) {
-                selectedFlavor = flavor;
-                break;
+                return flavor;
             }
         }
-        return selectedFlavor;
+        return null;
     }
 
 }
