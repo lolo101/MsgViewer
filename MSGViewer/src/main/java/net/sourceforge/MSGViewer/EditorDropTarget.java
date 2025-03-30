@@ -141,11 +141,7 @@ public class EditorDropTarget implements DropTargetListener {
             UnsupportedFlavorException {
         List<File> fileList = (List<File>) transferable
                 .getTransferData(DataFlavor.javaFileListFlavor);
-        fileList.forEach(transferFile -> {
-            logger.info("Opening file {}", transferFile);
-            messageView.view(transferFile.getPath());
-        });
-
+        fileList.stream().map(File::getPath).forEach(messageView::view);
         return true;
     }
 
