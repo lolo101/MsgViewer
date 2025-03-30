@@ -130,8 +130,7 @@ public class EditorDropTarget implements DropTargetListener {
 
     private void checkTransferType(DropTargetDragEvent dtde) {
         draggingFile = dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor);
-        draggingContent = dtde.isDataFlavorSupported(DataFlavor.plainTextFlavor)
-                || dtde.isDataFlavorSupported(DataFlavor.stringFlavor);
+        draggingContent = dtde.isDataFlavorSupported(DataFlavor.stringFlavor);
 
         logger.info("Dragging a file - {}", draggingFile);
         logger.info("Dragging content - {}", draggingContent);
@@ -179,8 +178,7 @@ public class EditorDropTarget implements DropTargetListener {
         // Look for either plain text or a String.
         for (DataFlavor flavor : flavors) {
             logger.info("Drop MIME type {} is available", flavor.getMimeType());
-            if (flavor.equals(DataFlavor.plainTextFlavor)
-                    || flavor.equals(DataFlavor.stringFlavor)) {
+            if (flavor.equals(DataFlavor.stringFlavor)) {
                 return flavor;
             }
         }
