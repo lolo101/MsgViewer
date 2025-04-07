@@ -35,6 +35,10 @@ public class MsgContainer {
     private final List<Attachment> attachments = new ArrayList<>();
 
     MsgContainer(Message msg) {
+        parse(msg);
+    }
+
+    private void parse(Message msg) {
         if (msg.getSubject() != null) {
             addVarEntry(new SubjectEntry(msg.getSubject()));
             addVarEntry(new StringUTF16SubstgEntry(PidTagNormalizedSubject, msg.getTopic()));
