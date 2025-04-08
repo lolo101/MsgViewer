@@ -1,28 +1,17 @@
 package net.sourceforge.MSGViewer.factory.msg;
 
-import com.auxilii.msgparser.Message;
-import com.auxilii.msgparser.Ptyp;
-import com.auxilii.msgparser.RecipientEntry;
-import com.auxilii.msgparser.attachment.Attachment;
-import com.auxilii.msgparser.attachment.FileAttachment;
-import com.auxilii.msgparser.attachment.MsgAttachment;
-import net.sourceforge.MSGViewer.factory.msg.entries.*;
-import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypInteger32;
-import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypTime;
-import net.sourceforge.MSGViewer.factory.msg.properties.PropType;
-import org.apache.poi.poifs.filesystem.DirectoryEntry;
+import static com.auxilii.msgparser.Pid.*;
+import static org.apache.commons.lang3.StringUtils.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+import java.io.*;
+import java.nio.*;
 import java.util.*;
 
-import static com.auxilii.msgparser.Pid.*;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import com.auxilii.msgparser.*;
+import com.auxilii.msgparser.attachment.*;
+import net.sourceforge.MSGViewer.factory.msg.entries.*;
+import net.sourceforge.MSGViewer.factory.msg.properties.*;
+import org.apache.poi.poifs.filesystem.*;
 
 public class MsgContainer {
     private static final String PROPERTY_STREAM = "__properties_version1.0";
@@ -33,12 +22,14 @@ public class MsgContainer {
 
     private final List<RecipientEntry> recipients = new ArrayList<>();
     private final List<Attachment> attachments = new ArrayList<>();
+    private final Message msg;
 
     MsgContainer(Message msg) {
-        parse(msg);
+        this.msg = msg;
+        parse();
     }
 
-    private void parse(Message msg) {
+    private void parse() {
         if (msg.getSubject() != null) {
             addVarEntry(new SubjectEntry(msg.getSubject()));
             addVarEntry(new StringUTF16SubstgEntry(PidTagNormalizedSubject, msg.getTopic()));
