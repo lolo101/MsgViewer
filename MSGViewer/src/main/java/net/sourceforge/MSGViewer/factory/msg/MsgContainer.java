@@ -1,17 +1,28 @@
 package net.sourceforge.MSGViewer.factory.msg;
 
-import static com.auxilii.msgparser.Pid.*;
-import static org.apache.commons.lang3.StringUtils.*;
+import com.auxilii.msgparser.Message;
+import com.auxilii.msgparser.Ptyp;
+import com.auxilii.msgparser.RecipientEntry;
+import com.auxilii.msgparser.attachment.Attachment;
+import com.auxilii.msgparser.attachment.FileAttachment;
+import com.auxilii.msgparser.attachment.MsgAttachment;
+import net.sourceforge.MSGViewer.factory.msg.entries.*;
+import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypInteger32;
+import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypTime;
+import net.sourceforge.MSGViewer.factory.msg.properties.PropType;
+import org.apache.poi.poifs.filesystem.DirectoryEntry;
 
-import java.io.*;
-import java.nio.*;
+import java.io.ByteArrayInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.*;
 
-import com.auxilii.msgparser.*;
-import com.auxilii.msgparser.attachment.*;
-import net.sourceforge.MSGViewer.factory.msg.entries.*;
-import net.sourceforge.MSGViewer.factory.msg.properties.*;
-import org.apache.poi.poifs.filesystem.*;
+import static com.auxilii.msgparser.Pid.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 public class MsgContainer {
     private static final String PROPERTY_STREAM = "__properties_version1.0";
@@ -26,7 +37,48 @@ public class MsgContainer {
 
     MsgContainer(Message msg) {
         this.msg = msg;
+    }
+
+    public void write(DirectoryEntry root) throws IOException {
         parse();
+        int headerSize = root.getParent() == null ? 32 : 24;
+        int size = headerSize + properties.size() * 16;
+        ByteBuffer bytes = ByteBuffer.allocate(size).order(ByteOrder.LITTLE_ENDIAN);
+
+        bytes.position(8);
+
+        // next recip id
+        bytes.putInt(recipients.size());
+
+        // next attachment id
+        bytes.putInt(attachments.size());
+
+        // recip count
+        bytes.putInt(recipients.size());
+
+        // attachment count
+        bytes.putInt(attachments.size());
+
+        bytes.position(headerSize);
+
+        for (PropType prop : properties) {
+            prop.writePropertiesEntry(bytes);
+        }
+
+        for (SubStorageEntry entry : substg_streams) {
+            entry.createEntry(root);
+        }
+
+        for (int count = 0; count < recipients.size(); ++count) {
+            writeRecipientEntry(root, recipients.get(count), count);
+        }
+
+        for (int count = 0; count < attachments.size(); ++count) {
+            writeAttachment(root, attachments.get(count), count);
+        }
+
+        createPropertyStreamEntry(bytes, root);
+        createNamedPropertyEntry(root);
     }
 
     private void parse() {
@@ -110,47 +162,6 @@ public class MsgContainer {
         for (Attachment attachment : msg.getAttachments()) {
             addAttachment(attachment);
         }
-    }
-
-    public void write(DirectoryEntry root) throws IOException {
-        int headerSize = root.getParent() == null ? 32 : 24;
-        int size = headerSize + properties.size() * 16;
-        ByteBuffer bytes = ByteBuffer.allocate(size).order(ByteOrder.LITTLE_ENDIAN);
-
-        bytes.position(8);
-
-        // next recip id
-        bytes.putInt(recipients.size());
-
-        // next attachment id
-        bytes.putInt(attachments.size());
-
-        // recip count
-        bytes.putInt(recipients.size());
-
-        // attachment count
-        bytes.putInt(attachments.size());
-
-        bytes.position(headerSize);
-
-        for (PropType prop : properties) {
-            prop.writePropertiesEntry(bytes);
-        }
-
-        for (SubStorageEntry entry : substg_streams) {
-            entry.createEntry(root);
-        }
-
-        for (int count = 0; count < recipients.size(); ++count) {
-            writeRecipientEntry(root, recipients.get(count), count);
-        }
-
-        for (int count = 0; count < attachments.size(); ++count) {
-            writeAttachment(root, attachments.get(count), count);
-        }
-
-        createPropertyStreamEntry(bytes, root);
-        createNamedPropertyEntry(root);
     }
 
     private void addProperty(PropType prop) {
