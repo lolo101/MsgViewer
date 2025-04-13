@@ -33,8 +33,55 @@ public class MsgContainer {
 
     private final List<RecipientEntry> recipients = new ArrayList<>();
     private final List<Attachment> attachments = new ArrayList<>();
+    private final Message msg;
 
     MsgContainer(Message msg) {
+        this.msg = msg;
+    }
+
+    public void write(DirectoryEntry root) throws IOException {
+        parse();
+        int headerSize = root.getParent() == null ? 32 : 24;
+        int size = headerSize + properties.size() * 16;
+        ByteBuffer bytes = ByteBuffer.allocate(size).order(ByteOrder.LITTLE_ENDIAN);
+
+        bytes.position(8);
+
+        // next recip id
+        bytes.putInt(recipients.size());
+
+        // next attachment id
+        bytes.putInt(attachments.size());
+
+        // recip count
+        bytes.putInt(recipients.size());
+
+        // attachment count
+        bytes.putInt(attachments.size());
+
+        bytes.position(headerSize);
+
+        for (PropType prop : properties) {
+            prop.writePropertiesEntry(bytes);
+        }
+
+        for (SubStorageEntry entry : substg_streams) {
+            entry.createEntry(root);
+        }
+
+        for (int count = 0; count < recipients.size(); ++count) {
+            writeRecipientEntry(root, recipients.get(count), count);
+        }
+
+        for (int count = 0; count < attachments.size(); ++count) {
+            writeAttachment(root, attachments.get(count), count);
+        }
+
+        createPropertyStreamEntry(bytes, root);
+        createNamedPropertyEntry(root);
+    }
+
+    private void parse() {
         if (msg.getSubject() != null) {
             addVarEntry(new SubjectEntry(msg.getSubject()));
             addVarEntry(new StringUTF16SubstgEntry(PidTagNormalizedSubject, msg.getTopic()));
@@ -115,47 +162,6 @@ public class MsgContainer {
         for (Attachment attachment : msg.getAttachments()) {
             addAttachment(attachment);
         }
-    }
-
-    public void write(DirectoryEntry root) throws IOException {
-        int headerSize = root.getParent() == null ? 32 : 24;
-        int size = headerSize + properties.size() * 16;
-        ByteBuffer bytes = ByteBuffer.allocate(size).order(ByteOrder.LITTLE_ENDIAN);
-
-        bytes.position(8);
-
-        // next recip id
-        bytes.putInt(recipients.size());
-
-        // next attachment id
-        bytes.putInt(attachments.size());
-
-        // recip count
-        bytes.putInt(recipients.size());
-
-        // attachment count
-        bytes.putInt(attachments.size());
-
-        bytes.position(headerSize);
-
-        for (PropType prop : properties) {
-            prop.writePropertiesEntry(bytes);
-        }
-
-        for (SubStorageEntry entry : substg_streams) {
-            entry.createEntry(root);
-        }
-
-        for (int count = 0; count < recipients.size(); ++count) {
-            writeRecipientEntry(root, recipients.get(count), count);
-        }
-
-        for (int count = 0; count < attachments.size(); ++count) {
-            writeAttachment(root, attachments.get(count), count);
-        }
-
-        createPropertyStreamEntry(bytes, root);
-        createNamedPropertyEntry(root);
     }
 
     private void addProperty(PropType prop) {
