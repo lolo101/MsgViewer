@@ -1,15 +1,12 @@
-package net.sourceforge.MSGViewer.factory.msg;
+package com.auxilii.msgparser;
 
-import com.auxilii.msgparser.Message;
-import com.auxilii.msgparser.Ptyp;
-import com.auxilii.msgparser.RecipientEntry;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
 import com.auxilii.msgparser.attachment.MsgAttachment;
-import net.sourceforge.MSGViewer.factory.msg.entries.*;
-import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypInteger32;
-import net.sourceforge.MSGViewer.factory.msg.properties.PropPtypTime;
-import net.sourceforge.MSGViewer.factory.msg.properties.PropType;
+import com.auxilii.msgparser.entries.*;
+import com.auxilii.msgparser.properties.PropPtypInteger32;
+import com.auxilii.msgparser.properties.PropPtypTime;
+import com.auxilii.msgparser.properties.PropType;
 import org.apache.poi.poifs.filesystem.DirectoryEntry;
 
 import java.io.ByteArrayInputStream;

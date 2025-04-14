@@ -1,8 +1,8 @@
-package net.sourceforge.MSGViewer.factory.msg.entries;
+package com.auxilii.msgparser.entries;
 
 import com.auxilii.msgparser.Pid;
 import com.auxilii.msgparser.Ptyp;
-import net.sourceforge.MSGViewer.factory.msg.properties.PropType;
+import com.auxilii.msgparser.properties.PropType;
 import org.apache.poi.poifs.filesystem.DirectoryEntry;
 
 import java.io.IOException;

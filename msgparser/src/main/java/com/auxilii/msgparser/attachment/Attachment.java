@@ -19,9 +19,9 @@ package com.auxilii.msgparser.attachment;
 
 /**
  * Interface that defines an attachment.
- * 
+ *
  * @author roman.kurmanowytsch
  */
-public interface Attachment {
-	
+public sealed interface Attachment permits FileAttachment, MsgAttachment {
+
 }

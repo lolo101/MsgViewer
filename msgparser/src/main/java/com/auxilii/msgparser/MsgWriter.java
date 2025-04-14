@@ -1,6 +1,5 @@
-package net.sourceforge.MSGViewer.factory.msg;
+package com.auxilii.msgparser;
 
-import com.auxilii.msgparser.Message;
 import org.apache.poi.poifs.filesystem.DirectoryNode;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 

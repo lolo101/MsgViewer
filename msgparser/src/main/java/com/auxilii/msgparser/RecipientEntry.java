@@ -1,23 +1,9 @@
-/*
- * msgparser - http://auxilii.com/msgparser
- * Copyright (C) 2007  Roman Kurmanowytsch
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
- */
 package com.auxilii.msgparser;
 
 import org.apache.commons.validator.routines.EmailValidator;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
@@ -34,8 +20,10 @@ public class RecipientEntry {
     private String smtp;
     private String name;
     private RecipientType type;
+    private final List<Property> properties = new ArrayList<>();
 
-    void setProperty(Property property) {
+    void addProperty(Property property) {
+        properties.add(property);
         switch (property.getPid()) {
             case PidTagRecipientType:
                 setType(RecipientType.from((int) property.getValue()));
@@ -50,6 +38,10 @@ public class RecipientEntry {
                 setSmtp((String) property.getValue());
                 break;
         }
+    }
+
+    public List<Property> getProperties() {
+        return properties;
     }
 
     public String getEmail() {
@@ -105,7 +97,7 @@ public class RecipientEntry {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(this.name);
-        if (sb.length() > 0) {
+        if (!sb.isEmpty()) {
             sb.append(" ");
         }
         String mailTo = mailTo();
