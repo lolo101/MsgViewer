@@ -39,6 +39,12 @@ public class MsgContainer {
         this.msg = msg;
     }
 
+    /**
+     * Write header and properties of the message to the given filesystem.
+     * See [MS-OXMSG] §2.4 for details about the message structure.
+     *
+     * @param root the root of the filesystem.
+     */
     public void write(DirectoryEntry root) throws IOException {
         parse();
         int headerSize = root.getParent() == null ? 32 : 24;
