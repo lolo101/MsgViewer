@@ -30,8 +30,8 @@ public class Setup {
     private final Path config_file;
     private final Properties props;
 
-    protected Setup(String app_name) {
-        config_file = getAppConfigFile(app_name);
+    protected Setup(String userHome, String app_name) {
+        config_file = getAppConfigFile(userHome, app_name);
 
         if (Files.exists(config_file)) {
             props = loadProps();
@@ -71,9 +71,17 @@ public class Setup {
         }
     }
 
-    public static String getAppConfigDir( String app_name )
+    private static Path getAppConfigFile(String userHome, String app_name) {
+        String file_name = app_name + ".properties";
+
+        String dir = getAppConfigDir(userHome, app_name);
+
+        return Path.of(dir, file_name);
+    }
+
+    public static String getAppConfigDir(String userHome, String app_name)
     {
-        Path name = getHiddenUserHomeFileName(app_name);
+        Path name = getHiddenUserHomeFileName(userHome, app_name);
 
         try {
             Files.createDirectories(name);
@@ -84,30 +92,21 @@ public class Setup {
         return name.toString();
     }
 
+    private static Path getHiddenUserHomeFileName(String userHome, String name) {
+
+        if (!is_win_system()) {
+            name = "." + name;
+        }
+
+        return Path.of(userHome, name);
+    }
+
     public String getConfig(String key, String default_value) {
         return props.getProperty(key, default_value);
     }
 
     public void setLocalConfig(String key, String value) {
         props.setProperty(key, value);
-    }
-
-    private static Path getHiddenUserHomeFileName(String name) {
-        String config_path = System.getProperty("user.home");
-
-        if (!is_win_system()) {
-            name = "." + name;
-        }
-
-        return Path.of(config_path, name);
-    }
-
-    private static Path getAppConfigFile(String app_name) {
-        String file_name = app_name + ".properties";
-
-        String dir = getAppConfigDir(app_name);
-
-        return Path.of(dir, file_name);
     }
 
     private Properties loadProps() {
