@@ -100,7 +100,7 @@ public class BaseModuleLauncher {
         ConsoleAppender consoleAppender = ConsoleAppender.createDefaultAppenderForLayout(layout);
 
         String logFileDir = BaseAppConfigDefinitions.LoggingDir.getConfigValue();
-        logger.trace("logFileDir: " + logFileDir);
+        logger.trace("logFileDir: {}", logFileDir);
         String logFileLevel = BaseAppConfigDefinitions.LoggingLevel.getConfigValue();
         String loggingEnabled = BaseAppConfigDefinitions.DoLogging.getConfigValue();
 
@@ -111,7 +111,7 @@ public class BaseModuleLauncher {
                 + "log.OS-" + System.getProperty("user.name", "unknown-user")
                 + ".txt";
 
-        logger.trace("Filename: " + filename);
+        logger.trace("Filename: {}", filename);
 
         LoggerConfig loggerConfig = LoggerContext.getContext().getConfiguration().getRootLogger();
         loggerConfig.setLevel(Level.getLevel(logFileLevel));
@@ -149,7 +149,7 @@ public class BaseModuleLauncher {
 
         String config = FrameWorkConfigDefinitions.LookAndFeel.getConfigValue();
 
-        logger.debug("Found LookAndFeel PRM value: <" + config + ">");
+        logger.debug("Found LookAndFeel PRM value: <{}>", config);
 
         try {
             UIManager.setLookAndFeel(UIManager.createLookAndFeel(config));
