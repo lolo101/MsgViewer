@@ -16,7 +16,7 @@ public class DLLCache {
     private final Collection<DLLExtractor> extractors = new ArrayList<>();
 
     public DLLCache(String appName) {
-        cache_dir = Setup.getAppConfigDir(appName + "/jar/dll_cache");
+        cache_dir = Setup.getAppConfigDir(System.getProperty("user.home"), appName + "/jar/dll_cache");
     }
 
     synchronized public void initEnv() {

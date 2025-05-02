@@ -557,7 +557,7 @@ public class TranslationDialog extends BaseDialog {
     }
 
     public static String getTranslationsDir(Root root) {
-        String dir = Setup.getAppConfigDir(root.getAppName()) + "/translations/";
+        String dir = Setup.getAppConfigDir(System.getProperty("user.home"), root.getAppName()) + "/translations/";
 
         File fdir = new File(dir);
 

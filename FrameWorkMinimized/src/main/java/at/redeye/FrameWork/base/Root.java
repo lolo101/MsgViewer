@@ -58,7 +58,7 @@ public class Root {
     public Root(String app_name) {
         this.app_name = app_name;
         static_root = this;
-        setup = new Setup(app_name);
+        setup = new Setup(System.getProperty("user.home"), app_name);
         plugins = new Plugins(app_name);
         storage = Storage.getEphemeralStorage(this.app_name);
         dialogs = new Dialogs(this);
