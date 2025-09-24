@@ -23,7 +23,7 @@
         <poi.version>5.4.1</poi.version>
         <log4j.version>2.25.2</log4j.version>
         <commons-validator.version>1.10.0</commons-validator.version>
-        <commons-lang3.version>3.18.0</commons-lang3.version>
+        <commons-lang3.version>3.19.0</commons-lang3.version>
     </properties>
 
     <build>
