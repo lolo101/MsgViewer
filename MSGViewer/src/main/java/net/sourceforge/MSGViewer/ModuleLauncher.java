@@ -83,9 +83,9 @@ public class ModuleLauncher extends BaseModuleLauncher {
     }
 
     private void invokeGui() {
-        if (splashEnabled()) {
-            splash = new StartupWindow(
-                    "/at/redeye/FrameWork/base/resources/pictures/redeye.png");
+//        if (splashEnabled()) {
+//            splash = new StartupWindow(
+//                    "/at/redeye/FrameWork/base/resources/pictures/redeye.png");
         }
 
         registerPlugins();
