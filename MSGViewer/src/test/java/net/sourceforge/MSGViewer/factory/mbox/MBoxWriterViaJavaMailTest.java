@@ -14,6 +14,7 @@ import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static com.google.common.jimfs.Configuration.unix;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
@@ -22,7 +23,7 @@ class MBoxWriterViaJavaMailTest {
     void testWrite() throws Exception {
         ModuleLauncher.BaseConfigureLogging();
 
-        try (FileSystem fileSystem = Jimfs.newFileSystem()) {
+        try (FileSystem fileSystem = Jimfs.newFileSystem(unix())) {
             Path testOut = fileSystem.getPath("test_out.mbox");
             try (OutputStream outputStream = Files.newOutputStream(testOut)) {
                 Message msg = givenMessage("/danke.msg");
@@ -37,7 +38,7 @@ class MBoxWriterViaJavaMailTest {
     void testIssue124() throws Exception {
         ModuleLauncher.BaseConfigureLogging();
 
-        try (FileSystem fileSystem = Jimfs.newFileSystem()) {
+        try (FileSystem fileSystem = Jimfs.newFileSystem(unix())) {
             Path testOut = fileSystem.getPath("test_out.mbox");
             try (OutputStream outputStream = Files.newOutputStream(testOut)) {
                 Message msg = givenMessage("/issue124/testing.msg");
@@ -52,7 +53,7 @@ class MBoxWriterViaJavaMailTest {
     void testIssue127() throws Exception {
         ModuleLauncher.BaseConfigureLogging();
 
-        try (FileSystem fileSystem = Jimfs.newFileSystem()) {
+        try (FileSystem fileSystem = Jimfs.newFileSystem(unix())) {
             Path testOut = fileSystem.getPath("test_out.mbox");
             try (OutputStream outputStream = Files.newOutputStream(testOut)) {
                 Message msg = givenMessage("/issue127/test.msg");
@@ -67,7 +68,7 @@ class MBoxWriterViaJavaMailTest {
     void testIssue133() throws Exception {
         ModuleLauncher.BaseConfigureLogging();
 
-        try (FileSystem fileSystem = Jimfs.newFileSystem()) {
+        try (FileSystem fileSystem = Jimfs.newFileSystem(unix())) {
             Path testOut = fileSystem.getPath("test_out.eml");
             try (OutputStream outputStream = Files.newOutputStream(testOut)) {
                 Message msg = givenMessage("/issue133/test.msg");
@@ -82,7 +83,7 @@ class MBoxWriterViaJavaMailTest {
     void testIssue178() throws Exception {
         ModuleLauncher.BaseConfigureLogging();
 
-        try (FileSystem fileSystem = Jimfs.newFileSystem()) {
+        try (FileSystem fileSystem = Jimfs.newFileSystem(unix())) {
             Path testOut = fileSystem.getPath("test_out.eml");
             try (OutputStream outputStream = Files.newOutputStream(testOut)) {
                 Message msg = givenMessage("/danke.msg");
@@ -97,7 +98,7 @@ class MBoxWriterViaJavaMailTest {
     void testIssue231() throws Exception {
         ModuleLauncher.BaseConfigureLogging();
 
-        try (FileSystem fileSystem = Jimfs.newFileSystem()) {
+        try (FileSystem fileSystem = Jimfs.newFileSystem(unix())) {
             Path testOut = fileSystem.getPath("test_out.eml");
             try (OutputStream outputStream = Files.newOutputStream(testOut)) {
                 Message msg = new Message();

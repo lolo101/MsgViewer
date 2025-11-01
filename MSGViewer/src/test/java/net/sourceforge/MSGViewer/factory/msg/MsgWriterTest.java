@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 
+import static com.google.common.jimfs.Configuration.unix;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class MsgWriterTest {
@@ -26,7 +27,7 @@ class MsgWriterTest {
     void testWrite() throws Exception {
         ModuleLauncher.BaseConfigureLogging();
 
-        try (FileSystem fileSystem = Jimfs.newFileSystem()) {
+        try (FileSystem fileSystem = Jimfs.newFileSystem(unix())) {
             Path testOut = fileSystem.getPath("test_out.msg");
             try (OutputStream outputStream = Files.newOutputStream(testOut)) {
                 Message msg = givenMessage("/danke.msg");
@@ -40,7 +41,7 @@ class MsgWriterTest {
     void issue129() throws Exception {
         ModuleLauncher.BaseConfigureLogging();
 
-        try (FileSystem fileSystem = Jimfs.newFileSystem()) {
+        try (FileSystem fileSystem = Jimfs.newFileSystem(unix())) {
             Path testOut = fileSystem.getPath("test_out.msg");
             try (OutputStream outputStream = Files.newOutputStream(testOut)) {
                 Message msg = givenMessage("/issue129/test.eml");
