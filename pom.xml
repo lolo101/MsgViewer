@@ -22,7 +22,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <poi.version>5.5.0</poi.version>
         <log4j.version>2.25.2</log4j.version>
-        <commons-validator.version>1.10.0</commons-validator.version>
+        <commons-validator.version>1.10.1</commons-validator.version>
         <commons-lang3.version>3.20.0</commons-lang3.version>
     </properties>
 
