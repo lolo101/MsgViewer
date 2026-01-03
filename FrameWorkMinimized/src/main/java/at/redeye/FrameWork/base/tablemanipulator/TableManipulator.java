@@ -25,7 +25,6 @@ public class TableManipulator {
     private RowHeader row_header;
     private int auto_show_row_header = 20;
     private static final Logger logger = LogManager.getLogger(TableManipulator.class);
-    private TableEditorStopper editor_stopper;
     private BaseDialogBase base_dlg;
 
     public TableManipulator(Setup setup, JTable table, DBStrukt binddesc) {
@@ -42,11 +41,6 @@ public class TableManipulator {
     }
 
     private void configure() {
-        if (editor_stopper == null) {
-            // ansonten hängen wir mehrere listener drann und das wollen wir nicht.
-            editor_stopper = new TableEditorStopper(table);
-        }
-
         List<Coll> colls = new ArrayList<>();
 
         ArrayList<String> titles = binddesc.getAllNames();
@@ -196,7 +190,6 @@ public class TableManipulator {
 
     public void remove( int row )
     {
-        editor_stopper.doPause();
         logger.info("PAUSE PAUSE PAUSE");
 
         tabledesign.remove(row);
@@ -205,8 +198,6 @@ public class TableManipulator {
         row_header.updateUI();
 
         logger.info("CONTINUE CONTINUE CONTINUE");
-
-        editor_stopper.doContinue();
     }
 
     public Set<Integer> getEditedRows()
