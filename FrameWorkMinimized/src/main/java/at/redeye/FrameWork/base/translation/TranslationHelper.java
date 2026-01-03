@@ -16,9 +16,9 @@ public class TranslationHelper {
     private Properties currentProps;
     private List<String> additional_strings;
     private boolean need_locale_autoload = true;
-    private final BaseDialogBaseHelper helper;
 
     class OpenTransDialog implements Runnable {
+        @Override
         public void run() {
 
             if (extract_strings != null) {
@@ -51,6 +51,7 @@ public class TranslationHelper {
             lang_current = root.getDisplayLanguage();
         }
 
+        @Override
         public void run() {
             if (lang_b.equals(lang_current)) {
                 lang_current = lang_a;
@@ -66,7 +67,6 @@ public class TranslationHelper {
     {
         this.root = root;
         this.base_dlg = base_dlg;
-        this.helper = helper;
 
         helper.registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_F12, 0), new OpenTransDialog());
         helper.registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_F11, 0), new SwitchTranslation());
@@ -125,7 +125,7 @@ public class TranslationHelper {
     {
         String locale = root.getDisplayLanguage();
 
-        if (locale.equals(helper.getBaseLanguage())) {
+        if (locale.equals(root.getBaseLanguage())) {
             return;
         }
 
@@ -133,7 +133,7 @@ public class TranslationHelper {
             return;
         }
 
-        if (locale.length() == 2 && !MLUtil.compareLanguagesOnly(root.getDefaultLanguage(), helper.getBaseLanguage())) {
+        if (locale.length() == 2 && !MLUtil.compareLanguagesOnly(root.getDefaultLanguage(), root.getBaseLanguage())) {
             switchTranslation(root.getDefaultLanguage());
             return;
         }
@@ -142,12 +142,12 @@ public class TranslationHelper {
             return;
         }
 
-        if( MLUtil.compareLanguagesOnly(locale, helper.getBaseLanguage()))
+        if (MLUtil.compareLanguagesOnly(locale, root.getBaseLanguage()))
         {
             return;
         }
 
-        if (!root.getDefaultLanguage().equals(helper.getBaseLanguage())) {
+        if (!root.getDefaultLanguage().equals(root.getBaseLanguage())) {
             switchTranslation(root.getDefaultLanguage());
         }
     }
@@ -155,7 +155,7 @@ public class TranslationHelper {
     private void autoLoadCurrentLocale() {
         String locale = root.getDisplayLanguage();
 
-        if (locale.equals(helper.getBaseLanguage())) {
+        if (locale.equals(root.getBaseLanguage())) {
             return;
         }
 
@@ -163,7 +163,7 @@ public class TranslationHelper {
             return;
         }
 
-        if (locale.length() == 2  && !MLUtil.compareLanguagesOnly(root.getDefaultLanguage(), helper.getBaseLanguage())) {
+        if (locale.length() == 2 && !MLUtil.compareLanguagesOnly(root.getDefaultLanguage(), root.getBaseLanguage())) {
             loadTranslation(root.getDefaultLanguage());
             return;
         }
@@ -172,12 +172,12 @@ public class TranslationHelper {
             return;
         }
 
-        if( MLUtil.compareLanguagesOnly(locale, helper.getBaseLanguage()))
+        if (MLUtil.compareLanguagesOnly(locale, root.getBaseLanguage()))
         {
             return;
         }
 
-        if (!root.getDefaultLanguage().equals(helper.getBaseLanguage())) {
+        if (!root.getDefaultLanguage().equals(root.getBaseLanguage())) {
             loadTranslation(root.getDefaultLanguage());
         }
     }

@@ -198,14 +198,6 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
         return this.getClass().getName() + "/" + getTitle();
     }
 
-    /**
-     * The language dialog is programmed in if not set, the settings from
-     * Root.getBaseLangague() are used
-     */
-    protected final void setBaseLanguage(String language) {
-        helper.setBaseLanguage(language);
-    }
-
     @Override
     public void doLayout() {
         helper.doLayout();

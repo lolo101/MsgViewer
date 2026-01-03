@@ -118,14 +118,6 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
         return getTitle();
     }
 
-    /**
-     * The language dialog is programmed in if not set, the settings from
-     * Root.getBaseLangague() are used
-     */
-    protected final void setBaseLanguage(String language) {
-        helper.setBaseLanguage(language);
-    }
-
     @Override
     public void doLayout() {
         helper.doLayout();

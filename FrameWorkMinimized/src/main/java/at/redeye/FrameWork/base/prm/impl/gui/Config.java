@@ -32,7 +32,7 @@ public class Config extends BaseDialog implements Saveable, PrmListener {
      */
     public Config(Root root) {
         super(root, "Einstellungen");
-        setBaseLanguage("de");
+
         initComponents();
 
         DBConfig config = new DBConfig();

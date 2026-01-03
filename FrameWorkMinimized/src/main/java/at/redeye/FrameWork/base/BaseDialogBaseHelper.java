@@ -13,9 +13,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.*;
 import java.util.List;
 import java.util.Timer;
-import java.util.*;
 
 public class BaseDialogBaseHelper implements BindVarInterface {
     protected final Root root;
@@ -43,11 +43,6 @@ public class BaseDialogBaseHelper implements BindVarInterface {
 
     private static int default_pos_x = 300;
     private static int default_pos_y = 300;
-    /**
-     * The language dialog is programmed in if not set, the settings from
-     * Root.getBaseLangague() are used
-     */
-    private String base_language;
 
     private class ActionKeyListener implements ActionListener {
         private final KeyStroke key;
@@ -329,25 +324,6 @@ public class BaseDialogBaseHelper implements BindVarInterface {
         checkBindVars();
 
         return bind_vars.getBindVarPairs();
-    }
-
-    /**
-     * The language dialog is programmed in if not set, the settings from
-     * Root.getBaseLangague() are used
-     */
-    public void setBaseLanguage(String language) {
-        base_language = language;
-    }
-
-    /**
-     * @return the language dialog is programmed in if not set, the settings
-     * from Root.getBaseLangague() are used
-     */
-    public String getBaseLanguage() {
-        if (base_language == null)
-            return root.getBaseLanguage();
-
-        return base_language;
     }
 
     public void doLayout() {

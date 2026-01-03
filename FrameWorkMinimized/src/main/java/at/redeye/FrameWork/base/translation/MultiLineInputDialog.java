@@ -13,7 +13,8 @@ package at.redeye.FrameWork.base.translation;
 
 import at.redeye.FrameWork.base.BaseDialogDialog;
 import at.redeye.FrameWork.base.Root;
-import javax.swing.JFrame;
+
+import javax.swing.*;
 
 /**
  *
@@ -25,9 +26,6 @@ public class MultiLineInputDialog extends BaseDialogDialog {
     public MultiLineInputDialog(JFrame base, Root root) {
         super( base, root, "Text mehrzeilig editieren");
         initComponents();
-        setBaseLanguage("de");
-
-        
     }
 
     public MultiLineInput getMli()

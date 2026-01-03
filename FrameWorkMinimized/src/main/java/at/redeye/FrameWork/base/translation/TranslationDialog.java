@@ -1,13 +1,18 @@
 package at.redeye.FrameWork.base.translation;
 
 import at.redeye.FrameWork.base.*;
-import at.redeye.FrameWork.widgets.*;
+import at.redeye.FrameWork.widgets.GridLayout2;
+import at.redeye.FrameWork.widgets.NoticeIfChangedTextField;
 import at.redeye.FrameWork.widgets.helpwindow.HelpWin;
+
+import javax.swing.*;
 import java.awt.*;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
-import javax.swing.*;
 
 public class TranslationDialog extends BaseDialog {
 
@@ -33,8 +38,6 @@ public class TranslationDialog extends BaseDialog {
     public TranslationDialog(final Root root, Container frame, String name, ExtractStrings es) {
         super(root, name);
         initComponents();
-
-        setBaseLanguage("de");
 
         ClassName = name;
 
