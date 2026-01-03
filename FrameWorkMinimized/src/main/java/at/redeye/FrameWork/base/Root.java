@@ -7,7 +7,6 @@ import at.redeye.FrameWork.utilities.Storage;
 
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Locale;
 
 public class Root {
     private static Root static_root;
@@ -45,12 +44,6 @@ public class Root {
      * eg: /at/redeye/Zeiterfassung/resources/translations
      */
     private String language_resource_path;
-
-    /**
-     * language used in messages, can differ from
-     * Locale.getDefault()
-     */
-    private String display_language;
 
     private String[] startupArgs;
 
@@ -160,16 +153,15 @@ public class Root {
 
     /**
      * @return language that should be used for translations
-     * can be Locale.getDefault() or something userdefined
+     * If the Display Language is not configured, Default Language is returned.
      */
     public String getDisplayLanguage()
     {
-        if (display_language == null)
-        {
-            display_language = selectDisplayLanguage();
+        String lang = BaseAppConfigDefinitions.DisplayLanguage.getConfigValue();
+        if (lang == null || lang.isBlank()) {
+            return getDefaultLanguage();
         }
-
-        return display_language;
+        return lang;
     }
 
     /**
@@ -236,11 +228,4 @@ public class Root {
         return configs;
     }
 
-    private static String selectDisplayLanguage() {
-        String lang = BaseAppConfigDefinitions.DisplayLanguage.getConfigValue();
-        if (lang == null || lang.isBlank()) {
-            return Locale.getDefault().toString();
-        }
-        return lang;
-    }
 }

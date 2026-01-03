@@ -12,7 +12,7 @@ public class MLHelper {
     private final Root root;
     private Properties props;
     private String current_lang;
-    private final String locale;
+    private final String display_language;
     private Properties missing_props;
     private String missing_props_file_name;
 
@@ -20,7 +20,7 @@ public class MLHelper {
 
     public MLHelper(Root root) {
         this.root = root;
-        locale = root.getDisplayLanguage();
+        display_language = root.getDisplayLanguage();
         autoLoadCurrentLocale();
     }
 
@@ -76,23 +76,23 @@ public class MLHelper {
     }
 
     public final void autoLoadCurrentLocale() {
-        if (loadTrans(locale)) {
+        if (loadTrans(display_language)) {
             return;
         }
 
-        if (locale.length() == 2 && !MLUtil.compareLanguagesOnly(locale, root.getBaseLanguage())) {
+        if (display_language.length() == 2 && !MLUtil.compareLanguagesOnly(display_language, root.getBaseLanguage())) {
             loadTrans(root.getDefaultLanguage());
             return;
         }
 
-        if (loadTrans(MLUtil.getLanguageOnly(locale))) {
+        if (loadTrans(MLUtil.getLanguageOnly(display_language))) {
             return;
         }
 
-        if (!MLUtil.compareLanguagesOnly(locale, root.getBaseLanguage())) {
+        if (!MLUtil.compareLanguagesOnly(display_language, root.getBaseLanguage())) {
             if (!loadTrans(root.getDefaultLanguage())) {
                 // damit nun alle Werte auf das richtige locale eingestellt sind.
-                loadTrans(locale);
+                loadTrans(display_language);
             }
         }
     }
