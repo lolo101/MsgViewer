@@ -10,8 +10,8 @@ import org.apache.logging.log4j.Logger;
 import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.*;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.Map.Entry;
 
 public class TableManipulator {
@@ -72,8 +72,6 @@ public class TableManipulator {
         int margin_default = Integer.parseInt(smargin_default);
         int margin_editable = Integer.parseInt(smargin_editable);
 
-        int max_height = 0;
-
         for (int i = 0; i < table.getColumnCount(); i++) {
             TableColumnModel colModel = table.getColumnModel();
             TableColumn col = colModel.getColumn(i);
@@ -99,8 +97,6 @@ public class TableManipulator {
                 Dimension dim = comp.getPreferredSize();
 
                 width = Math.max(width, dim.width);
-
-                max_height = Math.max(max_height, dim.height);
             }
 
 
@@ -128,35 +124,7 @@ public class TableManipulator {
         setReorderingAllowed();
         setResortingAllowed();
 
-        if (max_height > 0) {
-
-            int correction = 0;
-
-            LookAndFeel look_and_feel = UIManager.getLookAndFeel();
-
-            if (look_and_feel != null) {
-                logger.info("look and feel: " + look_and_feel.getID() );
-
-                if( Setup.is_linux_system() )
-                {
-                    correction = 1;
-
-                    if( look_and_feel.getID().equals("Nimbus") )
-                        correction = 3;
-                }
-                else // Windows
-                {
-                    correction=2;
-
-                    if( look_and_feel.getID().equals("Nimbus") )
-                        correction = 4;
-                    else if (look_and_feel.getID().equals("Windows"))
-                        correction = 0;
-                }
-            }
-
-            row_header.setCellHeight(max_height - correction);
-        }
+        row_header.setCellHeight(table.getRowHeight());
     }
 
     private void setReorderingAllowed() {
@@ -227,10 +195,6 @@ public class TableManipulator {
 
 
     public void hide(DBValue... columns) {
-        hide(Arrays.asList(columns));
-    }
-
-    private void hide(Iterable<DBValue> columns) {
         for (DBValue column : columns) {
             if (column == null)
                 continue;
