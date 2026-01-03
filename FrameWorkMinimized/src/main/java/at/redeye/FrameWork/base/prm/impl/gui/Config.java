@@ -87,17 +87,6 @@ public class Config extends BaseDialog implements Saveable, PrmListener {
         jBHelp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/at/redeye/FrameWork/base/resources/icons/help.png"))); // NOI18N
         jBHelp.addActionListener(this::jBHelpActionPerformed);
 
-        jTContent.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
         jScrollPane1.setViewportView(jTContent);
 
         jBSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/at/redeye/FrameWork/base/resources/icons/button_ok.gif"))); // NOI18N
@@ -177,7 +166,7 @@ private void jBCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
         int ret = checkSave(tm);
 
         if (ret == 1) {
-            ((Saveable) this).saveData();
+            this.saveData();
             return true;
         }
         return ret != -1;
