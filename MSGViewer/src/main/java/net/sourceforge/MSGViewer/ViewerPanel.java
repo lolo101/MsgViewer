@@ -3,10 +3,8 @@ package net.sourceforge.MSGViewer;
 import at.redeye.FrameWork.base.AutoMBox;
 import at.redeye.FrameWork.base.BaseDialog;
 import at.redeye.FrameWork.base.Root;
-import at.redeye.FrameWork.base.Setup;
 import at.redeye.FrameWork.base.imagestorage.ImageUtils;
 import at.redeye.FrameWork.utilities.StringUtils;
-import at.redeye.Plugins.ShellExec.ShellExec;
 import com.auxilii.msgparser.Message;
 import com.auxilii.msgparser.RecipientEntry;
 import com.auxilii.msgparser.RecipientType;
@@ -384,25 +382,17 @@ public class ViewerPanel extends JPanel implements Printable, MessageView {
         }
     }
 
-    private void open(String path) throws IOException {
-        if (Setup.is_win_system() && root.getPlugins().getAvailable("ShellExec") != null) {
-            logger.info("opening: {}", path);
+    private static void open(String path) throws IOException {
+        String open_command = ViewerHelper.getOpenCommand();
 
-            ShellExec shell = new ShellExec();
-            int ret = shell.execute(path);
-            logger.debug("shell exec returned: {}", ret);
-        } else {
-            String open_command = ViewerHelper.getOpenCommand();
+        logger.info("{} \"{}\"", open_command, path);
 
-            logger.info("{} \"{}\"", open_command, path);
+        String[] command_array = new String[2];
 
-            String[] command_array = new String[2];
+        command_array[0] = open_command;
+        command_array[1] = path;
 
-            command_array[0] = open_command;
-            command_array[1] = path;
-
-            Runtime.getRuntime().exec(command_array);
-        }
+        Runtime.getRuntime().exec(command_array);
     }
 
     public void parse(final String file_name) {

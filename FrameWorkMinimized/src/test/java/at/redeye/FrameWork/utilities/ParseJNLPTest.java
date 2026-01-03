@@ -94,7 +94,6 @@ public class ParseJNLPTest {
             jar_list.add("proxy-vole.jar");
             jar_list.add("js.jar");
             jar_list.add("jshortcut-0_4_repacked.jar");
-            jar_list.add("ShellExec.jar");
         }
     }
 

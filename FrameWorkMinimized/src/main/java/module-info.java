@@ -14,5 +14,4 @@ module FrameWorkMinimized {
     exports at.redeye.FrameWork.utilities;
     exports at.redeye.FrameWork.widgets;
     exports at.redeye.FrameWork.widgets.helpwindow;
-    exports at.redeye.Plugins.ShellExec;
 }

@@ -3,7 +3,6 @@ package net.sourceforge.MSGViewer;
 import at.redeye.FrameWork.base.BaseModuleLauncher;
 import at.redeye.FrameWork.base.FrameWorkConfigDefinitions;
 import at.redeye.FrameWork.base.Root;
-import at.redeye.FrameWork.base.Setup;
 import at.redeye.FrameWork.widgets.StartupWindow;
 import org.apache.logging.log4j.Level;
 
@@ -88,8 +87,6 @@ public class ModuleLauncher extends BaseModuleLauncher {
                     "/at/redeye/FrameWork/base/resources/pictures/redeye.png");
         }
 
-        registerPlugins();
-
         setLookAndFeel();
 
         configureLogging();
@@ -109,12 +106,6 @@ public class ModuleLauncher extends BaseModuleLauncher {
 
         closeSplash();
         mainwin.setVisible(true);
-    }
-
-    private void registerPlugins() {
-        if (Setup.is_win_system()) {
-            root.getPlugins().register(new at.redeye.Plugins.ShellExec.Plugin());
-        }
     }
 
     private boolean anyArgumentMatches(String string) {
