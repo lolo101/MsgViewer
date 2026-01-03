@@ -120,18 +120,6 @@
                 <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
               </AuxValues>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="jMPlugins">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Plugins"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMPluginsActionPerformed"/>
-              </Events>
-              <AuxValues>
-                <AuxValue name="JavaCodeGenerator_VariableLocal" type="java.lang.Boolean" value="true"/>
-                <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
-              </AuxValues>
-            </MenuItem>
           </SubComponents>
         </Menu>
       </SubComponents>
@@ -176,7 +164,7 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="net.sourceforge.MSGViewer.ViewerPanel" name="viewerPanel">
+    <Component class="javax.swing.JPanel" name="viewerPanel">
       <Events>
         <EventHandler event="propertyChange" listener="java.beans.PropertyChangeListener" parameters="java.beans.PropertyChangeEvent" handler="viewerPanelPropertyChange"/>
       </Events>

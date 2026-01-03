@@ -1,6 +1,5 @@
 package net.sourceforge.MSGViewer;
 
-import at.redeye.FrameWork.Plugin.AboutPlugins;
 import at.redeye.FrameWork.base.AutoMBox;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.base.prm.impl.gui.Config;
@@ -49,7 +48,6 @@ public class SingleWin extends BaseWin {
         javax.swing.JPopupMenu.Separator jSeparator1 = new javax.swing.JPopupMenu.Separator();
         javax.swing.JMenuItem jMAbout = new javax.swing.JMenuItem();
         javax.swing.JMenuItem jMChangelog = new javax.swing.JMenuItem();
-        javax.swing.JMenuItem jMPlugins = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -95,10 +93,6 @@ public class SingleWin extends BaseWin {
         jMChangelog.setText("Changelog");
         jMChangelog.addActionListener(this::jMChangelogActionPerformed);
         jMInfo.add(jMChangelog);
-
-        jMPlugins.setText("Plugins");
-        jMPlugins.addActionListener(this::jMPluginsActionPerformed);
-        jMInfo.add(jMPlugins);
 
         menubar.add(jMInfo);
 
@@ -153,12 +147,6 @@ public class SingleWin extends BaseWin {
         invokeDialogUnique(new HelpWin(root, "ChangeLog"));
 
     }//GEN-LAST:event_jMChangelogActionPerformed
-
-    private void jMPluginsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMPluginsActionPerformed
-
-        invokeDialogUnique(new AboutPlugins(root));
-
-    }//GEN-LAST:event_jMPluginsActionPerformed
 
     private void jMDetailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMDetailActionPerformed
 

@@ -4,14 +4,15 @@ import at.redeye.FrameWork.base.prm.bindtypes.DBConfig;
 import at.redeye.FrameWork.base.prm.impl.ConfigDefinitions;
 import at.redeye.FrameWork.base.translation.MLHelper;
 import at.redeye.FrameWork.utilities.Storage;
+
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Collection;
+import java.util.Locale;
 
 public class Root {
     private static Root static_root;
     private final String app_name;
     private final Setup setup;
-    private final Plugins plugins;
     private final Path storage;
     private final Dialogs dialogs;
     private final MLHelper ml_helper;
@@ -57,7 +58,6 @@ public class Root {
         this.app_name = app_name;
         static_root = this;
         setup = new Setup(Path.of(System.getProperty("user.home")), app_name);
-        plugins = new Plugins(app_name);
         storage = Storage.getEphemeralStorage(this.app_name);
         dialogs = new Dialogs(this);
         ml_helper = new MLHelper(this);
@@ -83,10 +83,6 @@ public class Root {
 
     public String getAppName() {
         return app_name;
-    }
-
-    public Plugins getPlugins() {
-        return plugins;
     }
 
     /**
