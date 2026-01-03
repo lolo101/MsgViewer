@@ -1,16 +1,12 @@
 package at.redeye.FrameWork.base.prm.impl;
 
-import at.redeye.FrameWork.base.bindtypes.DBString;
 import at.redeye.FrameWork.base.prm.PrmDefaultChecksInterface;
 import at.redeye.SqlDBInterface.SqlDBIO.DateTimeFormat;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.swing.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.function.Predicate;
 
 public class PrmDefaultCheckSuite implements PrmDefaultChecksInterface {
 
@@ -104,21 +100,6 @@ public class PrmDefaultCheckSuite implements PrmDefaultChecksInterface {
 		}
 	}
 
-	private boolean passesLookAndFeel(PrmActionEvent event) {
-
-		DBString newPrmValue = event.getNewPrmValue();
-		boolean valid = Arrays.stream(UIManager.getInstalledLookAndFeels())
-				.map(UIManager.LookAndFeelInfo::getName)
-				.anyMatch(Predicate.isEqual(newPrmValue.toString()));
-
-		if (!valid) {
-			logger.warn(newPrmValue
-					+ ": Not a valid LookAndFeel value !");
-		}
-		return valid;
-
-	}
-
 	public boolean doChecks(PrmActionEvent event) {
 
 		if (parameterType(PRM_IS_DOUBLE)) {
@@ -161,9 +142,6 @@ public class PrmDefaultCheckSuite implements PrmDefaultChecksInterface {
 			return passesDateTime(event, sdf);
 		}
 
-		if (parameterType(PRM_IS_LOOKANDFEEL)) {
-			return passesLookAndFeel(event);
-		}
 		return true;
 	}
 
