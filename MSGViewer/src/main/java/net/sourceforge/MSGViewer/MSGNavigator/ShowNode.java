@@ -415,7 +415,7 @@ public class ShowNode extends BaseDialog {
 
             offset += 4;
 
-            long len = Long.valueOf(s_lenght.toString(), 16);
+            int len = Integer.valueOf(s_lenght.toString(), 16);
 
             sb.append(s_lenght);
             sb.append(" (").append(len).append(")");
@@ -423,7 +423,7 @@ public class ShowNode extends BaseDialog {
 
             byte[] s_byte = new byte[(int) len];
 
-            System.arraycopy(bytes, offset, s_byte, 0, (int) len);
+            System.arraycopy(bytes, offset, s_byte, 0, len);
 
             offset += len;
 
