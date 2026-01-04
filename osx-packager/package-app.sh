@@ -13,13 +13,14 @@ cd ..
 echo "Packaging DMG.." 
 cd -
 jpackage --type dmg \
-         -i ../MSGViewer/target \
-         -n "MSG Viewer" \
-         --icon "./msg-viewer.icns" \
-         --main-class net.sourceforge.MSGViewer.ModuleLauncher \
-         --main-jar msgviewer.jar
+         --name "MSG Viewer" \
+         --icon ./msg-viewer.icns \
+         --input ../MSGViewer/target \
+         --main-jar msgviewer.jar \
+         --main-class net.sourceforge.MSGViewer.ModuleLauncher
 
 echo "Moving to distribution folder.."
+mkdir -p ../dist
 mv *.dmg ../dist
 
 echo "packaging complete."
