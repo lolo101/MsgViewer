@@ -1,4 +1,6 @@
 name: Qodana
+permissions:
+  contents: read
 on:
   workflow_dispatch:
   pull_request:
