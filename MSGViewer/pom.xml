@@ -9,13 +9,6 @@
     <artifactId>msgviewer</artifactId>
     <name>MSGViewer</name>
 
-    <repositories>
-        <repository>
-            <id>MSGViewer externals</id>
-            <url>file://${basedir}/ext_resources</url>
-        </repository>
-    </repositories>
-
     <build>
         <plugins>
             <plugin>
@@ -92,11 +85,6 @@
             <groupId>at.redeye</groupId>
             <artifactId>FrameWorkMinimized</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>at.redeye.Plugins</groupId>
-            <artifactId>ShellExec</artifactId>
-            <version>2.0.0</version>
         </dependency>
         <dependency>
             <groupId>com.auxilii</groupId>
