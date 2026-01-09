@@ -69,7 +69,7 @@ public class MsgParser {
                 DirectoryEntry entry = (DirectoryEntry) dir.getEntry(String.format("__attach_version1.0_#%08X", index));
                 msg.addAttachment(parseAttachment(entry));
             }
-            while (propertyStream.available() > 0) {
+            while (propertyStream.available() >= 8) {
                 msg.setProperty(new Property(propertyStream, dir));
             }
             return msg;
@@ -113,7 +113,7 @@ public class MsgParser {
         if (dir.hasEntry(Ptyp.SUBSTORAGE_PREFIX + "3701000D")) {
             return parseEmbeddedMessage(dir);
         }
-        return ParseFileAttachment(dir);
+        return parseFileAttachment(dir);
     }
 
     private static MsgAttachment parseEmbeddedMessage(DirectoryEntry dir) throws IOException {
@@ -122,7 +122,7 @@ public class MsgParser {
         return new MsgAttachment(parseMsg(entry));
     }
 
-    private static FileAttachment ParseFileAttachment(DirectoryEntry dir) throws IOException {
+    private static FileAttachment parseFileAttachment(DirectoryEntry dir) throws IOException {
         DocumentEntry propertyEntry = (DocumentEntry) dir.getEntry(PROPERTIES_ENTRY);
         try (DocumentInputStream propertyStream = new DocumentInputStream(propertyEntry)) {
             propertyStream.skip(8);
