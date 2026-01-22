@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: cimg/openjdk:25.0-browsers
+      - image: cimg/openjdk:25.0.1-browsers
 
     steps:
       - checkout
