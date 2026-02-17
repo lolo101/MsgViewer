@@ -61,7 +61,7 @@
             <plugin>
                 <groupId>org.javacc.plugin</groupId>
                 <artifactId>javacc-maven-plugin</artifactId>
-                <version>3.0.3</version>
+                <version>3.8.0</version>
                 <executions>
                     <execution>
                         <goals>
