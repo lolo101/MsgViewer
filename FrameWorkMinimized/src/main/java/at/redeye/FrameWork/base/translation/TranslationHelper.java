@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.base.translation;
 
 import at.redeye.FrameWork.base.AutoLogger;
@@ -12,99 +7,86 @@ import at.redeye.FrameWork.base.Root;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.*;
 
-/**
- *
- * @author martin
- */
-public class TranslationHelper
-{
-     BaseDialogBase base_dlg;
-     Root  root;
-     ExtractStrings extract_strings;
-     Properties currentProps;
-     List additional_strings;
-     boolean tried_autoloading_locale = false;
-     BaseDialogBaseHelper helper;
+public class TranslationHelper {
+    private final BaseDialogBase base_dlg;
+    private final Root root;
+    private ExtractStrings extract_strings;
+    private Properties currentProps;
+    private List<String> additional_strings;
+    private boolean need_locale_autoload = true;
 
-     class OpenTransDialog implements Runnable
-     {
-         public void run() {
+    class OpenTransDialog implements Runnable {
+        @Override
+        public void run() {
 
-             if( extract_strings != null )
-             {
-                 if( additional_strings != null )
+            if (extract_strings != null) {
+                if (additional_strings != null)
                     extract_strings.strings.addAll(additional_strings);
 
-                 // alle in der property Datei gefundenen Strings hinzufügen
-                 if( currentProps != null )
-                 {
-                     Set<Object> keys = currentProps.keySet();
+                // alle in der property Datei gefundenen Strings hinzufügen
+                if (currentProps != null) {
+                    Set<Object> keys = currentProps.keySet();
 
-                     for (Object key : keys) extract_strings.strings.add((String) key);
-                 }
-             }
+                    for (Object key : keys) extract_strings.strings.add((String) key);
+                }
+            }
 
 
-             base_dlg.invokeDialogUnique(
-                new TranslationDialog(root, base_dlg.getContainer(), base_dlg.getClass().getName(), extract_strings)
-             );
-         }
-     }
+            base_dlg.invokeDialogUnique(
+                    new TranslationDialog(root, base_dlg.getContainer(), base_dlg.getClass().getName(), extract_strings)
+            );
+        }
+    }
 
-     class SwitchTrans_DE_EN implements Runnable
-     {
-         String lang_a = "";
-         String lang_b = "en";
-         String lang_current;
+    class SwitchTranslation implements Runnable {
+        private final String lang_a;
+        private final String lang_b;
+        private String lang_current;
 
-         public void run() {
-             if (lang_b.equals(lang_current)) {
-                 lang_current = lang_a;
-             } else {
-                 lang_current = lang_b;
-             }
+        private SwitchTranslation() {
+            lang_a = root.getDisplayLanguage();
+            lang_b = root.getDefaultLanguage();
+            lang_current = root.getDisplayLanguage();
+        }
 
-             new AutoLogger(this.getClass().getName()) {
+        @Override
+        public void run() {
+            if (lang_b.equals(lang_current)) {
+                lang_current = lang_a;
+            } else {
+                lang_current = lang_b;
+            }
 
-                 @Override
-                 public void do_stuff() throws Exception {
-                     switchTranslation(lang_current);
-                 }
-             };
-         }
-     }
+            new AutoLogger<>(this.getClass().getName(), () -> switchTranslation(lang_current)).run();
+        }
+    }
 
     public TranslationHelper(Root root, BaseDialogBase base_dlg, BaseDialogBaseHelper helper)
     {
         this.root = root;
         this.base_dlg = base_dlg;
-        this.helper = helper;
 
-        helper.registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_F12, 0), new OpenTransDialog() );
-        helper.registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_F11, 0), new SwitchTrans_DE_EN() );
+        helper.registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_F12, 0), new OpenTransDialog());
+        helper.registerActionKeyListener(KeyStroke.getKeyStroke(KeyEvent.VK_F11, 0), new SwitchTranslation());
     }
 
-    private boolean loadTranslation( String new_trans ) throws FileNotFoundException, IOException
-    {
+    private boolean loadTranslation(String new_trans) {
         return switchTranslation(new_trans, true);
     }
 
-    private boolean switchTranslation( String new_trans ) throws FileNotFoundException, IOException
-    {
+    private boolean switchTranslation(String new_trans) {
         return switchTranslation(new_trans, false);
     }
 
     private boolean switchTranslation( String new_trans, boolean load_only ) {
-        boolean not_found = false;
+        boolean found = true;
 
         Properties props = MLUtil.autoLoadFile4Class(root, base_dlg, new_trans, true);
 
         if( props == null ) {
-            not_found = true;
+            found = false;
             props = new Properties();
         }
 
@@ -113,14 +95,13 @@ public class TranslationHelper
                 extract_strings = new ExtractStrings(base_dlg.getContainer());
             }
 
-            HashMap<String, List<JComponent>> all = extract_strings.getComponents();
+            Map<String, List<JComponent>> all = extract_strings.getComponents();
 
-            Set<String> keys = all.keySet();
-
-            for (String key : keys) {
+            for (Map.Entry<String, List<JComponent>> entry : all.entrySet()) {
+                String key = entry.getKey();
                 String value = props.getProperty(key);
 
-                for (JComponent comp : all.get(key)) {
+                for (JComponent comp : entry.getValue()) {
                     if (value != null && !value.isEmpty()) {
                         assign(comp, value);
                     } else {
@@ -132,7 +113,7 @@ public class TranslationHelper
 
         currentProps = props;
 
-        return !not_found;
+        return found;
     }
 
     private static void assign( JComponent comp, String value )
@@ -140,97 +121,64 @@ public class TranslationHelper
         ExtractStrings.assign( comp, value );
     }
 
-    public boolean switchTrans(String trans) {
-        try {
-            return switchTranslation(trans);
-
-        } catch (FileNotFoundException ex) {
-            return false;
-
-        } catch (IOException ex) {
-            return false;
-        }
-    }
-
-    public boolean loadTrans(String trans) {
-        try {
-            return loadTranslation(trans);
-
-        } catch (FileNotFoundException ex) {
-            return false;
-
-        } catch (IOException ex) {
-            return false;
-        }
-    }
-
     public void autoSwitchToCurrentLocale()
     {
         String locale = root.getDisplayLanguage();
 
-        if (locale.equals(helper.getBaseLanguage())) {
+        if (locale.equals(root.getBaseLanguage())) {
             return;
         }
 
-        if (switchTrans(locale)) {
+        if (switchTranslation(locale)) {
             return;
         }
 
-        if (locale.length() == 2 && !MLUtil.compareLanguagesOnly(root.getDefaultLanguage(), helper.getBaseLanguage())) {
-            switchTrans(root.getDefaultLanguage());
+        if (locale.length() == 2 && !MLUtil.compareLanguagesOnly(root.getDefaultLanguage(), root.getBaseLanguage())) {
+            switchTranslation(root.getDefaultLanguage());
             return;
         }
 
-        if (switchTrans(MLUtil.getLanguageOnly(locale))) {
+        if (switchTranslation(MLUtil.getLanguageOnly(locale))) {
             return;
         }
 
-        /**
-         * ist die Implementationssprache die gleiche, wie
-         * die gewünschte, dann kein Fallback auf die Default Sprache.
-         */
-        if( MLUtil.compareLanguagesOnly(locale, helper.getBaseLanguage()))
+        if (MLUtil.compareLanguagesOnly(locale, root.getBaseLanguage()))
         {
             return;
         }
 
-        if (!root.getDefaultLanguage().equals(helper.getBaseLanguage())) {
-            switchTrans(root.getDefaultLanguage());
+        if (!root.getDefaultLanguage().equals(root.getBaseLanguage())) {
+            switchTranslation(root.getDefaultLanguage());
         }
     }
 
-    public void autoLoadCurrentLocale()
-    {
+    private void autoLoadCurrentLocale() {
         String locale = root.getDisplayLanguage();
 
-        if (locale.equals(helper.getBaseLanguage())) {
+        if (locale.equals(root.getBaseLanguage())) {
             return;
         }
 
-        if (loadTrans(locale)) {
+        if (loadTranslation(locale)) {
             return;
         }
 
-        if (locale.length() == 2  && !MLUtil.compareLanguagesOnly(root.getDefaultLanguage(), helper.getBaseLanguage())) {
-            loadTrans(root.getDefaultLanguage());
+        if (locale.length() == 2 && !MLUtil.compareLanguagesOnly(root.getDefaultLanguage(), root.getBaseLanguage())) {
+            loadTranslation(root.getDefaultLanguage());
             return;
         }
 
-        if (loadTrans(MLUtil.getLanguageOnly(locale))) {
+        if (loadTranslation(MLUtil.getLanguageOnly(locale))) {
             return;
         }
 
-        /**
-         * ist die Implementationssprache die gleiche, wie
-         * die gewünschte, dann kein Fallback auf die Default Sprache.
-         */
-        if( MLUtil.compareLanguagesOnly(locale, helper.getBaseLanguage()))
+        if (MLUtil.compareLanguagesOnly(locale, root.getBaseLanguage()))
         {
             return;
         }
 
-        if (!root.getDefaultLanguage().equals(helper.getBaseLanguage())) {
-            loadTrans(root.getDefaultLanguage());
+        if (!root.getDefaultLanguage().equals(root.getBaseLanguage())) {
+            loadTranslation(root.getDefaultLanguage());
         }
     }
 
@@ -238,10 +186,9 @@ public class TranslationHelper
     {
         String res = null;
 
-        if( currentProps == null && !tried_autoloading_locale )
-        {
+        if (currentProps == null && need_locale_autoload) {
             autoLoadCurrentLocale();
-            tried_autoloading_locale = true;
+            need_locale_autoload = false;
         }
 
         if( currentProps != null )
@@ -256,7 +203,7 @@ public class TranslationHelper
                 // Die Funktion wird nämlich erst beim doLayout aufgerufen
 
                 if( additional_strings == null )
-                    additional_strings = new LinkedList<String>();
+                    additional_strings = new LinkedList<>();
 
                 additional_strings.add(message);
             }

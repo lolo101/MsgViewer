@@ -1,372 +1,161 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.base;
 
-import at.redeye.FrameWork.base.prm.bindtypes.DBConfig;
-import at.redeye.FrameWork.utilities.ParseJNLP;
-import at.redeye.FrameWork.utilities.StringUtils;
+import at.redeye.FrameWork.utilities.*;
 import at.redeye.FrameWork.widgets.StartupWindow;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.io.File;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.stream.Stream;
+import javax.swing.*;
+import org.apache.logging.log4j.*;
 import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.appender.ConsoleAppender;
-import org.apache.logging.log4j.core.appender.RollingFileAppender;
+import org.apache.logging.log4j.core.appender.*;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 
-import javax.swing.*;
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Properties;
+public class BaseModuleLauncher {
+    protected StartupWindow splash;
+    public static final Logger logger = LogManager.getRootLogger();
+    public Root root;
+    public final String[] args;
 
+    public BaseModuleLauncher(String... args) {
 
-/**
- *
- * @author martin
- */
-public abstract class BaseModuleLauncher {
-	public StartupWindow splash = null;
-	public static Logger logger = LogManager.getRootLogger();
-	public Root root;
-	public String[] args;
-        // public AutoImportDB auto_import_db;
-        Properties jnlp_properties;
-
-	public BaseModuleLauncher() {
-
-                BaseConfigureLogging();
-	}
-
-	public BaseModuleLauncher(String[] args) {
-
-                this.args = args;
-                BaseConfigureLogging();
-	}
-
-	public String getWebStartUrl() {
-		return getWebStartUrl(null);
-	}
-
-	public String getWebStartUrl(String default_url) {
-		String value = getStartupParam("wsu", "webstarturl", "WEBSTARTURL",
-				default_url);
-
-		if (value != null && !value.trim().isEmpty()) {
-
-			try {
-				new URL(value);
-
-                                logger.trace("webstarturl: " + value + " is a valid url");
-				// System.out.println("webstarturl: " + value + " is a valid url");
-
-				return value;
-			} catch (MalformedURLException ex) {
-				System.err.println("invalid url specified: " + value);
-				System.err.println(ex);
-			}
-		}
-
-		return null;
-	}
-
-	public String getStartupParam(String shortname, String longname,
-			String envname) {
-		return getStartupParam(shortname, longname, envname, null);
-	}
-
-        public String getStartupParam(String name) {
-            return getStartupParam(name, name, name);
-        }
-
-	public String getStartupParam(String shortname, String longname,
-			String envname, String default_value) {
-
-                shortname = "-" + shortname;
-                longname = "-" + longname;
-
-		if (args != null) {
-			boolean next = false;
-
-			for (String arg : args) {
-				if (next) {
-					return arg;
-				} else if (arg.equalsIgnoreCase( shortname)
-				           || arg.equalsIgnoreCase(longname)) {
-					next = true;
-				}
-			}
-		}
-
-                parseJNLP();
-
-		String url = System.getProperty(envname.toUpperCase());
-
-                if( url == null && jnlp_properties != null )
-                    url = jnlp_properties.getProperty(envname.toUpperCase());
-
-		if (url == null || url.trim().isEmpty()) {
-                        String sdev = default_value;
-                        if( sdev == null )
-                            sdev = "(null)";
-
-                        if( logger.isTraceEnabled() )
-                            logger.trace(envname + "=" +  sdev + " (default)" );
-			return default_value;
-		}
-
-		System.out.println( envname + "=" + url);
-		return url;
-	}
-
-    private void parseJNLP()
-    {
-        if( jnlp_properties != null )
-            return;
-
-        for( String arg : args )
-        {
-            if( arg.endsWith(".jnlp") )
-            {
-                final File jnlp_file = new File( arg );
-
-                if( jnlp_file.exists() )
-                {
-                    new AutoLogger(BaseModuleLauncher.class.getName()) {
-
-                        @Override
-                        public void do_stuff() throws Exception {
-                            ParseJNLP parser = new ParseJNLP(jnlp_file);
-
-                            jnlp_properties = parser.getProperties();
-                        }
-                    };
-                }
-            }
-        }
+        this.args = args;
+        BaseConfigureLogging();
     }
 
-    /**
-     * will be called when jnlp update process is completet
-     * overload if required
-     */
-    public void jnlpUpdated()
-    {
+    private String getNoSplash() {
+        return Stream.of(args)
+                .filter("-nosplash"::equalsIgnoreCase)
+                .map(s->"yes")
+                .findFirst()
+                .orElseGet(this::getNoSplashProperty);
+    }
 
+    private String getNoSplashProperty() {
+
+        String envValue = System.getProperty("NOSPLASH");
+        if (envValue != null) {
+            System.out.println("env NOSPLASH=" + envValue);
+            return envValue;
+        }
+
+        Properties jnlp_properties = findJnlpProperties();
+        String jnlpValue = jnlp_properties.getProperty("NOSPLASH");
+        if (jnlpValue != null) {
+            System.out.println("JNLP NOSPLASH" + "=" + jnlpValue);
+            return jnlpValue;
+        }
+
+        if (logger.isTraceEnabled())
+            logger.trace("NOSPLASH undefined");
+        return null;
+    }
+
+    private Properties findJnlpProperties() {
+        return Stream.of(args)
+                .filter(arg -> arg.endsWith(".jnlp"))
+                .map(File::new)
+                .filter(File::exists)
+                .findFirst()
+                .flatMap(jnlp_file -> new AutoLogger<>(BaseModuleLauncher.class.getName(),
+                        () -> new ParseJNLP(jnlp_file).getProperties()
+                ).result())
+                .orElseGet(Properties::new);
     }
 
     /**
      * configures logger for the first usage
-     * The default logging level is Leve.ALL
+     * The default logging level is {@link Level#ALL}
      */
-    public static void BaseConfigureLogging()
-    {
+    public static void BaseConfigureLogging() {
         BaseConfigureLogging(Level.ALL);
     }
 
     /**
      * configures logger for the first usage
+     *
      * @param level Logging Level
      */
     public static void BaseConfigureLogging(Level level) {
 
         PatternLayout layout = PatternLayout.newBuilder()
-				.withPattern("%d{ISO8601} %-5p (%F:%L): %m%n")
-				.build();
+                .withPattern("%d{ISO8601} %-5p (%F:%L): %m%n")
+                .build();
 
         ConsoleAppender consoleAppender = ConsoleAppender.createDefaultAppenderForLayout(layout);
 
-		LoggerConfig loggerConfig = LoggerContext.getContext().getConfiguration().getRootLogger();
-		loggerConfig.setLevel(level);
-		loggerConfig.addAppender(consoleAppender, null, null);
+        LoggerConfig loggerConfig = LoggerContext.getContext().getConfiguration().getRootLogger();
+        loggerConfig.setLevel(level);
+        loggerConfig.addAppender(consoleAppender, null, null);
     }
 
-	public void configureLogging() {
+    protected final void configureLogging() {
 
-		PatternLayout layout = PatternLayout.newBuilder()
-				.withPattern("%d{ISO8601} %-5p (%F:%L): %m%n")
-				.build();
+        PatternLayout layout = PatternLayout.newBuilder()
+                .withPattern("%d{ISO8601} %-5p (%F:%L): %m%n")
+                .build();
 
-		ConsoleAppender consoleAppender = ConsoleAppender.createDefaultAppenderForLayout(layout);
+        ConsoleAppender consoleAppender = ConsoleAppender.createDefaultAppenderForLayout(layout);
 
-		String logFileDir = root.getSetup().getLocalConfig(
-				BaseAppConfigDefinitions.LoggingDir);
-		logger.trace("logFileDir: " + logFileDir);
-		String logFileLevel = root.getSetup().getLocalConfig(
-				BaseAppConfigDefinitions.LoggingLevel);
-		String loggingEnabled = root.getSetup().getLocalConfig(
-				BaseAppConfigDefinitions.DoLogging);
+        String logFileDir = BaseAppConfigDefinitions.LoggingDir.getConfigValue();
+        logger.trace("logFileDir: {}", logFileDir);
+        String logFileLevel = BaseAppConfigDefinitions.LoggingLevel.getConfigValue();
+        String loggingEnabled = BaseAppConfigDefinitions.DoLogging.getConfigValue();
 
-                if( logFileDir.equals("APPHOME") )
-                    logFileDir = Setup.getAppConfigDir(root.getAppName() + "/log");
+        if (logFileDir.equals("APPHOME"))
+            logFileDir = Setup.getAppConfigDir(Path.of(System.getProperty("user.home")), root.getAppName()).resolve("log").toString();
 
-		String filename = logFileDir + (logFileDir.isEmpty() ? "" : "/")
-				+ "log.OS-" + System.getProperty("user.name", "unknown-user")
-				+ ".txt";
+        String filename = logFileDir + (logFileDir.isEmpty() ? "" : "/")
+                + "log.OS-" + System.getProperty("user.name", "unknown-user")
+                + ".txt";
 
-		logger.trace("Filename: " + filename);
+        logger.trace("Filename: {}", filename);
 
-		LoggerConfig loggerConfig = LoggerContext.getContext().getConfiguration().getRootLogger();
-		loggerConfig.setLevel(Level.getLevel(logFileLevel));
-		loggerConfig.addAppender(consoleAppender, null, null);
+        LoggerConfig loggerConfig = LoggerContext.getContext().getConfiguration().getRootLogger();
+        loggerConfig.setLevel(Level.getLevel(logFileLevel));
+        loggerConfig.addAppender(consoleAppender, null, null);
 
-		if (loggingEnabled.equalsIgnoreCase("ja")
-				|| loggingEnabled.equalsIgnoreCase("yes")
-				|| loggingEnabled.equalsIgnoreCase("true")) {
+        if (StringUtils.isYes(loggingEnabled)) {
 
-			RollingFileAppender fileAppender = RollingFileAppender.newBuilder()
-					.setLayout(layout)
-					.withFileName(filename)
-					.setName(RollingFileAppender.class.getSimpleName())
-					.withAppend(true)
-					.build();
+            RollingFileAppender fileAppender = RollingFileAppender.newBuilder()
+                    .setLayout(layout)
+                    .withFileName(filename)
+                    .setName(RollingFileAppender.class.getSimpleName())
+                    .withAppend(true)
+                    .build();
 
-			loggerConfig.addAppender(fileAppender, null, null);
-		}
-
-	}
-
-	public abstract String getVersion();
-
-	public void setSetupParam(String value, DBConfig config,
-			boolean if_not_exist) {
-		if (value == null)
-			return;
-
-		if (value.trim().isEmpty())
-			return;
-
-		root.getSetup().setLocalConfig(config.getConfigName(), value,
-				if_not_exist);
-	}
-
-	public void setCommonLoggingLevel() {
-
-		String do_logging = getStartupParam("dl", "do-logging", "LOGGING");
-		String level = getStartupParam("ll", "logging-level", "LOGGING_LEVEL");
-		String dir = getStartupParam("ld", "logging-dir", "LOGGING_DIR");
-		String force_logging = getStartupParam("fl", "force-logging",
-				"FORCE_LOGGING");
-
-		String enable_logging_on_new_version = getStartupParam("",
-				"enable-logging-on-new_version",
-				"ENABLE_LOGGING_ON_NEW_VERSION");
-
-		if (StringUtils.isYes(enable_logging_on_new_version)) {
-			String version = root.getSetup().getLocalConfig(
-					BaseAppConfigDefinitions.Version);
-
-			if (version == null || !version.equalsIgnoreCase(getVersion())) {
-				if (!StringUtils.isYes(do_logging))
-					do_logging = "true";
-
-				if (!StringUtils.isYes(force_logging))
-					force_logging = "true";
-			}
-		}
-
-		root.getSetup().setLocalConfig(
-				BaseAppConfigDefinitions.Version.getConfigName(), getVersion());
-
-		if (dir != null && dir.equalsIgnoreCase("APPHOME")) {
-			dir = Setup.getAppConfigDir(root.getAppName() + "/log");
-		}
-
-		boolean force = false;
-
-		if (StringUtils.isYes(force_logging)) {
-			force = true;
-		}
-
-		setSetupParam(do_logging, BaseAppConfigDefinitions.DoLogging, force);
-		setSetupParam(level, BaseAppConfigDefinitions.LoggingLevel, force);
-		setSetupParam(dir, BaseAppConfigDefinitions.LoggingDir, force);
-
-		root.getSetup().saveConfig();
-
-		// I think this is too much...
-
-		configureLogging();
-	}
-
-	public boolean splashEnabled() {
-		return !StringUtils.isYes(getStartupParam(null, "nosplash", "NOSPLASH"));
-	}
-
-        public void closeSplash()
-        {
-            if( splash != null )
-                splash.close();
+            loggerConfig.addAppender(fileAppender, null, null);
         }
 
-	/**
-	 * This method sets the LookAndFeel which the user has parameterized. It may
-	 * be called after the PrmInit was done, but it has to be done before the UI
-	 * starts.
-	 */
-	public void setLookAndFeel(Root root) {
+    }
 
-		String config = root.getSetup().getLocalConfig(
-				FrameWorkConfigDefinitions.LookAndFeel);
+    protected final boolean splashEnabled() {
+        return !StringUtils.isYes(getNoSplash());
+    }
 
-		logger.debug("Found LookAndFeel PRM value: <" + config + ">");
-
-		try {
-			UIManager.setLookAndFeel(getLookAndFeelStrByName(config));
-		} catch (ReflectiveOperationException | UnsupportedLookAndFeelException e) {
-			logger.error(e.getMessage());
-		}
-	}
-
-	public static String getLookAndFeelStrByName(String name) {
-
-            if (name.equalsIgnoreCase("motif")) {
-                return "com.sun.java.swing.plaf.motif.MotifLookAndFeel";
-            } else if (name.equalsIgnoreCase("metal")) {
-                return "javax.swing.plaf.metal.MetalLookAndFeel";
-            } else if (name.equalsIgnoreCase("nimbus")) {
-                return "com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel";
-            } else {
-                return UIManager.getSystemLookAndFeelClassName();
-            }
-	}
-
-    /**
-     * initialises the default params for the database
-     * vars, if they are not already existing
-     */
-    public void initDBConnectionFromParams() {
-        boolean always_overwrite = StringUtils.isYes(getStartupParam(null, "dboverwrite",
-                Setup.USE_DB_CONNECTION_ALWAYS_FROM_JNLP));
-
-        initIfSet(Setup.DBDatabase, always_overwrite);
-        initIfSet(Setup.DBHost, always_overwrite);
-        initIfSet(Setup.DBInstance, always_overwrite);
-        initIfSet(Setup.DBPasswd, always_overwrite);
-        initIfSet(Setup.DBPort, always_overwrite);
-        initIfSet(Setup.DBType, always_overwrite);
-        initIfSet(Setup.DBUser, always_overwrite);
-        initIfSet(Setup.EncryptAllDBSettings,always_overwrite);
-
-        root.saveSetup();
+    protected final void closeSplash() {
+        if (splash != null)
+            splash.close();
     }
 
     /**
-     * Sets a local config param if it is set detected by <b>getStartupParam()</b>
-     * @param param Name of the parameter
-     * @param always_over_write set it to true, if you wan't to override existing settings.
+     * This method sets the LookAndFeel which the user has parameterized. It may
+     * be called after the PrmInit was done, but it has to be done before the UI
+     * starts.
      */
-        public void initIfSet( String param, boolean always_over_write )
-        {
-            String val = getStartupParam(param, param, param);
+    protected static void setLookAndFeel() {
 
-            if( val != null )
-            {
-                root.getSetup().setLocalConfig(param, val, !always_over_write);
-            }
+        String config = FrameWorkConfigDefinitions.LookAndFeel.getConfigValue();
+
+        logger.debug("Found LookAndFeel PRM value: <{}>", config);
+
+        try {
+            UIManager.setLookAndFeel(UIManager.createLookAndFeel(config));
+        } catch (UnsupportedLookAndFeelException e) {
+            List<String> names = Arrays.stream(UIManager.getInstalledLookAndFeels()).map(UIManager.LookAndFeelInfo::getName).toList();
+            logger.error("{} is unavailable. Available LnF: {}", config, names);
         }
+    }
 }

@@ -1,11 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.base;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Simple class that holds a list of open dialogs that should only be opened once
@@ -13,30 +9,22 @@ import java.util.HashMap;
  */
 public class UniqueDialogHelper
 {
-    HashMap<String,BaseDialogBase> dialogs = new HashMap<>();
-
-    public static final String ID_STRING = "invokeDialogUnique";
+    private final Map<String, BaseDialogBase> dialogs = new HashMap<>();
 
     public BaseDialogBase invokeUniqueDialog( final BaseDialogBase dialog )
     {
-        BaseDialogBase d = dialogs.get(dialog.getUniqueDialogIdentifier(ID_STRING));
+        String identifier = dialog.getUniqueDialogIdentifier();
+        BaseDialogBase d = dialogs.get(identifier);
 
-        if( d == null )
-        {
-            dialogs.put(dialog.getUniqueDialogIdentifier(ID_STRING), dialog);
+        if (d == null) {
+            dialogs.put(identifier, dialog);
 
-            dialog.registerOnCloseListener(new Runnable() {
-
-                public void run() {
-                    dialogs.remove(dialog.getUniqueDialogIdentifier(ID_STRING));
-                }
-            });
+            dialog.registerOnCloseListener(() -> dialogs.remove(identifier));
 
             return dialog;
 
-        } else {
-            dialog.close();
         }
+        dialog.close();
 
         return d;
     }

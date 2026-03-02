@@ -17,9 +17,14 @@
  */
 package com.auxilii.msgparser;
 
+import org.apache.commons.validator.routines.EmailValidator;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 /**
- * This class represents a recipient's entry of the parsed .msg file. It provides informations like the
- * email address and the display name.
+ * This class represents a recipient's entry of the parsed .msg file. It
+ * provides information like the email address and the display name.
+ *
  * @author thomas.misar
  * @author roman.kurmanowytsch
  */
@@ -27,20 +32,16 @@ public class RecipientEntry {
 
     private String email;
     private String smtp;
-    private String addressType;
     private String name;
     private RecipientType type;
 
     void setProperty(Property property) {
-        switch(property.getPid()) {
+        switch (property.getPid()) {
             case PidTagRecipientType:
                 setType(RecipientType.from((int) property.getValue()));
                 break;
             case PidTagDisplayName:
                 setName((String) property.getValue());
-                break;
-            case PidTagAddressType:
-                setAddressType((String) property.getValue());
                 break;
             case PidTagEmailAddress:
                 setEmail((String) property.getValue());
@@ -50,7 +51,6 @@ public class RecipientEntry {
                 break;
         }
     }
-
 
     public String getEmail() {
         return email;
@@ -66,14 +66,6 @@ public class RecipientEntry {
 
     public void setSmtp(String smtp) {
         this.smtp = smtp;
-    }
-
-    public String getAddressType() {
-        return addressType;
-    }
-
-    public void setAddressType(String addressType) {
-        this.addressType = addressType;
     }
 
     public String getName() {
@@ -92,6 +84,17 @@ public class RecipientEntry {
         this.type = type;
     }
 
+    public String mailTo() {
+        EmailValidator emailValidator = EmailValidator.getInstance();
+        if (isNotBlank(email) && emailValidator.isValid(email)) {
+            return email;
+        }
+        if (isNotBlank(smtp)) {
+            return smtp;
+        }
+        return "";
+    }
+
     /**
      * Provides a short representation of this recipient object <br>
      * (e.g. 'Firstname Lastname &lt;firstname.lastname@domain.tld&gt;').
@@ -105,8 +108,9 @@ public class RecipientEntry {
         if (sb.length() > 0) {
             sb.append(" ");
         }
-        if ((this.email != null) && (this.email.length() > 0)) {
-            sb.append("<").append(this.email).append(">");
+        String mailTo = mailTo();
+        if (isNotBlank(mailTo)) {
+            sb.append("<").append(mailTo).append(">");
         }
         return sb.toString();
     }

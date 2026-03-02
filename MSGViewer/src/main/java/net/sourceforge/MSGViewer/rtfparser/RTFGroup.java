@@ -1,67 +1,64 @@
 package net.sourceforge.MSGViewer.rtfparser;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 
-public class RTFGroup
-{
-    private StringBuilder text_content;
+public class RTFGroup {
+
+    private final StringBuilder htmlContent;
+    private final Charset characterSet;
     private final List<String> commands = new ArrayList<>();
-    private String last_command = "";
 
-    void addCommand( String command )
-    {
-
-        if( command.equals("\\par") )
-            addTextContent("\n");
-        else if( command.equals("\\tab"))
-            addTextContent("\t");
-        else
-        {
-            commands.add(command);
-            last_command = command;
-        }
+    public RTFGroup(Charset characterSet, StringBuilder htmlContent, RTFGroup parent) {
+        this.characterSet = characterSet;
+        this.htmlContent = htmlContent;
+        if (parent != null) this.commands.addAll(parent.commands);
     }
 
-    public void addEscapedChar( String characterSet, String hexa )
-    {
-        addTextContent(ConvertCharset.convertCharacter(characterSet, hexa));
+    public void handleCommand(String command) {
+        this.commands.add(command);
     }
 
-    public void addTextContent( String text )
-    {
-        if( text_content == null )
-            text_content = new StringBuilder();
-
-        if( last_command.startsWith("\\html") )
-            text_content.append(text);
+    public void destination(String destination) {
     }
 
-    public boolean isEmpty()
-    {
-        if( text_content == null && commands.isEmpty() )
-            return true;
-
-        if( text_content.length() > 0 )
-            return false;
-
-        return false;
+    public String getTextContent() {
+        return htmlContent.toString();
     }
 
-    public String getTextContent()
-    {
-        return text_content.toString();
+    public void addEscapedChar(String escapedChar) {
+        int hexa = Integer.parseInt(escapedChar.substring(2), 16);
+        byte[] bytes = {(byte) hexa};
+        addTextContent(new String(bytes, characterSet));
     }
 
-    public List<String> getCommands()
-    {
-        return commands;
+    public void addUnicodeChar(String code) {
+        String codepoint = code.substring(2);
+        char ch = (char) Integer.parseInt(codepoint);
+        addCharacterContent(ch);
     }
 
-    boolean isEmptyText() {
-
-       return StringUtils.isEmpty(text_content);
+    public void addTextContent(String text) {
+        if (shouldPrint())
+            htmlContent.append(text);
     }
 
+    private void addCharacterContent(char character) {
+        if (shouldPrint())
+            htmlContent.append(character);
+    }
+
+    private boolean shouldPrint() {
+        return htmlRtfDisabled() && !plainTextBullet();
+    }
+
+    private boolean htmlRtfDisabled() {
+        return commands.lastIndexOf("\\htmlrtf0") > commands.lastIndexOf("\\htmlrtf")
+                && commands.lastIndexOf("\\htmlrtf0") > commands.lastIndexOf("\\htmlrtf1");
+    }
+
+    private boolean plainTextBullet() {
+        return commands.contains("\\pntext");
+    }
 }

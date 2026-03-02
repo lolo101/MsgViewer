@@ -3,214 +3,79 @@ package net.sourceforge.MSGViewer;
 import at.redeye.FrameWork.base.FrameWorkConfigDefinitions;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.base.Setup;
-import at.redeye.FrameWork.utilities.DeleteDir;
-import at.redeye.FrameWork.utilities.StringUtils;
-import at.redeye.FrameWork.utilities.TempDir;
 import com.auxilii.msgparser.Message;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
-import com.auxilii.msgparser.attachment.MsgAttachment;
-import net.htmlparser.jericho.Attributes;
-import net.htmlparser.jericho.Source;
-import net.htmlparser.jericho.StartTag;
+import jakarta.activation.MimeType;
+import net.htmlparser.jericho.*;
 import net.sourceforge.MSGViewer.rtfparser.ParseException;
-import org.apache.poi.util.IOUtils;
+import org.apache.commons.validator.routines.EmailValidator;
 
-import javax.activation.MimeType;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
+import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import static at.redeye.FrameWork.base.BaseDialog.logger;
+import static org.apache.commons.lang3.StringUtils.repeat;
 
 public class ViewerHelper {
 
-    private Root root;
-    private File tmp_dir;
-    private boolean delete_tmp_dir = false;
+    private final AttachmentRepository attachmentRepository;
 
-    public ViewerHelper( Root root )
-    {
-        this.root = root;
-
-        try {
-           tmp_dir = TempDir.getTempDir(null, null);
-           delete_tmp_dir = true;
-        } catch (IOException ex) {
-           tmp_dir = new File(System.getProperty("java.io.tmpdir") + "/" + root.getAppName());
-        }
+    public ViewerHelper(Root root) {
+        attachmentRepository = new AttachmentRepository(root);
     }
 
-   static boolean is_image_mime_type( MimeType mime )
-    {
-        return  mime.getPrimaryType().equalsIgnoreCase("image");
+    static boolean is_image_mime_type(MimeType mime) {
+        return mime.getPrimaryType().equalsIgnoreCase("image");
     }
 
-    static boolean is_mail_message( String file_name )
-    {
+    static boolean is_mail_message(String file_name) {
         return file_name.toLowerCase().endsWith(".mbox")
                 || file_name.toLowerCase().endsWith(".msg");
     }
 
-    static boolean is_mail_message( String file_name, String mime )
-    {
-        return is_mail_message( file_name );
-    }
-
-    public String getOpenCommand()
-    {
-        if( Setup.is_win_system() )
+    public static String getOpenCommand() {
+        if (Setup.is_win_system())
             return "explorer";
 
-        return root.getSetup().getLocalConfig(FrameWorkConfigDefinitions.OpenCommand);
+        return FrameWorkConfigDefinitions.OpenCommand.getConfigValue();
     }
 
-    static String prepareText( String s )
-    {
-        if( s == null )
-            return "";
+    public static Source extractHTMLFromRTF(String rtf) throws ParseException {
+        byte[] htmlBytes = new HtmlFromRtf(rtf).extractHtml();
+        return toHtmlSource(htmlBytes);
+    }
 
-        StringBuilder sb = new StringBuilder();
-
-        s = s.replaceAll("<", "&lt;");
-        s = s.replaceAll(">", "&gt;");
-
-        int last_start = 0;
-
-        while( true )
-        {
-            int start = s.indexOf("http://", last_start);
-
-            if( start == -1 )
-            {
-                sb.append(s.substring(last_start));
-                break;
-            }
-
-            logger.info("last_start: " + last_start + " start: " + start + " length: " + s.length() );
-
-            sb.append(s, last_start, start);
-            last_start = start;
-
-            sb.append("<a href=\"");
-
-            int i;
-
-            for( i = start; i < s.length(); i++ )
-            {
-              if( s.indexOf("&gt;",i ) == i )
-                  break;
-
-              char c = s.charAt(i);
-
-              if( StringUtils.is_space(c) )
-              {
-                  break;
-              }
-              sb.append(c);
-            }
-
-            sb.append("\">");
-            sb.append(s, start, i-1);
-            sb.append("</a>");
-
-            last_start = i;
+    public static Source toHtmlSource(byte[] htmlBytes) {
+        try (InputStream stream = new ByteArrayInputStream(htmlBytes)) {
+            return new Source(stream);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
-
-        return sb.toString();
     }
 
-    static public String stripMetaTags(String html )
-    {
-       html =  html.replaceAll("<[Mm][eE][Tt][aA]\\s.*>", "");
-
-       StringBuilder body_text = new StringBuilder(html);
-       Source source = new Source(html);
-       source.fullSequentialParse();
-
-       for( StartTag tag : source.getAllStartTags("font") )
-       {
-            // remove size="x"
-            Attributes atts = tag.getAttributes();
-           if( atts == null )
-               continue;
-
-           net.htmlparser.jericho.Attribute att = atts.get("size");
-
-           if( att != null )
-           {
-               int start = att.getBegin();
-               int end = att.getEnd();
-
-               for( int i = start; i < end+1; i++ )
-               {
-                body_text.setCharAt(i, ' ');
-               }
-           }
-       }
-
-       System.out.println(body_text.toString());
-
-       return body_text.toString();
+    public String prepareImages(Message message, Source html) {
+        PrepareImages prep_images = new PrepareImages(attachmentRepository, message);
+        return prep_images.prepareImages(stripMetaTags(html));
     }
 
-
-    public void dispose()
-    {
-         if( delete_tmp_dir && tmp_dir.exists() )
-            DeleteDir.deleteDirectory(tmp_dir);
-    }
-
-    public String extractHTMLFromRTF(String bodyText, Message message ) throws ParseException
-    {
-        HtmlFromRtf rtf2html = new HtmlFromRtf(bodyText);
-
-        String html = rtf2html.getHTML();
-
-        html = ViewerHelper.stripMetaTags(html);
-
-        PrepareImages prep_images = new PrepareImages(this, message);
-
-        return prep_images.prepareImages(new StringBuilder(html));
-    }
-
-    public File getMailIconFile() throws IOException
-    {
-        File file = new File(tmp_dir, "mail.png");
-
-        if( file.exists() )
-            return file;
-
-        try (InputStream stream = ViewerHelper.class.getResourceAsStream("/icons/rg1024_yellow_mail.png");
-                FileOutputStream writer = new FileOutputStream(file)) {
-            writer.write(IOUtils.toByteArray(stream));
-        }
-
-        return file;
-    }
-
-    public File extractUrl(URL url, Message message ) throws IOException
-    {
+    public Path extractUrl(URI uri, Message message) throws IOException {
         List<Attachment> attachments = message.getAttachments();
 
-        for( Attachment att : attachments )
-        {
-            if( att instanceof FileAttachment)
-            {
-                FileAttachment fatt = (FileAttachment) att;
+        for (Attachment att : attachments) {
+            if (att instanceof FileAttachment fatt) {
 
-                File content = getTempFile(fatt);
+                Path content = attachmentRepository.getTempFile(fatt);
 
-                if( content.toURI().toURL().equals(url) )
-                {
-                    logger.info("opening " + fatt);
+                if (content.toUri().equals(uri)) {
+                    logger.info("opening {}", fatt);
 
-                    if( !content.exists() )
-                    {
-                        try (FileOutputStream fout = new FileOutputStream(content)) {
+                    if (!Files.exists(content)) {
+                        try (OutputStream fout = Files.newOutputStream(content)) {
                             fout.write(fatt.getData());
                         }
                     }
@@ -220,28 +85,49 @@ public class ViewerHelper {
             }
         }
 
-        return null;
+        return Path.of(uri.getPath());
     }
 
-    public File getTempFile(FileAttachment fatt)
-    {
-        if( !tmp_dir.isDirectory() && !tmp_dir.mkdirs() )
-        {
-            throw new RuntimeException( "Cannot create tmp dir: " + tmp_dir );
+    public static boolean isValidEmail(String email) {
+        EmailValidator emailValidator = EmailValidator.getInstance();
+        return emailValidator.isValid(email);
+    }
+
+    public static String printMailIconHtml() {
+        return "<img border=0 align=\"baseline\" src=\"" + getMailIconFile() + "\"/>";
+    }
+
+    private static String stripMetaTags(Source html) {
+        StringBuilder mutableHtml = new StringBuilder(html);
+
+        html.getAllElements("meta").forEach(element -> removeSegment(mutableHtml, element));
+        html.getAllStartTags("font").forEach(tag -> removeSizeAttribute(mutableHtml, tag));
+
+        System.out.println(mutableHtml);
+        return mutableHtml.toString();
+    }
+
+    private static void removeSizeAttribute(StringBuilder mutableHtml, StartTag tag) {
+        Attributes atts = tag.getAttributes();
+        if (atts == null) return;
+
+        Attribute att = atts.get("size");
+        if (att == null) return;
+
+        removeSegment(mutableHtml, att);
+    }
+
+    private static void removeSegment(StringBuilder mutableHtml, Segment segment) {
+        int start = segment.getBegin();
+        int end = segment.getEnd();
+        mutableHtml.replace(start, end, repeat(' ', end - start));
+    }
+
+    private static URI getMailIconFile() {
+        try {
+            return ViewerHelper.class.getResource("/icons/rg1024_yellow_mail.png").toURI();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
         }
-        return new File(tmp_dir,
-                org.apache.commons.lang3.StringUtils.isBlank(fatt.getFilename())
-                        ? fatt.getLongFilename()
-                        : fatt.getFilename());
     }
-
-    public File getTempFile(MsgAttachment matt)
-    {
-        if( !tmp_dir.isDirectory() && !tmp_dir.mkdirs() )
-        {
-            throw new RuntimeException( "Cannot create tmp dir: " + tmp_dir );
-        }
-        return new File(tmp_dir, matt.getMessage().hashCode() + ".msg");
-    }
-
 }

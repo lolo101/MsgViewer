@@ -25,7 +25,6 @@
         <jar href="proxy-vole.jar" download="eager"/>
         <jar href="js.jar" download="eager"/>
         <jar href="jshortcut-0_4_repacked.jar" download="eager"/>
-        <jar href="ShellExec.jar" download="eager"/>
     </resources>
     <application-desc main-class="at.redeye.MSGViewer.Main">
     </application-desc>

@@ -1,46 +1,35 @@
 package at.redeye.FrameWork.base.prm.bindtypes;
 
-import at.redeye.FrameWork.base.bindtypes.*;
-import at.redeye.FrameWork.base.prm.PrmAttachInterface;
-import at.redeye.FrameWork.base.prm.PrmCustomChecksInterface;
+import at.redeye.FrameWork.base.bindtypes.DBHistory;
+import at.redeye.FrameWork.base.bindtypes.DBString;
+import at.redeye.FrameWork.base.bindtypes.DBStrukt;
 import at.redeye.FrameWork.base.prm.PrmDefaultChecksInterface;
 import at.redeye.FrameWork.base.prm.PrmListener;
 import at.redeye.FrameWork.base.prm.impl.PrmActionEvent;
-import java.util.Vector;
 
+import java.util.ArrayList;
+import java.util.Collection;
 
-/**
- *
- * @author martin
- */
-public class DBConfig extends DBStrukt implements PrmAttachInterface
-{
-    public static String TABLENAME = "CONFIG";
+public class DBConfig extends DBStrukt {
+    private static final String TABLENAME = "CONFIG";
 
-    private Vector <PrmListener> prmListeners = new Vector<>();
-    private String oldValue = "";
-    private String [] possibleValues = {};
+    private final Collection<PrmListener> prmListeners = new ArrayList<>();
+    private String[] possibleValues = {};
 
-    private PrmCustomChecksInterface customChecks = null;
-    private PrmDefaultChecksInterface defaultChecks = null;
+    private PrmDefaultChecksInterface defaultChecks;
 
+    public final DBString name = new DBString("name", "Name", 100);
+    public final DBString value = new DBString("value", "Wert", 100);
+    public final DBString descr = new DBString("description", "Beschreibung", 250);
+    public final DBHistory hist = new DBHistory("hist");
 
-    public DBString  name  = new DBString("name", "Name", 100 );
-    public DBString  value = new DBString( "value", "Wert", 100 );
-    public DBString  descr  = new DBString( "description", "Beschreibung", 250 );
-    public DBHistory hist  = new DBHistory("hist");
-
-    protected boolean changed = false;
-
-    public DBConfig()
-    {
+    public DBConfig() {
         super(TABLENAME);
 
         register();
     }
 
-    public DBConfig( String name, String value, String descr )
-    {
+    public DBConfig(String name, String value, String descr) {
         super(TABLENAME);
 
         register();
@@ -48,17 +37,6 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface
         this.name.loadFromString(name);
         this.value.loadFromString(value);
         this.descr.loadFromString(descr);
-
-    }
-
-    public DBConfig( String name, String value )
-    {
-        super(TABLENAME);
-
-        register();
-
-        this.name.loadFromString(name);
-        this.value.loadFromString(value);
     }
 
     public DBConfig( String name, String value, String descr, PrmDefaultChecksInterface checks )
@@ -71,7 +49,6 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface
         this.value.loadFromString(value);
         this.descr.loadFromString(descr);
         this.defaultChecks = checks;
-
     }
 
     public DBConfig( String name, String value, String descr, PrmDefaultChecksInterface checks, String [] possibleValues )
@@ -85,42 +62,6 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface
         this.descr.loadFromString(descr);
         this.defaultChecks = checks;
         this.possibleValues = possibleValues;
-
-    }
-
-    public DBConfig( String name, String value, PrmDefaultChecksInterface checks, String [] possibleValues )
-    {
-        super(TABLENAME);
-
-        register();
-
-        this.name.loadFromString(name);
-        this.value.loadFromString(value);
-        this.defaultChecks = checks;
-        this.possibleValues = possibleValues;
-    }
-
-    public DBConfig( String name, String value, PrmDefaultChecksInterface checks, String [] possibleValues, PrmCustomChecksInterface specialChecks )
-    {
-        super(TABLENAME);
-
-        register();
-
-        this.name.loadFromString(name);
-        this.value.loadFromString(value);
-        this.defaultChecks = checks;
-        this.possibleValues = possibleValues;
-        this.customChecks = specialChecks;
-    }
-
-
-    public boolean differs(DBConfig c_db) {
-        if( getConfigName().equals(c_db.getConfigName() ) == false )
-            return true;
-        if( getConfigValue().equals(c_db.getConfigValue()) == false )
-            return true;
-
-        return false;
     }
 
     private void register()
@@ -129,8 +70,6 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface
         add( value );
         add( descr );
         add( hist );
-
-        name.setAsPrimaryKey();
     }
 
     public String getConfigName()
@@ -145,13 +84,7 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface
 
     public void setConfigValue( String val )
     {
-        oldValue = value.toString();
         value.loadFromString(val);
-    }
-
-    @Override
-    public DBStrukt getNewOne() {
-        return new DBConfig();
     }
 
     public void addPrmListener(PrmListener listener) {
@@ -162,80 +95,23 @@ public class DBConfig extends DBStrukt implements PrmAttachInterface
         prmListeners.remove(listener);
     }
 
-    public void addAllPrmListeners( DBConfig  other )
-    {
-        prmListeners.addAll(other.prmListeners);
-    }
-
-    @Override
     public void updateListeners(PrmActionEvent prmActionEvent) {
 
-        System.out.println ("PRM " + name.toString()+
+        System.out.println("PRM " + name +
                 " has " + prmListeners.size() + " listener(s) registered!");
 
+        boolean valueHasChanged = prmActionEvent.valueHasChanged();
+
         for (PrmListener currentListener : prmListeners) {
-
-            if (defaultChecks != null) {
-                // Only send, if value has changed
-                if (!prmActionEvent.getNewPrmValue().toString().equals(prmActionEvent.getOldPrmValue().toString()))
-                    currentListener.onChange(defaultChecks, prmActionEvent);
-            } else {
+            if (defaultChecks == null) {
                 System.out.println("-> no default check");
+            } else if (valueHasChanged) {
+                currentListener.onChange(defaultChecks, prmActionEvent);
             }
-
-            if (customChecks != null) {
-                // Only send, if value has changed
-                if (!prmActionEvent.getNewPrmValue().toString().equals(prmActionEvent.getOldPrmValue().toString()))
-                    currentListener.onChange(customChecks, prmActionEvent);
-            } else {
-                System.out.println("-> no custom check");
-            }
-
         }
-    }
-
-    public String getOldValue() {
-        return oldValue;
     }
 
     public String[] getPossibleValues() {
         return possibleValues;
     }
-
-    public void setPossibleValues(String[] possibleValues) {
-        this.possibleValues = possibleValues;
-    }
-
-    public void setCustomChecks(PrmCustomChecksInterface customChecks) {
-        this.customChecks = customChecks;
-    }
-
-    public void setDefaultChecks(PrmDefaultChecksInterface defaultChecks) {
-        this.defaultChecks = defaultChecks;
-    }
-
-    public PrmCustomChecksInterface getCustomChecks() {
-        return customChecks;
-    }
-
-    public PrmDefaultChecksInterface getDefaultChecks() {
-        return defaultChecks;
-    }
-
-
-    public boolean hasChanged()
-    {
-        return changed;
-    }
-
-    public void setChanged()
-    {
-        changed = true;
-    }
-
-    public void setChanged( boolean state )
-    {
-        changed = state;
-    }
-
 }

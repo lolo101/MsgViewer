@@ -1,9 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.sourceforge.MSGViewer.MSGNavigator;
 
+import com.auxilii.msgparser.Ptyp;
 import org.apache.poi.poifs.filesystem.DirectoryEntry;
 import org.apache.poi.poifs.filesystem.DocumentEntry;
 import org.apache.poi.poifs.filesystem.DocumentInputStream;
@@ -13,18 +10,14 @@ import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-/**
- *
- * @author martin
- */
 public class TopLevelPropertyStream
 {
-    public static final String NAME = "__properties_version1.0";
+    private static final String NAME = "__properties_version1.0";
     private static final int HEADER_SIZE = 8 + 4 + 4 + 4 + 4 + 8;
 
     private final DirectoryEntry root;
     private DocumentEntry property_entry;
-    private byte[] bytes = null;
+    private byte[] bytes;
 
     TopLevelPropertyStream(DirectoryEntry root) throws IOException
     {
@@ -32,108 +25,17 @@ public class TopLevelPropertyStream
 
         try {
             property_entry = (DocumentEntry) root.getEntry(NAME);
-
-        } catch (FileNotFoundException ex) {
-        }
-
-        if( property_entry != null )
-        {
-            bytes = new byte[property_entry.getSize()];
-            DocumentInputStream stream = new DocumentInputStream( property_entry );
-            stream.read(bytes);
-        }
-    }
-
-    /**
-     * saves property field
-     */
-    public void save() throws IOException
-    {
-        int size = root.getEntryCount() * 16 + HEADER_SIZE;
-
-        bytes = new byte[size];
-
-        int offset = 0;
-
-        // first 8 bytes should be set to zero in any case
-        // read MS-OXMSG section 2.4.1.1 for Details
-        for( int i = 0; i < 8; i++, offset++ )
-            bytes[i] = 0;
-
-        // write next recipient id
-        for( int i = 0; i < 4; i++, offset++ )
-            bytes[offset] = 0;
-
-        // write next attachment id
-        for( int i = 0; i < 4; i++, offset++ )
-            bytes[offset] = 0;
-
-        // recipient count
-        for( int i = 0; i < 4; i++, offset++ )
-            bytes[offset] = 0;
-
-        // attachment count
-        for( int i = 0; i < 4; i++, offset++ )
-            bytes[offset] = 0;
-
-        // reserved 8 bytes
-        for( int i = 0; i < 8; i++, offset++ )
-            bytes[offset] = 0;
-
-
-        for( Entry entry : root )
-        {
-            DocumentEntry de = null;
-
-            if( entry.isDocumentEntry() )
-                de = (DocumentEntry) entry;
-
-            String name = entry.getName();
-            // ignore myself
-            if( name.equals(NAME) )
-                continue;
-
-            String tagname = "";
-
-            if( name.startsWith("__substg1.0_") )
-                tagname = name.substring(12);
-
-            String tagtype = tagname.substring(4).toLowerCase();
-
-            // save tagname
-            offset = insert(tagname, offset);
-
-            // flags set everything to RW
-            bytes[offset] = 0x0002 | 0x004;
-            offset += 4;
-
-            if( tagtype.equals("001f")) {
-                // PStringType
-                // length of the String UTF16-LE Coded + 2
-                String lenght_str  = String.format("%08x", de.getSize()+2);
-
-                offset = insert(lenght_str, offset);
+            try (DocumentInputStream stream = new DocumentInputStream(property_entry)) {
+                bytes = stream.readAllBytes();
             }
 
-            // reserved
-            offset += 4;
+        } catch (FileNotFoundException ignored) {
         }
-
-        try {
-            property_entry = (DocumentEntry) root.getEntry(NAME);
-            property_entry.delete();
-        } catch( FileNotFoundException ex ) {
-
-        }
-
-        property_entry = root.createDocument(NAME, new ByteArrayInputStream(bytes));
     }
 
     /**
-     * deletes one entry and removes it's data from the property stream
+     * deletes one entry and removes its data from the property stream
      * entry.delete() is called by this function
-     * @param entry
-     * @throws IOException
      */
     void delete(Entry entry) throws IOException
     {
@@ -146,7 +48,7 @@ public class TopLevelPropertyStream
         if( entry.getName().startsWith("__substg_version1.0") )
             throw new  RuntimeException("unly __substg entries are supported yet" );
 
-        boolean found = false;
+        boolean absent = true;
 
         for( int offset = HEADER_SIZE; offset < bytes.length; offset+= 16 )
         {
@@ -157,7 +59,7 @@ public class TopLevelPropertyStream
                 tagname.append(formatByte0S(bytes[i]));
             }
 
-            if( ("__substg1.0_" + tagname).equals(entry.getName() ) )
+            if( (Ptyp.SUBSTORAGE_PREFIX + tagname).equals(entry.getName() ) )
             {
                 if( !entry.delete() )
                 {
@@ -169,18 +71,18 @@ public class TopLevelPropertyStream
                 System.arraycopy(bytes, 0,         new_bytes,  0,      offset);
                 System.arraycopy(bytes, offset+16, new_bytes, offset, new_bytes.length - offset );
                 bytes = new_bytes;
-                found = true;
+                absent = false;
                 break;
             }
         }
 
-        if( !found )
+        if(absent)
             throw new RuntimeException("entry not found");
 
         try {
             property_entry = (DocumentEntry) root.getEntry(NAME);
             property_entry.delete();
-        } catch( FileNotFoundException ex ) {
+        } catch (FileNotFoundException ignored) {
 
         }
 
@@ -196,9 +98,9 @@ public class TopLevelPropertyStream
             throw new RuntimeException("deleting directories not supported yet");
 
         if( entry.getName().startsWith("__substg_version1.0") )
-            throw new  RuntimeException("unly __substg entries are supported yet" );
+            throw new RuntimeException("only __substg entries are supported yet");
 
-        boolean found = false;
+        boolean absent = true;
 
         for( int offset = HEADER_SIZE; offset < bytes.length; offset+= 16 )
         {
@@ -209,36 +111,27 @@ public class TopLevelPropertyStream
                 tagname.append(formatByte0S(bytes[i]));
             }
 
-            if( ("__substg1.0_" + tagname).equals(entry.getName() ) )
+            if( (Ptyp.SUBSTORAGE_PREFIX + tagname).equals(entry.getName() ) )
             {
                 String tagtype = tagname.toString().toLowerCase().substring(4);
 
-                int voffset = offset + 8;
-
-                if (tagtype.equals("001f")) {
-                    // PStringType
-                    // length of the String UTF16-LE Coded + 2
-                    String lenght_str  = String.format("%08x", entry.getSize()+2);
-                    insert(lenght_str, voffset);
-
-                } else if (tagtype.equals("0102")) {
-                    // Binary
-                    String lenght_str  = String.format("%08x", entry.getSize()+2);
-                    insert(lenght_str, voffset);
+                if (tagtype.equals("001f") || tagtype.equals("0102")) {
+                    String lenght_str = String.format("%08x", entry.getSize() + 2);
+                    insert(lenght_str, offset + 8);
                 }
 
-                found = true;
+                absent = false;
                 break;
             }
         }
 
-         if( !found )
+         if(absent)
             throw new RuntimeException("entry not found");
 
         try {
             property_entry = (DocumentEntry) root.getEntry(NAME);
             property_entry.delete();
-        } catch( FileNotFoundException ex ) {
+        } catch (FileNotFoundException ignored) {
 
         }
 

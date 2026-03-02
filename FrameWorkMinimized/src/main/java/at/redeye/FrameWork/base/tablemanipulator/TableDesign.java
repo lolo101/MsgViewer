@@ -1,214 +1,107 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package at.redeye.FrameWork.base.tablemanipulator;
 
+import at.redeye.FrameWork.base.BaseDialogBase;
 import at.redeye.FrameWork.base.bindtypes.DBValue;
+import at.redeye.FrameWork.base.prm.bindtypes.DBConfig;
 
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Vector;
-import javax.swing.JTable;
-import javax.swing.RowSorter;
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import java.util.*;
 
-/**
- *
- * @author martin
- */
-public class TableDesign {
+public class TableDesign extends AbstractTableModel {
 
-    public static class ColoredCell {
-        int row;
-        int col;
-        Color color;
-    }
+    public final Set<Integer> edited_cols = new HashSet<>();
+    public Set<Integer> edited_rows = new HashSet<>();
+    private final List<DBConfig> rows = new ArrayList<>();
+    private final BaseDialogBase base;
 
-    public static class ToolTipCell {
-        int row;
-        int col;
-        String tooltip;
-    }
+    public final List<Coll> colls;
 
-    public Set<Integer> edited_cols;
-    public Set<Integer> edited_rows;
-    public Vector<Vector<Object>> rows = new Vector<>();
-    protected Vector<ColoredCell>  coloredCells = new Vector<>();
-    protected List<ToolTipCell> tooltipCells = new ArrayList<>();
-
-
-    public void addColoredCell (int row, int col, Color color) {
-        ColoredCell cell = new ColoredCell();
-        cell.row = row;
-        cell.col = col;
-        cell.color = color;
-        coloredCells.add (cell);
-    }
-
-    void addToolTipCell(int row, int col, String tooltip)
-    {
-        ToolTipCell cell = new ToolTipCell();
-
-        cell.row = row;
-        cell.col = col;
-        cell.tooltip = tooltip;
-
-        tooltipCells.add(cell);
-    }
-
-    public static class Coll {
-
-        public String Title;
-        public boolean isEditable = true;
-        public TableValidator validator = null;
-        DBValue dbval = null;
-        public Vector<Object> additional_autocomplete_values = null;
-        private boolean doAutocompleteForAllOfThisColl = true;
-        private boolean doAutoCompleteForCollAtAll = true;
-
-        public Coll(String title) {
-            this.Title = title;
-        }
-
-        public Coll(String title, Boolean isEditable) {
-            this.Title = title;
-            this.isEditable = isEditable;
-        }
-
-        public Coll(String title, Boolean isEditable, DBValue val ) {
-            this.Title = title;
-            this.isEditable = isEditable;
-            this.dbval = val;
-        }
-
-        void setEditable(boolean isEditable) {
-            this.isEditable = isEditable;
-        }
-
-        void setDoAutocompleteForAllOfThisColl( boolean state )
-        {
-            doAutocompleteForAllOfThisColl = state;
-        }
-
-        boolean getDoAutocompleteForAllOfThisColl()
-        {
-            return doAutocompleteForAllOfThisColl;
-        }
-
-        void setAutoCompleteForCollAtAll( boolean state )
-        {
-            doAutoCompleteForCollAtAll = state;
-        }
-
-        boolean getAutoCompleteForCollAtAll()
-        {
-            return doAutoCompleteForCollAtAll;
-        }
-    }
-    public Vector<Coll> colls;
-
-    public TableDesign(Vector<Coll> colls) {
+    public TableDesign(BaseDialogBase base, List<Coll> colls) {
+        this.base = base;
         this.colls = colls;
-        this.edited_cols = new HashSet<>();
-        this.edited_rows = new HashSet<>();
     }
 
-    public Vector<String> getAllOfCollSorted(int col)
-    {
-        Vector<String> all = new Vector<>();
+    void clear() {
+        edited_cols.clear();
+        edited_rows.clear();
+        rows.clear();
+    }
 
-        TableValidator validator = null;
-        Coll coll = null;
-
-        if( col >= 0 && col < colls.size() )
-        {
-            coll = colls.get(col);
-            validator = coll.validator;
-        }
-
-        if( !coll.getDoAutocompleteForAllOfThisColl() )
-            return all;
-
-        for( int i = 0; i < rows.size(); i++ )
-        {
-            if( rows.get(i).size() > col && col > 0 )
-            {
-                Object obj = rows.get(i).get(col);
-
-
-                if( validator != null )
-                {
-                    all.add(validator.formatData(obj));
-                }
-                else
-                {
-                    all.add(obj.toString());
-                }
-            }
-        }
-
-        if( coll.additional_autocomplete_values != null )
-        {
-            for( Object obj : coll.additional_autocomplete_values )
-            {
-                if( validator != null )
-                    all.add(validator.formatData(obj));
-                else
-                    all.add(obj.toString());
-            }
-        }
-
-        Collections.sort(all);
-
-        // System.out.println( "HEEEEEEEEERE ");
-        /*
-        for( int i = 0; i < all.size(); i++ )
-        {
-            System.out.println("xx: " + all.get(i));
-        }
-        */
-        return all;
+    public List<String> getPossibleValues(int row) {
+        return Arrays.asList(rows.get(row).getPossibleValues());
     }
 
 
-    public DBValue getColOfRow( DBValue col, int row )
-    {
-        return getColOfRow( col.getName(), row );
-    }
-
-    public DBValue getColOfRow( String name, int row )
-    {
-        Vector vecrow = rows.get(row);
-
-        for( Object o : vecrow )
-        {
-            if( o instanceof DBValue )
-            {
-                DBValue val = (DBValue) o;
-                if( val.getName().equals(name) )
-                    return val;
-            }
-        }
-
-        return null;
-    }
-
-    static int getModelCol( JTable table, int col )
-    {
+    static int getModelCol(JTable table, int col) {
         return table.getColumnModel().getColumn(col).getModelIndex();
     }
 
-    static int getModelRow( JTable table, int row )
-    {
-        RowSorter sorter  = table.getRowSorter();
+    static int getModelRow(JTable table, int row) {
+        RowSorter<?> sorter = table.getRowSorter();
 
-        if( sorter == null )
+        if (sorter == null)
             return row;
 
-        return sorter.convertRowIndexToModel( row );
+        return sorter.convertRowIndexToModel(row);
+    }
+
+    @Override
+    public int getRowCount() {
+        return rows.size();
+    }
+
+    @Override
+    public int getColumnCount() {
+        return colls.size();
+    }
+
+    @Override
+    public DBValue getValueAt(int rowIndex, int columnIndex) {
+        return rows.get(rowIndex).getAllValues().get(columnIndex);
+    }
+
+    @Override
+    public String getColumnName(int column) {
+        return base.MlM(colls.get(column).title);
+    }
+
+    @Override
+    public Class<?> getColumnClass(int columnIndex) {
+        return DBValue.class;
+    }
+
+    @Override
+    public boolean isCellEditable(int rowindex, int columnindex) {
+        return colls.get(columnindex).isEditable;
+    }
+
+    public void addRows(Collection<DBConfig> rows) {
+        if (rows.isEmpty()) return;
+        int firstRow = this.rows.size();
+        this.rows.addAll(rows);
+        int lastRow = this.rows.size() - 1;
+        fireTableRowsInserted(firstRow, lastRow);
+    }
+
+    public void remove(int row) {
+        rows.remove(row);
+
+        Set<Integer> er = new HashSet<>();
+
+        for (Integer editedRow : edited_rows) {
+            if (editedRow == row) {
+                continue;
+            }
+
+            if (editedRow < row) {
+                er.add(editedRow);
+            } else {
+                er.add(editedRow - 1);
+            }
+        }
+
+        edited_rows = er;
+        fireTableRowsDeleted(row, row);
     }
 }

@@ -1,249 +1,190 @@
 package net.sourceforge.MSGViewer.factory.mbox;
 
-import at.redeye.FrameWork.utilities.DeleteDir;
-import at.redeye.FrameWork.utilities.TempDir;
 import com.auxilii.msgparser.Message;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
 import com.auxilii.msgparser.attachment.MsgAttachment;
-import net.sourceforge.MSGViewer.HtmlFromRtf;
-import net.sourceforge.MSGViewer.ModuleLauncher;
-import net.sourceforge.MSGViewer.factory.MessageParserFactory;
-import net.sourceforge.MSGViewer.factory.mbox.headers.DateHeader;
+import jakarta.activation.DataHandler;
+import jakarta.mail.BodyPart;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Part;
+import jakarta.mail.Session;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
+import jakarta.mail.internet.MimeUtility;
+import jakarta.mail.util.ByteArrayDataSource;
+import net.htmlparser.jericho.Source;
+import net.sourceforge.MSGViewer.AttachmentRepository;
+import net.sourceforge.MSGViewer.ViewerHelper;
+import net.sourceforge.MSGViewer.factory.MessageSaver;
 
-import javax.activation.DataHandler;
-import javax.mail.BodyPart;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-import javax.mail.util.ByteArrayDataSource;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.ZonedDateTime;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.regex.Pattern;
 
-/**
- *
- * @author martin
- */
-public class MBoxWriterViaJavaMail
-{
-     private final Session session = Session.getInstance(System.getProperties());
-     private File tmp_dir;
+import static java.util.Objects.requireNonNullElse;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-     public void write(Message msg, OutputStream out ) throws Exception
-     {
-         javax.mail.Message jmsg = new MimeMessage(session);
+public class MBoxWriterViaJavaMail {
+    private static final Pattern START_WITH_BLANK = Pattern.compile("^\\s");
+    private final Session session = Session.getInstance(System.getProperties());
+    private final AttachmentRepository attachmentRepository;
 
-         writeMBoxHeader(msg, out);
-
-         MimeMultipart mp = new MimeMultipart();
-
-         MimeBodyPart mp_text_alternate = new MimeBodyPart();
-         MimeMultipart mp_alternate = new MimeMultipart("alternative");
-
-         String rtf = msg.getBodyRTF();
-
-         if( rtf != null && !rtf.isEmpty() )
-         {
-             MimeBodyPart html_text = new MimeBodyPart();
-
-             String html = rtf;
-
-             if( rtf.contains("\\fromhtml") )
-             {
-                HtmlFromRtf rtf2html= new HtmlFromRtf(rtf);
-
-                html = rtf2html.getHTML();
-             }
-             html_text.setDataHandler(new DataHandler(new ByteArrayDataSource(html, "text/html")));
-
-             mp_alternate.addBodyPart(html_text);
-         }
-         {
-             MimeBodyPart plain_text = new MimeBodyPart();
-             String plain_text_string = msg.getBodyText();
-
-             if (plain_text_string != null) {
-                 plain_text.setText(plain_text_string);
-             } else {
-                 plain_text.setText("");
-             }
-
-             mp_alternate.addBodyPart(plain_text);
-
-             mp_text_alternate.setContent(mp_alternate);
-             MimeBodyPart part = new MimeBodyPart();
-             part.setContent(mp_alternate);
-
-             mp.addBodyPart(part);
-
-         }
-
-         for( Attachment att : msg.getAttachments() )
-         {
-             if( att instanceof FileAttachment )
-             {
-                FileAttachment fatt = (FileAttachment) att;
-                MimeBodyPart part = new MimeBodyPart();
-                part.setDisposition(BodyPart.ATTACHMENT);
-
-                part.attachFile(dumpAttachment(fatt));
-
-                mp.addBodyPart(part);
-             } else if( att instanceof MsgAttachment ) {
-
-                MsgAttachment msgAtt = (MsgAttachment) att;
-
-                Message message = msgAtt.getMessage();
-
-                MessageParserFactory factory = new MessageParserFactory();
-
-                String message_file_name = message.getSubject();
-                if( message_file_name == null || message_file_name.isEmpty() ) {
-                    message_file_name = String.valueOf(message.hashCode());
-                }
-                message_file_name = message_file_name.replaceAll("/", " ");
-
-                File subMessage = new File(getTmpDir() + "/" + message_file_name + "." + getExtension());
-                factory.saveMessage(message, subMessage);
-
-                MimeBodyPart part = new MimeBodyPart();
-                part.setDisposition(BodyPart.ATTACHMENT);
-
-                part.attachFile(subMessage);
-
-                mp.addBodyPart(part);
-             }
-         }
-
-         addHeaders(msg, jmsg);
-
-         jmsg.setContent(mp);
-
-         jmsg.writeTo(out);
-
-         close();
-     }
-
-     private File getTmpDir()
-     {
-         if (tmp_dir == null) {
-             try {
-                 tmp_dir = TempDir.getTempDir(null, null);
-             } catch (IOException ex) {
-                 tmp_dir = new File(System.getProperty("java.io.tmpdir") + "/" + this.getClass().getSimpleName());
-             }
-         }
-
-         return tmp_dir;
-     }
-
-     File dumpAttachment( FileAttachment fatt ) throws IOException
-     {
-         File content = new File(getTmpDir(), fatt.toString());
-
-         try (FileOutputStream fout = new FileOutputStream(content)) {
-             fout.write(fatt.getData());
-         }
-
-         return content;
-     }
-
-    private void writeMBoxHeader(Message msg, OutputStream out) throws IOException
-    {
-       StringBuilder sb = new StringBuilder();
-
-       sb.append("From ");
-       sb.append(msg.getFromEmail());
-       sb.append(" ");
-
-       Date date = msg.getDate();
-
-       if( date == null ) {
-           date = new Date(0);
-       }
-
-       sb.append(DateHeader.date_format.format(date));
-       sb.append("\r\n");
-
-       out.write(sb.toString().getBytes(StandardCharsets.US_ASCII));
+    public MBoxWriterViaJavaMail(AttachmentRepository attachmentRepository) {
+        this.attachmentRepository = attachmentRepository;
     }
 
-    void addHeaders( Message msg, javax.mail.Message jmsg ) throws MessagingException
-    {
-        if( msg.getHeaders() == null ) {
+    public void write(Message msg, OutputStream out) throws Exception {
+        Part jmsg = new MimeMessage(session);
+
+        writeMBoxHeader(msg, out);
+
+        MimeMultipart mp_alternate = new MimeMultipart("alternative");
+        addTextPart(msg, mp_alternate);
+        addRtfPart(msg, mp_alternate);
+        addHtmlPart(msg, mp_alternate);
+
+        MimeBodyPart part = new MimeBodyPart();
+        part.setContent(mp_alternate);
+
+        MimeMultipart mp = new MimeMultipart();
+        mp.addBodyPart(part);
+
+        for (Attachment att : msg.getAttachments()) {
+            mp.addBodyPart(createPart(att));
+        }
+
+        addHeaders(msg, jmsg);
+
+        jmsg.setContent(mp);
+
+        jmsg.writeTo(out);
+    }
+
+    protected String getExtension() {
+        return ".mbox";
+    }
+
+    private BodyPart createPart(Attachment att) throws Exception {
+        MimeBodyPart part = new MimeBodyPart();
+        part.setDisposition(BodyPart.ATTACHMENT);
+        dumpAttachment(att, part);
+        return part;
+    }
+
+    private void dumpAttachment(Attachment att, MimeBodyPart part) throws Exception {
+        if (att instanceof FileAttachment)
+            dumpFileAttachment((FileAttachment) att, part);
+        else if (att instanceof MsgAttachment)
+            dumpMsgAttachment((MsgAttachment) att, part);
+        else
+            throw new IllegalArgumentException("Unknown attchment type: " + att.getClass());
+    }
+
+    private void dumpFileAttachment(FileAttachment fatt, MimeBodyPart part) throws IOException, MessagingException {
+        Path content = attachmentRepository.getTempFile(fatt);
+        part.attachFile(content.toFile());
+        part.setFileName(MimeUtility.encodeText(fatt.toString(), "UTF-8", null));
+        part.setContentID(fatt.getContentId());
+
+        try (OutputStream fout = Files.newOutputStream(content)) {
+            fout.write(fatt.getData());
+        }
+    }
+
+    private void dumpMsgAttachment(MsgAttachment msgAtt, MimeBodyPart part) throws Exception {
+        Path attachedMessagePath = attachmentRepository.getTempFile(msgAtt);
+        part.attachFile(attachedMessagePath.toFile());
+        part.setFileName(MimeUtility.encodeText(attachedMessagePath.getFileName().toString(), "UTF-8", null));
+
+        Message attachedMessage = msgAtt.message();
+        new MessageSaver(attachmentRepository, attachedMessage).saveMessage(withExtension(attachedMessagePath));
+    }
+
+    private static void writeMBoxHeader(Message msg, OutputStream out) throws IOException {
+        ZonedDateTime date = msg.getDate();
+
+        String sb = String.format("From %s %s\r\n",
+                msg.getFromEmail(),
+                date == null ? "" : date.format(Message.DATE_TIME_FORMATTER));
+
+        out.write(sb.getBytes(StandardCharsets.US_ASCII));
+    }
+
+    private static void addTextPart(Message msg, MimeMultipart mp_alternate) throws MessagingException {
+        String plain_text_string = msg.getBodyText();
+
+        MimeBodyPart textPart = new MimeBodyPart();
+        textPart.setText(requireNonNullElse(plain_text_string, ""));
+        mp_alternate.addBodyPart(textPart);
+    }
+
+    private static void addRtfPart(Message msg, MimeMultipart mp_alternate) throws MessagingException, IOException {
+        String rtf = msg.getBodyRTF();
+
+        if (isNotBlank(rtf)) {
+            MimeBodyPart rtfPart = new MimeBodyPart();
+            rtfPart.setDataHandler(new DataHandler(new ByteArrayDataSource(rtf, "text/rtf;charset=UTF-8")));
+            mp_alternate.addBodyPart(rtfPart);
+        }
+    }
+
+    private static void addHtmlPart(Message msg, MimeMultipart mp_alternate) throws MessagingException {
+        byte[] html = msg.getBodyHtml();
+
+        if (html != null) {
+            MimeBodyPart htmlPart = new MimeBodyPart();
+            Source source = ViewerHelper.toHtmlSource(html);
+            htmlPart.setContent(source.toString(), "text/html;charset=" + source.getEncoding());
+            mp_alternate.addBodyPart(htmlPart);
+        }
+    }
+
+    private static void addHeaders(Message msg, Part jmsg) throws MessagingException {
+        if (msg.getHeaders() == null) {
             return;
         }
 
         String[] headers = msg.getHeaders().split("\n");
+        Deque<String> lines = new ArrayDeque<>(Arrays.asList(headers));
 
-        StringBuilder sb = new StringBuilder();
-
-        for( String hl : headers)
-        {
-            String header_line = hl.trim();
-
-            if( header_line.startsWith(" ") ) {
-                sb.append("\n");
-                sb.append(header_line);
-            } else {
-                sb.append(header_line);
-
-                String h = sb.toString();
-
-                int idx = h.indexOf(':');
-
-                if( idx > 0 ) {
-                    String name = h.substring(0,idx);
-                    String value =  h.substring(idx+1);
-
-                    if( name.startsWith("From ") )
-                    {
-                         sb.setLength(0);
-                         continue;
-                    }
-                    jmsg.addHeader(name, value);
-                }
-
-                sb.setLength(0);
+        while (!lines.isEmpty()) {
+            String headerLine = lines.remove();
+            int separatorIndex = headerLine.indexOf(':');
+            if (separatorIndex > 0) {
+                String name = headerLine.substring(0, separatorIndex);
+                String value = accumulateValue(lines, headerLine.substring(separatorIndex + 1));
+                jmsg.addHeader(name, value);
             }
         }
     }
 
-    public void close()
-    {
-        if( tmp_dir != null ) {
-            DeleteDir.deleteDirectory(tmp_dir);
-        }
-
-        tmp_dir = null;
+    private Path withExtension(Path subMessage) {
+        String fileName = subMessage.getFileName().toString();
+        int extensionPosition = fileName.lastIndexOf('.');
+        String fileNameWithoutExtension = extensionPosition > 0 ? fileName.substring(0, extensionPosition) : fileName;
+        Path parent = subMessage.getParent();
+        return parent.resolve(fileNameWithoutExtension + getExtension());
     }
 
-     public static void main(String[] args)
-     {
-         ModuleLauncher.BaseConfigureLogging();
+    private static String accumulateValue(Deque<String> lines, String value) {
+        StringBuilder buffer = new StringBuilder(value.trim());
+        while (!lines.isEmpty()) {
+            String valueContinuation = lines.peek();
+            if (START_WITH_BLANK.matcher(valueContinuation).find()) {
+                buffer.append(' ').append(valueContinuation.trim());
+                lines.remove();
+            } else break;
+        }
+        return buffer.toString();
+    }
 
-         try {
-            MessageParserFactory factory = new MessageParserFactory();
-            Message msg = factory.parseMessage(new File( "/home/martin/NetBeansProjects/redeye/MSGViewer/test/data/Logminer.mbox"));
-
-            MBoxWriterViaJavaMail writer = new MBoxWriterViaJavaMail();
-
-            writer.write(msg, new FileOutputStream("/home/martin/test_out.mbox"));
-
-         } catch( Exception ex ) {
-             System.out.println(ex);
-             ex.printStackTrace();
-         }
-     }
-
-     public String getExtension()
-     {
-         return "mbox";
-     }
 }

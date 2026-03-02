@@ -7,21 +7,21 @@ import java.io.IOException;
 
 public class Property {
 
-    private final Pid tag;
+    private final Pid pid;
     private final Object value;
 
     Property(DocumentInputStream propertyStream, DirectoryEntry dir) throws IOException {
         short pType = propertyStream.readShort();
         short id = propertyStream.readShort();
-        int flags = propertyStream.readInt();
+        propertyStream.readInt(); // flags
         Ptyp typ = Ptyp.from(pType);
 
-        tag = Pid.from(id);
+        pid = Pid.from(id, typ);
         value = typ.parseValue(propertyStream, dir, String.format("%04X%04X", id, pType));
     }
 
     public Pid getPid() {
-        return tag;
+        return pid;
     }
 
     public Object getValue() {

@@ -26,12 +26,12 @@ public class PropertyParser {
                 .map(Pid::toString)
                 .mapToInt(String::length)
                 .max()
-                .getAsInt();
+                .orElse(0);
         max_type_lenght = Arrays.stream(Ptyp.values())
                 .map(Ptyp::toString)
                 .mapToInt(String::length)
                 .max()
-                .getAsInt();
+                .orElse(0);
 
         parse();
     }
@@ -48,18 +48,18 @@ public class PropertyParser {
 
     private void parseHeader(DocumentInputStream in) throws IOException {
         boolean is_toplevel = entry.getParent().getParent() == null;
-        boolean is_msg = is_toplevel || entry.getParent().getName().equals("__substg1.0_3701000D");
+        boolean is_msg = is_toplevel || entry.getParent().getName().equals(Ptyp.SUBSTORAGE_PREFIX + "3701000D");
 
-        // RESERVED 8 bytes (should by zero)
+        // RESERVED 8 bytes (should be zero)
         in.skip(8);
         if (is_msg) {
-            int nextRecipientId = in.readInt();
-            int nextAttachmentId = in.readInt();
-            int recipientCount = in.readInt();
-            int attachmentCount = in.readInt();
+            in.readInt(); // nextRecipientId
+            in.readInt(); // nextAttachmentId
+            in.readInt(); // recipientCount
+            in.readInt(); // attachmentCount
 
             if (is_toplevel) {
-                // RESERVED 8 bytes (should by zero)
+                // RESERVED 8 bytes (should be zero)
                 in.skip(8);
             }
         }
@@ -76,7 +76,7 @@ public class PropertyParser {
         sb.append((flags & 0x0004) > 0 ? "W" : "_");
         sb.append(" ");
 
-        Pid id = Pid.from(tag >> 16);
+        Pid id = Pid.from(tag >> 16, Ptyp.from(tag & 0xffff));
         Ptyp typ = Ptyp.from(tag & 0xffff);
         sb.append(StringUtils.rightPad(id.toString(), max_id_lenght));
         sb.append(" ");
@@ -84,7 +84,7 @@ public class PropertyParser {
 
         if (typ.variableLength || typ.multipleValued) {
             int size = in.readInt();
-            int reserved = in.readInt();
+            in.readInt(); // reserved
             sb.append(" size: ").append(size);
         } else {
             sb.append(" value: ").append(typ.convert(in));

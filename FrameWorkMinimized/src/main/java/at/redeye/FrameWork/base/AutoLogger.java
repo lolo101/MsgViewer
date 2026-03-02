@@ -1,57 +1,42 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.base;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-/**
- *
- * @author martin
- */
-public abstract class AutoLogger {
+import java.util.Optional;
+import java.util.concurrent.Callable;
 
-    protected Logger logger;
-    protected Exception thrown_ex = null;
-    private boolean failed = true;
-    protected boolean logical_failure = false;
-    public Object result = null;
+public class AutoLogger<R> {
 
-    public AutoLogger( String className )
-    {
-        logger = LogManager.getLogger(className);
+    private final Logger logger;
+    private final Callable<R> callable;
 
-        invoke();
+    public AutoLogger(String loggerName, Invokable invokable) {
+        this(loggerName, () -> {
+            invokable.invoke();
+            return null;
+        });
     }
 
-    private void invoke()
-    {
+    public AutoLogger(String loggerName, Callable<R> callable) {
+        logger = LogManager.getLogger(loggerName);
+        this.callable = callable;
+    }
+
+    public R resultOrElse(R defaultValue) {
         try {
-            do_stuff();
-            failed = false;
-        } catch ( Exception ex ) {
+            return callable.call();
+        } catch (Exception ex) {
             logger.error("Exception: " + ex, ex);
-            thrown_ex = ex;
+            return defaultValue;
         }
     }
 
-    public abstract void do_stuff() throws Exception;
-
-    public boolean isFailed()
-    {
-        return failed || logical_failure;
+    public Optional<R> result() {
+        return Optional.ofNullable(resultOrElse(null));
     }
 
-    protected void setFailed()
-    {
-        logical_failure = true;
-    }
-
-    protected void clearFailed()
-    {
-        logical_failure = false;
+    public void run() {
+        resultOrElse(null);
     }
 }

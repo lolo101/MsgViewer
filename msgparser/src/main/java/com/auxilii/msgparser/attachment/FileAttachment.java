@@ -18,8 +18,9 @@
 package com.auxilii.msgparser.attachment;
 
 import com.auxilii.msgparser.Property;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 
-import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
@@ -54,29 +55,13 @@ public class FileAttachment implements Attachment {
     private byte[] data;
 
     /**
-     * Subdir where the attachment was found
-     */
-    private String subdir;
-
-    /**
      * AttachContentId
      */
     private String contentId;
     private String contentLocation;
 
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public void setDisplayName(String displayName) {
+    private void setDisplayName(String displayName) {
         this.displayName = displayName;
-    }
-
-    /**
-     * @return the extension
-     */
-    public String getExtension() {
-        return extension;
     }
 
     /**
@@ -84,6 +69,27 @@ public class FileAttachment implements Attachment {
      */
     public void setExtension(String extension) {
         this.extension = extension;
+    }
+
+    /**
+     * @return the extension
+     * @see <a href="https://learn.microsoft.com/en-us/office/client-developer/outlook/mapi/pidtagattachextension-canonical-property">PidTagAttachExtension Canonical Property</a>
+     */
+    public String getExtension() {
+        if (extension != null)
+            return extension;
+        String extensionFromFilename = extensionFromFilename();
+        return extensionFromFilename.isEmpty()
+                ? extensionFromFilename
+                : "." + extensionFromFilename;
+    }
+
+    private String extensionFromFilename() {
+        if (longFilename != null)
+            return FilenameUtils.getExtension(longFilename);
+        if (filename != null)
+            return FilenameUtils.getExtension(filename);
+        return "";
     }
 
     /**
@@ -101,10 +107,10 @@ public class FileAttachment implements Attachment {
     }
 
     /**
-     * @return the longFilename
+     * @return the long filename if present, 8.3 filename otherwise
      */
     public String getLongFilename() {
-        return longFilename;
+        return longFilename == null ? filename : longFilename;
     }
 
     /**
@@ -142,24 +148,6 @@ public class FileAttachment implements Attachment {
         this.data = data;
     }
 
-    /**
-     * @return the size
-     */
-    public long getSize() {
-        return data == null ? -1 : data.length;
-    }
-
-    /**
-     * @return the subdir where the attachment was found
-     */
-    public String getSubDir() {
-        return subdir;
-    }
-
-    public void setSubDir(String subdir) {
-        this.subdir = subdir;
-    }
-
     public void setContentId(String contentId) {
         this.contentId = contentId;
     }
@@ -178,9 +166,6 @@ public class FileAttachment implements Attachment {
 
     public void setProperty(Property property) throws ClassCastException {
         switch (property.getPid()) {
-            case PidTagRecordKey:
-                //TODO setRecordKey((byte[]) value);
-                break;
             case PidTagDisplayName:
                 setDisplayName((String) property.getValue());
                 break;
@@ -209,15 +194,14 @@ public class FileAttachment implements Attachment {
     }
 
     /**
-     * Returns either the long filename or the short filename, depending on which is available.
+     * Returns either the display name, the long filename or the short filename, the first non-blank in that order.
      *
      * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
         return Stream.of(displayName, longFilename, filename)
-                .filter(Objects::nonNull)
-                .filter(name -> !name.isBlank())
+                .filter(StringUtils::isNotBlank)
                 .findFirst()
                 .orElse(null);
     }

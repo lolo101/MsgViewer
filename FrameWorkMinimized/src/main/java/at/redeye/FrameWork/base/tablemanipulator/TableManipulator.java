@@ -1,161 +1,81 @@
-  /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.base.tablemanipulator;
 
 import at.redeye.FrameWork.base.*;
-import at.redeye.FrameWork.base.bindtypes.*;
-import at.redeye.FrameWork.utilities.StringUtils;
+import at.redeye.FrameWork.base.bindtypes.DBStrukt;
+import at.redeye.FrameWork.base.bindtypes.DBValue;
+import at.redeye.FrameWork.base.prm.bindtypes.DBConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.*;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.Map.Entry;
 
-/**
- *
- * @author martin
- */
 public class TableManipulator {
 
-    private DBStrukt binddesc = null;
-    private Vector<Integer> hidden_values = new Vector<>();
+    private final DBStrukt binddesc;
+    private final Collection<Integer> hidden_values = new ArrayList<>();
 
-    TableDesign tabledesign;
-    JTable table;
-    NormalTableModel model;
-    boolean allEditable = false;
-    Root root;
-    RowHeader row_header;
-    int auto_show_row_header = 20;
-    private static Logger logger = LogManager.getLogger(TableManipulator.class);
-    TableEditorStopper editor_stopper;
-    BaseDialogBase base_dlg;
-    boolean allowReordering = true;
-    boolean allowResorting = true;
-    boolean saveUserColWidth = true;
-    Runnable closeListener = null;
+    private TableDesign tabledesign;
+    private final JTable table;
+    private final Setup setup;
+    private RowHeader row_header;
+    private int auto_show_row_header = 20;
+    private static final Logger logger = LogManager.getLogger(TableManipulator.class);
+    private BaseDialogBase base_dlg;
 
-    public TableManipulator( Root root, JTable table, TableDesign tabledesign )
-    {
-        this.tabledesign = tabledesign;
-        this.table = table;
-        this.model = new NormalTableModel(tabledesign);
-        this.root = root;
-        table.setModel(model);
-        table.setDefaultRenderer(Object.class, new NormalCellRenderer(root, this.tabledesign));
-        row_header = new RowHeader( table, this::checkRowHeaderLimit);
-
-        editor_stopper = new TableEditorStopper(table);
-
-        readShowHeaderLimit();
-        addCloseListener();
-    }
-
-    public TableManipulator( Root root, JTable table, DBStrukt binddesc )
-    {
-        this.root = root;
-        readShowHeaderLimit();
-        configure( table, binddesc, false );
-        addCloseListener();
-    }
-
-    public TableManipulator( Root root, JTable table, DBStrukt binddesc, boolean allEditable )
-    {
-        this.root = root;
-        readShowHeaderLimit();
-        configure( table, binddesc, allEditable );
-        addCloseListener();
-    }
-
-    public void setSaveUserColWidth( boolean state )
-    {
-        saveUserColWidth = state;
-    }
-
-    protected boolean isHidden( int i )
-    {
-        for(int ii = 0; ii < hidden_values.size(); ii++ )
-        {
-            if( hidden_values.get(ii).equals(i) )
-                return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * reconfigure the table for a new bindtype
-     * @param binddesc
-     */
-    public void reconfigure(DBStrukt binddesc)
-    {
-        hidden_values.clear();
-        configure( table, binddesc, allEditable );
-    }
-
-    private void configure( JTable table, DBStrukt binddesc, boolean allEditable )
-    {
+    public TableManipulator(Setup setup, JTable table, DBStrukt binddesc) {
+        this.setup = setup;
         this.binddesc = binddesc;
-        this.allEditable = allEditable;
-
-        if( editor_stopper == null )
-        {
-            // ansonten hängen wir mehrere listener drann und das wollen wir nicht.
-            editor_stopper = new TableEditorStopper(table);
-        }
-
-        Vector<TableDesign.Coll> vec = new Vector<>();
-
-        ArrayList<String> names = binddesc.getAllNames();
-        ArrayList<DBValue> values = binddesc.getAllValues();
-
-        for( int i = 0; i < names.size(); i++ )
-        {
-            if( !isHidden(i) )
-                vec.add( new TableDesign.Coll( names.get(i), false, values.get(i) ) );
-        }
-
-        this.tabledesign = new TableDesign( vec );
         this.table = table;
-        this.model = new NormalTableModel(tabledesign);
-        table.setModel(model);
-        table.setDefaultRenderer(Object.class, new NormalCellRenderer(root, this.tabledesign));
-        row_header = new RowHeader( table, this::checkRowHeaderLimit);
+        readShowHeaderLimit();
+        configure();
+        addCloseListener();
+    }
+
+    private boolean isHidden(int i) {
+        return hidden_values.contains(i);
+    }
+
+    private void configure() {
+        List<Coll> colls = new ArrayList<>();
+
+        ArrayList<String> titles = binddesc.getAllNames();
+        List<DBValue> values = binddesc.getAllValues();
+
+        for (int i = 0; i < titles.size(); i++) {
+            if (!isHidden(i))
+                colls.add(new Coll(titles.get(i), false, values.get(i)));
+        }
+
+        this.tabledesign = new TableDesign(getBaseDialog(), colls);
+        table.setModel(tabledesign);
+        table.setDefaultRenderer(DBValue.class, new NormalCellRenderer(this.tabledesign));
+        row_header = new RowHeader(table, this::checkRowHeaderLimit);
     }
 
     public void autoResize()
     {
-        autoResizeColWidth( table );
+        autoResizeColWidth();
         setUserColWidth();
     }
 
-    public void autoResizeNoUserColWidth()
-    {
-        autoResizeColWidth( table );
-    }
-
-     public void autoResizeColWidth(JTable table ) {
+    private void autoResizeColWidth() {
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
-        String smargin_default = root.getSetup().getLocalConfig(FrameWorkConfigDefinitions.SpreadSheetMarginReadOnly);
-        String smargin_editable = root.getSetup().getLocalConfig(FrameWorkConfigDefinitions.SpreadSheetMarginEditable);
+        String smargin_default = FrameWorkConfigDefinitions.SpreadSheetMarginReadOnly.getConfigValue();
+        String smargin_editable = FrameWorkConfigDefinitions.SpreadSheetMarginEditable.getConfigValue();
 
         int margin_default = Integer.parseInt(smargin_default);
         int margin_editable = Integer.parseInt(smargin_editable);
 
-        int max_height = 0;
-
         for (int i = 0; i < table.getColumnCount(); i++) {
-            DefaultTableColumnModel colModel  = (DefaultTableColumnModel) table.getColumnModel();
-            TableColumn             col       = colModel.getColumn(i);
-            int                     width     = 0;
+            TableColumnModel colModel = table.getColumnModel();
+            TableColumn col = colModel.getColumn(i);
+            int width = 0;
 
             // Get width of column header
             TableCellRenderer renderer = col.getHeaderRenderer();
@@ -177,10 +97,6 @@ public class TableManipulator {
                 Dimension dim = comp.getPreferredSize();
 
                 width = Math.max(width, dim.width);
-
-                // System.out.println("hieght: " + dim.height + " row: " + (r +1) + " col: " + (i+1) );
-
-                max_height = Math.max(max_height, dim.height);
             }
 
 
@@ -189,13 +105,13 @@ public class TableManipulator {
                 if( width_header <= width )
                     width += 2 * margin_editable;
                 else
-                    width = width_header += margin_default;
+                    width = width_header + margin_default;
             } else {
                 // Add margin
                 if( width_header <= width )
                     width += 2 * margin_default;
                 else
-                    width = width_header += margin_default;
+                    width = width_header + margin_default;
             }
 
             // Set the width
@@ -203,257 +119,53 @@ public class TableManipulator {
         }
 
         ((DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(
-            SwingConstants.LEFT);
+                SwingConstants.LEFT);
 
-        setReorderingAllowed(allowReordering);
-        setResortingAllowed(allowResorting);
+        setReorderingAllowed();
+        setResortingAllowed();
 
-        if( max_height > 0 )
-        {
-
-            int correction = 0;
-
-            LookAndFeel look_and_feel = UIManager.getLookAndFeel();
-
-            if( look_and_feel != null )
-            {
-                logger.info("look and feel: " + look_and_feel.getID() );
-
-                if( Setup.is_linux_system() )
-                {
-                    correction = 1;
-
-                    if( look_and_feel.getID().equals("Nimbus") )
-                        correction = 3;
-                }
-                else // Windows
-                {
-                    correction=2;
-
-                    if( look_and_feel.getID().equals("Nimbus") )
-                        correction = 4;
-                    else if( look_and_feel.getID().equals("Windows") )
-                        correction = 0;
-                }
-            }
-
-            //System.out.println(String.format("height: %d",max_height) );
-            row_header.setCellHeight(max_height-correction);
-        }
- /*
-        for (int i = 0; i < table.getColumnCount(); i++) {
-            TableColumn column = table.getColumnModel().getColumn(i);
-
-            column.setCellRenderer(new DefaultTableColour());
-        }
-
-        return table;
-  */
+        row_header.setCellHeight(table.getRowHeight());
     }
 
-    public void setReorderingAllowed(boolean state) {
-        allowReordering = state;
-        table.getTableHeader().setReorderingAllowed(state);
+    private void setReorderingAllowed() {
+        table.getTableHeader().setReorderingAllowed(true);
     }
 
-    public void setResortingAllowed(boolean state) {
-        allowResorting = state;
-        table.setAutoCreateRowSorter(state);
+    private void setResortingAllowed() {
+        table.setAutoCreateRowSorter(true);
     }
 
-    public void add(DBStrukt binddesc)
-    {
-        ArrayList<DBValue> values = binddesc.getAllValues();
-
-        addRow( values );
-    }
-
-    public void add(DBStrukt strukt, boolean set_edited )
-    {
-        add( strukt );
-
-        if( set_edited )
-            tabledesign.edited_rows.add(tabledesign.rows.size()-1);
-    }
-
-    public void add(DBStrukt strukt, boolean set_edited, boolean scrool_to_last_row )
-    {
-        add( strukt, set_edited);
-        scrollToLastRow();
-    }
-
-    public <T extends DBStrukt> void addAll( Collection<T> col)
-    {
-        for( DBStrukt s : col )
-        {
-            ArrayList<DBValue> values = s.getAllValues();
-
-            addRow( values, false );
-        }
-
+    public void addAll(Collection<DBConfig> rows) {
+        tabledesign.addRows(rows);
         checkRowHeaderLimit();
         row_header.updateUI();
     }
 
-    public void prepareTable()
-    {
-        for( TableDesign.Coll coll : tabledesign.colls )
-        {
-            model.addColumn(MlM(coll.Title));
+    public void prepareTable() {
+        TableColumnModel columnModel = table.getColumnModel();
+        for (Enumeration<TableColumn> columns = columnModel.getColumns(); columns.hasMoreElements(); ) {
+            TableColumn col = columns.nextElement();
+            col.setCellEditor(new AdvancedTableCellEditor(tabledesign));
         }
-
-        /* Das muß so sein,
-         * da bei der ersten for Schleife der CellEditor resetted wird
-         * anscheinend
-         */
-        for( int i = 0; i < table.getColumnCount(); i++ )
-        {
-            TableColumn col = table.getColumnModel().getColumn(i);
-
-            TableDesign.Coll tcoll = tabledesign.colls.get(i);
-
-            if( tcoll.dbval instanceof DBEnum ) {
-                col.setCellEditor(new AdvancedEnumTableCellEditor(tabledesign, (DBEnum)tcoll.dbval));
-            } else if( tcoll.dbval instanceof DBEnumAsInteger ) {
-                col.setCellEditor(new AdvancedEnumTableCellEditor(tabledesign, (DBEnumAsInteger)tcoll.dbval));
-            } else if( tcoll.dbval instanceof DBSqlAsInteger ) {
-                col.setCellEditor(new AdvancedEnumTableCellEditor(tabledesign, (DBSqlAsInteger)tcoll.dbval));
-            } else {
-                col.setCellEditor(new AdvancedTableCellEditor(tabledesign));
-            }
-        }
-    }
-
-    public void addRow( Collection<?> data )
-    {
-        addRow(data,true);
-    }
-
-
-    private void addRow( Collection<?> data, boolean update_ui )
-    {
-        /* Wir müssen hier einen 2. Vector anlegen,
-         * da der eine an die Tabelle angebunden wird
-         * und wenn über den TableVelidator ein
-         * anderer Anzeige Format String verwendet wird
-         * wird unser ursprüngliches Objekt in
-         * table_copy durch einen String ersetzt,
-         * und weil das alles Referenzen sind,
-         * würde dies auch mit unserem db_copy
-         * Vector passieren.
-         * Deswegen der 2. Vector.
-         */
-
-
-        Vector<Object> table_copy = new Vector<>();
-        Vector<Object> db_copy = new Vector<>();
-
-        int i = 0;
-        for( Object d : data )
-        {
-            if( !hidden_values.contains(i) ) {
-                table_copy.add( d );
-                db_copy.add( d );
-            }
-            i++;
-
-        }
-
-        model.addRow(table_copy);
-        tabledesign.rows.add(db_copy);
-
-        if( update_ui ) {
-            checkRowHeaderLimit();
-            row_header.updateUI();
-        }
-    }
-
-    public void scrollToLastRow()
-    {
-        scrollToVisible(table,model.getRowCount()-1,0);
-    }
-
-    public void scrollToRow( int row )
-    {
-        scrollToVisible(table,row,0);
-    }
-
-    public static void scrollToVisible(JTable table, int rowIndex, int vColIndex) {
-        if (!(table.getParent() instanceof JViewport)) {
-            return;
-        }
-        JViewport viewport = (JViewport)table.getParent();
-
-        // This rectangle is relative to the table where the
-        // northwest corner of cell (0,0) is always (0,0).
-        Rectangle rect = table.getCellRect(rowIndex, vColIndex, true);
-
-        // The location of the viewport relative to the table
-        Point pt = viewport.getViewPosition();
-
-        // Translate the cell location so that it is relative
-        // to the view, assuming the northwest corner of the
-        // view is (0,0)
-        rect.setLocation(rect.x-pt.x, rect.y-pt.y + table.getRowHeight());
-
-        table.scrollRectToVisible(rect);
-
-        // Scroll the area into view
-        viewport.scrollRectToVisible(rect);
     }
 
     public void clear()
     {
-        int i;
-        while( ( i = model.getRowCount() ) > 0 )
-            model.removeRow( i-1 );
-
-        tabledesign.edited_cols.clear();
-        tabledesign.edited_rows.clear();
-        tabledesign.rows.clear();
-        tabledesign.coloredCells.clear();
-
+        tabledesign.clear();
         checkRowHeaderLimit();
         row_header.updateUI();
     }
 
     public void remove( int row )
     {
-        editor_stopper.doPause();
-        logger.info(("PAUSE PAUSE PAUSE"));
+        logger.info("PAUSE PAUSE PAUSE");
 
-        model.removeRow(row);
-        tabledesign.rows.remove(row);
-
-        Object[] rows = getEditedRows().toArray();
-
-        HashSet<Integer> er = new HashSet<>();
-
-        for( int i = 0; i < rows.length; i++ )
-        {
-            if( (Integer)rows[i] == row )
-            {
-                continue;
-            }
-
-            if( (Integer)rows[i] < row )
-            {
-                er.add(Integer.valueOf(i));
-            }
-            else
-            {
-                er.add(Integer.valueOf(i - 1));
-            }
-        }
-
-        tabledesign.edited_rows = er;
+        tabledesign.remove(row);
 
         checkRowHeaderLimit();
         row_header.updateUI();
 
-        logger.info(("CONTINUE CONTINUE CONTINUE"));
-
-        editor_stopper.doContinue();
+        logger.info("CONTINUE CONTINUE CONTINUE");
     }
 
     public Set<Integer> getEditedRows()
@@ -461,37 +173,10 @@ public class TableManipulator {
         return tabledesign.edited_rows;
     }
 
-    public void setEditedAll()
-    {
-        for( int i = 0; i < tabledesign.rows.size(); i++ )
-            tabledesign.edited_rows.add(i);
-    }
-
-    public void setEdited( int row)
-    {
-        tabledesign.edited_rows.add(row);
-    }
-
-
-    public boolean isEdited()
-    {
-        if( tabledesign.edited_rows == null )
-            return false;
-
-        if( tabledesign.edited_rows.isEmpty() )
-            return false;
-
-        return true;
-    }
 
     public void setEditable( DBValue column )
     {
-        setEditable( column, true );
-    }
-
-    public void setEditable( DBValue column, boolean isEditable )
-    {
-        ArrayList<DBValue> values = binddesc.getAllValues();
+        List<DBValue> values = binddesc.getAllValues();
 
         for( int i = 0, col=0; i < values.size(); i++ )
         {
@@ -500,52 +185,7 @@ public class TableManipulator {
 
             if( values.get(i).hashCode() == column.hashCode() )
             {
-
-                tabledesign.colls.get(col).setEditable( isEditable );
-                return;
-            }
-
-            col++;
-        }
-    }
-
-    /**
-     * disable, or enables the Autocompletet feature for this column
-     * @param column
-     * @param doAutocomplete
-     */
-    public void setAutoCompleteForAllOfThisColl(DBValue column, boolean doAutocomplete) {
-        ArrayList<DBValue> values = binddesc.getAllValues();
-
-        for (int i = 0, col = 0; i < values.size(); i++) {
-            if (isHidden(i)) {
-                continue;
-            }
-
-            if (values.get(i).hashCode() == column.hashCode()) {
-                tabledesign.colls.get(col).setDoAutocompleteForAllOfThisColl(doAutocomplete);
-                return;
-            }
-
-            col++;
-        }
-    }
-
-    /**
-     * disable, or enables the Autocompletet feature
-     * @param column
-     * @param doAutocomplete
-     */
-    public void setAutoCompleteForCollAtAll(DBValue column, boolean doAutocomplete) {
-        ArrayList<DBValue> values = binddesc.getAllValues();
-
-        for (int i = 0, col = 0; i < values.size(); i++) {
-            if (isHidden(i)) {
-                continue;
-            }
-
-            if (values.get(i).hashCode() == column.hashCode()) {
-                tabledesign.colls.get(col).setAutoCompleteForCollAtAll(doAutocomplete);
+                tabledesign.colls.get(col).setEditable();
                 return;
             }
 
@@ -554,84 +194,30 @@ public class TableManipulator {
     }
 
 
-    public void setValidator(DBValue column,TableValidator validator)
-    {
-        ArrayList<DBValue> values = binddesc.getAllValues();
-
-        for( int i = 0, col=0; i < values.size(); i++ )
-        {
-            if( isHidden( i ) )
+    public void hide(DBValue... columns) {
+        for (DBValue column : columns) {
+            if (column == null)
                 continue;
 
-            if( values.get(i).hashCode() == column.hashCode() )
-            {
-                tabledesign.colls.get(col).validator = validator;
-                return;
-            }
+            List<DBValue> values = binddesc.getAllValues();
 
-            col++;
-        }
-    }
-
-    public void setAdditionalAutocompleteData( DBValue column, Vector<Object> data )
-    {
-        ArrayList<DBValue> values = binddesc.getAllValues();
-
-        for( int i = 0, col=0; i < values.size(); i++ )
-        {
-            if( isHidden( i ) )
-                continue;
-
-            if( values.get(i).hashCode() == column.hashCode() )
-            {
-                tabledesign.colls.get(col).additional_autocomplete_values = data;
-                return;
-            }
-
-            col++;
-        }
-    }
-
-    public void hide( DBValue ... columns )
-    {
-        ArrayList<DBValue> col_list = new ArrayList();
-
-        col_list.addAll(Arrays.asList(columns));
-
-        hide( col_list );
-    }
-
-    public void hide( DBStrukt hist )
-    {
-        hide( hist.getAllValues() );
-    }
-
-    public void hide( List<DBValue> columns )
-    {
-        for (DBValue column : columns )
-        {
-            if( column == null )
-                continue;
-
-            ArrayList<DBValue> values = binddesc.getAllValues();
-
-            boolean found = false;
+            boolean missing = true;
 
             for (int i = 0; i < values.size(); i++) {
                 if (values.get(i).hashCode() == column.hashCode()) {
                     hidden_values.add(i);
-                    found = true;
+                    missing = false;
                     break;
                 }
             }
 
-            if (!found) {
+            if (missing) {
                 System.out.println("Didn't found: " + column.getName());
                 return;
             }
         }
 
-        configure( table, binddesc, allEditable );
+        configure();
     }
 
 
@@ -643,75 +229,6 @@ public class TableManipulator {
            ce.stopCellEditing();
     }
 
-
-    public void setCellColor (DBValue column, int row, Color color) {
-
-        ArrayList<DBValue> values = binddesc.getAllValues();
-
-
-        for( int i = 0, col=0; i < values.size(); i++ )
-        {
-            if( isHidden( i ) )
-                continue;
-
-
-            if( values.get(i).getName().equals(column.getName()) )
-            {
-                tabledesign.addColoredCell(row, col, color);
-                return;
-            }
-
-            col++;
-        }
-    }
-
-    public void setToolTip (DBValue column, int row, String tooltip) {
-
-        ArrayList<DBValue> values = binddesc.getAllValues();
-
-
-        for( int i = 0, col=0; i < values.size(); i++ )
-        {
-            if( isHidden( i ) )
-                continue;
-
-
-            if( values.get(i).getName().equals(column.getName()) )
-            {
-                tabledesign.addToolTipCell(row, col, tooltip);
-                return;
-            }
-
-            col++;
-        }
-    }
-
-    public void updateValue( DBValue value, int row )
-    {
-        ArrayList<DBValue> values = binddesc.getAllValues();
-
-        for( int i = 0, col=0; i < values.size(); i++ )
-        {
-            if( isHidden( i ) )
-                continue;
-
-            if( values.get(i).getName().equals(value.getName()) )
-            {
-                model.setValueAt(value, row, col);
-                //model.fireTableCellUpdated(row, col);
-                return;
-            }
-
-            col++;
-        }
-    }
-
-    public void updateUI()
-    {
-        model.fireTableDataChanged();
-        row_header.updateUI();
-        //table.updateUI();
-    }
 
     /**
      * @return -1 if nothing was selected
@@ -726,10 +243,6 @@ public class TableManipulator {
         return TableDesign.getModelRow(table, row);
     }
 
-    public TableDesign getTabledesign() {
-        return tabledesign;
-    }
-
     public void showRowHeader(boolean selected)
     {
         if( selected )
@@ -738,13 +251,11 @@ public class TableManipulator {
             hideRowHeader();
     }
 
-    public void showRowHeader()
-    {
+    private void showRowHeader() {
         row_header.setVisible(true);
     }
 
-    public void hideRowHeader()
-    {
+    private void hideRowHeader() {
         row_header.setVisible(false);
     }
 
@@ -760,34 +271,18 @@ public class TableManipulator {
         }
         else
         {
-            if (table.getRowCount() < auto_show_row_header &&
-                !row_header.isScrollBarVisible() ) {
-                row_header.setVisible(false);
-            } else {
-                row_header.setVisible(true);
-            }
+            row_header.setVisible(auto_show_row_header <= table.getRowCount() || row_header.isScrollBarVisible());
         }
     }
 
     private void readShowHeaderLimit()
     {
         try {
-            auto_show_row_header = Integer.parseInt(root.getSetup().getLocalConfig(
-                    FrameWorkConfigDefinitions.SpreadSheetRowHeaderLimit));
+            auto_show_row_header = Integer.parseInt(FrameWorkConfigDefinitions.SpreadSheetRowHeaderLimit.getConfigValue());
 
         } catch ( NumberFormatException ex ) {
-            logger.error(StringUtils.exceptionToString(ex));
+            logger.error(ex.getLocalizedMessage(), ex);
         }
-    }
-
-    public void disableAutoRowHeader()
-    {
-        auto_show_row_header = -1;
-    }
-
-    public void enableAutoRowHeader()
-    {
-        readShowHeaderLimit();
     }
 
     private void addCloseListener()
@@ -797,19 +292,7 @@ public class TableManipulator {
         if( base == null )
             return;
 
-        if( closeListener == null )
-        {
-            closeListener = new Runnable() {
-
-                @Override
-                public void run() {
-                    if( saveUserColWidth )
-                        saveTableHeaderSize();
-                }
-            };
-
-            base.registerOnCloseListener(closeListener);
-        }
+        base.registerOnCloseListener(this::saveTableHeaderSize);
     }
 
     private BaseDialogBase getBaseDialog()
@@ -839,28 +322,24 @@ public class TableManipulator {
         return null;
     }
 
-    private String getUniqueSaveIdForTable()
-    {
+    private String getUniqueSaveIdForTable() {
         BaseDialogBase base = getBaseDialog();
 
-        if( base == null )
+        if (base == null)
             return null;
 
-        return base.getUniqueDialogIdentifier(this);
+        return base.getUniqueDialogIdentifier();
     }
 
-    public void saveTableHeaderSize()
-    {
-        if( binddesc == null )
-        {
+    private void saveTableHeaderSize() {
+        if (binddesc == null) {
             logger.error("save Table size without a binddesc not testet yet");
             return;
         }
 
         String uid = getUniqueSaveIdForTable();
 
-        if( uid == null )
-        {
+        if (uid == null) {
             logger.error("die Tabelle befindet sich nicht in einem BaseDialog sichern nicht möglich!");
         }
 
@@ -870,15 +349,13 @@ public class TableManipulator {
 
         logger.info("saving cols width for binddesc: " + binddesc.getName() );
 
-        Setup setup = root.getSetup();
-
         for( int j = 0; j < table.getColumnCount(); j++ )
         {
             Rectangle col_rect = header.getHeaderRect(j);
 
-            TableDesign.Coll col =  tabledesign.colls.get(TableDesign.getModelCol(table, j));
+            Coll col = tabledesign.colls.get(TableDesign.getModelCol(table, j));
 
-            logger.info(j + ": " + col_rect.width + " " +col.Title + " => " +  col.dbval.getName() );
+            logger.info(j + ": " + col_rect.width + " " + col.title + " => " + col.dbval.getName());
 
             String col_uid = uid + "_" + col.dbval.getName();
 
@@ -903,23 +380,22 @@ public class TableManipulator {
         }
 
         uid += binddesc.getName();
-        Setup setup = root.getSetup();
 
         // remember the position of each column
         // in this array
-        List<Entry<String,Integer>> positions = new ArrayList();
+        List<Entry<String,Integer>> positions = new ArrayList<>();
 
         for (int i = 0; i < table.getColumnCount(); i++) {
-            DefaultTableColumnModel colModel  = (DefaultTableColumnModel) table.getColumnModel();
-            TableColumn             tcol       = colModel.getColumn(i);
+            TableColumnModel colModel = table.getColumnModel();
+            TableColumn tcol = colModel.getColumn(i);
 
             int width = 0;
 
-            TableDesign.Coll col =  tabledesign.colls.get(TableDesign.getModelCol(table, i));
+            Coll col = tabledesign.colls.get(TableDesign.getModelCol(table, i));
 
             String col_uid = uid + "_" + col.dbval.getName();
 
-            String val = setup.getLocalConfig(col_uid,"");
+            String val = setup.getConfig(col_uid, "");
 
             logger.debug(col_uid + "=" + val);
 
@@ -936,56 +412,21 @@ public class TableManipulator {
                     positions.add(new AbstractMap.SimpleEntry<>(col_uid, Integer.parseInt(values[1])));
 
             } catch( NumberFormatException ex ) {
-                logger.error(StringUtils.exceptionToString(ex));
+                logger.error(ex.getLocalizedMessage(), ex);
                 positions.add(new AbstractMap.SimpleEntry<>(col_uid, -1));
             }
 
-            if( width > 5 )
+            if (width > 5)
                 tcol.setPreferredWidth(width);
         }
 
-        if (allowReordering) {
-            // Wiederherstellen der Spalten, so wie es das letzte mal
-            // abgespeichert war
+        ColumnOrder orderer = new ColumnOrder(table);
 
-            ColumnOrder orderer = new ColumnOrder(table);
-
-            for (int i = 0; i < positions.size(); i++)
-            {
-                Entry<String,Integer> entry = positions.get(i);
-                orderer.addColumn(entry.getKey(), i, entry.getValue());
-            }
-
-            orderer.moveColumns();
-/*
-            List<Integer> dont_move_anymore = new ArrayList<Integer>();
-
-            for (int i = 0; i < positions.size(); i++) {
-                int index = positions.get(i);
-
-                if (dont_move_anymore.contains(i)) {
-                    continue;
-                }
-
-                if (index >= 0 && index != i && index < table.getColumnCount()) {
-                    //System.out.println("i " + i + " = " + index );
-
-                    table.getColumnModel().moveColumn(i, index);
-                    dont_move_anymore.add(index);
-                }
-            }
-            *
-            */
+        for (int i = 0; i < positions.size(); i++) {
+            Entry<String, Integer> entry = positions.get(i);
+            orderer.addColumn(entry.getKey(), i, entry.getValue());
         }
-    }
 
-    public String MlM( String message )
-    {
-        base_dlg = getBaseDialog();
-
-        if( base_dlg == null )
-            return message;
-
-        return base_dlg.MlM(message);
+        orderer.moveColumns();
     }
 }

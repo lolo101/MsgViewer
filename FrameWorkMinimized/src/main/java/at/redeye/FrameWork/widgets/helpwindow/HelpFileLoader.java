@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.widgets.helpwindow;
 
 import at.redeye.FrameWork.utilities.StringUtils;
@@ -15,113 +10,46 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-/**
- *
- * @author martin
- */
 public class HelpFileLoader {
 
-	private static Logger logger = LogManager.getLogger(HelpFileLoader.class);
+	private static final Logger logger = LogManager.getLogger(HelpFileLoader.class);
+	private static final Pattern IMG_TAG = Pattern.compile("<img\\s+");
+	private static final Pattern SRC_ATTRIBUTE = Pattern.compile("src\\s*=\\s*\"(?<value>.*?)\"");
 
-	public int findImgTag(StringBuilder s, int start) {
-		int pos;
-
-		do {
-			pos = s.indexOf("img", start);
-
-			// System.out.println("pos:" + pos);
-
-			if (pos <= 0) {
-				// weil bei start 0 getht sich keine <img aus
-				return -1;
-			}
-
-			int rpos = StringUtils.skip_spaces_reverse(s, pos - 1);
-
-			if (rpos < 0) {
-				start = pos + 3;
-				continue;
-			}
-
-			if (s.charAt(rpos) != '<') {
-				start = pos + 3;
-				continue;
-			}
-
-			if (s.length() <= pos + 3)
-				return -1;
-
-			if (StringUtils.is_space(s.charAt(pos + 3)))
-				return pos;
-		} while (pos < (s.length() - 1));
-
-		return -1;
+	private String replace_src(String s) {
+		String src = StringUtils.strip(s, " \t\r\n\"");
+		URL resource = getClass().getResource(src);
+		if (resource == null) {
+			logger.error("Cannot load Image: " + src);
+			return s;
+		}
+		logger.info("image: " + src);
+		return resource.toString();
 	}
 
-	public String replace_src(StringBuilder s) {
+	private String prepareImages(String s) {
+		StringBuilder res = new StringBuilder(s);
 
-		List<String> res = StringUtils.split_str(s, "=");
+		int tagFromIndex = 0;
+		for (Matcher imgMatcher = IMG_TAG.matcher(res); imgMatcher.find(tagFromIndex); ) {
+			int attributeFromIndex = imgMatcher.end();
+			Matcher srcMatcher = SRC_ATTRIBUTE.matcher(res);
+			if (srcMatcher.find(attributeFromIndex)) {
+				int attributeValueStart = srcMatcher.start("value");
+				int attributeValueEnd = srcMatcher.end("value");
 
-		int i = 0;
+				String substitute = replace_src(res.substring(attributeValueStart, attributeValueEnd));
 
-		StringBuilder ret = new StringBuilder();
-
-		for (String part : res) {
-			i++;
-
-			if (i == 1) {
-				ret.append(part);
-				continue;
+				res.replace(attributeValueStart, attributeValueEnd, substitute);
 			}
-
-			ret.append("=");
-
-			String src = StringUtils
-					.strip(new StringBuilder(part), " \t\r\n\"");
-
-			URL resource = getClass().getResource(src);
-
-			String imgsrc = null;
-
-			if (resource != null) {
-				imgsrc = resource.toString();
-				logger.info("image: " + src);
-			} else {
-				logger.error("Cannot load Image: " + src);
-			}
-
-			if (imgsrc != null) {
-				ret.append("\"");
-				ret.append(imgsrc);
-				ret.append("\"");
-			}
+			tagFromIndex = attributeFromIndex;
 		}
 
-		return ret.toString();
-	}
-
-	public StringBuilder prepareImages(StringBuilder s) {
-		int start = 0;
-
-		while ((start = findImgTag(s, start)) >= 0) {
-			// System.out.println("HERE");
-
-			int end = s.indexOf(">", start);
-
-			if (end < 0)
-				break;
-
-			String res = replace_src(new StringBuilder(
-					s.subSequence(start, end)));
-
-			s.replace(start, end, res);
-
-			start += res.length();
-		}
-
-		return s;
+		return res.toString();
 	}
 
         public static String getResourceName( String Base, String ModuleName )
@@ -130,45 +58,22 @@ public class HelpFileLoader {
         }
 
 	public String loadHelp(String Base, String ModuleName) throws IOException {
-		String resource = getResourceName( Base, ModuleName);
+		String resource = getResourceName(Base, ModuleName);
 
 		resource = resource.replaceAll("//", "/");
 
-		InputStream stream = getClass().getResourceAsStream(resource);
+		try (InputStream stream = getClass().getResourceAsStream(resource)) {
+			if (stream == null) {
+				System.out.println("Failed loading resource:" + resource);
+				return "";
+			}
+			System.out.println("Loading resource:" + resource);
 
-		System.out.println("Loading resource:" + resource);
-
-		if (stream == null) {
-			System.out.println("Failed loading resource:" + resource);
-			return "";
-		}
-
-		StringBuilder res = new StringBuilder();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(
-				stream, StandardCharsets.UTF_8));
-
-		while (reader.ready()) {
-			String line = reader.readLine();
-			res.append(line);
-		}
-
-		reader.close();
-		stream.close();
-
-		res = prepareImages(res);
-
-		return res.toString();
-	}
-
-	public static void main(String[] argv) {
-		HelpFileLoader hfl = new HelpFileLoader();
-
-		try {
-			System.out.println(hfl.loadHelp(
-					"/at/redeye/Application/resources/Help/", "MainWin"));
-		} catch (IOException ex) {
-			System.out.println(ex);
-			ex.printStackTrace();
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+					stream, StandardCharsets.UTF_8))) {
+				String res = reader.lines().collect(Collectors.joining());
+				return prepareImages(res);
+			}
 		}
 	}
 }

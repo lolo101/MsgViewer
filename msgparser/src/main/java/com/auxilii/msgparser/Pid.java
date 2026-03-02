@@ -1,107 +1,125 @@
 package com.auxilii.msgparser;
 
+import java.util.Arrays;
+import java.util.Set;
+
+import static com.auxilii.msgparser.Ptyp.*;
+
+/**
+ * [MS-OXPROPS]
+ */
 public enum Pid {
-    PidTagGuidStream(0x0002),
-    PidTagEntryStream(0x0003),
-    PidTagStringStream(0x0004),
+    PidTagGuidStream(0x0002, PtypBinary),
+    PidTagEntryStream(0x0003, PtypBinary),
+    PidTagStringStream(0x0004, PtypBinary),
 
     // 0x0001-0x0BFF Message object envelope property; reserved
-    PidTagMessageClass(0x001a),
-    PidTagSubject(0x0037),
-    PidTagClientSubmitTime(0x0039),
-    PidTagSentRepresentingSearchKey(0x003b),
-    PidTagSubjectPrefix(0x003d),
-    PidTagReceivedByEntryId(0x003f),
-    PidTagReceivedByName(0x0040),
-    PidTagSentRepresentingEntryId(0x0041),
-    PidTagSentRepresentingName(0x0042),
-    PidTagReceivedRepresentingEntryId(0x0043),
-    PidTagReceivedRepresentingName(0x0044),
-    PidTagOriginalAuthorName(0x004d),
-    PidTagReplyRecipientNames(0x0050),
-    PidTagReceivedBySearchKey(0x0051),
-    PidTagReceivedRepresentingSearchKey(0x0052),
-    PidTagOriginalSenderName(0x005a),
-    PidTagSentRepresentingAddressType(0x0064),
-    PidTagSentRepresentingEmailAddress(0x0065),
-    PidTagConversationTopic(0x0070),
-    PidTagConversationIndex(0x0071),
-    PidTagReceivedByAddressType(0x0075),
-    PidTagReceivedByEmailAddress(0x0076),
-    PidTagReceivedRepresentingAddressType(0x0077),
-    PidTagReceivedRepresentingEmailAddress(0x0078),
-    PidTagTransportMessageHeaders(0x007d),
-    PidTagTnefCorrelationKey(0x007f),
+    PidTagMessageClass(0x001a, PtypString, PtypString8),
+    PidTagSensitivity(0x0036, PtypInteger32),
+    PidTagSubject(0x0037, PtypString, PtypString8),
+    PidTagClientSubmitTime(0x0039, PtypTime),
+    PidTagSentRepresentingSearchKey(0x003b, PtypBinary),
+    PidTagSubjectPrefix(0x003d, PtypString, PtypString8),
+    PidTagReceivedByEntryId(0x003f, PtypBinary),
+    PidTagReceivedByName(0x0040, PtypString, PtypString8),
+    PidTagSentRepresentingEntryId(0x0041, PtypBinary),
+    PidTagSentRepresentingName(0x0042, PtypString, PtypString8),
+    PidTagReceivedRepresentingEntryId(0x0043, PtypBinary),
+    PidTagReceivedRepresentingName(0x0044, PtypString, PtypString8),
+    PidTagOriginalAuthorName(0x004d, PtypString, PtypString8),
+    PidTagReplyRecipientEntries(0x004f, PtypBinary),
+    PidTagReplyRecipientNames(0x0050, PtypString, PtypString8),
+    PidTagReceivedBySearchKey(0x0051, PtypBinary),
+    PidTagReceivedRepresentingSearchKey(0x0052, PtypBinary),
+    PidTagOriginalSenderName(0x005a, PtypString, PtypString8),
+    PidTagSentRepresentingAddressType(0x0064, PtypString, PtypString8),
+    PidTagSentRepresentingEmailAddress(0x0065, PtypString, PtypString8),
+    PidTagConversationTopic(0x0070, PtypString, PtypString8),
+    PidTagConversationIndex(0x0071, PtypBinary),
+    PidTagReceivedByAddressType(0x0075, PtypString, PtypString8),
+    PidTagReceivedByEmailAddress(0x0076, PtypString, PtypString8),
+    PidTagReceivedRepresentingAddressType(0x0077, PtypString, PtypString8),
+    PidTagReceivedRepresentingEmailAddress(0x0078, PtypString, PtypString8),
+    PidTagTransportMessageHeaders(0x007d, PtypString, PtypString8),
+    PidTagTnefCorrelationKey(0x007f, PtypBinary),
 
     // 0x0C00-0x0DFF Recipient property; reserved
-    PidTagSenderEntryId(0x0c19),
-    PidTagSenderName(0x0c1a),
-    PidTagSenderAddressType(0x0c1e),
-    PidTagRecipientType(0x0c15),
-    PidTagSenderSearchKey(0x0c1d),
-    PidTagSenderEmailAddress(0x0c1f),
+    PidTagSenderEntryId(0x0c19, PtypBinary),
+    PidTagSenderName(0x0c1a, PtypString, PtypString8),
+    PidTagSenderAddressType(0x0c1e, PtypString, PtypString8),
+    PidTagRecipientType(0x0c15, PtypInteger32),
+    PidTagSenderSearchKey(0x0c1d, PtypBinary),
+    PidTagSenderEmailAddress(0x0c1f, PtypString, PtypString8),
 
     // 0x0E00-0x0FFF Non-transmittable Message property; reserved
-    PidTagDisplayBcc(0x0e02),
-    PidTagDisplayCc(0x0e03),
-    PidTagDisplayTo(0x0e04),
-    PidTagMessageDeliveryTime(0x0e06),
-    PidTagMessageFlags(0x0e07),
-    PidTagResponsibility(0x0e0f),
-    PidTagHasAttachments(0x0e1b),
-    PidTagNormalizedSubject(0x0e1d),
-    PidTagRtfInSync(0x0e1f),
-    PidTagPrimarySendAccount(0x0e28),
-    PidTagNextSendAcct(0x0e29),
-    PidTagAccess(0x0ff4),
-    PidTagInstanceKey(0x0ff6),
-    PidTagAccessLevel(0x0ff7),
-    PidTagRecordKey(0x0ff9),
-    PidTagObjectType(0x0ffe),
-    PidTagEntryId(0x0fff),
+    PidTagDisplayBcc(0x0e02, PtypString, PtypString8),
+    PidTagDisplayCc(0x0e03, PtypString, PtypString8),
+    PidTagDisplayTo(0x0e04, PtypString, PtypString8),
+    PidTagMessageDeliveryTime(0x0e06, PtypTime),
+    PidTagMessageFlags(0x0e07, PtypInteger32),
+    PidTagResponsibility(0x0e0f, PtypBoolean),
+    PidTagHasAttachments(0x0e1b, PtypBoolean),
+    PidTagNormalizedSubject(0x0e1d, PtypString, PtypString8),
+    PidTagRtfInSync(0x0e1f, PtypBoolean),
+    PidTagPrimarySendAccount(0x0e28, PtypString, PtypString8),
+    PidTagNextSendAcct(0x0e29, PtypString, PtypString8),
+    PidTagAccess(0x0ff4, PtypInteger32),
+    PidTagInstanceKey(0x0ff6, PtypBinary),
+    PidTagAccessLevel(0x0ff7, PtypInteger32),
+    PidTagRecordKey(0x0ff9, PtypBinary),
+    PidTagObjectType(0x0ffe, PtypInteger32),
+    PidTagEntryId(0x0fff, PtypBinary),
 
     // 0x1000-0x2FFF Message content property; reserved
-    PidTagBody(0x1000),
-    PidTagRtfCompressed(0x1009),
-    PidTagInternetMessageId(0x1035),
-    PidTagOriginalMessageId(0x1046),
+    PidTagBody(0x1000, PtypString, PtypString8),
+    PidTagRtfCompressed(0x1009, PtypBinary),
+    PidTagBodyHtml(0x1013, PtypString, PtypString8),
+    PidTagHtml(0x1013, PtypBinary),
+    PidTagInternetMessageId(0x1035, PtypString, PtypString8),
+    PidTagOriginalMessageId(0x1046, PtypString, PtypString8),
 
     // 0x3000-0x33FF Multi-purpose property that can appear on all or most objects; reserved
-    PidTagRowid(0x3000),
-    PidTagDisplayName(0x3001),
-    PidTagAddressType(0x3002),
-    PidTagEmailAddress(0x3003),
-    PidTagCreationTime(0x3007),
-    PidTagLastModificationTime(0x3008),
-    PidTagSearchKey(0x300b),
+    PidTagRowid(0x3000, PtypInteger32),
+    PidTagDisplayName(0x3001, PtypString, PtypString8),
+    PidTagAddressType(0x3002, PtypString, PtypString8),
+    PidTagEmailAddress(0x3003, PtypString, PtypString8),
+    PidTagCreationTime(0x3007, PtypTime),
+    PidTagLastModificationTime(0x3008, PtypTime),
+    PidTagSearchKey(0x300b, PtypBinary),
+    PidTagTargetEntryId(0x3010, PtypBinary),
+    PidTagConversationId(0x3013, PtypBinary),
 
     // 0x3400-0x35FF Message store property; reserved
-    PidTagStoreSupportMask(0x340d),
+    PidTagStoreSupportMask(0x340d, PtypInteger32),
 
     // 0x3600-0x36FF Folder and address book container property; reserved
 
     // 0x3700-0x38FF Attachment property; reserved
-    PidTagAttachDataBinary(0x3701),
-    PidTagAttachEncoding(0x3702),
-    PidTagAttachExtension(0x3703),
-    PidTagAttachFilename(0x3704),
-    PidTagAttachMethod(0x3705),
-    PidTagAttachLongFilename(0x3707),
-    PidTagAttachRendering(0x3709),
-    PidTagRenderingPosition(0x370b),
-    PidTagAttachMimeTag(0x370e),
-    PidTagAttachContentId(0x3712),
-    PidTagAttachContentLocation(0x3713),
-    PidTagAttachFlags(0x3714),
+    PidTagAttachDataBinary(0x3701, PtypBinary),
+    PidTagAttachEncoding(0x3702, PtypBinary),
+    PidTagAttachExtension(0x3703, PtypString, PtypString8),
+    PidTagAttachFilename(0x3704, PtypString, PtypString8),
+    PidTagAttachMethod(0x3705, PtypInteger32),
+    PidTagAttachLongFilename(0x3707, PtypString, PtypString8),
+    PidTagAttachRendering(0x3709, PtypBinary),
+    PidTagAttachTag(0x370a, PtypBinary),
+    PidTagRenderingPosition(0x370b, PtypInteger32),
+    PidTagAttachMimeTag(0x370e, PtypString, PtypString8),
+    PidTagAttachContentId(0x3712, PtypString, PtypString8),
+    PidTagAttachContentLocation(0x3713, PtypString, PtypString8),
+    PidTagAttachFlags(0x3714, PtypInteger32),
 
     // 0x3900-0x39FF Address Book object property; reserved
-    PidTagSmtpAddress(0x39fe),
-    PidTagAddressBookDisplayNamePrintable(0x39ff),
+    PidTagDisplayType(0x3900, PtypInteger32),
+    PidTagDisplayTypeEx(0x3905, PtypInteger32),
+    PidTagSmtpAddress(0x39fe, PtypString, PtypString8),
+    PidTagAddressBookDisplayNamePrintable(0x39ff, PtypString, PtypString8),
 
     // 0x3A00 0x3BFF Mail user object property; reserved
-    PidTagLanguage(0x3a0c),
-    PidTagTransmittableDisplayName(0x3a20),
-    PidTagSendRichInfo(0x3a40),
+    PidTagAccount(0x3a00, PtypString, PtypString8),
+    PidTagLanguage(0x3a0c, PtypString, PtypString8),
+    PidTagTransmittableDisplayName(0x3a20, PtypString, PtypString8),
+    PidTagSendRichInfo(0x3a40, PtypBoolean),
 
     // 0x3C00 0x3CFF Distribution list property; reserved
 
@@ -109,48 +127,60 @@ public enum Pid {
 
     // 0x3E00 0x3EFF Status object property; reserved
 
-    PidTagInternetCodepage(0x3fde),
-    PidTagCreatorName(0x3ff8),
-    PidTagLastModifierName(0x3ffa),
+    PidTagInternetCodepage(0x3fde, PtypInteger32),
+    PidTagCreatorName(0x3ff8, PtypString, PtypString8),
+    PidTagCreatorEntryId(0x3ff9, PtypBinary),
+    PidTagLastModifierName(0x3ffa, PtypString, PtypString8),
+    PidTagLastModifierEntryId(0x3ffb, PtypBinary),
 
     // 0x4000 0x57FF Transport-defined envelope property
 
     // 0x5800 0x5FFF Transport-defined recipient property
-    PidTagSentRepresentingSmtpAddress(0x5d02),
-    PidTagReceivedBySmtpAddress(0x5d07),
-    PidTagReceivedRepresentingSmtpAddress(0x5d08),
-    PidTagRecipientEntryId(0x5ff7),
+    PidTagSenderSmtpAddress(0x5d01, PtypString, PtypString8),
+    PidTagSentRepresentingSmtpAddress(0x5d02, PtypString, PtypString8),
+    PidTagReceivedBySmtpAddress(0x5d07, PtypString, PtypString8),
+    PidTagReceivedRepresentingSmtpAddress(0x5d08, PtypString, PtypString8),
+    PidTagRecipientOrder(0x5fdf, PtypInteger32),
+    PidTagRecipientDisplayName(0x5ff6, PtypString, PtypString8),
+    PidTagRecipientEntryId(0x5ff7, PtypBinary),
+    PidTagRecipientFlags(0x5ffd, PtypInteger32),
+    PidTagRecipientTrackStatus(0x5fff, PtypInteger32),
 
     // 0x6000 0x65FF User-defined non-transmittable property
+    PidTagSourceKey(0x65e0, PtypBinary),
+    PidTagParentSourceKey(0x65e1, PtypBinary),
+    PidTagChangeKey(0x65e2, PtypBinary),
+    PidTagPredecessorChangeList(0x65e3, PtypBinary),
 
     // 0x6600 0x67FF Provider-defined internal non-transmittable property
 
     // 0x6800 0x7BFF Message class-defined content property
 
     // 0x7C00 0x7FFF Message class-defined non-transmittable property
-    PidTagAttachmentLinkId(0x7ffa),
-    PidTagExceptionStartTime(0x7ffb),
-    PidTagExceptionEndTime(0x7ffc),
-    PidTagAttachmentFlags(0x7ffd),
-    PidTagAttachmentHidden(0x7ffe),
-    PidTagAttachmentContactPhoto(0x7fff),
+    PidTagAttachmentLinkId(0x7ffa, PtypInteger32),
+    PidTagExceptionStartTime(0x7ffb, PtypTime),
+    PidTagExceptionEndTime(0x7ffc, PtypTime),
+    PidTagAttachmentFlags(0x7ffd, PtypInteger32),
+    PidTagAttachmentHidden(0x7ffe, PtypBoolean),
+    PidTagAttachmentContactPhoto(0x7fff, PtypBoolean),
 
     // 0x8000 0xFFFF Reserved for mapping to named properties. The exceptions to this rule are some of the address book tagged properties (those with names beginning with PidTagAddressBook). Many are static property ids but are in this range.
 
     Unknown(0);
 
     public final int id;
+    public final Set<Ptyp> typ;
 
-    Pid(int id) {
+    Pid(int id, Ptyp... typ) {
         this.id = id;
+        this.typ = Set.of(typ);
     }
 
-    public static Pid from(int id) {
-        for (Pid value : Pid.values()) {
-            if (value.id == id) {
-                return value;
-            }
-        }
-        return Unknown;
+    public static Pid from(int id, Ptyp typ) {
+        return Arrays.stream(Pid.values())
+                .filter(value -> value.id == id)
+                .filter(value -> value.typ.contains(typ))
+                .findFirst()
+                .orElse(Unknown);
     }
 }

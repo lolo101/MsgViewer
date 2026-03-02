@@ -3,7 +3,6 @@ package net.sourceforge.MSGViewer;
 import at.redeye.FrameWork.base.AutoLogger;
 import at.redeye.FrameWork.base.BaseDialog;
 import at.redeye.FrameWork.base.Root;
-import net.sourceforge.MSGViewer.rtfparser.ParseException;
 import com.auxilii.msgparser.Message;
 
 public class Internals extends BaseDialog {
@@ -13,10 +12,11 @@ public class Internals extends BaseDialog {
     private static final String MESSAGE_NOHTML_CODE = "This message does not contain HTML formatted code.";
     private static final String MESSAGE_UNPARSABLE_CODE = "Cannot extract HTML formatted code from RTF coded message.";
 
-    /** Creates new form Internals */
-    public Internals(Root root, final Message message)
-    {
-        super(root, root.MlM("Detail info") + ": " + (message.getSubject() != null ? message.getSubject() : root.getAppTitle()) );
+    /**
+     * Creates new form Internals
+     */
+    public Internals(Root root, final Message message) {
+        super(root, root.MlM("Detail info") + ": " + (message.getSubject() != null ? message.getSubject() : root.getAppName()));
 
         initComponents();
 
@@ -29,39 +29,30 @@ public class Internals extends BaseDialog {
         jTRTF.setText(message.getBodyRTF());
         jTRTF.setCaretPosition(0);
 
-        if ( message.getBodyRTF() != null && message.getBodyRTF().contains("\\fromhtml")) {
-            AutoLogger al = new AutoLogger(Internals.class.getName()) {
-
-                @Override
-                public void do_stuff() throws Exception {
-                    jTHTML.setText(extractHTMLFromRTF(message.getBodyRTF()));
-                }
-            };
-
-            if (al.isFailed()) {
-                jTHTML.setText(MlM(MESSAGE_UNPARSABLE_CODE));
-
-
-            }
-        } else if ( message.getBodyHtml() != null ) {
-             jTHTML.setText(message.getBodyHtml());
-        } else {
-            jTHTML.setText(MlM(MESSAGE_NOHTML_CODE));
-        }
-
+        jTHTML.setText(getText(message));
         jTHTML.setCaretPosition(0);
     }
 
+    private String getText(Message message) {
+        if (message.getBodyRTF() != null && message.getBodyRTF().contains("\\fromhtml")) {
+            return new AutoLogger<>(Internals.class.getName(),
+                    () -> ViewerHelper.extractHTMLFromRTF(message.getBodyRTF()).toString()
+            ).resultOrElse(MlM(MESSAGE_UNPARSABLE_CODE));
+        }
+        if (message.getBodyHtml() != null) {
+            return ViewerHelper.toHtmlSource(message.getBodyHtml()).toString();
+        }
+        return MlM(MESSAGE_NOHTML_CODE);
+    }
 
     @Override
-    public String getUniqueDialogIdentifier(Object requester)
-    {
+    public String getUniqueDialogIdentifier() {
         /*
          * dadurch können wir später den Titel ändern, ohne das sich dadurch
          * die Dialog ID verändert.
          */
-        if( dialog_id == null )
-         dialog_id = super.getUniqueDialogIdentifier(requester);
+        if (dialog_id == null)
+            dialog_id = super.getUniqueDialogIdentifier();
 
         return dialog_id;
     }
@@ -69,14 +60,14 @@ public class Internals extends BaseDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jTabbedPane1 = new javax.swing.JTabbedPane();
-        jScrollPane1 = new javax.swing.JScrollPane();
+        javax.swing.JTabbedPane jTabbedPane1 = new javax.swing.JTabbedPane();
+        javax.swing.JScrollPane jScrollPane1 = new javax.swing.JScrollPane();
         jTHeader = new javax.swing.JTextArea();
-        jScrollPane2 = new javax.swing.JScrollPane();
+        javax.swing.JScrollPane jScrollPane2 = new javax.swing.JScrollPane();
         jTPlain = new javax.swing.JTextArea();
-        jScrollPane3 = new javax.swing.JScrollPane();
+        javax.swing.JScrollPane jScrollPane3 = new javax.swing.JScrollPane();
         jTRTF = new javax.swing.JTextArea();
-        jScrollPane4 = new javax.swing.JScrollPane();
+        javax.swing.JScrollPane jScrollPane4 = new javax.swing.JScrollPane();
         jTHTML = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -119,24 +110,10 @@ public class Internals extends BaseDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTextArea jTHTML;
     private javax.swing.JTextArea jTHeader;
     private javax.swing.JTextArea jTPlain;
     private javax.swing.JTextArea jTRTF;
-    private javax.swing.JTabbedPane jTabbedPane1;
     // End of variables declaration//GEN-END:variables
-
-    private String extractHTMLFromRTF(String bodyText) throws ParseException {
-
-        HtmlFromRtf rtf2html = new HtmlFromRtf(bodyText);
-
-        return rtf2html.getHTML();
-    }
-
 }

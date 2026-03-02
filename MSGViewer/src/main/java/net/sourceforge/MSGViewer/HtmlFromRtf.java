@@ -2,20 +2,14 @@ package net.sourceforge.MSGViewer;
 
 import net.sourceforge.MSGViewer.rtfparser.ParseException;
 import net.sourceforge.MSGViewer.rtfparser.RTFParser;
+
 import java.io.StringReader;
 
-public class HtmlFromRtf
-{
-    final String htmlText;
+class HtmlFromRtf {
+    private final String rtf;
 
-    public HtmlFromRtf(String bodyText) throws ParseException
-    {
-        htmlText = extractHtml(bodyText);
-    }
-
-    public String getHTML()
-    {
-        return htmlText;
+    HtmlFromRtf(String rtf) {
+        this.rtf = rtf;
     }
 
     /*
@@ -39,11 +33,10 @@ public class HtmlFromRtf
 {\*\htmltag1 \par }
 {\*\htmltag241 <style>}
      *
-     *  So we will try to remove all leading { and } and removing all \htmltag and hoping the best
+     *  So we will try to remove all leading { and } and all \htmltag and hope for the best
      */
 
-    private String extractHtml(String rtf) throws ParseException
-    {
+    byte[] extractHtml() throws ParseException {
         RTFParser parser = new RTFParser(new StringReader(rtf));
 
         parser.parse();

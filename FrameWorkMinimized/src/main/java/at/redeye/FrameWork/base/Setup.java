@@ -1,162 +1,138 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package at.redeye.FrameWork.base;
 
+import static java.nio.file.StandardOpenOption.CREATE;
 import at.redeye.FrameWork.base.prm.bindtypes.DBConfig;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import at.redeye.FrameWork.base.prm.impl.*;
+import java.io.*;
+import java.nio.file.*;
+import java.util.Properties;
+import java.util.regex.Pattern;
+import org.apache.logging.log4j.*;
 
-import java.io.File;
+public class Setup {
 
+    private static final Logger logger = LogManager.getLogger(Setup.class);
+    private static final Pattern WINDOWS_OS_NAME = Pattern.compile(".*win.*", Pattern.CASE_INSENSITIVE);
+    public static final String WindowX = "WindowX";
+    public static final String WindowY = "WindowY";
+    public static final String WindowWidth = "WindowWidth";
+    public static final String WindowHeight = "WindowHeight";
 
-
-/**
- *
- * @author martin
- */
-public abstract class Setup {
-
-    static public final String USE_DB_CONNECTION_ALWAYS_FROM_JNLP="USE_DB_CONNECTION_ALWAYS_FROM_JNLP";
-    static public final String DBType = "DBType";
-    static public final String DBHost = "DBHost";
-    static public final String DBInstance = "DBInstance";
-    static public final String DBPort = "DBPort";
-    static public final String DBUser = "DBUser";
-    static public final String DBPasswd = "DBPasswd";
-    static public final String DBDatabase = "DBDatabase";
-    static public final String EncryptAllDBSettings = "ENCRYPT_ALL_DB_SETTINGS";
-    static public final String H1IPAddress = "H1IPAddress";
-    static public final String H1Port = "H1Port";
-    static public final String H1LTSAP = "H1LTSAP";
-    static public final String H1RTSAP = "H1RTSAP";
-
-    static public final String WindowX = "WindowX";
-    static public final String WindowY = "WindowY";
-    static public final String WindowWidth = "WindowWidth";
-    static public final String WindowHeight = "WindowHeight";
-
-    public static Logger logger = LogManager.getLogger(Setup.class);
-
-    private static final boolean b_is_win_system = System.getProperty("os.name").matches(".*[Ww][Ii][Nn].*");
-    private static final boolean b_is_win_7_system  = System.getProperty("os.name").matches("Windows 7");
+    private static final boolean b_is_win_system = WINDOWS_OS_NAME.matcher(System.getProperty("os.name")).matches();
     private static final boolean b_is_linux_system = System.getProperty("os.name").equals("Linux");
-    private static final boolean b_is_65bit_system = System.getProperty("os.arch").contains("64");
     private static final boolean b_is_mac = System.getProperty("os.name").toLowerCase().contains("mac");
-    private static final boolean b_is_sun = System.getProperty("os.name").toLowerCase().contains("sunos");
+    private final Path config_file;
+    private final Properties props;
 
-    public static boolean is_win_system()
-    {
+    protected Setup(Path userHome, String app_name) {
+        config_file = getAppConfigFile(userHome, app_name);
+
+        if (Files.exists(config_file)) {
+            props = loadProps();
+        } else {
+            props = new Properties();
+            writeAppConfigFile(props);
+        }
+    }
+
+    public static boolean is_win_system() {
         return b_is_win_system;
     }
 
-    public static boolean is_win_7_system()
-    {
-        return b_is_win_7_system;
-    }
-
-    public static boolean is_linux_system()
-    {
+    public static boolean is_linux_system() {
         return b_is_linux_system;
     }
 
-    public static boolean is_64bit_system()
-    {
-        return b_is_65bit_system;
-    }
-
-    public static boolean is_mac_system()
-    {
+    public static boolean is_mac_system() {
         return b_is_mac;
     }
 
-    public static boolean is_sun_system()
-    {
-        return b_is_sun;
-    }
+    public final void saveProps() {
+        try {
+            Properties oldProps = new Properties();
 
-    public static String getHiddenUserHomeFileName( String name )
-    {
-        String config_path = System.getProperty("user.home");
-
-        if( !is_win_system() )
-        {
-           name = "." + name;
-        }
-
-        return config_path + File.separator + name;
-    }
-
-    public static String getAppConfigDir( String app_name )
-    {
-        String name = getHiddenUserHomeFileName( app_name );
-
-        File file = new File(name);
-
-        if( !file.exists() )
-        {
-            if( !file.mkdirs() )
-            {
-                logger.error("failed createing directory" + name + " !!!");
-                name = null;
+            try (InputStream in = Files.newInputStream(config_file)) {
+                oldProps.load(in);
+            } catch (FileNotFoundException ex) {
+                logger.error(ex.toString());
             }
+
+            writeAppConfigFile(oldProps);
+
+        } catch (IOException ioe) {
+            System.err.println("Unhandled exception:");
+            ioe.printStackTrace();
         }
+    }
+
+    private static Path getAppConfigFile(Path userHome, String app_name) {
+        String file_name = app_name + ".properties";
+
+        Path dir = getAppConfigDir(userHome, app_name);
+
+        return dir.resolve(file_name);
+    }
+
+    public static Path getAppConfigDir(Path userHome, String app_name)
+    {
+        Path name = getHiddenUserHomeFileName(userHome, app_name);
+
+        try {
+            Files.createDirectories(name);
+        } catch (IOException ignored) {
+            logger.error("failed createing directory {} !!!", name);
+        }
+
         return name;
     }
 
-    public static String getAppConfigFile( String app_name, String file_name )
-    {
-        String dir = getAppConfigDir(app_name);
+    private static Path getHiddenUserHomeFileName(Path userHome, String name) {
 
-        return dir + File.separator + file_name;
+        if (!is_win_system()) {
+            name = "." + name;
+        }
+
+        return userHome.resolve(name);
     }
 
-    public String getConfig(DBConfig config) {
-        return getConfig( config.getConfigName(), config.getConfigValue() );
+    public String getConfig(String key, String default_value) {
+        return props.getProperty(key, default_value);
     }
 
-    public String getLocalConfig(DBConfig config) {
-        return getLocalConfig( config.getConfigName(), config.getConfigValue());
+    public void setLocalConfig(String key, String value) {
+        props.setProperty(key, value);
     }
 
-    public abstract String getLocalConfig( String key, String default_value );
+    private Properties loadProps() {
+        Properties properties = new Properties();
 
-    public abstract String getConfig( String key, String default_value );
+        try (InputStream in = Files.newInputStream(config_file)) {
+            properties.load(in);
+        } catch (IOException ioe) {
+            System.err.println("Unhandled exception:");
+            ioe.printStackTrace();
+        }
+        return properties;
+    }
 
-    public abstract DBConfig getConfig( String key);
+    private void writeAppConfigFile(Properties oldProps) {
+        for (String currKey : oldProps.stringPropertyNames()) {
+            DBConfig c = ConfigDefinitions.get(currKey);
+            if (c != null) {
+                PrmActionEvent event = new PrmActionEvent();
+                event.setOldPrmValue(oldProps.getProperty(currKey, ""));
+                event.setNewPrmValue(props.getProperty(currKey, ""));
+                event.setParameterName(currKey);
+                event.setPossibleVals(c.getPossibleValues());
+                c.updateListeners(event);
+            }
+        }
 
-    public abstract DBConfig getLocalConfig(String key);
-
-    /**
-     * set a local parameter in the config file
-     * @param key   key element
-     * @param value your data
-     * @param if_not_exists set it to true and the parameter won't be overwritten,
-     * if it already exists.
-     */
-    public abstract void setLocalConfig(String key, String value, boolean if_not_exists);
-
-    /**
-     * set a local parameter in the config file
-     * @param key   key element
-     * @param value your data
-     */
-    public abstract void setLocalConfig( String key, String value );
-
-    public abstract void setConfig( String key, String value, boolean if_not_exists );
-
-    public abstract void setConfig( String key, String value );
-
-    public void saveConfig() {}
-
-    /**
-     * @return true if this is the first start of this appliaction for this computer.
-     * simple checks, if the config file, of the appliaction already existed before, or not.
-     */
-    public boolean initialRun()
-    {
-        return false;
+        try (OutputStream out = Files.newOutputStream(config_file, CREATE)) {
+            props.store(out, "nix");
+        } catch (IOException ioe) {
+            System.err.println("Unhandled exception:");
+            ioe.printStackTrace();
+        }
     }
 }

@@ -1,21 +1,13 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package at.redeye.FrameWork.base.prm.impl;
 
 import at.redeye.FrameWork.base.prm.PrmDefaultChecksInterface;
-import at.redeye.SqlDBInterface.SqlDBIO.StmtExecInterface;
+import at.redeye.SqlDBInterface.SqlDBIO.DateTimeFormat;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-/**
- *
- * @author mmattl
- */
 public class PrmDefaultCheckSuite implements PrmDefaultChecksInterface {
 
 	private final Logger logger = LogManager.getLogger(PrmDefaultCheckSuite.class);
@@ -69,13 +61,11 @@ public class PrmDefaultCheckSuite implements PrmDefaultChecksInterface {
 
 		String[] validStr = { "ja", "nein", "true", "false", "yes", "no" };
 
-		for (int idx = 0; idx < validStr.length; idx++) {
-
+		for (String s : validStr) {
 			if (event.getNewPrmValue().toString().equalsIgnoreCase(
-					validStr[idx])) {
+					s)) {
 				return true;
 			}
-
 		}
 		logger.warn(event.getParameterName().toString()
 				+ ": Not a Yes/No (True/False) !");
@@ -86,10 +76,10 @@ public class PrmDefaultCheckSuite implements PrmDefaultChecksInterface {
 	private boolean passesHasAValueEqual(PrmActionEvent event) {
 
 		String[] values = event.getPossibleVals();
-		for (int idx = 0; idx < values.length; idx++) {
-			logger.trace("Checking " + values[idx] + " / "
+		for (String value : values) {
+			logger.trace("Checking " + value + " / "
 					+ event.getNewPrmValue().toString());
-			if (values[idx].equals(event.getNewPrmValue().toString())) {
+			if (value.equals(event.getNewPrmValue().toString())) {
 				return true;
 			}
 		}
@@ -100,107 +90,62 @@ public class PrmDefaultCheckSuite implements PrmDefaultChecksInterface {
 	}
 
 	private boolean passesDateTime(PrmActionEvent event, SimpleDateFormat sdf) {
-
 		try {
 			sdf.parse(event.getNewPrmValue().toString());
+			return true;
 		} catch (ParseException pe) {
 			logger.warn(event.getParameterName().toString()
 					+ ": Date and/or Time is not valid!\n" + pe.getMessage());
 			return false;
 		}
-
-		return true;
-
-	}
-
-	private boolean passesLookAndFeel(PrmActionEvent event) {
-
-		String[] validStr = { "metal", "system", "motif", "nimbus" };
-
-		for (int idx = 0; idx < validStr.length; idx++) {
-
-			if (event.getNewPrmValue().toString().equalsIgnoreCase(
-					validStr[idx])) {
-				return true;
-			}
-
-		}
-		logger.warn(event.getParameterName().toString()
-				+ ": Not a valid LookAndFeel value !");
-		return false;
-
 	}
 
 	public boolean doChecks(PrmActionEvent event) {
 
-		if ((checks2Execute & PRM_IS_DOUBLE) != 0) {
-			if (!passesDouble(event)) {
-				return false;
-			}
+		if (parameterType(PRM_IS_DOUBLE)) {
+			return passesDouble(event);
 		}
 
-		if ((checks2Execute & PRM_IS_LONG) != 0) {
-			if (!passesLong(event)) {
-				return false;
-			}
+		if (parameterType(PRM_IS_LONG)) {
+			return passesLong(event);
 		}
 
-		if ((checks2Execute & PRM_IS_BIT) != 0) {
-			if (!passesBit(event)) {
-				return false;
-			}
+		if (parameterType(PRM_IS_BIT)) {
+			return passesBit(event);
 		}
 
-		if ((checks2Execute & PRM_IS_TRUE_FALSE) != 0) {
-			if (!passesJaNein(event)) {
-				return false;
-			}
+		if (parameterType(PRM_IS_TRUE_FALSE)) {
+			return passesJaNein(event);
 		}
 
-		if ((checks2Execute & PRM_HAS_VALUE) != 0) {
-			if (!passesHasAValueEqual(event)) {
-				return false;
-			}
+		if (parameterType(PRM_HAS_VALUE)) {
+			return passesHasAValueEqual(event);
 		}
 
-		if ((checks2Execute & PRM_IS_DATE) != 0) {
-			SimpleDateFormat sdf = new SimpleDateFormat(
-					StmtExecInterface.SQLIF_STD_DATE_FORMAT);
-			if (!passesDateTime(event, sdf)) {
-				return false;
-			}
+		if (parameterType(PRM_IS_DATE)) {
+			SimpleDateFormat sdf = DateTimeFormat.SQLIF_STD_DATE_FORMAT.formatter();
+			return passesDateTime(event, sdf);
 		}
 
-		if ((checks2Execute & PRM_IS_TIME) != 0) {
-			SimpleDateFormat sdf = new SimpleDateFormat(
-					StmtExecInterface.SQLIF_STD_TIME_FORMAT);
-			if (!passesDateTime(event, sdf)) {
-				return false;
-			}
+		if (parameterType(PRM_IS_TIME)) {
+			SimpleDateFormat sdf = DateTimeFormat.SQLIF_STD_TIME_FORMAT.formatter();
+			return passesDateTime(event, sdf);
 		}
 
-		if ((checks2Execute & PRM_IS_SHORTTIME) != 0) {
-			SimpleDateFormat sdf = new SimpleDateFormat(
-					StmtExecInterface.SQLIF_STD_SHORTTIME_FORMAT);
-			if (!passesDateTime(event, sdf)) {
-				return false;
-			}
+		if (parameterType(PRM_IS_SHORTTIME)) {
+			SimpleDateFormat sdf = DateTimeFormat.SQLIF_STD_SHORTTIME_FORMAT.formatter();
+			return passesDateTime(event, sdf);
 		}
 
-		if ((checks2Execute & PRM_IS_DATETIME) != 0) {
-			SimpleDateFormat sdf = new SimpleDateFormat(
-					StmtExecInterface.SQLIF_STD_DATE_FORMAT + " "
-							+ StmtExecInterface.SQLIF_STD_TIME_FORMAT);
-			if (!passesDateTime(event, sdf)) {
-				return false;
-			}
+		if (parameterType(PRM_IS_DATETIME)) {
+			SimpleDateFormat sdf = DateTimeFormat.SQLIF_STD_DATETIME_FORMAT.formatter();
+			return passesDateTime(event, sdf);
 		}
 
-		if ((checks2Execute & PRM_IS_LOOKANDFEEL) != 0) {
-			if (!passesLookAndFeel(event)) {
-				return false;
-			}
-		}
 		return true;
+	}
+
+	private boolean parameterType(long type) {
+		return (checks2Execute & type) != 0;
 	}
 }
