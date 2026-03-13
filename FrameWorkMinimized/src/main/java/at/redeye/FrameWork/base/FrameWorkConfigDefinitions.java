@@ -30,7 +30,7 @@ public class FrameWorkConfigDefinitions {
     public static final DBConfig OpenCommand = new DBConfig("OpenCommand", "xdg-open", "Kommando für das öffnen einer Datei, oder eines Verzeichnisses");
 
     public static void registerDefinitions() {
-        ConfigDefinitions.add_help_path("/at/redeye/FrameWork/base/resources/Help/Params/");
+        ConfigDefinitions.add_help_path("/Help/Params/");
 
         addLocal(HelpParamColorEven);
         addLocal(HelpParamColorOdd);

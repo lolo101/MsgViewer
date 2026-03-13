@@ -9,22 +9,17 @@ public class HelpWin extends BaseDialog {
 
     private static final long serialVersionUID = 1L;
 
-    private final String base;
+    private final String base = "/Help";
     private final HelpWinHook hook;
 
     public HelpWin(Root root, String ModuleName) {
-        this(root, "/Help", ModuleName);
+        this(root, ModuleName, null);
     }
 
-    public HelpWin(Root root, String Base, String ModuleName) {
-        this(root, Base, ModuleName, null);
-    }
-
-    public HelpWin(Root root, String Base, String ModuleName, HelpWinHook hook) {
+    public HelpWin(Root root, String ModuleName, HelpWinHook hook) {
         super(root, "Hilfe");
 
         this.hook = hook;
-        base = Base;
 
         initComponents();
 

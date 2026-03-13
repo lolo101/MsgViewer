@@ -139,7 +139,7 @@ private void jBHelpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:
     HelpWinHook hook = new ConfigParamHook(root, "LOCALSETTINGSHOOOK",
             ConfigDefinitions.help_search_path);
 
-    invokeDialog(new HelpWin(root, "/at/redeye/FrameWork/base/resources/Help/", "LocalConfig", hook));
+    invokeDialog(new HelpWin(root, "LocalConfig", hook));
 
 }//GEN-LAST:event_jBHelpActionPerformed
 

@@ -13,4 +13,7 @@ module FrameWorkMinimized {
     exports at.redeye.FrameWork.utilities;
     exports at.redeye.FrameWork.widgets;
     exports at.redeye.FrameWork.widgets.helpwindow;
+
+    opens at.redeye.FrameWork.base.resources.icons;
+    opens at.redeye.FrameWork.base.resources.pictures;
 }

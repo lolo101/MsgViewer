@@ -4,7 +4,11 @@ import at.redeye.FrameWork.base.BaseDialog;
 import at.redeye.FrameWork.base.Root;
 import at.redeye.FrameWork.widgets.helpwindow.HelpWin;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class About extends BaseDialog {
 
@@ -18,6 +22,11 @@ public class About extends BaseDialog {
         jLVersion.setText(MlM("Version") + " " + version);
     }
 
+    private static ImageIcon getIcon(Module module, String name) throws IOException {
+        InputStream resource = module.getResourceAsStream(name);
+        Image image = ImageIO.read(resource);
+        return new ImageIcon(image);
+    }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -35,23 +44,36 @@ public class About extends BaseDialog {
         jLTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLTitle.setText("About Redeye Barcode Editor");
 
-        jBCancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/at/redeye/FrameWork/base/resources/icons/fileclose.gif"))); // NOI18N
         jBCancel.setText("Close");
         jBCancel.addActionListener(this::jBCancelActionPerformed);
 
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/at/redeye/FrameWork/base/resources/pictures/redeye.png"))); // NOI18N
 
         jLVersion.setFont(new java.awt.Font("Dialog", Font.BOLD, 14)); // NOI18N
         jLVersion.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLVersion.setText("Version");
 
-        jBLicence.setIcon(new javax.swing.ImageIcon(getClass().getResource("/at/redeye/FrameWork/base/resources/icons/history.png"))); // NOI18N
         jBLicence.setText("Licence");
         jBLicence.addActionListener(this::jBLicenceActionPerformed);
 
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("Licence: GPL Version 3");
+
+        ModuleLayer.boot().findModule("FrameWorkMinimized").ifPresentOrElse(
+                module -> {
+                    try {
+                        jBCancel.setIcon(getIcon(module, "/at/redeye/FrameWork/base/resources/icons/fileclose.gif"));
+                        jLabel1.setIcon(getIcon(module, "/at/redeye/FrameWork/base/resources/pictures/redeye.png"));
+                        jBLicence.setIcon(getIcon(module, "/at/redeye/FrameWork/base/resources/icons/history.png"));
+                    } catch (IOException ignore) {
+                    }
+                },
+                () -> {
+                    jBCancel.setIcon(new ImageIcon(getClass().getResource("/at/redeye/FrameWork/base/resources/icons/fileclose.gif")));
+                    jLabel1.setIcon(new ImageIcon(getClass().getResource("/at/redeye/FrameWork/base/resources/pictures/redeye.png")));
+                    jBLicence.setIcon(new ImageIcon(getClass().getResource("/at/redeye/FrameWork/base/resources/icons/history.png")));
+                }
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);

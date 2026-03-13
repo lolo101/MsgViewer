@@ -223,7 +223,7 @@ public class TranslationDialog extends BaseDialog {
 
         adjustScrollingSpeed(jScrollPane1);
 
-        registerHelpWin(() -> invokeDialogUnique(new HelpWin(root, "/at/redeye/FrameWork/base/translation/resources/Help", "TranslationDialog")));
+        registerHelpWin(() -> invokeDialogUnique(new HelpWin(root, "TranslationDialog")));
     }
 
     private String getTitle(String name) {
