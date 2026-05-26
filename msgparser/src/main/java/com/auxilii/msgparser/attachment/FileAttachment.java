@@ -52,7 +52,7 @@ public class FileAttachment implements Attachment {
     /**
      * The attachment itself as a byte array.
      */
-    private byte[] data;
+    private byte[] data = new byte[0];
 
     /**
      * AttachContentId
