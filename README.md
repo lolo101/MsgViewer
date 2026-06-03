@@ -8,21 +8,30 @@ This project is a fork of <https://sourceforge.net/projects/msgviewer>
 
 It has been Mavenized, and support for .eml to .msg has been added.
 
-## Build
+## Technical instructions
 
-In order to build this project, make sure to have JDK 17+ installed, then clone the project sources:
+### Build
 
-`git clone https://github.com/lolo101/MsgViewer.git`
+In order to build this project, make sure to have JDK 17+ installed, then clone the project sources and build the
+executable jar:
 
-cd to the project directory:
+```shell
+git clone https://github.com/lolo101/MsgViewer.git
+cd MsgViewer
+./mvnw package
+```
 
-`cd MsgViewer`
+The build will generate a number of files. The main file is an 'uber-jar' placed under **MSGViewer/target** directory.
 
-then run the Maven build:
+### Release
 
-`./mvnw package`
+We use the Maven release plugin to manage project version update and Git tagging
 
-Building will generate a number of files. The main file is an 'uber-jar' placed under **MSGViewer/target** directory.
+```shell
+mvn release:prepare
+```
+
+Then we rely on the `.github/workflows/release.yml` GitHub action to trigger a GitHub release.
 
 ## Command Line
 
