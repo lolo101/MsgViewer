@@ -51,6 +51,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
             this.key = key;
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             listen_key_events.get(key).forEach(Runnable::run);
         }
@@ -96,20 +97,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
      * Setzt den Sanduhr Mauscursor
      */
     public void setWaitCursor() {
-        setWaitCursor(true);
-    }
-
-    /**
-     * Setzt den Sanduhr, oder "normale" Mauscursor
-     *
-     * @param state <b>true</b> für die Sanduhr und <b>false</b> für den nurmalen
-     *              Cursor
-     */
-    public void setWaitCursor(boolean state) {
-        if (state)
-            parent.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        else
-            parent.setCursor(Cursor.getDefaultCursor());
+        parent.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
     }
 
     /**
@@ -405,16 +393,14 @@ public class BaseDialogBaseHelper implements BindVarInterface {
         logger.info("position now: {}x{}", parent.getX(), parent.getY());
 
         if (w > 0 && h > 0 && parent.openWithLastWidthAndHeight()) {
-            logger.info(String.format("x (%d) + w (%d) = %d dim.Width: %d", x,
-                    w, x + w, (int) dim.getWidth()));
+            logger.info("x ({}) + w ({}) = {} dim.Width: {}", x, w, x + w, (int) dim.getWidth());
 
             if (x + w > dim.getWidth()) {
                 logger.info("reducing with");
                 w = (int) dim.getWidth() - x;
             }
 
-            logger.info(String.format("y (%d) + h (%d) = %d dim.Height: %d", y,
-                    h, y + h, (int) dim.getHeight()));
+            logger.info("y ({}) + h ({}) = {} dim.Height: {}", y, h, y + h, (int) dim.getHeight());
 
             if (y + h > dim.getHeight()) {
                 logger.info("reducing height");
@@ -460,8 +446,8 @@ public class BaseDialogBaseHelper implements BindVarInterface {
     /**
      * Setzt wieder den "normalen" Mauscursor
      */
-    private void setNormalCursor() {
-        setWaitCursor(false);
+    public void setNormalCursor() {
+        parent.setCursor(Cursor.getDefaultCursor());
     }
 
     private static void adjustScrollingSpeed(Adjustable scrollBar, DBConfig config) {

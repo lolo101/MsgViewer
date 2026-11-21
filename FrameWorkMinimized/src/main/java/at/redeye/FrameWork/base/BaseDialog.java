@@ -11,11 +11,9 @@ import java.util.Collection;
 public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
         BaseDialogBase {
 
-    private static final long serialVersionUID = 1L;
-
     private final BaseDialogBaseHelper helper;
     private JRootPane myrootPane;
-    public static Logger logger = LogManager.getLogger(BaseDialog.class);
+    public static final Logger logger = LogManager.getLogger(BaseDialog.class);
     public final Root root;
 
     public BaseDialog(Root root, String title) {
@@ -149,7 +147,7 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
     }
 
     public void setNormalCursor() {
-        helper.setWaitCursor(false);
+        helper.setNormalCursor();
     }
 
     /**
