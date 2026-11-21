@@ -3,7 +3,7 @@
 ##################################
 ## OSX Packager for MSG Viewer
 ## 
-## This requires JDK 14 or higher
+## This requires JDK 21 or higher
 ##################################
 
 echo "Building app.."

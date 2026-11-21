@@ -12,7 +12,7 @@ It has been Mavenized, and support for .eml to .msg has been added.
 
 ### Build
 
-In order to build this project, make sure to have JDK 17+ installed, then clone the project sources and build the
+In order to build this project, make sure to have JDK 21+ installed, then clone the project sources and build the
 executable jar:
 
 ```shell
