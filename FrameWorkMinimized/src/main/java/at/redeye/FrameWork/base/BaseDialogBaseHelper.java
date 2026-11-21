@@ -10,8 +10,6 @@ import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.*;
 import java.util.List;
@@ -35,7 +33,6 @@ public class BaseDialogBaseHelper implements BindVarInterface {
      * All keys ESC, or F1, F2 listeners are registered in this container
      */
     private final Map<KeyStroke, Vector<Runnable>> listen_key_events = new HashMap<>();
-    private final JRootPane myrootPane;
     private Runnable HelpWinRunnable;
     private final UniqueDialogHelper unique_dialog_helper = new UniqueDialogHelper();
     private TranslationHelper translation_helper;
@@ -44,27 +41,13 @@ public class BaseDialogBaseHelper implements BindVarInterface {
     private static int default_pos_x = 300;
     private static int default_pos_y = 300;
 
-    private class ActionKeyListener implements ActionListener {
-        private final KeyStroke key;
-
-        private ActionKeyListener(KeyStroke key) {
-            this.key = key;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            listen_key_events.get(key).forEach(Runnable::run);
-        }
-    }
-
     private final BaseDialogBase parent;
 
     public BaseDialogBaseHelper(final BaseDialogBase parent, Root root,
-                                String title, JRootPane myrootPane, boolean do_not_inform_root) {
+                                String title, boolean do_not_inform_root) {
         this.parent = parent;
         this.root = root;
         this.title = title;
-        this.myrootPane = myrootPane;
         this.close_subdialog_helper = new CloseSubDialogHelper(parent);
 
         initCommon(do_not_inform_root);
@@ -251,15 +234,7 @@ public class BaseDialogBaseHelper implements BindVarInterface {
      */
     public void registerActionKeyListener(KeyStroke to_listen_Key,
                                           Runnable runnable) {
-        Vector<Runnable> listeners = listen_key_events.get(to_listen_Key);
-
-        if (listeners == null) {
-            listeners = new Vector<>();
-            listen_key_events.put(to_listen_Key, listeners);
-
-            registerActionKeyListenerOnRootPane(to_listen_Key);
-        }
-
+        Vector<Runnable> listeners = listen_key_events.computeIfAbsent(to_listen_Key, k -> new Vector<>());
         listeners.add(runnable);
     }
 
@@ -461,14 +436,6 @@ public class BaseDialogBaseHelper implements BindVarInterface {
         }
 
         scrollBar.setUnitIncrement(i);
-    }
-
-    private void registerActionKeyListenerOnRootPane(KeyStroke key) {
-        if (myrootPane == null)
-            return;
-
-        myrootPane.registerKeyboardAction(new ActionKeyListener(key), key,
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
     private void setBindVarsChanged() {

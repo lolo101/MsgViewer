@@ -12,7 +12,6 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
         BaseDialogBase {
 
     private final BaseDialogBaseHelper helper;
-    private JRootPane myrootPane;
     public static final Logger logger = LogManager.getLogger(BaseDialog.class);
     public final Root root;
 
@@ -22,7 +21,7 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
 
     public BaseDialog(Root root, String title, boolean do_not_inform_root) {
         this.root = root;
-        helper = new BaseDialogBaseHelper(this, root, title, myrootPane,
+        helper = new BaseDialogBaseHelper(this, root, title,
                 do_not_inform_root);
     }
 
@@ -62,13 +61,6 @@ public class BaseDialog extends javax.swing.JFrame implements BindVarInterface,
     protected final void registerActionKeyListener(KeyStroke to_listen_Key,
                                                    Runnable runnable) {
         helper.registerActionKeyListener(to_listen_Key, runnable);
-    }
-
-    @Override
-    protected JRootPane createRootPane() {
-        myrootPane = super.createRootPane();
-
-        return myrootPane;
     }
 
     /**

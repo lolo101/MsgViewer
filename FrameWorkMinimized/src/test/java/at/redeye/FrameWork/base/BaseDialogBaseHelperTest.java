@@ -25,7 +25,7 @@ class BaseDialogBaseHelperTest {
         int mouseY = 231;
         when(parent.mousePosition()).thenReturn(new Point(mouseX, mouseY));
 
-        new BaseDialogBaseHelper(parent, root, "title", null, true);
+        new BaseDialogBaseHelper(parent, root, "title", true);
 
         verify(parent).setBounds(mouseX - 100, mouseY - 100, 0, 0);
     }

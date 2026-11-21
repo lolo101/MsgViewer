@@ -7,8 +7,6 @@ import java.util.Collection;
 public class BaseDialogDialog extends javax.swing.JDialog implements
         BindVarInterface, BaseDialogBase {
 
-    private static final long serialVersionUID = 1L;
-
     private final BaseDialogBaseHelper helper;
 
     public BaseDialogDialog(JFrame owner, Root root, String title) {
@@ -19,7 +17,7 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
                              boolean do_not_inform_root) {
         super(owner);
 
-        helper = new BaseDialogBaseHelper(this, root, title, null,
+        helper = new BaseDialogBaseHelper(this, root, title,
                 do_not_inform_root);
     }
 
@@ -29,6 +27,7 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
      *
      * @return true if the size of the dialog should be stored
      */
+    @Override
     public boolean openWithLastWidthAndHeight() {
         return !Setup.is_win_system();
     }
@@ -41,6 +40,7 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
     /**
      * closes the current dialog.
      */
+    @Override
     public void close() {
         helper.close();
     }
@@ -50,6 +50,7 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
      *
      * @return true if the dialog can be closed
      */
+    @Override
     public boolean canClose() {
         return true;
     }
@@ -65,6 +66,7 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
      *            dann der demenstprechende Inhalt entweder vom GUI zu
      *            Variablen, oder umgekehrt übertragen.
      */
+    @Override
     public void bindVar(JTextField jtext, StringBuffer var) {
         helper.bindVar(jtext, var);
     }
@@ -86,22 +88,27 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
         helper.gui_to_var();
     }
 
+    @Override
     public void invokeDialogUnique(BaseDialogBase dialog) {
         helper.invokeDialogUnique(dialog);
     }
 
+    @Override
     public void registerOnCloseListener(Runnable runnable) {
         helper.registerOnCloseListener(runnable);
     }
 
+    @Override
     public boolean closeSubdialogsOnClose() {
         return true;
     }
 
+    @Override
     public Container getContainer() {
         return this;
     }
 
+    @Override
     public Collection<Pair> getBindVarPairs() {
         return helper.getBindVarPairs();
     }
@@ -114,6 +121,7 @@ public class BaseDialogDialog extends javax.swing.JDialog implements
      * each one has a different title.
      */
 
+    @Override
     public String getUniqueDialogIdentifier() {
         return getTitle();
     }
