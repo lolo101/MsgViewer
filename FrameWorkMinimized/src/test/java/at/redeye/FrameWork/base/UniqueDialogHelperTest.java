@@ -1,16 +1,25 @@
 package at.redeye.FrameWork.base;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.awt.*;
+
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 class UniqueDialogHelperTest {
 
     private static final Root ROOT = new Root("test");
+
+    @BeforeAll
+    static void disableWhenHeadless() {
+        assumeFalse(GraphicsEnvironment.isHeadless());
+    }
 
     @Test
     void should_return_dialog_instance() {

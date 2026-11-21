@@ -2,12 +2,21 @@ package net.sourceforge.MSGViewer;
 
 import at.redeye.FrameWork.base.BaseDialog;
 import at.redeye.FrameWork.base.Root;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
+import java.awt.*;
 
 import static net.sourceforge.MSGViewer.ViewerPanel.FILE_NAME_PROPERTY;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 class ViewerPanelTest {
+    @BeforeAll
+    static void disableWhenHeadless() {
+        assumeFalse(GraphicsEnvironment.isHeadless());
+    }
+
     private String fileName;
 
     @Test

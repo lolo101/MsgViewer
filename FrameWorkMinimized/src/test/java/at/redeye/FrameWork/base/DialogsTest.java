@@ -1,10 +1,18 @@
 package at.redeye.FrameWork.base;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.awt.*;
+
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.mockito.Mockito.*;
 
 class DialogsTest {
+    @BeforeAll
+    static void disableWhenHeadless() {
+        assumeFalse(GraphicsEnvironment.isHeadless());
+    }
 
     @Test
     void should_close_app_when_all_dialgs_closed() {
