@@ -16,7 +16,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v6
         with:
-          java-version: '21.0.13'
+          java-version: '21.0.13+100000002.0.LTS'
           distribution: 'temurin'
 
       - name: Build with Maven
