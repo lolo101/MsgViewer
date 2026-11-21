@@ -1,9 +1,9 @@
-version: 2
-jobs:
-  build:
-    docker:
-      - image: cimg/openjdk:25.0.5-browsers
+version: 2.1
 
-    steps:
-      - checkout
-      - run: mvn test
+orbs:
+  maven: circleci/maven@2.4.1
+
+workflows:
+  maven_test:
+    jobs:
+      - maven/test
