@@ -516,7 +516,6 @@ public class ShowNode extends BaseDialog {
         StringBuilder s_guid = new StringBuilder();
         StringBuilder sb = new StringBuilder();
 
-        // 15 Bytes GUID
         for (int i = voffset + 1; i >= voffset; i--) {
             s_guid.append(formatByte0S(bytes[i]));
         }

@@ -9,10 +9,7 @@ import com.auxilii.msgparser.Ptyp;
 import org.apache.poi.poifs.filesystem.*;
 
 import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.MutableTreeNode;
-import javax.swing.tree.TreePath;
+import javax.swing.tree.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.io.*;
@@ -52,33 +49,32 @@ public class MSGNavigator extends BaseDialog {
         try (InputStream in = new FileInputStream(file)) {
             fs = new POIFSFileSystem(in);
             DirectoryNode fs_root = fs.getRoot();
-
-            DefaultMutableTreeNode localRoot = new DefaultMutableTreeNode(fs_root.getShortDescription());
-
-            parse(localRoot, fs_root);
-
+            TreeNode localRoot = parseRoot(fs_root);
             tree.setModel(new DefaultTreeModel(localRoot));
         }
     }
 
-    private void parse(DefaultMutableTreeNode root_node, DirectoryEntry fs_root) throws IOException {
-        for (Entry entry : fs_root) {
-            root_node.add(toNode(entry));
+    private TreeNode parseRoot(DirectoryNode fs_root) throws IOException {
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode(fs_root.getShortDescription());
+        parse(root, fs_root);
+        return root;
+    }
+
+    private void parse(DefaultMutableTreeNode localRoot, Iterable<Entry> entries) throws IOException {
+        for (Entry entry : entries) {
+            localRoot.add(toNode(entry));
         }
     }
 
     private MutableTreeNode toNode(Entry entry) throws IOException {
-        if (entry.isDirectoryEntry()) {
-            return parseDirectory((DirectoryEntry) entry);
-        }
-        DocumentEntry de = (DocumentEntry) entry;
-        if (de.getName().startsWith(Ptyp.SUBSTORAGE_PREFIX)) {
-            return parseSubStrorage(de);
-        }
-        if (de.getName().equals(PROPERTIES_ENTRY)) {
-            return parseProperties(de);
-        }
-        return new DefaultMutableTreeNode(de.getName());
+        return switch (entry) {
+            case DirectoryEntry directoryEntry -> parseDirectory(directoryEntry);
+            case DocumentEntry documentEntry when documentEntry.getName().startsWith(Ptyp.SUBSTORAGE_PREFIX) ->
+                    parseSubStrorage(documentEntry);
+            case DocumentEntry documentEntry when documentEntry.getName().equals(PROPERTIES_ENTRY) ->
+                    parseProperties(documentEntry);
+            default -> new DefaultMutableTreeNode(entry.getName());
+        };
     }
 
     private MutableTreeNode parseDirectory(DirectoryEntry entry) throws IOException {
@@ -103,11 +99,11 @@ public class MSGNavigator extends BaseDialog {
         }
 
         Object data = info.getData();
-        if (data instanceof String) {
-            sb.append("     <i>").append(StringUtils.limitLength((String) data, 100)).append("</i>");
+        if (data instanceof String stringValue) {
+            sb.append("<i>").append(StringUtils.limitLength(stringValue, 100)).append("</i>");
         }
         if (data instanceof byte[]) {
-            sb.append("     <i style=\"color: dd5555\">byte array</i>");
+            sb.append("<i style=\"color: dd5555\">byte array</i>");
         }
         sb.append("</body></html>");
         return new TreeNodeContainer(de, sb.toString(), data);
@@ -117,7 +113,7 @@ public class MSGNavigator extends BaseDialog {
         TreeNodeContainer node = toNode(de);
         PropertyParser pp = new PropertyParser(de);
         for (String tag : pp.getPropertyTags()) {
-            TreeNodeContainer pnode = new TreeNodeContainer(de,
+            var pnode = new TreeNodeContainer(de,
                     "<html><body><pre style=\"font-family: monospace; fonz-size:8px\">" + tag + "</pre></body></html>",
                     null);
             node.add(pnode);
@@ -144,6 +140,7 @@ public class MSGNavigator extends BaseDialog {
 
         tree.setFont(new java.awt.Font("Monospaced", Font.PLAIN, 15)); // NOI18N
         tree.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 treeMouseClicked(evt);
             }
