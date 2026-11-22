@@ -12,39 +12,44 @@ import org.apache.poi.hmef.CompressedRTF;
 
 import java.awt.*;
 import java.io.ByteArrayInputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 import static java.util.Map.entry;
 
 public class ShowNode extends BaseDialog {
 
-    private static final long serialVersionUID = 3130592579862038804L;
     private static final Pattern NAMED_PROPERTY_SUBSTORAGE = Pattern.compile("__substg1\\.0_\\d{4}0102");
     private static final int PROPATTR_MANDATORY = 0x00000001;
     private static final int PROPATTR_READABLE = 0x00000002;
     private static final int PROPATTR_WRITABLE = 0x00000004;
-    private static final Map<String, String> PROPERTY_SETS = Map.ofEntries(
-            entry("00020329-0000-0000-C000-000000000046", "PS_PUBLIC_STRINGS"),
-            entry("00062008-0000-0000-C000-000000000046", "PSETID_Common"),
-            entry("00062004-0000-0000-C000-000000000046", "PSETID_Address"),
-            entry("00020386-0000-0000-C000-000000000046", "PS_INTERNET_HEADERS"),
-            entry("00062002-0000-0000-C000-000000000046", "PSETID_Appointment"),
-            entry("6ED8DA90-450B-101B-98DA-00AA003F1305", "PSETID_Meeting"),
-            entry("0006200A-0000-0000-C000-000000000046", "PSETID_Log"),
-            entry("41F28F13-83F4-4114-A584-EEDB5A6B0BFF", "PSETID_Messaging"),
-            entry("0006200E-0000-0000-C000-000000000046", "PSETID_Note"),
-            entry("00062041-0000-0000-C000-000000000046", "PSETID_PostRss"),
-            entry("00062003-0000-0000-C000-000000000046", "PSETID_Task"),
-            entry("4442858E-A9E3-4E80-B900-317A210CC15B", "PSETID_UnifiedMessaging"),
-            entry("00020328-0000-0000-C000-000000000046", "PS_MAPI"),
-            entry("71035549-0739-4DCB-9163-00F0580DBBDF", "PSETID_AirSync"),
-            entry("00062040-0000-0000-C000-000000000046", "PSETID_Sharing"),
-            entry("23239608-685D-4732-9C55-4C95CB4E8E33", "PSETID_XmlExtractedEntities"),
-            entry("96357F7F-59E1-47D0-99A7-46515C183B54", "PSETID_Attachment"));
+    private static final Map<UUID, String> PROPERTY_SETS = Map.ofEntries(
+            entry(UUID.fromString("00020328-0000-0000-C000-000000000046"), "PS_MAPI"),
+            entry(UUID.fromString("00020329-0000-0000-C000-000000000046"), "PS_PUBLIC_STRINGS"),
+            entry(UUID.fromString("00020386-0000-0000-C000-000000000046"), "PS_INTERNET_HEADERS"),
+            entry(UUID.fromString("00062002-0000-0000-C000-000000000046"), "PSETID_Appointment"),
+            entry(UUID.fromString("00062003-0000-0000-C000-000000000046"), "PSETID_Task"),
+            entry(UUID.fromString("00062004-0000-0000-C000-000000000046"), "PSETID_Address"),
+            entry(UUID.fromString("00062008-0000-0000-C000-000000000046"), "PSETID_Common"),
+            entry(UUID.fromString("0006200A-0000-0000-C000-000000000046"), "PSETID_Log"),
+            entry(UUID.fromString("0006200E-0000-0000-C000-000000000046"), "PSETID_Note"),
+            entry(UUID.fromString("00062013-0000-0000-C000-000000000046"), "PSETID_Report"),
+            entry(UUID.fromString("00062014-0000-0000-C000-000000000046"), "PSETID_Remote"),
+            entry(UUID.fromString("00062040-0000-0000-C000-000000000046"), "PSETID_Sharing"),
+            entry(UUID.fromString("00062041-0000-0000-C000-000000000046"), "PSETID_PostRss"),
+            entry(UUID.fromString("6ED8DA90-450B-101B-98DA-00AA003F1305"), "PSETID_Meeting"),
+            entry(UUID.fromString("41F28F13-83F4-4114-A584-EEDB5A6B0BFF"), "PSETID_Messaging"),
+            entry(UUID.fromString("11000E07-B51B-40D6-AF21-CAA85EDAB1D0"), "PSETID_CalendarAssistant"),
+            entry(UUID.fromString("4442858E-A9E3-4E80-B900-317A210CC15B"), "PSETID_UnifiedMessaging"),
+            entry(UUID.fromString("71035549-0739-4DCB-9163-00F0580DBBDF"), "PSETID_AirSync"),
+            entry(UUID.fromString("23239608-685D-4732-9C55-4C95CB4E8E33"), "PSETID_XmlExtractedEntities"),
+            entry(UUID.fromString("96357F7F-59E1-47D0-99A7-46515C183B54"), "PSETID_Attachment"));
 
     private final int max_descr_lenght;
 
@@ -96,17 +101,19 @@ public class ShowNode extends BaseDialog {
     // End of variables declaration//GEN-END:variables
 
     private String show_entry(String name, TreeNodeContainer cont) {
-        if (name.equals("__properties_version1.0")) {
-            return show_properties_entry(cont);
-        }
-        if (name.equals(Ptyp.SUBSTORAGE_PREFIX + "00020102")) {
-            return show_guid_stream(cont);
-        }
-        if (name.equals(Ptyp.SUBSTORAGE_PREFIX + "00030102")) {
-            return show_entry_stream(cont);
-        }
-        if (name.equals(Ptyp.SUBSTORAGE_PREFIX + "00040102")) {
-            return show_string_stream(cont);
+        switch (name) {
+            case "__properties_version1.0" -> {
+                return show_properties_entry(cont);
+            }
+            case Ptyp.SUBSTORAGE_PREFIX + "00020102" -> {
+                return show_guid_stream(cont);
+            }
+            case Ptyp.SUBSTORAGE_PREFIX + "00030102" -> {
+                return show_entry_stream(cont);
+            }
+            case Ptyp.SUBSTORAGE_PREFIX + "00040102" -> {
+                return show_string_stream(cont);
+            }
         }
         if (NAMED_PROPERTY_SUBSTORAGE.matcher(name).matches() &&
                 cont.getEntry().getParent().getName().equals("__nameid_version1.0")) {
@@ -282,71 +289,36 @@ public class ShowNode extends BaseDialog {
      */
     private static String show_guid_stream(TreeNodeContainer cont) {
         StringBuilder sb = new StringBuilder();
-        byte[] bytes = (byte[]) cont.getData();
-
         sb.append("GUID Stream ");
         sb.append(cont.getEntry().getName());
         sb.append("\n\n");
 
-        int count = 0;
-
-        for (int offset = 0; offset < bytes.length; offset += 16, count++) {
-
-            sb.append("INDEX: ");
-            sb.append(String.format("% 2d", count + 3));
-
-            sb.append(" {");
-
-            StringBuilder sb_prop_set = new StringBuilder();
-
-            int voffset = offset;
-            for (int i = voffset + 3; i >= voffset; i--) {
-                sb_prop_set.append(formatByte0S(bytes[i]));
-            }
-
-            sb_prop_set.append("-");
-
-            voffset = offset + 4;
-            for (int i = voffset + 1; i >= voffset; i--) {
-                sb_prop_set.append(formatByte0S(bytes[i]));
-            }
-
-            sb_prop_set.append("-");
-
-            voffset = offset + 6;
-            for (int i = voffset + 1; i >= voffset; i--) {
-                sb_prop_set.append(formatByte0S(bytes[i]));
-            }
-
-            sb_prop_set.append("-");
-
-            voffset = offset + 8;
-            for (int i = voffset; i < voffset + 2; i++) {
-                sb_prop_set.append(formatByte0S(bytes[i]));
-            }
-
-            sb_prop_set.append("-");
-
-            voffset = offset + 10;
-            for (int i = voffset; i < voffset + 6; i++) {
-                sb_prop_set.append(formatByte0S(bytes[i]));
-            }
-
-            sb.append(sb_prop_set);
-            sb.append("} ");
-            sb.append(getPropertySetById(sb_prop_set.toString()));
-
-            sb.append("\n");
+        byte[] bytes = (byte[]) cont.getData();
+        for (int offset = 0, count = 0; offset < bytes.length; offset += 16, count++) {
+            UUID guid = toGUID(bytes, offset);
+            sb.append("INDEX: ").append(String.format("% 2d", count + 3))
+                    .append(" {").append(guid).append("} ")
+                    .append(getPropertySetById(guid))
+                    .append("\n");
         }
 
-
         return sb.toString();
+    }
+
+    private static UUID toGUID(byte[] bytes, int offset) {
+        ByteBuffer byteBuffer = ByteBuffer.wrap(bytes, offset, 16).order(ByteOrder.LITTLE_ENDIAN);
+        long high = byteBuffer.getInt();
+        long mid = byteBuffer.getShort();
+        long version = byteBuffer.getShort();
+        byteBuffer.order(ByteOrder.BIG_ENDIAN);
+        long low = byteBuffer.getLong();
+        return new UUID(high << 32 | mid << 16 | version, low);
     }
 
     /**
      * [MS-OXPROPS] 1.3.2
      */
-    private static String getPropertySetById(String id) {
+    private static String getPropertySetById(UUID id) {
         return PROPERTY_SETS.getOrDefault(id, "");
     }
 
