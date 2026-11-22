@@ -3,6 +3,7 @@ package com.auxilii.msgparser;
 import org.apache.poi.poifs.filesystem.DirectoryEntry;
 import org.apache.poi.poifs.filesystem.DocumentEntry;
 import org.apache.poi.poifs.filesystem.DocumentInputStream;
+import org.apache.poi.util.LittleEndianInput;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -136,7 +137,7 @@ public enum Ptyp {
         }
     }
 
-    private static LocalDateTime toFloatingTime(DocumentInputStream s) {
+    private static LocalDateTime toFloatingTime(LittleEndianInput s) {
         double x = s.readDouble();
         long days = (long) x;
         double decimal = x - days;
@@ -144,11 +145,11 @@ public enum Ptyp {
         return FLOATING_TIME_EPOCH.plusDays(days).plusNanos(nanos);
     }
 
-    private static LocalDateTime toTime(DocumentInputStream x) {
+    private static LocalDateTime toTime(LittleEndianInput x) {
         return TIME_EPOCH.plus(x.readLong() / 10, ChronoUnit.MICROS);
     }
 
-    private static int[] toBinaryLengths(DocumentInputStream subStream) {
+    private static int[] toBinaryLengths(LittleEndianInput subStream) {
         int[] lengths = new int[subStream.available() / 8];
         for (int i = 0; i < lengths.length; i++) {
             lengths[i] = subStream.readInt();
@@ -157,7 +158,7 @@ public enum Ptyp {
         return lengths;
     }
 
-    private static int[] toStringLengths(DocumentInputStream subStream) {
+    private static int[] toStringLengths(LittleEndianInput subStream) {
         int[] lengths = new int[subStream.available() / 4];
         for (int i = 0; i < lengths.length; i++) {
             lengths[i] = subStream.readInt();
