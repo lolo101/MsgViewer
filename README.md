@@ -8,6 +8,12 @@ This project is a fork of <https://sourceforge.net/projects/msgviewer>
 
 It has been Mavenized, and support for .eml to .msg has been added.
 
+## Support
+
+You may support the maintenance effort here ♥️
+
+[![Buy me AI tokens](https://buymeatokens.com/api/badge/lolo101)](https://buymeatokens.com/lolo101)
+
 ## Technical instructions
 
 ### Build
